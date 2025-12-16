@@ -3,110 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compteur DoV</title>
+    <title>DoV - Liste des Assets</title>
     <style>
-        /* Design simple et propre */
-        body { font-family: sans-serif; background-color: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 400px; }
-        h1 { margin-top: 0; color: #333; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 5px; width: 65%; font-size: 16px; margin-bottom: 10px; }
-        button { padding: 12px 20px; background-color: #2c3e50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #34495e; }
-        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
-        .result-box { margin-top: 20px; padding: 20px; background: #e8f6f3; border-radius: 8px; color: #1abc9c; }
-        .count { font-size: 50px; font-weight: bold; line-height: 1; }
-        .status { margin-top: 10px; font-size: 14px; color: #7f8c8d; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-top: 0; }
+        
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button { padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:disabled { background-color: #bdc3c7; }
+        button:hover:not(:disabled) { background-color: #2980b9; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .stat-label { font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
+
+        .status-bar { margin-bottom: 15px; font-style: italic; color: #7f8c8d; text-align: center; min-height: 20px; }
+
+        .asset-list { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid #eee; 
+            border-radius: 8px; 
+            padding: 10px; 
+            background: #fafafa;
+        }
+        .asset-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px; 
+            border-bottom: 1px solid #eee; 
+            font-size: 14px; 
+        }
+        .asset-item:last-child { border-bottom: none; }
+        .asset-link { color: #e67e22; text-decoration: none; font-weight: bold; }
+        .asset-link:hover { text-decoration: underline; }
+        .division-tag { background: #ddd; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Divisions DoV</h1>
-    <p>Entrez un compte pour compter ses divisions.</p>
+<div class="container">
+    <h1>Inspecteur DoV</h1>
     
-    <input type="text" id="accountName" placeholder="Ex: tonnom.wam" />
-    <button id="btnAction" onclick="lancerCompteur()">Compter</button>
+    <div class="input-group">
+        <input type="text" id="accountInput" placeholder="Nom du compte (ex: ami.wam)">
+        <button id="btnScan" onclick="scanAssets()">Scanner</button>
+    </div>
 
-    <div class="result-box">
-        <div class="count" id="displayCount">0</div>
-        <div class="status" id="statusMsg">En attente...</div>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-val" id="divCount">0</div>
+            <div class="stat-label">Divisions</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="assetCount">0</div>
+            <div class="stat-label">Cartes (Assets)</div>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusMsg">Prêt à scanner</div>
+
+    <h3 style="margin-bottom: 10px;">Liste des Assets Stakés</h3>
+    <div class="asset-list" id="listContainer">
+        <div style="text-align:center; color:#ccc; padding: 20px;">Les résultats apparaîtront ici...</div>
     </div>
 </div>
 
 <script>
-    // Configuration WAX
     const RPC_URL = "https://wax.greymass.com/v1/chain/get_table_rows";
     const CONTRACT = "dovpvecontrl";
-    const TABLE = "sdivisions";
 
-    async function lancerCompteur() {
-        // 1. Récupérer le nom
-        const account = document.getElementById('accountName').value.trim().toLowerCase();
-        const display = document.getElementById('displayCount');
+    async function scanAssets() {
+        const account = document.getElementById('accountInput').value.trim().toLowerCase();
+        const btn = document.getElementById('btnScan');
         const status = document.getElementById('statusMsg');
-        const btn = document.getElementById('btnAction');
+        const listDiv = document.getElementById('listContainer');
+        const divCountDisplay = document.getElementById('divCount');
+        const assetCountDisplay = document.getElementById('assetCount');
 
-        if (!account) { alert("Mets un nom de compte !"); return; }
+        if (!account) return alert("Nom de compte requis !");
 
-        // 2. Préparer l'interface
+        // Reset
         btn.disabled = true;
-        btn.innerText = "Calcul...";
-        status.innerText = "Chargement des données...";
-        display.innerText = "0";
+        listDiv.innerHTML = ""; 
+        status.innerText = "Initialisation...";
+        divCountDisplay.innerText = "0";
+        assetCountDisplay.innerText = "0";
 
-        let total = 0;
+        let allDivisions = [];
+        let totalAssets = 0;
         let more = true;
-        let nextKey = ""; // Pour la pagination
+        let nextKey = "";
 
         try {
-            // 3. Boucle tant qu'il y a des résultats (pour gérer les +1000)
+            // --- 1. RÉCUPÉRATION (BOUCLE) ---
             while (more) {
-                // Requête directe à la blockchain (pas besoin de plugin)
-                const response = await fetch(RPC_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        json: true,
-                        code: CONTRACT,
-                        scope: CONTRACT,
-                        table: TABLE,
-                        index_position: 2,     // Trie par USER
-                        key_type: 'i64',       // Format de clé standard
-                        lower_bound: nextKey || account, // Commence au compte
-                        upper_bound: account,  // S'arrête APRES le compte (filtre)
-                        limit: 1000            // Maximum autorisé par WAX
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!data.rows) throw new Error("Erreur API WAX");
-
-                // Filtrage de sécurité (garder uniquement les lignes du user)
-                const mesDivisions = data.rows.filter(r => r.user === account);
-                total += mesDivisions.length;
-
-                // Mise à jour visuelle immédiate
-                display.innerText = total;
-                status.innerText = `Analyse en cours... (${total} trouvées)`;
-
-                // Vérifier s'il y a une page suivante
-                more = data.more;
-                if (more && data.next_key) {
-                    nextKey = data.next_key;
-                }
-            }
-
-            status.innerText = "Calcul terminé avec succès.";
-            
-        } catch (error) {
-            console.error(error);
-            status.innerText = "Erreur : " + error.message;
-        }
-
-        btn.disabled = false;
-        btn.innerText = "Compter";
-    }
-</script>
-
-</body>
-</html>
+                status.innerText = `Récupération en cours... (${allDiv
