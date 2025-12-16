@@ -3,133 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoV - DIAGNOSTIC</title>
+    <title>DoV - Liste Finale</title>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: monospace; padding: 20px; }
-        .box { border: 2px solid #333; padding: 20px; max-width: 800px; margin: 0 auto; background: #1e1e1e; }
-        h1 { color: #bb86fc; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; width: 100%; max-width: 700px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
         
         .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        input { padding: 10px; background: #333; border: 1px solid #555; color: white; width: 60%; }
-        button { padding: 10px 20px; background: #03dac6; border: none; color: black; font-weight: bold; cursor: pointer; }
-        button:hover { background: #018786; }
+        input { padding: 12px; width: 60%; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { padding: 12px 20px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #2ecc71; }
+        button:disabled { background-color: #bdc3c7; }
 
-        #console { 
-            background: black; 
-            border: 1px solid #444; 
-            height: 400px; 
-            overflow-y: auto; 
-            padding: 10px; 
-            font-size: 13px;
-            white-space: pre-wrap; 
-        }
+        .stats { display: flex; justify-content: space-around; background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .stat-box { text-align: center; }
+        .stat-num { font-size: 24px; font-weight: bold; color: #2c3e50; }
 
-        .log-info { color: #888; }
-        .log-success { color: #4caf50; font-weight: bold; }
-        .log-error { color: #ff5252; font-weight: bold; border-left: 3px solid #ff5252; padding-left: 5px; }
-        .log-data { color: #4fc3f7; }
+        .log { background: #333; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; margin-bottom: 20px; border-radius: 5px; min-height: 40px; }
+        
+        .asset-list { max-height: 500px; overflow-y: auto; border-top: 1px solid #eee; }
+        .item { padding: 10px; border-bottom: 1px solid #f1f1f1; display: flex; justify-content: space-between; align-items: center; }
+        .item:hover { background-color: #fafafa; }
+        .item a { text-decoration: none; color: #3498db; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h1>MODE DIAGNOSTIC</h1>
-    <p style="text-align:center">Si ça ne marche pas, lisez le texte ci-dessous.</p>
+<div class="container">
+    <h1>Inspecteur DoV</h1>
     
     <div class="input-group">
-        <input type="text" id="userInput" placeholder="Nom du compte (ex: tonami.wam)">
-        <button onclick="lancerTest()">LANCER LE TEST</button>
+        <input type="text" id="userInput" placeholder="Compte WAX (ex: u2d2k.c.wam)" value="u2d2k.c.wam">
+        <button id="btn" onclick="lancerScan()">VOIR MES CARTES</button>
     </div>
 
-    <div id="console">En attente...</div>
+    <div class="log" id="logBox">Prêt. Cliquez sur le bouton.</div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-num" id="divCount">0</div>
+            <div>Divisions</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num" id="assetCount">0</div>
+            <div>Cartes (Assets)</div>
+        </div>
+    </div>
+
+    <div class="asset-list" id="resultList"></div>
 </div>
 
 <script>
-    // On utilise un serveur souvent plus permissif pour les navigateurs
-    const RPC_URL = "https://api.waxsweden.org/v1/chain/get_table_rows";
+    // On garde le serveur qui a fonctionné pour toi (waxsweden)
+    const RPC = "https://api.waxsweden.org/v1/chain/get_table_rows";
 
-    function log(msg, type = "info") {
-        const c = document.getElementById('console');
-        const time = new Date().toLocaleTimeString();
-        c.innerHTML += `<div class="log-${type}">[${time}] ${msg}</div>`;
-        c.scrollTop = c.scrollHeight;
-    }
-
-    async function lancerTest() {
+    async function lancerScan() {
         const account = document.getElementById('userInput').value.trim().toLowerCase();
-        document.getElementById('console').innerHTML = ""; // Reset
+        const logBox = document.getElementById('logBox');
+        const list = document.getElementById('resultList');
+        const btn = document.getElementById('btn');
+
+        if(!account) return alert("Nom manquant");
+
+        // Reset
+        btn.disabled = true;
+        list.innerHTML = "";
+        document.getElementById('divCount').innerText = "0";
+        document.getElementById('assetCount').innerText = "0";
         
-        if (!account) return alert("Mets un nom !");
+        logBox.innerText = `Recherche des divisions pour ${account}...`;
 
-        log("1. Démarrage du test...", "info");
-        log(`2. Cible : ${account}`, "info");
-        log(`3. Serveur visé : ${RPC_URL}`, "info");
-
-        // Configuration de la demande
-        const payload = {
-            json: true,
-            code: "dovpvecontrl",
-            scope: "dovpvecontrl",
-            table: "sdivisions",
-            index_position: 2,     // Recherche par USER
-            key_type: "i64",       // ESSAI STANDARD D'ABORD
-            lower_bound: account,
-            upper_bound: account,
-            limit: 50
-        };
+        let allDivisions = [];
+        let more = true;
+        let nextKey = "";
 
         try {
-            log("4. Envoi de la requête internet...", "info");
-            
-            const response = await fetch(RPC_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-
-            log(`5. Réponse reçue ! Code: ${response.status}`, response.ok ? "success" : "error");
-
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status} (${response.statusText})`);
-            }
-
-            const data = await response.json();
-            log("6. Données décodées.", "success");
-
-            if (!data.rows) {
-                log("ERREUR : Le serveur a répondu mais sans données (pas de 'rows').", "error");
-                return;
-            }
-
-            // Filtrage manuel pour être sûr
-            const myRows = data.rows.filter(r => r.user === account);
-
-            log(`7. Résultats bruts reçus : ${data.rows.length}`, "data");
-            log(`8. Résultats après filtre '${account}' : ${myRows.length}`, "success");
-
-            if (myRows.length === 0) {
-                log("--- DIAGNOSTIC ---", "info");
-                log("La connexion fonctionne (c'est une bonne nouvelle).", "success");
-                log("Mais aucune division n'a été trouvée pour ce nom EXACT.", "error");
-                log("Causes possibles :", "info");
-                log("- Le compte n'a pas de divisions stakées actuellement.", "info");
-                log("- Le jeu a changé de table (peu probable).", "info");
-            } else {
-                log("!!! SUCCÈS !!!", "success");
-                myRows.forEach(div => {
-                    log(`> Division #${div.division_id} contient ${div.asset_ids.length} cartes.`, "data");
+            while(more) {
+                // LA CORRECTION EST ICI : key_type: "name"
+                const response = await fetch(RPC, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true,
+                        code: "dovpvecontrl",
+                        scope: "dovpvecontrl",
+                        table: "sdivisions",
+                        index_position: 2,     // Index Utilisateur
+                        key_type: "name",      // <--- C'EST CA QUI MANQUAIT !
+                        lower_bound: nextKey || account,
+                        upper_bound: account,
+                        limit: 200
+                    })
                 });
+
+                if(!response.ok) throw new Error("Erreur réseau WAX");
+
+                const data = await response.json();
+                
+                // Filtrage strict
+                const rows = data.rows.filter(r => r.user === account);
+                allDivisions = [...allDivisions, ...rows];
+
+                logBox.innerText = `Trouvé ${allDivisions.length} divisions... (Chargement suite...)`;
+
+                more = data.more;
+                if(more && data.next_key) {
+                    nextKey = data.next_key;
+                } else {
+                    more = false; // Sécurité anti-boucle infinie si next_key bug
+                }
+            }
+
+            // Affichage final
+            if(allDivisions.length === 0) {
+                logBox.innerText = "Aucune division trouvée. (Vérifie qu'elles sont bien stakées)";
+                logBox.style.color = "orange";
+            } else {
+                logBox.innerText = "Chargement terminé avec succès !";
+                logBox.style.color = "#0f0";
+                afficherResultats(allDivisions);
             }
 
         } catch (e) {
-            log("--- ÉCHEC CRITIQUE ---", "error");
-            log(e.message, "error");
-            
-            if (e.message.includes("Failed to fetch")) {
-                log("EXPLICATION : C'est une erreur de sécurité (CORS).", "info");
-                log("Ton navigateur empêche le site GitHub de parler à WAX.", "info");
-                log("Solution : Essaie sur un autre navigateur ou sur mobile en 4G.", "info");
-            }
+            logBox.innerText = "Erreur: " + e.message;
+            logBox.style.color = "red";
         }
+        
+        btn.disabled = false;
+    }
+
+    function afficherResultats(divisions) {
+        const list = document.getElementById('resultList');
+        let totalAssets = 0;
+        let html = "";
+
+        divisions.forEach(div => {
+            if(div.asset_ids && div.asset_ids.length > 0) {
+                totalAssets += div.asset_ids.length;
+                div.asset_ids.forEach(id => {
+                    html += `
+                        <div class="item">
+                            <div>
+                                <strong>Asset ${id}</strong> 
+                                <span style="font-size:12px; color:#888; margin-left:10px">(Div #${div.division_id})</span>
+                            </div>
+                            <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank">Voir sur AtomicHub →</a>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        document.getElementById('divCount').innerText = divisions.length;
+        document.getElementById('assetCount').innerText = totalAssets;
+        list.innerHTML = html;
     }
 </script>
 
