@@ -3,199 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoV - Scan Ultimate</title>
+    <title>DoV - Debug Mode</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #333; margin-top: 0; }
-        input { width: 60%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
-        button { width: 30%; padding: 10px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:disabled { background-color: #ccc; }
+        body { font-family: monospace; background-color: #222; color: #ddd; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #333; padding: 20px; border: 1px solid #555; }
+        h1 { color: #fff; margin-top: 0; }
         
-        .status-box { margin: 15px 0; padding: 10px; background: #eef; border-radius: 5px; font-size: 14px; color: #333; min-height: 20px; word-wrap: break-word; }
-        .error { color: red; font-weight: bold; }
-        
-        .stats-grid { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; }
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 20px; font-weight: bold; color: #2c3e50; }
-        
-        .asset-list { margin-top: 20px; max-height: 500px; overflow-y: auto; border-top: 2px solid #eee; }
-        .item { padding: 10px; border-bottom: 1px solid #f1f1f1; display: flex; justify-content: space-between; align-items: center; }
-        .item a { text-decoration: none; color: #2980b9; font-weight: bold; }
-        .badge { background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        input { padding: 10px; width: 60%; background: #000; color: #0f0; border: 1px solid #555; font-family: monospace; }
+        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #555; cursor: wait; }
+
+        .console-log {
+            background: black;
+            color: #0f0;
+            padding: 15px;
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #0f0;
+            margin-top: 20px;
+            font-size: 13px;
+            white-space: pre-wrap; /* Garde les sauts de ligne */
+        }
+
+        .error-msg { color: #ff3333; font-weight: bold; }
+        .success-msg { color: #33ff33; font-weight: bold; }
+        .info-msg { color: #ffff33; }
+
+        .asset-link { color: #00bfff; text-decoration: none; display: block; margin: 2px 0; }
+        .asset-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Scanner DoV (Multi-RPC)</h1>
-    <div style="display:flex; gap:10px; justify-content:center;">
-        <input type="text" id="accountInput" placeholder="Nom du compte (ex: tonnom.wam)">
-        <button id="btnScan" onclick="startScan()">Scanner</button>
+    <h1>CONSOLE DE DÉBUG DOV</h1>
+    <p>Si ça ne marche pas, regarde la boîte noire ci-dessous.</p>
+    
+    <div>
+        <input type="text" id="acc" placeholder="Nom du compte (ex: tonnom.wam)">
+        <button id="btn" onclick="runDebug()">LANCER LE TEST</button>
     </div>
 
-    <div class="status-box" id="statusLog">Prêt.</div>
-
-    <div class="stats-grid">
-        <div class="stat-item">
-            <div class="stat-val" id="countDiv">0</div>
-            <div>Divisions</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-val" id="countAsset">0</div>
-            <div>Cartes</div>
-        </div>
-    </div>
-
-    <div class="asset-list" id="resultList"></div>
+    <div class="console-log" id="logs"> > En attente de l'utilisateur...</div>
 </div>
 
 <script>
-    // LISTE COMPLÈTE DES NOEUDS RPC WAX
-    // Le script va essayer le premier, si échec -> le deuxième, etc.
-    const ENDPOINTS = [
-        "https://wax.greymass.com",
-        "https://wax.eosn.io",
-        "https://api.wax.alohaeos.com",
-        "https://wax.pink.gg",
-        "https://wax.dapplica.io",
-        "https://api.waxsweden.org",
-        "https://wax.eosphere.io",
-        "https://api.wax.liquidstudios.io",
-        "https://wax-bp.wizardsguild.one",
-        "https://api-wax.eosarabia.net",
-        "https://wax.eu.eosamsterdam.net",
-        "https://wax.cryptolions.io"
-    ];
+    // On utilise un seul nœud très permissif pour commencer
+    const RPC = "https://wax.greymass.com/v1/chain/get_table_rows";
 
-    async function startScan() {
-        const account = document.getElementById('accountInput').value.trim().toLowerCase();
-        const log = document.getElementById('statusLog');
-        const list = document.getElementById('resultList');
-        const btn = document.getElementById('btnScan');
+    function log(msg, type = "") {
+        const consoleBox = document.getElementById('logs');
+        const time = new Date().toLocaleTimeString();
+        let colorClass = "";
+        if(type === "error") colorClass = "error-msg";
+        if(type === "success") colorClass = "success-msg";
+        if(type === "info") colorClass = "info-msg";
 
-        if (!account) return alert("Mets un nom de compte !");
-
-        // Reset
-        btn.disabled = true;
-        list.innerHTML = "";
-        document.getElementById('countDiv').innerText = "0";
-        document.getElementById('countAsset').innerText = "0";
-        log.className = "status-box";
-        log.innerText = "Recherche d'un serveur rapide...";
-
-        let allRows = [];
-        let endpointIndex = 0;
-        let success = false;
-
-        // Boucle de tentative de connexion (Failover)
-        while (!success && endpointIndex < ENDPOINTS.length) {
-            const currentUrl = ENDPOINTS[endpointIndex];
-            const url = currentUrl + "/v1/chain/get_table_rows";
-            
-            log.innerText = `Connexion au serveur ${endpointIndex + 1}/${ENDPOINTS.length}...`;
-            
-            try {
-                // On tente de récupérer les données
-                allRows = await fetchAllDivisions(url, account, log);
-                success = true; // Victoire !
-                log.innerText = `Connecté avec succès sur ${currentUrl}`;
-            } catch (e) {
-                console.warn(`Échec sur ${currentUrl}:`, e);
-                endpointIndex++; // On passe au suivant
-                if (endpointIndex >= ENDPOINTS.length) {
-                    log.innerHTML = `<span class="error">Impossible de se connecter. Tous les serveurs ont échoué. Vérifie ta connexion internet.</span>`;
-                    btn.disabled = false;
-                    return; // Arrêt total
-                }
-            }
-        }
-
-        // Affichage des résultats
-        log.innerText = "Affichage des données...";
-        renderResults(allRows);
-        
-        if (allRows.length > 0) {
-            log.innerText = "Scan terminé avec succès !";
-        } else {
-            log.innerText = "Scan terminé : Aucune division trouvée sur ce compte.";
-        }
-        btn.disabled = false;
+        consoleBox.innerHTML += `<div class="${colorClass}">[${time}] ${msg}</div>`;
+        consoleBox.scrollTop = consoleBox.scrollHeight; // Scroll automatique vers le bas
     }
 
-    // Fonction de récupération avec pagination
-    async function fetchAllDivisions(rpcUrl, account, logDiv) {
-        let rows = [];
-        let more = true;
-        let nextKey = "";
+    async function runDebug() {
+        const account = document.getElementById('acc').value.trim().toLowerCase();
+        const btn = document.getElementById('btn');
+        
+        if (!account) { log("ERREUR: Tu n'as pas mis de nom de compte !", "error"); return; }
 
-        // Timeout pour ne pas attendre un serveur mort pendant 10 ans
-        const fetchWithTimeout = (url, options, timeout = 5000) => {
-            return Promise.race([
-                fetch(url, options),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
-            ]);
-        };
+        btn.disabled = true;
+        document.getElementById('logs').innerHTML = " > Démarrage du script...\n"; // Reset
+        
+        log(`Compte ciblé : ${account}`);
+        log(`Tentative de connexion à : ${RPC}`);
 
-        while (more) {
-            const res = await fetchWithTimeout(rpcUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({
-                    json: true,
-                    code: 'dovpvecontrl',
-                    scope: 'dovpvecontrl',
-                    table: 'sdivisions',
-                    index_position: 2,
-                    key_type: 'i64',
-                    lower_bound: nextKey || account,
-                    upper_bound: account,
-                    limit: 1000
-                })
+        try {
+            // Étape 1 : Création de la requête
+            const payload = {
+                json: true,
+                code: "dovpvecontrl",
+                scope: "dovpvecontrl",
+                table: "sdivisions",
+                index_position: 2,
+                key_type: "i64",
+                lower_bound: account,
+                upper_bound: account,
+                limit: 100
+            };
+
+            log("Envoi de la requête réseau...", "info");
+
+            // Étape 2 : L'appel réseau (Fetch)
+            const response = await fetch(RPC, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain" // Astuce pour éviter le blocage CORS OPTIONS
+                },
+                body: JSON.stringify(payload)
             });
 
-            if (!res.ok) throw new Error(`Erreur serveur HTTP ${res.status}`);
-            
-            const data = await res.json();
-            
-            // Filtre de sécurité
-            const myRows = data.rows.filter(r => r.user === account);
-            rows = [...rows, ...myRows];
+            log(`Réponse serveur reçue. Code: ${response.status}`);
 
-            logDiv.innerText = `Chargement... ${rows.length} divisions récupérées`;
-
-            more = data.more;
-            if (more && data.next_key) nextKey = data.next_key;
-        }
-        return rows;
-    }
-
-    function renderResults(divisions) {
-        const list = document.getElementById('resultList');
-        let assetCount = 0;
-        let html = "";
-
-        divisions.forEach(div => {
-            if (div.asset_ids && div.asset_ids.length > 0) {
-                assetCount += div.asset_ids.length;
-                
-                div.asset_ids.forEach(id => {
-                    html += `
-                        <div class="item">
-                            <div>
-                                <span class="badge">Div #${div.division_id}</span>
-                                <span style="margin-left:10px; font-family:monospace">ID: ${id}</span>
-                            </div>
-                            <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank">Voir Carte →</a>
-                        </div>
-                    `;
-                });
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP : ${response.status} ${response.statusText}`);
             }
-        });
 
-        document.getElementById('countDiv').innerText = divisions.length;
-        document.getElementById('countAsset').innerText = assetCount;
-        list.innerHTML = html;
+            // Étape 3 : Lecture des données
+            const data = await response.json();
+            log("Données JSON décodées.", "success");
+
+            if (!data.rows) {
+                log("ERREUR: Le serveur n'a pas renvoyé de lignes (rows).", "error");
+                console.log(data); // Pour le vrai débugger navigateur
+                btn.disabled = false;
+                return;
+            }
+
+            // Étape 4 : Filtrage
+            const myDivisions = data.rows.filter(r => r.user === account);
+            log(`Trouvé ${data.rows.length} résultats bruts.`);
+            log(`Après filtre "${account}": ${myDivisions.length} divisions trouvées.`, "success");
+
+            if (myDivisions.length === 0) {
+                log("ATTENTION: 0 division trouvée. Es-tu sûr que ce compte a des unités STAKÉES ?", "info");
+                log("Si elles sont dans ton inventaire AtomicHub, elles n'apparaissent pas ici.");
+            }
+
+            // Étape 5 : Affichage des assets
+            let assetCount = 0;
+            myDivisions.forEach(div => {
+                if(div.asset_ids && div.asset_ids.length > 0) {
+                    div.asset_ids.forEach(id => {
+                        assetCount++;
+                        log(`Asset trouvé: ${id} (Div #${div.division_id})`);
+                        // Ajout lien cliquable
+                        document.getElementById('logs').innerHTML += 
+                            `<a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" class="asset-link">   -> Voir l'asset ${id}</a>`;
+                    });
+                }
+            });
+
+            log(`FINI. Total assets affichés : ${assetCount}`, "success");
+
+        } catch (error) {
+            log("--- CRASH DU SCRIPT ---", "error");
+            log(error.message, "error");
+            log("Si l'erreur est 'Failed to fetch', c'est que ton réseau ou le navigateur bloque l'accès à WAX.", "info");
+        }
+
+        btn.disabled = false;
     }
 </script>
 
