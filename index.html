@@ -3,154 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoV - Debug Mode</title>
+    <title>DoV - Lecteur Direct</title>
     <style>
-        body { font-family: monospace; background-color: #222; color: #ddd; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #333; padding: 20px; border: 1px solid #555; }
-        h1 { color: #fff; margin-top: 0; }
+        body { font-family: sans-serif; background: #1a1a1a; color: #fff; padding: 20px; text-align: center; }
+        .container { max-width: 700px; margin: 0 auto; background: #2c2c2c; padding: 20px; border-radius: 10px; }
         
-        input { padding: 10px; width: 60%; background: #000; color: #0f0; border: 1px solid #555; font-family: monospace; }
-        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #555; cursor: wait; }
-
-        .console-log {
-            background: black;
-            color: #0f0;
-            padding: 15px;
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #0f0;
-            margin-top: 20px;
-            font-size: 13px;
-            white-space: pre-wrap; /* Garde les sauts de ligne */
-        }
-
-        .error-msg { color: #ff3333; font-weight: bold; }
-        .success-msg { color: #33ff33; font-weight: bold; }
-        .info-msg { color: #ffff33; }
-
-        .asset-link { color: #00bfff; text-decoration: none; display: block; margin: 2px 0; }
-        .asset-link:hover { text-decoration: underline; }
+        input { padding: 10px; width: 60%; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; background: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #d35400; }
+        
+        #log { margin-top: 20px; text-align: left; background: #000; padding: 10px; font-family: monospace; border: 1px solid #444; min-height: 100px; white-space: pre-wrap; color: #0f0; }
+        
+        .item { background: #333; margin: 5px 0; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .item a { color: #3498db; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>CONSOLE DE DÉBUG DOV</h1>
-    <p>Si ça ne marche pas, regarde la boîte noire ci-dessous.</p>
+    <h2>Lecteur Divisions DoV</h2>
+    <p>Basé sur la table sdivisions / dovpvecontrl</p>
     
     <div>
-        <input type="text" id="acc" placeholder="Nom du compte (ex: tonnom.wam)">
-        <button id="btn" onclick="runDebug()">LANCER LE TEST</button>
+        <input type="text" id="userInput" placeholder="Ton compte WAX (ex: abcde.wam)">
+        <button onclick="lancerRecherche()">VOIR MES ASSETS</button>
     </div>
 
-    <div class="console-log" id="logs"> > En attente de l'utilisateur...</div>
+    <div id="resultats"></div>
+    <div id="log">En attente...</div>
 </div>
 
 <script>
-    // On utilise un seul nœud très permissif pour commencer
+    // Configuration EXACTE du lien Bloks.io
     const RPC = "https://wax.greymass.com/v1/chain/get_table_rows";
+    const CONTRACT = "dovpvecontrl";
+    const SCOPE = "dovpvecontrl";
+    const TABLE = "sdivisions";
 
-    function log(msg, type = "") {
-        const consoleBox = document.getElementById('logs');
-        const time = new Date().toLocaleTimeString();
-        let colorClass = "";
-        if(type === "error") colorClass = "error-msg";
-        if(type === "success") colorClass = "success-msg";
-        if(type === "info") colorClass = "info-msg";
-
-        consoleBox.innerHTML += `<div class="${colorClass}">[${time}] ${msg}</div>`;
-        consoleBox.scrollTop = consoleBox.scrollHeight; // Scroll automatique vers le bas
+    function log(msg) {
+        const div = document.getElementById('log');
+        div.innerText = msg + "\n" + div.innerText;
     }
 
-    async function runDebug() {
-        const account = document.getElementById('acc').value.trim().toLowerCase();
-        const btn = document.getElementById('btn');
+    async function lancerRecherche() {
+        const account = document.getElementById('userInput').value.trim().toLowerCase();
+        const resDiv = document.getElementById('resultats');
         
-        if (!account) { log("ERREUR: Tu n'as pas mis de nom de compte !", "error"); return; }
-
-        btn.disabled = true;
-        document.getElementById('logs').innerHTML = " > Démarrage du script...\n"; // Reset
+        if(!account) return alert("Mets un compte !");
         
-        log(`Compte ciblé : ${account}`);
-        log(`Tentative de connexion à : ${RPC}`);
+        resDiv.innerHTML = "";
+        log("--- Nouvelle recherche ---");
+        log(`Cible : ${account}`);
 
         try {
-            // Étape 1 : Création de la requête
-            const payload = {
+            // C'est ICI que la correction est faite (key_type: 'name')
+            const params = {
                 json: true,
-                code: "dovpvecontrl",
-                scope: "dovpvecontrl",
-                table: "sdivisions",
-                index_position: 2,
-                key_type: "i64",
-                lower_bound: account,
-                upper_bound: account,
-                limit: 100
+                code: CONTRACT,
+                scope: SCOPE,
+                table: TABLE,
+                index_position: 2,     // On cherche par User (Index Secondaire)
+                key_type: "name",      // CORRECTION: C'est un 'name', pas un 'i64'
+                lower_bound: account,  // On commence à ce nom
+                upper_bound: account,  // On s'arrête après ce nom
+                limit: 1000
             };
 
-            log("Envoi de la requête réseau...", "info");
+            log("Envoi demande à la Blockchain...");
 
-            // Étape 2 : L'appel réseau (Fetch)
             const response = await fetch(RPC, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain" // Astuce pour éviter le blocage CORS OPTIONS
-                },
-                body: JSON.stringify(payload)
+                method: 'POST',
+                body: JSON.stringify(params)
             });
 
-            log(`Réponse serveur reçue. Code: ${response.status}`);
+            if (!response.ok) throw new Error("Erreur serveur: " + response.status);
 
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP : ${response.status} ${response.statusText}`);
-            }
-
-            // Étape 3 : Lecture des données
             const data = await response.json();
-            log("Données JSON décodées.", "success");
-
+            
             if (!data.rows) {
-                log("ERREUR: Le serveur n'a pas renvoyé de lignes (rows).", "error");
-                console.log(data); // Pour le vrai débugger navigateur
-                btn.disabled = false;
+                log("Réponse reçue mais vide.");
                 return;
             }
 
-            // Étape 4 : Filtrage
-            const myDivisions = data.rows.filter(r => r.user === account);
-            log(`Trouvé ${data.rows.length} résultats bruts.`);
-            log(`Après filtre "${account}": ${myDivisions.length} divisions trouvées.`, "success");
+            // Filtrage final pour être sûr à 100%
+            const mesDivisions = data.rows.filter(r => r.user === account);
+            
+            log(`Trouvé ${mesDivisions.length} divisions.`);
 
-            if (myDivisions.length === 0) {
-                log("ATTENTION: 0 division trouvée. Es-tu sûr que ce compte a des unités STAKÉES ?", "info");
-                log("Si elles sont dans ton inventaire AtomicHub, elles n'apparaissent pas ici.");
+            if (mesDivisions.length === 0) {
+                log("Aucune division trouvée. Vérifie l'orthographe ou si elles sont bien stakées.");
             }
 
-            // Étape 5 : Affichage des assets
+            // Affichage
+            let html = "";
             let assetCount = 0;
-            myDivisions.forEach(div => {
-                if(div.asset_ids && div.asset_ids.length > 0) {
+
+            mesDivisions.forEach(div => {
+                if (div.asset_ids && div.asset_ids.length > 0) {
                     div.asset_ids.forEach(id => {
                         assetCount++;
-                        log(`Asset trouvé: ${id} (Div #${div.division_id})`);
-                        // Ajout lien cliquable
-                        document.getElementById('logs').innerHTML += 
-                            `<a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" class="asset-link">   -> Voir l'asset ${id}</a>`;
+                        html += `
+                            <div class="item">
+                                <span>Division #${div.division_id} - Asset <strong>${id}</strong></span>
+                                <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank">Voir Carte →</a>
+                            </div>
+                        `;
                     });
                 }
             });
 
-            log(`FINI. Total assets affichés : ${assetCount}`, "success");
+            resDiv.innerHTML = `<h3 style='color:#e67e22'>Total Cartes: ${assetCount}</h3>` + html;
+            log("Affichage terminé.");
 
-        } catch (error) {
-            log("--- CRASH DU SCRIPT ---", "error");
-            log(error.message, "error");
-            log("Si l'erreur est 'Failed to fetch', c'est que ton réseau ou le navigateur bloque l'accès à WAX.", "info");
+        } catch (e) {
+            log("ERREUR CRITIQUE : " + e.message);
         }
-
-        btn.disabled = false;
     }
 </script>
 
