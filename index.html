@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V43 (PERFECT ALIGN)</title>
+    <title>DoV - COMMAND V44 (ZONE ANALYST)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -65,7 +65,7 @@
         .db-val { font-size: 16px; font-weight: bold; color: #fff; }
         .db-usd { font-size: 11px; color: var(--money); text-align: right; }
 
-        /* RATIO BAR V43 */
+        /* RATIO BAR */
         .balance-container { background:#111; padding:15px; border:1px solid #333; margin-bottom:20px; }
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
@@ -88,16 +88,20 @@
         .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
         .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
 
+        /* V44 : ZONES UPGRADED */
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
-        .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 120px; opacity: 0.7; display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.3s; }
+        .zone.active { opacity: 1; border-color: #555; background: #111; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
-        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
-        .z-row { display: flex; justify-content: space-between; }
-        .z-earn { color: var(--main); font-weight: bold; }
-        .z-burn { color: var(--alert); }
-        .z-burn-x { color: var(--dovx); font-weight: bold; }
-        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
+        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 2px; }
+        .z-row { display: flex; justify-content: space-between; align-items: center; }
+        
+        .z-finance { border-top: 1px solid #222; margin-top: 5px; padding-top: 5px; font-size: 10px; }
+        .z-fin-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .z-fin-val { font-weight: bold; }
+        
+        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 5px; color: #666; }
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; }
         .z-act-ready { background: var(--main); height: 100%; }
@@ -120,7 +124,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V43 PERFECT ALIGN</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V44 ZONE ANALYST</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -249,7 +253,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V43 Aligned. Interface cohérente (Rouge/Gauche vs Vert/Droite).</div>
+<div class="logs" id="console">> V44 Zone Analyst. Cartes enrichies avec ROI $.</div>
 
 <script>
     // --- DEFAULT CONFIG ---
@@ -302,6 +306,7 @@
         RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0;
         RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0;
         if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay();
+        if(document.getElementById('zoneView').classList.contains('view-active')) refreshZoneValues();
         log("Taux mis à jour.", "#ffd700");
     }
 
@@ -328,7 +333,10 @@
         throw new Error("Réseau saturé.");
     }
 
-    // --- 1. SCAN ZONES (MAP) ---
+    // --- 1. SCAN ZONES (MAP V44) ---
+    // STOCKAGE TEMPORAIRE STATS ZONES
+    let ZONE_STATS_CACHE = {}; 
+
     async function startZoneScan() {
         stopSignal = false; switchView('zoneView'); initGrid();
         document.getElementById('btnStop').style.display = 'inline-block';
@@ -356,6 +364,7 @@
                         } else stats.zones[zID].idle++;
                     }
                 }
+                ZONE_STATS_CACHE = stats; // SAVE FOR REFRESH
                 updateZoneDash(stats);
                 if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false;
             }
@@ -363,8 +372,14 @@
         } catch(e) { log("Erreur: "+e.message, "red"); }
     }
 
+    function refreshZoneValues() {
+        if(ZONE_STATS_CACHE.zones) updateZoneDash(ZONE_STATS_CACHE);
+    }
+
     function updateZoneDash(stats) {
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
+        const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+
         setTextSafe('dDivs', fmt(stats.divs));
         setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX");
         setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX");
@@ -375,15 +390,30 @@
         
         ZONE_ORDER.forEach(id => {
             const data = stats.zones[id];
+            const zInfo = ZONE_DB[id];
             const card = document.getElementById(`z-card-${id}`);
             if(card && data) {
                 if(data.count > 0) card.classList.add('active');
-                document.getElementById(`z-count-${id}`).innerText = data.count;
-                document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
-                document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
-                const pctMiss = (data.active / data.count) * 100;
-                document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
-                document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
+                setTextSafe(`z-count-${id}`, data.count);
+                setTextSafe(`z-miss-${id}`, data.active + " Act.");
+                setTextSafe(`z-rdy-${id}`, data.idle + " Rdy");
+                
+                const pctMiss = (data.active / (data.count||1)) * 100;
+                let bm = document.getElementById(`z-bm-${id}`); if(bm) bm.style.width = pctMiss + "%";
+                let br = document.getElementById(`z-br-${id}`); if(br) br.style.width = (100 - pctMiss) + "%";
+
+                // V44 : FINANCIAL DETAILS
+                let burnUSD = 0;
+                if(zInfo.cost > 0) {
+                    // Cost * 4 Res * Price * Active Divs
+                    burnUSD = (zInfo.cost * 4 * RATES.TU_WAX * RATES.WAX_USD) * data.active;
+                } else if(zInfo.costX > 0) {
+                    burnUSD = (zInfo.costX * RATES.DOVX_WAX * RATES.WAX_USD) * data.active;
+                }
+                let winUSD = zInfo.reward * RATES.DOVX_WAX * RATES.WAX_USD;
+
+                setTextSafe(`z-burn-usd-${id}`, "-" + fmtUSD(burnUSD));
+                setTextSafe(`z-win-usd-${id}`, "+" + fmtUSD(winUSD));
             }
         });
     }
@@ -393,7 +423,22 @@
         ZONE_ORDER.forEach(id => {
             const z = ZONE_DB[id];
             let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
-            grid.innerHTML += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût 24h:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div><div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div></div>`;
+            grid.innerHTML += `
+            <div class="zone" id="z-card-${id}">
+                <div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div>
+                <div class="z-metrics">
+                    <div class="z-row"><span>Coût 24h:</span> ${costDisplay}</div>
+                    <div class="z-row"><span>Reward:</span> <span class="z-earn">+${z.reward}</span></div>
+                </div>
+                
+                <div class="z-finance">
+                    <div class="z-fin-row"><span>BURN 24H ($):</span> <span class="z-fin-val" style="color:var(--alert)" id="z-burn-usd-${id}">$0.00</span></div>
+                    <div class="z-fin-row"><span>WIN VAL ($):</span> <span class="z-fin-val" style="color:var(--main)" id="z-win-usd-${id}">$0.00</span></div>
+                </div>
+
+                <div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div>
+                <div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div>
+            </div>`;
         });
     }
 
@@ -408,7 +453,7 @@
             scanned: 0 
         };
         
-        log("Audit Financier V43 en cours...", "#fff");
+        log("Audit Financier V44 en cours...", "#fff");
         try {
             // DEMANDE (DIVISIONS)
             let nextKey = ""; let hasMore = true;
@@ -475,20 +520,17 @@
         setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX");
         setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
 
-        // --- V43 RATIO BAR ALIGNMENT ---
+        // RATIO
         let totalVol = totalD + totalS || 1; 
         let pctD = (totalD / totalVol) * 100;
         let pctS = (totalS / totalVol) * 100;
-        
         let barD = document.getElementById('barDemand'); if(barD) barD.style.width = pctD + "%";
         let barS = document.getElementById('barSupply'); if(barS) barS.style.width = pctS + "%";
         
         let diff = totalS - totalD;
         let diffTxt = diff >= 0 ? `SURPLUS (+${fmt(diff)})` : `DÉFICIT (${fmt(diff)})`;
         let diffColor = diff >= 0 ? "var(--main)" : "var(--alert)";
-        
         setHtmlSafe('ratioTxt', `<span style="color:${diffColor}">${diffTxt}</span>`);
-        // ------------------------------
 
         // MATRIX
         const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
