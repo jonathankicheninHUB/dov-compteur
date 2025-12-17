@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V25 (VALIDATED)</title>
+    <title>DoV - COMMAND V27 (PRODUCTION)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -75,16 +75,18 @@
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
 
-        .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; }
-        .b-json { font-size: 10px; color: #0f0; white-space: pre-wrap; margin-top: 5px; background: #000; padding: 5px; display:none; }
-
+        .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; }
+        .b-sub { font-size: 10px; color: #666; }
+        .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
+        
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--main)">V25 ULTIMATE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--main)">V27 PRODUCTION</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -105,7 +107,7 @@
         </div>
         
         <div style="font-size:9px; color:#444; padding:10px; text-align:center">
-            Moteur Réseau V23 (Tank)<br>Auto-Switch Intégré
+            Moteur Réseau V23<br>Audit V27 OK
         </div>
     </aside>
 
@@ -135,12 +137,14 @@
         </div>
 
         <div id="buildingView" class="view-section">
-            <div style="padding:20px; text-align:center; color:#666">Liste des bâtiments...</div>
+            <div style="padding:20px; text-align:center; color:#666">
+                Cliquez sur SCAN BÂTIMENTS
+            </div>
         </div>
     </main>
 </div>
 
-<div class="logs" id="console">> V25 chargée. Tout est là : Zones, Fighters, Bâtiments.</div>
+<div class="logs" id="console">> V27 Prête. Modules d'analyse validés.</div>
 
 <script>
     const PROXY = "https://corsproxy.io/?";
@@ -176,7 +180,6 @@
     };
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
-    // --- MOTEUR RÉSEAU BLINDÉ ---
     let stopSignal = false;
     let rpcIndex = 0; 
 
@@ -203,14 +206,12 @@
     }
 
     // --- FETCH TANK ---
-    async function robustFetch(table, lowerBound, limit=300) {
+    async function robustFetch(code, table, lowerBound, limit=300) {
         let attempts = 0;
         const maxAttempts = 15;
 
         while(attempts < maxAttempts && !stopSignal) {
             const server = RPCS[rpcIndex % RPCS.length];
-            // On alterne : Direct si possible, sinon Proxy
-            // Pour être sûr : on utilise le Proxy 2 fois sur 3 si ça foire
             let url = server + "/v1/chain/get_table_rows";
             let useProxy = (attempts > 0); 
             if(useProxy) url = PROXY + encodeURIComponent(url);
@@ -226,7 +227,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: table,
+                        json: true, code: code, scope: code, table: table, 
                         limit: limit, lower_bound: lowerBound
                     }),
                     signal: controller.signal
@@ -276,41 +277,31 @@
         stopSignal = false;
         switchView('dashView');
         initGrid();
-        
         document.getElementById('btnGlobal').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
 
-        let stats = { 
-            divs: 0, 
-            burn: { fuel: 0, health: 0, repair: 0, supply: 0 },
-            totalCostX: 0, totalGain: 0, zones: {} 
-        };
+        let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} };
         ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
-
         let nextKey = "";
         let hasMore = true;
 
-        log("Scan Global V25...", "#fff");
+        log("Scan Global V27...", "#fff");
 
         try {
             while(hasMore && !stopSignal) {
                 document.getElementById('scanProg').innerText = `Divs: ${stats.divs}`;
-                const data = await robustFetch("sdivisions", nextKey);
-                
+                const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
                 if(!data.rows || data.rows.length === 0) break;
 
                 for(let row of data.rows) {
                     stats.divs++;
                     const zID = getProp(row, ['zoneID', 'zone_id'], 0);
                     const busy = isBusy(row);
-
                     if(stats.zones[zID]) {
-                        const zStats = stats.zones[zID];
                         const zInfo = ZONE_DB[zID];
-                        zStats.count++;
-                        
+                        stats.zones[zID].count++;
                         if(busy) {
-                            zStats.active++;
+                            stats.zones[zID].active++;
                             if (zInfo.cost > 0) {
                                 stats.burn.fuel += zInfo.cost;
                                 stats.burn.health += zInfo.cost;
@@ -319,14 +310,11 @@
                             }
                             stats.totalCostX += zInfo.costX;
                             stats.totalGain += zInfo.reward;
-                        } else {
-                            zStats.idle++;
-                        }
+                        } else stats.zones[zID].idle++;
                     }
                 }
                 updateDash(stats);
-                if(data.more && data.next_key) nextKey = data.next_key;
-                else hasMore = false;
+                if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false;
             }
             log("Scan terminé !", "#00e676");
         } catch(e) { log("Erreur : " + e.message, "red"); }
@@ -341,15 +329,14 @@
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('targetView');
         const view = document.getElementById('targetView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche de ${user}...</div>`;
-        
+        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche divisions de ${user}...</div>`;
         let rows = [];
         let nextKey = user;
         let searching = true;
 
         try {
             while(searching) {
-                const data = await robustFetch("sdivisions", nextKey, 100);
+                const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 100);
                 if(!data.rows || data.rows.length === 0) break;
                 for(let row of data.rows) {
                     const owner = getProp(row, ['owner', 'user', 'account']);
@@ -360,69 +347,83 @@
                 await new Promise(r => setTimeout(r, 50)); 
             }
 
-            let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">
-                JOUEUR : ${user.toUpperCase()} (${rows.length} Divisions)
-            </div>`;
+            let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
             rows.forEach(r => {
                 const zID = getProp(r, ['zoneID', 'zone_id'], 0);
                 const zInfo = ZONE_DB[zID] || { name: "Inconnu", cost: 0, costX: 0, reward: 0 };
                 const busy = isBusy(r);
-                
                 let statusHtml = busy ? `<span class="st-mission">MISSION</span>` : `<span class="st-ready">PRÊT</span>`;
                 let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
-                let gainTxt = zInfo.reward > 0 ? `+${zInfo.reward}` : "POOL";
                 
-                html += `
-                <div class="t-row">
-                    <div style="width:50px; color:var(--main)">#${r.division_id}</div>
-                    <div style="flex:1; text-align:right;">
-                       <span style="font-size:9px; color:#888; margin-right:10px">
-                        <span style="color:var(--alert)">${costTxt}</span> | 
-                        <span style="color:var(--main)">${gainTxt}</span>
-                       </span>
-                    </div>
-                    <div style="display:flex; align-items:center; margin-left:10px;">
-                        ${statusHtml}
-                        <div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div>
-                    </div>
-                </div>`;
+                html += `<div class="t-row"><div style="width:50px; color:var(--main)">#${r.division_id}</div><div style="flex:1; text-align:right;"><span style="font-size:9px; color:#888; margin-right:10px"><span style="color:var(--alert)">${costTxt}</span></span></div><div style="display:flex; align-items:center; margin-left:10px;">${statusHtml}<div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div></div></div>`;
             });
             view.innerHTML = html;
         } catch(e) { log("Erreur cible: " + e.message, "red"); }
     }
 
-    // --- 3. SCAN BATIMENTS ---
+    // --- 3. SCAN BATIMENTS (PARSING AMÉLIORÉ) ---
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
         const view = document.getElementById('buildingView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Scan des bâtiments de ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Connexion à dovutilstake...</div>`;
 
         try {
-            // On récupère large car on ne connait pas l'index exact
-            const data = await robustFetch("fdata", 500); 
-            
+            const data = await robustFetch("dovutilstake", "buildings", "", 500); 
             if(data.rows) {
                 const found = data.rows.filter(row => JSON.stringify(row).includes(user));
                 
                 if(found.length > 0) {
-                    let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:#9b59b6">
-                        ${found.length} BÂTIMENTS TROUVÉS
-                    </div>`;
-                    
+                    // CALCULATRICE DE RENTABILITÉ BATIMENTS
+                    let totalProd = 0;
+                    let totalCost = 0;
+
+                    let listHtml = "";
                     found.forEach(b => {
-                        html += `
-                        <div class="b-card" onclick="this.querySelector('.b-json').style.display='block'">
-                            <div style="display:flex; justify-content:space-between">
-                                <span style="font-weight:bold; color:#fff">🏗️ Building #${b.id || b.key}</span>
-                                <span style="font-size:10px; color:#666">Cliquez pour détails</span>
+                        // Nettoyage des données (Ex: "583.2000 DOVH" -> 583.2)
+                        let rawPower = Array.isArray(b.power) ? b.power[0] : b.power;
+                        let rawIn = Array.isArray(b.token_in) ? b.token_in[0] : b.token_in;
+                        
+                        let powerVal = parseFloat(rawPower);
+                        let inVal = parseFloat(rawIn);
+                        
+                        // Détection du type pour la couleur
+                        let typeColor = "#fff";
+                        if(rawPower.includes("DOVF")) typeColor = "var(--fuel)";
+                        if(rawPower.includes("DOVH")) typeColor = "var(--health)";
+                        if(rawPower.includes("DOVR")) typeColor = "var(--repair)";
+                        if(rawPower.includes("DOVS")) typeColor = "var(--supply)";
+
+                        totalProd += powerVal;
+                        totalCost += inVal;
+
+                        listHtml += `
+                        <div class="b-card">
+                            <div>
+                                <div class="b-title">🏗️ Asset #${b.asset_id}</div>
+                                <div class="b-sub">Tpl: ${b.template_id}</div>
                             </div>
-                            <div class="b-json">${JSON.stringify(b, null, 2)}</div>
+                            <div class="b-stats">
+                                <div class="b-pow" style="color:${typeColor}">⚡ ${rawPower}</div>
+                                <div class="b-in">📉 ${rawIn}</div>
+                            </div>
                         </div>`;
                     });
-                    view.innerHTML = html;
+
+                    // En-tête avec Totaux
+                    let headerHtml = `
+                    <div style="background:#111; padding:10px; border-bottom:1px solid #333; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center">
+                        <span style="color:#9b59b6; font-weight:bold">${found.length} BÂTIMENTS</span>
+                        <div style="text-align:right; font-size:10px">
+                            <div style="color:var(--main)">TOTAL PROD: +${totalProd.toFixed(1)}</div>
+                            <div style="color:var(--dovx)">TOTAL COUT: -${totalCost.toFixed(2)} DOVX</div>
+                        </div>
+                    </div>`;
+
+                    view.innerHTML = headerHtml + listHtml;
+
                 } else {
-                    view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé pour ce compte.</div>";
+                    view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé.</div>";
                 }
             }
         } catch(e) { log("Erreur Bâtiments : " + e.message, "red"); }
