@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V68 (SPREADSHEET MATRIX)</title>
+    <title>DoV - COMMAND V69 (DAY CYCLE 24H)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -24,26 +24,29 @@
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; } .inp-money { color: var(--money); font-weight: bold; }
         
-        /* UI V68 */
+        /* UI V69 - DAY CYCLE */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
-        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--sec); }
+        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); }
         .g-mc-left { font-size: 16px; font-weight: bold; }
         .g-mc-right { text-align:right; }
-        .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; }
-        .g-cost-val { color: var(--dovx); font-weight:bold; font-size:18px; }
+        .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; font-weight:bold; }
+        .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
 
-        .g-status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .g-stat-box { background: #1a1a1a; border: 1px solid #333; padding: 10px; text-align: center; }
-        .g-stat-box .val { font-size: 20px; font-weight: bold; }
-        .g-stat-box .lbl { font-size: 10px; color: #888; text-transform: uppercase; }
-        .c-act { color: var(--warn); } .c-rdy { color: var(--main); }
-        
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .g-card-head { font-size: 11px; font-weight: bold; text-align: center; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display: flex; justify-content: space-between; }
-        .g-big-val { font-size: 14px; font-weight: bold; text-align: center; margin: 5px 0; }
-        .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 5px; }
-        .g-mini-cost { font-size:9px; color: var(--dovx); text-align:center; }
+        .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content:space-between; min-height:140px; }
+        
+        .g-card-head { display:flex; justify-content:space-between; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:5px; font-size:12px; font-weight:bold; text-transform:uppercase; }
+        .g-count-badge { background:#222; padding:2px 6px; border-radius:3px; color:#fff; }
+        
+        .g-prod-section { text-align:center; margin: 10px 0; }
+        .g-prod-val { font-size:18px; font-weight:bold; color:#fff; display:block; }
+        .g-prod-lbl { font-size:9px; color:#888; text-transform:uppercase; }
+        
+        .g-cost-section { text-align:center; margin-bottom:10px; }
+        .g-mini-cost { font-size:14px; color: var(--dovx); font-weight:bold; }
+        
+        .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
+        .c-act { color: var(--warn); } .c-rdy { color: var(--main); }
 
         /* RESTE DU CSS STANDARD */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -94,7 +97,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V68 MATH MATRIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V69 DAY CYCLE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -122,7 +125,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (MATRIX 8.5%)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (24H)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -211,47 +214,61 @@
                 <div class="g-dashboard">
                     <div class="g-main-count">
                         <div class="g-mc-left">
-                            <div>SCAN GLOBAL (MATRIX)</div>
+                            <div>SCAN GLOBAL (CYCLE 24H)</div>
                             <div style="font-size:12px; color:#555; margin-top:2px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
-                            <div class="g-cost-label">COÛT TOTAL DOV-X</div>
+                            <div class="g-cost-label">COÛT TOTAL DOV-X (24H)</div>
                             <div class="g-cost-val" id="gTotalCost">0</div>
-                        </div>
-                    </div>
-                    <div class="g-status-row">
-                        <div class="g-stat-box" style="border-color:var(--warn)">
-                            <div class="val c-act" id="gTotalAct">0</div>
-                            <div class="lbl">ACTIFS (EN PROD)</div>
-                        </div>
-                        <div class="g-stat-box" style="border-color:var(--main)">
-                            <div class="val c-rdy" id="gTotalRdy">0</div>
-                            <div class="lbl">PRÊTS À RÉCOLTER</div>
                         </div>
                     </div>
                     <div class="g-detail-grid">
                         <div class="g-card" style="border-top:3px solid var(--fuel)">
-                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span id="cnt-F">0</span></div>
-                            <div class="g-big-val" style="color:var(--fuel)" id="pwr-F">0</div>
-                            <div class="g-mini-cost">Coût: <span id="cost-F">0</span> DOVX</div>
+                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span>
+                                <span class="g-prod-lbl">PROD / JOUR (24H)</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-F">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--health)">
-                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span id="cnt-H">0</span></div>
-                            <div class="g-big-val" style="color:var(--health)" id="pwr-H">0</div>
-                            <div class="g-mini-cost">Coût: <span id="cost-H">0</span> DOVX</div>
+                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span>
+                                <span class="g-prod-lbl">PROD / JOUR (24H)</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-H">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--repair)">
-                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span id="cnt-R">0</span></div>
-                            <div class="g-big-val" style="color:var(--repair)" id="pwr-R">0</div>
-                            <div class="g-mini-cost">Coût: <span id="cost-R">0</span> DOVX</div>
+                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span>
+                                <span class="g-prod-lbl">PROD / JOUR (24H)</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-R">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--supply)">
-                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span id="cnt-S">0</span></div>
-                            <div class="g-big-val" style="color:var(--supply)" id="pwr-S">0</div>
-                            <div class="g-mini-cost">Coût: <span id="cost-S">0</span> DOVX</div>
+                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span>
+                                <span class="g-prod-lbl">PROD / JOUR (24H)</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-S">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
                         </div>
                     </div>
@@ -263,39 +280,11 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V68. Logic 8.5% Loaded.</div>
+<div class="logs" id="console">> V69. Cycle 24H Loaded.</div>
 
 <script>
-    // ==========================================================
-    // --- DICTIONNAIRE ISSU DE TON IMAGE (REFERENCE) ---
-    // (Utilisé pour l'affichage, mais la logique est Mathématique)
-    // ==========================================================
-    const SHEET_DATA = {
-        5.40: "C_F1_COMMON",
-        54.00: "SC_F2_COMMON",
-        12.15: "C_F2_COMMON",
-        121.50: "SC_F3_COMMON",
-        30.38: "C_F3_COMMON",
-        83.53: "C_F4_COMMON",
-        1458.00: "SC_F5_COMMON",
-        16.20: "R_F1_RARE",
-        36.45: "R_F2_RARE",
-        91.13: "R_F3_RARE",
-        250.59: "R_F4_RARE",
-        48.60: "E_F1_EPIC",
-        109.35: "E_F2_EPIC",
-        273.38: "E_F3_EPIC",
-        751.78: "E_F4_EPIC",
-        145.80: "L_F1_LEGENDARY",
-        328.05: "L_F2_LEGENDARY",
-        820.13: "L_F3_LEGENDARY",
-        2255.34: "L_F4_LEGENDARY",
-    };
-    
-    // FACTEUR DE COUT DOV-X (Basé sur ton Excel : 0.4590 / 5.40 = 0.085)
+    // FACTEUR DE COUT DOV-X (8.5% de la prod horaire)
     const DOVX_COST_RATIO = 0.085;
-
-    // ==========================================================
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
@@ -355,17 +344,18 @@
         throw new Error("Arrêt.");
     }
 
-    // --- SCAN GLOBAL MATRIX (V68) ---
+    // --- SCAN GLOBAL MATRIX (V69 - 24H) ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         
-        log("🌍 SCAN GLOBAL (MATRIX 8.5%) DÉMARRÉ...", "#fff");
+        log("🌍 SCAN GLOBAL (CYCLE 24H) DÉMARRÉ...", "#fff");
         let nextKey = ""; let hasMore = true; const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         
-        let stats = { total: 0, active: 0, ready: 0, totalDovxCost: 0, 
+        // stats.power stockera la puissance HORAIRE brute
+        let stats = { total: 0, active: 0, ready: 0, totalDovxCost24: 0, 
                       F: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, 
                       H: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, 
                       R: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, 
@@ -380,7 +370,7 @@
 
                 for(let b of data.rows) {
                     stats.total++;
-                    let pVal = extractPower(b);
+                    let pVal = extractPower(b); // Valeur Horaire Brute
                     let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
                     let pType = null;
 
@@ -395,9 +385,11 @@
                         stats[pType].power += pVal;
                         stats[pType].count++;
                         
-                        // CALCUL DU COUT (Matrice 8.5%)
-                        let cost = pVal * DOVX_COST_RATIO;
-                        stats[pType].cost += cost;
+                        // Calcul COUT DOVX 24H : (Puissance Horaire * 24) * 8.5%
+                        let dailyProd = pVal * 24;
+                        let dailyCost = dailyProd * DOVX_COST_RATIO;
+                        
+                        stats[pType].cost += dailyCost;
 
                         let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
                         let isReady = now > readyTime;
@@ -405,19 +397,17 @@
                         if(isReady) { stats.ready++; stats[pType].rdy++; } 
                         else { 
                             stats.active++; stats[pType].act++; 
-                            stats.totalDovxCost += cost; // On ajoute au total seulement si actif
+                            stats.totalDovxCost24 += dailyCost; 
                         }
                     }
                 }
 
-                setTextSafe('globalCount', fmt(stats.total)); 
-                setTextSafe('gTotalAct', fmt(stats.active)); 
-                setTextSafe('gTotalRdy', fmt(stats.ready));
-                setTextSafe('gTotalCost', fmt(stats.totalDovxCost));
+                setTextSafe('globalCount', fmt(stats.total) + " Bâtiments"); 
+                setTextSafe('gTotalCost', fmt(stats.totalDovxCost24));
 
                 ['F','H','R','S'].forEach(t => { 
-                    setTextSafe(`cnt-${t}`, "("+fmt(stats[t].count)+")"); 
-                    setTextSafe(`pwr-${t}`, fmt(stats[t].power)+" TU"); 
+                    setTextSafe(`cnt-${t}`, fmt(stats[t].count)); 
+                    setTextSafe(`pwr-${t}`, fmt(stats[t].power * 24) + " TU"); // Affichage x24
                     setTextSafe(`cost-${t}`, fmt(stats[t].cost));
                     setTextSafe(`act-${t}`, fmt(stats[t].act)); 
                     setTextSafe(`rdy-${t}`, fmt(stats[t].rdy)); 
