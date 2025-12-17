@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V39 (STABLE)</title>
+    <title>DoV - COMMAND V40 (GUARDIAN)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -34,7 +34,7 @@
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         .inp-money { color: var(--money); font-weight: bold; }
 
-        /* ECONOMY */
+        /* V40 : GRILLES ECONOMIQUES */
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
@@ -45,20 +45,20 @@
         .c-producer { border-top: 3px solid var(--main); }
         .c-market { border-top: 3px solid var(--dovx); }
 
-        /* MATRICE */
         .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
         .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
         .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
+        
         .mx-row { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
         .mx-val { color: #fff; font-weight: bold; }
         .mx-usd { color: var(--money); font-size: 10px; font-weight: bold; }
         .mx-lbl { color: #666; }
+
         .mx-bal { text-align: center; padding: 5px; font-weight: bold; margin-top: 5px; border-radius: 3px; }
         .bal-pos { background: rgba(0, 230, 118, 0.1); color: var(--main); border: 1px solid var(--main); }
         .bal-neg { background: rgba(255, 23, 68, 0.1); color: var(--alert); border: 1px solid var(--alert); }
 
-        /* DOVX P&L */
         .dovx-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; }
         .db-card { background: #080808; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
         .db-head { font-size: 10px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 3px; margin-bottom: 5px; }
@@ -109,13 +109,17 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        .balance-bar { width: 100%; height: 10px; background: #222; display: flex; margin-top: 20px; border-radius: 5px; overflow: hidden; }
+        .bal-demand { background: var(--alert); height: 100%; }
+        .bal-supply { background: var(--main); height: 100%; }
+
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V39 STABLE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V40 GUARDIAN</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -192,6 +196,17 @@
                     </div>
                 </div>
 
+                <div style="background:#111; padding:15px; border:1px solid #333; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#fff; font-weight:bold; margin-bottom:5px">
+                        <span>RATIO OFFRE / DEMANDE</span>
+                        <span id="ratioTxt">Calcul...</span>
+                    </div>
+                    <div class="balance-bar">
+                        <div class="bal-demand" id="barDemand" style="width:50%"></div>
+                        <div class="bal-supply" id="barSupply" style="width:50%"></div>
+                    </div>
+                </div>
+
                 <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; color:#fff; font-weight:bold; display:flex; justify-content:space-between">
                     <span>MATRICE OFFRE (Usines) / DEMANDE (Combattants)</span>
                     <span style="font-size:10px; color:#666">VALORISATIONS EN TEMPS RÉEL</span>
@@ -232,7 +247,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V39 Stable. Correctif interface appliqué. Tunnel OK.</div>
+<div class="logs" id="console">> V40 Guardian. Système blindé contre les erreurs DOM.</div>
 
 <script>
     // --- DEFAULT CONFIG ---
@@ -276,6 +291,7 @@
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
     function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
     function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
+    function setText(id, txt) { let el=document.getElementById(id); if(el) el.innerText = txt; } // SAFER SETTER
 
     // --- UPDATE RATES ---
     function updateRates() {
@@ -295,7 +311,9 @@
             let useProxy = (attempts > 0); 
             if(useProxy) url = PROXY + encodeURIComponent(url);
             try {
-                document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
+                if(document.getElementById('rpcStatus')) {
+                    document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
+                }
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; }
@@ -344,13 +362,13 @@
 
     function updateZoneDash(stats) {
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
-        document.getElementById('dDivs').innerText = fmt(stats.divs);
-        document.getElementById('dGain').innerText = "+ " + fmt(stats.totalGain) + " DOVX";
-        document.getElementById('dCostX').innerText = "- " + fmt(stats.totalCostX) + " DOVX";
-        document.getElementById('lFuel').innerText = "-" + fmt(stats.burn.fuel);
-        document.getElementById('lHealth').innerText = "-" + fmt(stats.burn.health);
-        document.getElementById('lRepair').innerText = "-" + fmt(stats.burn.repair);
-        document.getElementById('lSupply').innerText = "-" + fmt(stats.burn.supply);
+        setText('dDivs', fmt(stats.divs));
+        setText('dGain', "+ " + fmt(stats.totalGain) + " DOVX");
+        setText('dCostX', "- " + fmt(stats.totalCostX) + " DOVX");
+        setText('lFuel', "-" + fmt(stats.burn.fuel));
+        setText('lHealth', "-" + fmt(stats.burn.health));
+        setText('lRepair', "-" + fmt(stats.burn.repair));
+        setText('lSupply', "-" + fmt(stats.burn.supply));
         
         ZONE_ORDER.forEach(id => {
             const data = stats.zones[id];
@@ -442,17 +460,17 @@
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
-        // GLOBAL CARDS (V39 FIX)
+        // GLOBAL CARDS
         let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply;
         let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
         let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
 
-        document.getElementById('valDemandTU').innerText = fmt(totalD) + " TU";
-        document.getElementById('valDemandUSD').innerText = fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
-        document.getElementById('valSupplyTU').innerText = fmt(totalS) + " TU";
-        document.getElementById('valSupplyUSD').innerText = fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
-        document.getElementById('valDovxBurn').innerText = fmt(totalDovxIn) + " DOVX";
-        document.getElementById('valDovxUSD').innerText = fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h";
+        setText('valDemandTU', fmt(totalD) + " TU");
+        setText('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setText('valSupplyTU', fmt(totalS) + " TU");
+        setText('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setText('valDovxBurn', fmt(totalDovxIn) + " DOVX");
+        setText('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
 
         // MATRIX
         const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
@@ -467,7 +485,7 @@
             let balTxt = bal >= 0 ? "SURPLUS" : "DÉFICIT";
             html += `<div class="matrix-col" style="border-top:3px solid ${t.color}"><div class="mx-head" style="background:${t.color}">${t.label}</div><div class="mx-body"><div><div class="mx-row"><span class="mx-lbl">Production</span> <span class="mx-val">${fmt(s)}</span></div><div style="text-align:right; margin-bottom:5px" class="mx-usd">Val. Prod: ${fmtUSD(valProd)}</div><div class="mx-row"><span class="mx-lbl">Besoin</span> <span class="mx-val">${fmt(d)}</span></div><div style="text-align:right" class="mx-usd">Val. Besoin: ${fmtUSD(valDem)}</div></div><div class="mx-bal ${balClass}">${balTxt} ${fmt(bal)}</div></div></div>`;
         });
-        document.getElementById('tokenMatrix').innerHTML = html;
+        if(document.getElementById('tokenMatrix')) document.getElementById('tokenMatrix').innerHTML = html;
 
         // DOVX P&L
         let mint = ECO_DATA.dovx.rewards;
@@ -475,20 +493,21 @@
         let net = mint - burn;
         let colorNet = net >= 0 ? "var(--main)" : "var(--alert)";
 
-        document.getElementById('valDovxMint').innerText = "+ " + fmt(mint);
-        document.getElementById('usdDovxMint').innerText = fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD);
-        document.getElementById('valDovxBurnTotal').innerText = "- " + fmt(burn);
-        document.getElementById('usdDovxBurnTotal').innerText = fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD);
-        document.getElementById('valDovxNet').innerText = fmt(net);
-        document.getElementById('valDovxNet').style.color = colorNet;
-        document.getElementById('usdDovxNet').innerText = fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD);
+        setText('valDovxMint', "+ " + fmt(mint));
+        setText('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD));
+        setText('valDovxBurnTotal', "- " + fmt(burn));
+        setText('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD));
+        setText('valDovxNet', fmt(net));
+        if(document.getElementById('valDovxNet')) document.getElementById('valDovxNet').style.color = colorNet;
+        setText('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD));
 
-        document.getElementById('valCityDovx').innerText = fmt(ECO_DATA.dovx.cities);
-        document.getElementById('usdCityDovx').innerText = fmtUSD(ECO_DATA.dovx.cities * RATES.DOVX_WAX * RATES.WAX_USD);
-        document.getElementById('valBuildDovx').innerText = fmt(ECO_DATA.dovx.buildings);
-        document.getElementById('usdBuildDovx').innerText = fmtUSD(ECO_DATA.dovx.buildings * RATES.DOVX_WAX * RATES.WAX_USD);
+        setText('valCityDovx', fmt(ECO_DATA.dovx.cities));
+        setText('usdCityDovx', fmtUSD(ECO_DATA.dovx.cities * RATES.DOVX_WAX * RATES.WAX_USD));
+        setText('valBuildDovx', fmt(ECO_DATA.dovx.buildings));
+        setText('usdBuildDovx', fmtUSD(ECO_DATA.dovx.buildings * RATES.DOVX_WAX * RATES.WAX_USD));
+        
         let totalDovx = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
-        document.getElementById('totalDovxBurn').innerText = fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")";
+        setText('totalDovxBurn', fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")");
     }
 
     // --- 3. TARGET TOOLS (SNIPER) ---
