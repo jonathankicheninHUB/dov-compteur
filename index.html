@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V29 (SNIPER)</title>
+    <title>DoV - COMMAND V30 (OMNISCIENT)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -31,7 +31,7 @@
 
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
 
-        /* DASHBOARD LOGISTIQUE */
+        /* DASHBOARD STATS */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.8fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -49,22 +49,27 @@
         .val-win { color: var(--main); text-shadow: 0 0 10px rgba(0, 230, 118, 0.2); }
         .val-cost-x { color: var(--dovx); font-weight: bold; }
 
+        /* ZONES */
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
         .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
-        
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
-        
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
         .z-earn { color: var(--main); font-weight: bold; }
         .z-burn { color: var(--alert); }
         .z-burn-x { color: var(--dovx); font-weight: bold; }
-
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; }
         .z-act-ready { background: var(--main); height: 100%; }
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
+
+        /* GLOBAL BUILDINGS */
+        .gb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        .gb-card { background: #111; border: 1px solid #333; padding: 15px; text-align: center; }
+        .gb-title { color: #888; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px;}
+        .gb-val { font-size: 24px; font-weight: bold; color: #fff; }
+        .gb-sub { font-size: 10px; color: #666; margin-top: 5px; }
 
         /* VUES */
         .view-section { display: none; }
@@ -89,15 +94,16 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V29 SNIPER</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V30 OMNISCIENT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <div class="box">
-            <div class="box-title">1. Global (Zones)</div>
-            <button class="btn-start" id="btnGlobal" onclick="startGlobal()">SCAN GLOBAL</button>
+            <div class="box-title">1. Global (Monde)</div>
+            <button class="btn-start" id="btnGlobal" onclick="startGlobal()">SCAN ZONES (PVE)</button>
+            <button class="btn-build" id="btnGlobalBuild" onclick="startGlobalBuildings()">SCAN BÂTIMENTS</button>
             <button class="btn-stop" id="btnStop" onclick="stopSignal=true">ARRÊT</button>
             <div id="scanProg" style="text-align:center; font-size:10px; color:#666; margin-top:5px">-</div>
         </div>
@@ -105,12 +111,12 @@
         <div class="box">
             <div class="box-title">2. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
-            <button class="btn-target" onclick="startTarget()">SCAN JOUEUR</button>
-            <button class="btn-build" onclick="startBuildings()">SCAN BÂTIMENTS</button>
+            <button class="btn-target" onclick="startTarget()">SCAN DIVISIONS</button>
+            <button class="btn-target" onclick="startBuildings()">SCAN BÂTIMENTS</button>
         </div>
         
         <div style="font-size:9px; color:#444; padding:10px; text-align:center">
-            Moteur Réseau V23<br>Recherche Indexée (Rapide)
+            V30 : Analyse Complète<br>Divisions + Bâtiments
         </div>
     </aside>
 
@@ -133,23 +139,27 @@
                 <div class="stat"><span class="stat-val val-cost-x" id="dCostX">0</span><span class="stat-lbl">Conso. Villes (DOVX)</span></div>
             </div>
             <div class="zones-grid" id="zonesArea">
-                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">Cliquez sur SCAN GLOBAL pour voir les Zones.</div>
+                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">Cliquez sur SCAN ZONES pour voir la carte.</div>
+            </div>
+        </div>
+
+        <div id="globalBuildView" class="view-section">
+            <div style="padding:20px; text-align:center; color:#666">
+                Cliquez sur SCAN BÂTIMENTS pour l'analyse mondiale.
             </div>
         </div>
 
         <div id="targetView" class="view-section">
-            <div style="padding:20px; text-align:center; color:#666">Liste des divisions...</div>
+            <div style="padding:20px; text-align:center; color:#666">Cible non scannée.</div>
         </div>
 
         <div id="buildingView" class="view-section">
-            <div style="padding:20px; text-align:center; color:#666">
-                Cliquez sur SCAN BÂTIMENTS
-            </div>
+            <div style="padding:20px; text-align:center; color:#666">Cible non scannée.</div>
         </div>
     </main>
 </div>
 
-<div class="logs" id="console">> V29 Sniper. Recherche par index (Owner) activée.</div>
+<div class="logs" id="console">> V30 Omniscient. Scanner Global Bâtiments ajouté.</div>
 
 <script>
     const PROXY = "https://corsproxy.io/?";
@@ -216,7 +226,7 @@
         el.innerText = msg;
     }
 
-    // --- FETCH AVANCÉ (SNIPER SUPPORT) ---
+    // --- FETCH TANK ---
     async function robustFetch(code, table, lowerBound, limit=300, indexPosition=1, keyType="") {
         let attempts = 0;
         const maxAttempts = 15;
@@ -239,11 +249,10 @@
                     limit: limit, lower_bound: lowerBound
                 };
                 
-                // AJOUT V29 : INDEXATION SECONDAIRE
                 if(indexPosition > 1) {
                     bodyPayload.index_position = indexPosition;
-                    bodyPayload.key_type = keyType; // ex: "i64" ou "name"
-                    bodyPayload.upper_bound = lowerBound; // Pour recherche exacte
+                    bodyPayload.key_type = keyType;
+                    bodyPayload.upper_bound = lowerBound; 
                 }
 
                 const res = await fetch(url, {
@@ -292,7 +301,7 @@
         });
     }
 
-    // --- 1. SCAN GLOBAL (Rien ne change, ça marche déjà) ---
+    // --- 1. SCAN GLOBAL ZONES ---
     async function startGlobal() {
         stopSignal = false;
         switchView('dashView');
@@ -305,7 +314,7 @@
         let nextKey = "";
         let hasMore = true;
 
-        log("Scan Global V29...", "#fff");
+        log("Scan Global V30...", "#fff");
 
         try {
             while(hasMore && !stopSignal) {
@@ -344,31 +353,106 @@
         document.getElementById('scanProg').innerText = "Terminé";
     }
 
-    // --- 2. SCAN TARGET (V29 : SNIPER MODE) ---
-    async function startTarget() {
+    // --- 2. GLOBAL BUILDINGS (NEW V30) ---
+    async function startGlobalBuildings() {
         stopSignal = false;
+        switchView('globalBuildView');
+        const view = document.getElementById('globalBuildView');
+        view.innerHTML = `<div style="padding:30px; text-align:center">Scan mondial des bâtiments en cours...</div>`;
+        
+        let stats = {
+            total: 0,
+            prod: { fuel: 0, health: 0, repair: 0, supply: 0 },
+            totalDovxCost: 0
+        };
+        
+        let nextKey = "";
+        let hasMore = true;
+
+        try {
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "buildings", nextKey, 300);
+                
+                if(!data.rows || data.rows.length === 0) break;
+                
+                showStatus(`Analyse de ${stats.total} bâtiments...`);
+
+                for(let b of data.rows) {
+                    stats.total++;
+                    
+                    let rawPower = Array.isArray(b.power) ? b.power[0] : b.power;
+                    let rawIn = Array.isArray(b.token_in) ? b.token_in[0] : b.token_in;
+                    
+                    let powerVal = parseFloat(rawPower) || 0;
+                    let inVal = parseFloat(rawIn) || 0;
+
+                    stats.totalDovxCost += inVal;
+
+                    if(rawPower.includes("DOVF")) stats.prod.fuel += powerVal;
+                    if(rawPower.includes("DOVH")) stats.prod.health += powerVal;
+                    if(rawPower.includes("DOVR")) stats.prod.repair += powerVal;
+                    if(rawPower.includes("DOVS")) stats.prod.supply += powerVal;
+                }
+
+                if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false;
+            }
+
+            // RENDU DASHBOARD
+            const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits: 0});
+            
+            let html = `
+            <div style="background:#111; padding:20px; border-bottom:1px solid #333; margin-bottom:20px">
+                <div style="font-size:18px; color:#fff; font-weight:bold; margin-bottom:10px">STATISTIQUES MONDIALES : BÂTIMENTS</div>
+                <div style="font-size:12px; color:#666">${stats.total.toLocaleString()} Bâtiments scannés</div>
+            </div>
+
+            <div class="gb-grid">
+                <div class="gb-card" style="border-top: 3px solid var(--fuel)">
+                    <div class="gb-title">PRODUCTION FUEL</div>
+                    <div class="gb-val" style="color:var(--fuel)">+${fmt(stats.prod.fuel)}</div>
+                </div>
+                <div class="gb-card" style="border-top: 3px solid var(--health)">
+                    <div class="gb-title">PRODUCTION SANTÉ</div>
+                    <div class="gb-val" style="color:var(--health)">+${fmt(stats.prod.health)}</div>
+                </div>
+                <div class="gb-card" style="border-top: 3px solid var(--repair)">
+                    <div class="gb-title">PRODUCTION REPAIR</div>
+                    <div class="gb-val" style="color:var(--repair)">+${fmt(stats.prod.repair)}</div>
+                </div>
+                <div class="gb-card" style="border-top: 3px solid var(--supply)">
+                    <div class="gb-title">PRODUCTION SUPPLY</div>
+                    <div class="gb-val" style="color:var(--supply)">+${fmt(stats.prod.supply)}</div>
+                </div>
+            </div>
+
+            <div class="gb-card" style="margin-top:15px; border-top: 3px solid var(--dovx)">
+                <div class="gb-title">CONSOMMATION GLOBALE DE DOVX (BURN RATE)</div>
+                <div class="gb-val" style="color:var(--dovx)">-${fmt(stats.totalDovxCost)} DOVX / 24h</div>
+            </div>
+            `;
+            
+            view.innerHTML = html;
+            showStatus("Scan mondial terminé.");
+
+        } catch(e) { log("Erreur Global Buildings: " + e.message, "red"); }
+    }
+
+    // --- 3. SCAN TARGET ---
+    async function startTarget() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('targetView');
         const view = document.getElementById('targetView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche ciblée (Index Owner) pour ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche ciblée pour ${user}...</div>`;
         
         let rows = [];
-        
         try {
-            // ON UTILISE L'INDEX 2 (Owner)
-            // On demande toutes les lignes où index 2 == user
             const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
-            
             if(data.rows && data.rows.length > 0) {
-                // Double vérification au cas où (parfois l'API renvoie large)
                 rows = data.rows.filter(r => getProp(r, ['owner', 'user', 'account']) === user);
                 renderTargetList(rows, user, view);
-                log(`Trouvé ${rows.length} divisions pour ${user}.`, "#00e676");
             } else {
-                view.innerHTML = `<div style="padding:20px; text-align:center; color:orange">Aucune division trouvée pour ce joueur.</div>`;
-                log("Rien trouvé via l'index Owner.", "orange");
+                view.innerHTML = `<div style="padding:20px; text-align:center; color:orange">Aucune division trouvée.</div>`;
             }
-
         } catch(e) { log("Erreur cible: " + e.message, "red"); }
     }
 
@@ -386,73 +470,36 @@
         view.innerHTML = html;
     }
 
-    // --- 3. SCAN BATIMENTS (V29 : SNIPER MODE) ---
+    // --- 4. SCAN BATIMENTS TARGET ---
     async function startBuildings() {
-        stopSignal = false;
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
         const view = document.getElementById('buildingView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche bâtiments (Index Owner) pour ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche bâtiments pour ${user}...</div>`;
 
         try {
-            // ON UTILISE L'INDEX 2 (Owner)
             const data = await robustFetch("dovutilstake", "buildings", user, 500, 2, "i64"); 
             
             if(data.rows && data.rows.length > 0) {
-                // Filtrage strict
                 const found = data.rows.filter(r => r.owner === user);
-                
                 if(found.length > 0) {
-                    let totalProd = 0;
-                    let totalCost = 0;
-                    let listHtml = "";
-                    
+                    let totalProd = 0; let totalCost = 0; let listHtml = "";
                     found.forEach(b => {
                         let rawPower = Array.isArray(b.power) ? b.power[0] : b.power;
                         let rawIn = Array.isArray(b.token_in) ? b.token_in[0] : b.token_in;
-                        let powerVal = parseFloat(rawPower);
-                        let inVal = parseFloat(rawIn);
-                        
+                        let powerVal = parseFloat(rawPower); let inVal = parseFloat(rawIn);
                         let typeColor = "#fff";
                         if(rawPower.includes("DOVF")) typeColor = "var(--fuel)";
                         if(rawPower.includes("DOVH")) typeColor = "var(--health)";
                         if(rawPower.includes("DOVR")) typeColor = "var(--repair)";
                         if(rawPower.includes("DOVS")) typeColor = "var(--supply)";
-
-                        totalProd += powerVal;
-                        totalCost += inVal;
-
-                        listHtml += `
-                        <div class="b-card">
-                            <div>
-                                <div class="b-title">🏗️ Asset #${b.asset_id}</div>
-                                <div class="b-sub">Tpl: ${b.template_id}</div>
-                            </div>
-                            <div class="b-stats">
-                                <div class="b-pow" style="color:${typeColor}">⚡ ${rawPower}</div>
-                                <div class="b-in">📉 ${rawIn}</div>
-                            </div>
-                        </div>`;
+                        totalProd += powerVal; totalCost += inVal;
+                        listHtml += `<div class="b-card"><div><div class="b-title">🏗️ Asset #${b.asset_id}</div><div class="b-sub">Tpl: ${b.template_id}</div></div><div class="b-stats"><div class="b-pow" style="color:${typeColor}">⚡ ${rawPower}</div><div class="b-in">📉 ${rawIn}</div></div></div>`;
                     });
-
-                    let headerHtml = `
-                    <div style="background:#111; padding:10px; border-bottom:1px solid #333; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center">
-                        <span style="color:#9b59b6; font-weight:bold">${found.length} BÂTIMENTS</span>
-                        <div style="text-align:right; font-size:10px">
-                            <div style="color:var(--main)">TOTAL PROD: +${totalProd.toFixed(1)}</div>
-                            <div style="color:var(--dovx)">TOTAL COUT: -${totalCost.toFixed(2)} DOVX</div>
-                        </div>
-                    </div>`;
-
+                    let headerHtml = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center"><span style="color:#9b59b6; font-weight:bold">${found.length} BÂTIMENTS</span><div style="text-align:right; font-size:10px"><div style="color:var(--main)">TOTAL PROD: +${totalProd.toFixed(1)}</div><div style="color:var(--dovx)">TOTAL COUT: -${totalCost.toFixed(2)} DOVX</div></div></div>`;
                     view.innerHTML = headerHtml + listHtml;
-                    log(`Trouvé ${found.length} bâtiments.`, "#00e676");
-
-                } else {
-                    view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé (Filtre strict).</div>";
-                }
-            } else {
-                view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé via l'index.</div>";
-            }
+                } else view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé.</div>";
+            } else view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé.</div>";
         } catch(e) { log("Erreur Bâtiments : " + e.message, "red"); }
     }
 
