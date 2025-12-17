@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - WAR ROOM V19 (CERTIFIED)</title>
+    <title>DoV - WAR ROOM V20 (HYBRID)</title>
     <style>
         :root { 
             --main: #00e676; 
@@ -41,7 +41,7 @@
 
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
 
-        /* DASHBOARD LOGISTIQUE V19 */
+        /* DASHBOARD LOGISTIQUE V20 */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.8fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -89,7 +89,7 @@
 <body>
 
 <header>
-    <h1>DoV MONITOR <span style="color:var(--main)">V19 CERTIFIED</span></h1>
+    <h1>DoV MONITOR <span style="color:var(--sec)">V20 HYBRID</span></h1>
     <span class="rpc-badge" id="rpcStatus">OFFLINE</span>
 </header>
 
@@ -97,7 +97,7 @@
     <aside class="sidebar">
         <div class="box">
             <div class="box-title">1. Réseau</div>
-            <button class="btn-cx" onclick="autoConnect()">ACTIVER LE TUNNEL</button>
+            <button class="btn-cx" onclick="autoConnect()">CONNEXION INTELLIGENTE</button>
             <div id="cxMsg" style="text-align:center; font-size:10px; color:#666">Cliquez pour démarrer</div>
         </div>
 
@@ -158,19 +158,25 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V19 Certified. Système prêt.</div>
+<div class="logs" id="console">> V20 Hybride. Terminologie F/H/R/S + Correction Réseau.</div>
 
 <script>
     const PROXY = "https://corsproxy.io/?";
     const RPCS = [
-        "https://wax.greymass.com", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
-        "https://wax.pink.gg", "https://api.waxsweden.org", "https://wax.dapplica.io",
-        "https://wax.eosphere.io", "https://api.wax.liquidstudios.io", "https://wax-bp.wizardsguild.one",
-        "https://api-wax.eosarabia.net", "https://wax.eu.eosamsterdam.net", "https://wax.cryptolions.io",
-        "https://api.hivebp.io", "https://wax.blacklusion.io", "https://wax-public-bp.neftyblocks.com"
+        "https://wax.greymass.com", 
+        "https://wax.eosn.io", 
+        "https://api.wax.alohaeos.com",
+        "https://wax.pink.gg", 
+        "https://api.waxsweden.org", 
+        "https://wax.dapplica.io",
+        "https://wax.eosphere.io", 
+        "https://api.wax.liquidstudios.io",
+        "https://api-wax.eosarabia.net", 
+        "https://wax.eu.eosamsterdam.net",
+        "https://wax.cryptolions.io"
     ];
 
-    // CONFIGURATION EXACTE (DUMP)
+    // CONFIGURATION EXACTE
     const ZONE_DB = {
         1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 13.92 },
         2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 27.29 },
@@ -196,7 +202,7 @@
 
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
-    let activeRPC = null;
+    let activeEndpoint = null; // URL complète (avec ou sans proxy)
     let stopSignal = false;
 
     function log(msg, color="#aaa") {
@@ -216,32 +222,59 @@
         return endSec > now;
     }
 
-    // --- CONNEXION ---
+    // --- 1. CONNEXION INTELLIGENTE (DIRECT -> PUIS PROXY) ---
+    async function checkRPC(rpcUrl, useProxy) {
+        const baseUrl = useProxy ? (PROXY + encodeURIComponent(rpcUrl + "/v1/chain/get_info")) : (rpcUrl + "/v1/chain/get_info");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 sec timeout
+        
+        try {
+            const res = await fetch(baseUrl, { method: 'GET', signal: controller.signal });
+            clearTimeout(timeoutId);
+            if(res.ok) return true;
+        } catch(e) {}
+        return false;
+    }
+
     async function autoConnect() {
         const btn = document.querySelector('.btn-cx');
-        btn.disabled = true; btn.innerText = "TEST...";
+        btn.disabled = true; btn.innerText = "RECHERCHE...";
+        
+        // Etape 1 : Essai Direct (Le plus stable)
+        log("Tentative connexion DIRECTE (plus rapide)...", "#fff");
         for(let rpc of RPCS) {
-            try {
-                const url = PROXY + encodeURIComponent(rpc + "/v1/chain/get_info");
-                const controller = new AbortController();
-                setTimeout(() => controller.abort(), 3000);
-                const res = await fetch(url, { method: 'GET', signal: controller.signal });
-                if(res.ok) {
-                    activeRPC = rpc;
-                    document.getElementById('rpcStatus').innerText = "TUNNEL ACTIF";
-                    document.getElementById('rpcStatus').style.color = "#00e676";
-                    document.getElementById('cxMsg').innerText = "OK : " + new URL(rpc).hostname;
-                    document.getElementById('btnGlobal').disabled = false;
-                    document.getElementById('btnTarget').disabled = false;
-                    btn.innerText = "CONNECTÉ";
-                    btn.style.background = "#333"; btn.style.color = "#00e676";
-                    initGrid();
-                    return;
-                }
-            } catch(e) {}
+            if(await checkRPC(rpc, false)) {
+                activeEndpoint = rpc; // Pas de proxy
+                onConnected("DIRECT", rpc);
+                return;
+            }
         }
-        log("ECHEC PROXY.", "#ff1744");
+
+        // Etape 2 : Essai Proxy (Secours)
+        log("Connexion Directe échouée. Tentative TUNNEL...", "orange");
+        for(let rpc of RPCS) {
+            if(await checkRPC(rpc, true)) {
+                activeEndpoint = PROXY + encodeURIComponent(rpc); // Avec proxy
+                onConnected("TUNNEL", rpc);
+                return;
+            }
+        }
+
+        log("ERREUR FATALE : Aucun réseau disponible.", "#ff1744");
         btn.disabled = false; btn.innerText = "RÉESSAYER";
+    }
+
+    function onConnected(mode, rpc) {
+        const btn = document.querySelector('.btn-cx');
+        document.getElementById('rpcStatus').innerText = mode + " ACTIF";
+        document.getElementById('rpcStatus').style.color = "#00e676";
+        document.getElementById('cxMsg').innerText = "OK : " + new URL(rpc).hostname;
+        document.getElementById('btnGlobal').disabled = false;
+        document.getElementById('btnTarget').disabled = false;
+        btn.innerText = "CONNECTÉ (" + mode + ")";
+        btn.style.background = "#333"; btn.style.color = "#00e676";
+        log(`Connecté via ${mode} !`, "#00e676");
+        initGrid();
     }
 
     function initGrid() {
@@ -251,4 +284,236 @@
             const z = ZONE_DB[id];
             
             let costDisplay = "";
-            if (z.cost > 0) costDisplay = `<span class="z-burn">-${z.
+            if (z.cost > 0) costDisplay = `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>`;
+            else if (z.costX > 0) costDisplay = `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
+            
+            let rewardDisplay = "";
+            if (z.reward > 0) rewardDisplay = `<span class="z-earn">+${z.reward.toLocaleString()}</span>`;
+            else rewardDisplay = `<span style="color:#aaa">POOL</span>`;
+
+            html += `
+            <div class="zone" id="z-card-${id}">
+                <div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div>
+                <div class="z-metrics">
+                    <div class="z-row"><span>Coût 24h:</span> ${costDisplay}</div>
+                    <div class="z-row"><span>Gain Win:</span> ${rewardDisplay}</div>
+                </div>
+                <div class="z-act-text">
+                    <span style="color:var(--warn)" id="z-miss-${id}">0 act.</span>
+                    <span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span>
+                </div>
+                <div class="z-activity">
+                    <div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div>
+                    <div class="z-act-ready" id="z-br-${id}" style="width:0%"></div>
+                </div>
+            </div>`;
+        });
+        grid.innerHTML = html;
+    }
+
+    // --- REQUETE UNIVERSELLE ---
+    async function fetchTableRPC(table, lowerBound, limit=300) {
+        // Construction URL intelligente
+        // Si activeEndpoint contient déjà le proxy (http...), on l'utilise tel quel
+        // Sinon on ajoute juste le endpoint
+        let fullUrl = activeEndpoint.startsWith("http") ? activeEndpoint : ("https://" + activeEndpoint);
+        
+        // Cas spécial : si activeEndpoint est l'URL du proxy qui encode l'URL cible
+        if(activeEndpoint.includes("corsproxy")) {
+            // L'URL est déjà formatée dans autoConnect
+             fullUrl = activeEndpoint + "%2Fv1%2Fchain%2Fget_table_rows"; // Hack pour concaténer sur l'URL encodée
+             // Correction : Le proxy attend l'URL cible encodée en paramètre.
+             // Simplification : on refait la logique propre ici.
+        } else {
+             fullUrl = activeEndpoint + "/v1/chain/get_table_rows";
+        }
+
+        // RE-LOGIQUE PLUS PROPRE POUR EVITER LES ERREURS D'URL
+        let fetchUrl;
+        if(activeEndpoint.includes("corsproxy")) {
+             // On doit extraire l'URL RPC de base pour reconstruire la requête spécifique
+             const rawRpc = activeEndpoint.split("?")[1]; // C'est l'URL encodée
+             const decodedRpc = decodeURIComponent(rawRpc);
+             const target = decodedRpc + "/v1/chain/get_table_rows";
+             fetchUrl = PROXY + encodeURIComponent(target);
+        } else {
+             fetchUrl = activeEndpoint + "/v1/chain/get_table_rows";
+        }
+
+        try {
+            const res = await fetch(fetchUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: table,
+                    limit: limit, lower_bound: lowerBound
+                })
+            });
+            return await res.json();
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async function startGlobal() {
+        stopSignal = false;
+        document.getElementById('dashView').style.display = 'block';
+        document.getElementById('targetView').style.display = 'none';
+        document.getElementById('btnGlobal').style.display = 'none';
+        document.getElementById('btnStop').style.display = 'inline-block';
+
+        let stats = { 
+            divs: 0, 
+            burn: { fuel: 0, health: 0, repair: 0, supply: 0 },
+            totalCostX: 0, 
+            totalGain: 0, 
+            zones: {} 
+        };
+        ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
+
+        let nextKey = "";
+        let hasMore = true;
+
+        log("Scan Logistique en cours...", "#fff");
+
+        try {
+            while(hasMore && !stopSignal) {
+                document.getElementById('scanProg').innerText = `Divs: ${stats.divs}`;
+                const data = await fetchTableRPC("sdivisions", nextKey);
+                if(!data.rows || data.rows.length === 0) break;
+
+                for(let row of data.rows) {
+                    stats.divs++;
+                    const zID = getProp(row, ['zoneID', 'zone_id'], 0);
+                    const busy = isBusy(row);
+
+                    if(stats.zones[zID]) {
+                        const zStats = stats.zones[zID];
+                        const zInfo = ZONE_DB[zID];
+                        zStats.count++;
+                        
+                        if(busy) {
+                            zStats.active++;
+                            // Calculs Economiques
+                            if (zInfo.cost > 0) {
+                                stats.burn.fuel += zInfo.cost;
+                                stats.burn.health += zInfo.cost;
+                                stats.burn.repair += zInfo.cost;
+                                stats.burn.supply += zInfo.cost;
+                            }
+                            stats.totalCostX += zInfo.costX; // DOVX (Villes)
+                            stats.totalGain += zInfo.reward; // Gain
+                        } else {
+                            zStats.idle++;
+                        }
+                    }
+                }
+                updateDash(stats);
+                if(data.more && data.next_key) nextKey = data.next_key;
+                else hasMore = false;
+            }
+            log("Scan terminé.", "#00e676");
+        } catch(e) { log("Erreur Scan (Réessayez): " + e.message, "red"); }
+
+        document.getElementById('btnStop').style.display = 'none';
+        document.getElementById('btnGlobal').style.display = 'inline-block';
+        document.getElementById('scanProg').innerText = "Terminé";
+    }
+
+    async function startTarget() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        document.getElementById('dashView').style.display = 'none';
+        const view = document.getElementById('targetView');
+        view.style.display = 'flex';
+        view.innerHTML = `<div style="padding:20px; text-align:center">Espionnage de ${user}...</div>`;
+        
+        let rows = [];
+        let nextKey = user;
+        let searching = true;
+
+        try {
+            while(searching) {
+                const data = await fetchTableRPC("sdivisions", nextKey, 100);
+                if(!data.rows || data.rows.length === 0) break;
+                for(let row of data.rows) {
+                    const owner = getProp(row, ['owner', 'user', 'account']);
+                    if(owner === user) rows.push(row);
+                    else if(owner.localeCompare(user) > 0) { searching = false; break; }
+                }
+                if(searching && data.more) nextKey = data.next_key; else searching = false;
+            }
+
+            let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">
+                JOUEUR : ${user.toUpperCase()} (${rows.length} Divisions)
+            </div>`;
+            rows.forEach(r => {
+                const zID = getProp(r, ['zoneID', 'zone_id'], 0);
+                const zInfo = ZONE_DB[zID] || { name: "Inconnu", cost: 0, costX: 0, reward: 0 };
+                const busy = isBusy(r);
+                
+                let statusHtml = "";
+                let ecoHtml = "";
+                
+                if (busy) {
+                    statusHtml = `<span class="st-mission">MISSION</span>`;
+                    let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
+                    let gainTxt = zInfo.reward > 0 ? `+${zInfo.reward}` : "POOL";
+                    ecoHtml = `<span style="font-size:9px; color:#888; margin-right:10px">
+                        Conso: <span style="color:var(--alert)">${costTxt}</span> | 
+                        Gain: <span style="color:var(--main)">${gainTxt}</span>
+                    </span>`;
+                } else {
+                    statusHtml = `<span class="st-ready">PRÊT</span>`;
+                }
+                
+                html += `
+                <div class="t-row">
+                    <div style="width:50px; color:var(--main)">#${r.division_id}</div>
+                    <div style="flex:1; text-align:right;">${ecoHtml}</div>
+                    <div style="display:flex; align-items:center; margin-left:10px;">
+                        ${statusHtml}
+                        <div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div>
+                    </div>
+                </div>`;
+            });
+            view.innerHTML = html;
+        } catch(e) { log("Erreur cible: " + e.message, "red"); }
+    }
+
+    function updateDash(stats) {
+        document.getElementById('dDivs').innerText = stats.divs.toLocaleString();
+        
+        const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits: 0});
+        
+        document.getElementById('dGain').innerText = "+ " + fmt(stats.totalGain) + " DOVX";
+        document.getElementById('dCostX').innerText = "- " + fmt(stats.totalCostX) + " DOVX";
+
+        // Mise à jour de la logistique détaillée avec les nouveaux noms
+        document.getElementById('lFuel').innerText = "-" + fmt(stats.burn.fuel);
+        document.getElementById('lHealth').innerText = "-" + fmt(stats.burn.health);
+        document.getElementById('lRepair').innerText = "-" + fmt(stats.burn.repair);
+        document.getElementById('lSupply').innerText = "-" + fmt(stats.burn.supply);
+
+        ZONE_ORDER.forEach(id => {
+            const data = stats.zones[id];
+            const card = document.getElementById(`z-card-${id}`);
+            
+            if(card && data) {
+                if(data.count > 0) card.classList.add('active');
+                
+                document.getElementById(`z-count-${id}`).innerText = data.count;
+                document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
+                document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
+
+                const total = data.count || 1;
+                const pctMiss = (data.active / total) * 100;
+                document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
+                document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
