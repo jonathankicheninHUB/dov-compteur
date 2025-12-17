@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V41 (STABLE)</title>
+    <title>DoV - COMMAND V43 (PERFECT ALIGN)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -65,6 +65,13 @@
         .db-val { font-size: 16px; font-weight: bold; color: #fff; }
         .db-usd { font-size: 11px; color: var(--money); text-align: right; }
 
+        /* RATIO BAR V43 */
+        .balance-container { background:#111; padding:15px; border:1px solid #333; margin-bottom:20px; }
+        .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+        .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
+        .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; }
+        .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
+
         /* COMMON & MAP */
         .view-section { display: none; }
         .view-active { display: block; }
@@ -107,17 +114,13 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .balance-bar { width: 100%; height: 10px; background: #222; display: flex; margin-top: 20px; border-radius: 5px; overflow: hidden; }
-        .bal-demand { background: var(--alert); height: 100%; }
-        .bal-supply { background: var(--main); height: 100%; }
-
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V41 BUG FREE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V43 PERFECT ALIGN</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -194,10 +197,11 @@
                     </div>
                 </div>
 
-                <div style="background:#111; padding:15px; border:1px solid #333; margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#fff; font-weight:bold; margin-bottom:5px">
-                        <span>RATIO OFFRE / DEMANDE</span>
-                        <span id="ratioTxt">Calcul...</span>
+                <div class="balance-container">
+                    <div class="balance-header">
+                        <div style="color:var(--alert); text-align:left;">DEMANDE (BURN)</div>
+                        <div style="text-align:center; color:#fff" id="ratioTxt">Calcul...</div>
+                        <div style="color:var(--main); text-align:right;">OFFRE (MINT)</div>
                     </div>
                     <div class="balance-bar">
                         <div class="bal-demand" id="barDemand" style="width:50%"></div>
@@ -245,7 +249,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V41 Bug Free. HTML restauré, Sécurité JS activée.</div>
+<div class="logs" id="console">> V43 Aligned. Interface cohérente (Rouge/Gauche vs Vert/Droite).</div>
 
 <script>
     // --- DEFAULT CONFIG ---
@@ -279,7 +283,7 @@
         scanned: 0 
     };
 
-    // --- UTILS (AVEC SÉCURITÉ V41) ---
+    // --- UTILS ---
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
         const t = new Date().toLocaleTimeString();
@@ -289,12 +293,8 @@
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
     function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
     function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
-    
-    // FIX V41 : EMPECHE LE CRASH SI L'ELEMENT N'EXISTE PAS
-    function setTextSafe(id, txt) { 
-        let el = document.getElementById(id); 
-        if(el) el.innerText = txt; 
-    }
+    function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
+    function setHtmlSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerHTML = txt; }
 
     // --- UPDATE RATES ---
     function updateRates() {
@@ -408,7 +408,7 @@
             scanned: 0 
         };
         
-        log("Audit Financier V41 en cours...", "#fff");
+        log("Audit Financier V43 en cours...", "#fff");
         try {
             // DEMANDE (DIVISIONS)
             let nextKey = ""; let hasMore = true;
@@ -463,18 +463,32 @@
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
-        // GLOBAL CARDS (RESTORED V41)
+        // GLOBAL CARDS
         let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply;
         let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
         let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
 
-        // SAFE SETTERS
         setTextSafe('valDemandTU', fmt(totalD) + " TU");
         setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
         setTextSafe('valSupplyTU', fmt(totalS) + " TU");
         setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
         setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX");
         setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
+
+        // --- V43 RATIO BAR ALIGNMENT ---
+        let totalVol = totalD + totalS || 1; 
+        let pctD = (totalD / totalVol) * 100;
+        let pctS = (totalS / totalVol) * 100;
+        
+        let barD = document.getElementById('barDemand'); if(barD) barD.style.width = pctD + "%";
+        let barS = document.getElementById('barSupply'); if(barS) barS.style.width = pctS + "%";
+        
+        let diff = totalS - totalD;
+        let diffTxt = diff >= 0 ? `SURPLUS (+${fmt(diff)})` : `DÉFICIT (${fmt(diff)})`;
+        let diffColor = diff >= 0 ? "var(--main)" : "var(--alert)";
+        
+        setHtmlSafe('ratioTxt', `<span style="color:${diffColor}">${diffTxt}</span>`);
+        // ------------------------------
 
         // MATRIX
         const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
