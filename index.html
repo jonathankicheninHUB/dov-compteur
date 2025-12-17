@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V35 (COMPLETE)</title>
+    <title>DoV - COMMAND V36 (CFO FINAL)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -13,7 +13,7 @@
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
-        h1 { color: var(--main); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
+        h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
         .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
 
         .layout { display: flex; flex: 1; overflow: hidden; }
@@ -25,21 +25,45 @@
         
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
         .btn-zone { background: var(--main); color: #000; } 
-        .btn-eco { background: var(--gold); color: #000; } 
+        .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; }
         .btn-stop { background: var(--alert); color: #fff; display: none; }
         .btn-target { background: var(--sec); color: #000; }
         .btn-build { background: #9b59b6; color: #fff; }
 
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
 
-        /* DASHBOARD LOGISTIQUE (COMMON) */
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; margin-bottom:10px; }
+        /* V36 : MATRICE ECONOMIQUE */
+        .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
+        .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
+        .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
+        
+        .mx-row { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        .mx-val { color: #fff; font-weight: bold; }
+        .mx-usd { color: var(--money); font-size: 10px; }
+        .mx-lbl { color: #666; }
+
+        .mx-bal { text-align: center; padding: 5px; font-weight: bold; margin-top: 5px; border-radius: 3px; }
+        .bal-pos { background: rgba(0, 230, 118, 0.1); color: var(--main); border: 1px solid var(--main); }
+        .bal-neg { background: rgba(255, 23, 68, 0.1); color: var(--alert); border: 1px solid var(--alert); }
+
+        /* V36 : DOVX ANALYSIS */
+        .dovx-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .db-card { background: #080808; border: 1px solid var(--dovx); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .db-big { font-size: 18px; color: #fff; font-weight: bold; }
+
+        /* COMMON */
+        .view-section { display: none; }
+        .view-active { display: block; }
+        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
+        
+        /* ZONES & TARGET STYLES */
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .d-fuel { background: var(--fuel); } .d-health { background: var(--health); }
         .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
-
-        /* VUE ZONES (MAP) */
+        
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -52,47 +76,33 @@
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
+        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
+        .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; }
         .z-act-ready { background: var(--main); height: 100%; }
-        .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
-
-        /* VUE ECONOMIQUE */
-        .eco-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
-        .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 10px; display:flex; justify-content:space-between; }
-        .eco-val { font-size: 22px; font-weight: bold; color: #fff; }
-        .eco-sub { font-size: 14px; color: #666; margin-top: 5px; }
-        .eco-usd { font-size: 12px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 10px; }
-        .c-fighter { border-top: 3px solid var(--alert); }
-        .c-producer { border-top: 3px solid var(--main); }
-        .c-market { border-top: 3px solid var(--dovx); }
-        .balance-bar { width: 100%; height: 10px; background: #222; display: flex; margin-top: 20px; border-radius: 5px; overflow: hidden; }
-        .bal-demand { background: var(--alert); height: 100%; }
-        .bal-supply { background: var(--main); height: 100%; }
-
-        /* TARGET & BUILDINGS */
+        .z-earn { color: var(--main); font-weight: bold; }
+        .z-burn { color: var(--alert); }
+        .z-burn-x { color: var(--dovx); font-weight: bold; }
+        
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
 
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; }
+        .b-sub { font-size: 10px; color: #666; }
         .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
         .b-badge-ok { background: var(--main); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; }
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* UTILS */
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
-        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        .view-section { display: none; }
-        .view-active { display: block; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--main)">V35 COMPLETE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V36 CFO FINAL</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -114,7 +124,7 @@
         </div>
         
         <div style="font-size:9px; color:#444; padding:10px; text-align:center">
-            V35 : Zones + Economy<br>Tout est là.
+            V36 : Matrice Financière<br>Modules Joueur Restaurés
         </div>
     </aside>
 
@@ -143,34 +153,25 @@
 
         <div id="ecoView" class="view-section">
             <div id="ecoResults">
-                <div class="eco-grid">
-                    <div class="eco-card c-fighter">
-                        <div class="eco-head"><span>DEMANDE (COMBATTANTS)</span> <span>🔥 BURN</span></div>
-                        <div class="eco-val" id="valDemandTU">0 TU</div>
-                        <div class="eco-sub">Consommation journalière</div>
-                        <div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div>
-                    </div>
-                    <div class="eco-card c-producer">
-                        <div class="eco-head"><span>OFFRE (PRODUCTEURS)</span> <span>⚡ MINT</span></div>
-                        <div class="eco-val" id="valSupplyTU">0 TU</div>
-                        <div class="eco-sub">Production journalière</div>
-                        <div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div>
-                    </div>
-                    <div class="eco-card c-market">
-                        <div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div>
-                        <div class="eco-val" id="valDovxBurn">0 DOVX</div>
-                        <div class="eco-sub">Coût de production</div>
-                        <div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div>
-                    </div>
+                <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; color:#fff; font-weight:bold;">
+                    MATRICE OFFRE (Usines) / DEMANDE (Combattants)
                 </div>
-                <div style="background:#111; padding:20px; border:1px solid #333;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#fff; font-weight:bold; margin-bottom:5px">
-                        <span>RATIO OFFRE / DEMANDE</span>
-                        <span id="ratioTxt">Calcul...</span>
+                <div class="matrix-grid" id="tokenMatrix"></div>
+                
+                <div style="background:#111; padding:15px; border:1px solid var(--dovx); margin-top:20px;">
+                    <div style="font-weight:bold; color:var(--dovx); margin-bottom:10px; text-transform:uppercase;">Analyse de la Consommation DOVX (Input)</div>
+                    <div class="dovx-breakdown">
+                        <div class="db-card">
+                            <div><div style="color:#888; font-size:10px;">CONSOMMATION VILLES</div><div class="db-big" id="valCityDovx">0</div></div>
+                            <div style="text-align:right; font-size:10px; color:var(--money)" id="usdCityDovx">$0.00</div>
+                        </div>
+                        <div class="db-card">
+                            <div><div style="color:#888; font-size:10px;">CONSOMMATION BÂTIMENTS</div><div class="db-big" id="valBuildDovx">0</div></div>
+                            <div style="text-align:right; font-size:10px; color:var(--money)" id="usdBuildDovx">$0.00</div>
+                        </div>
                     </div>
-                    <div class="balance-bar">
-                        <div class="bal-demand" id="barDemand" style="width:50%"></div>
-                        <div class="bal-supply" id="barSupply" style="width:50%"></div>
+                    <div style="margin-top:10px; text-align:right; font-size:12px; color:#fff;">
+                        TOTAL BURN DOVX : <span id="totalDovxBurn" style="font-weight:bold">0</span>
                     </div>
                 </div>
             </div>
@@ -181,11 +182,13 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V35 Complète. Modules Map + Finance + Sniper intégrés.</div>
+<div class="logs" id="console">> V36 Finale Loaded. Code complet et restauré.</div>
 
 <script>
-    // CONFIG
+    // CONFIG V36
     const RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
+    
+    // CONFIG ZONES
     const ZONE_DB = {
         1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 13.92 }, 2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 27.29 },
         3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 54.59 }, 4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 108.53 },
@@ -204,7 +207,7 @@
 
     let stopSignal = false;
     let rpcIndex = 0; 
-    let ECO_DATA = {};
+    let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
@@ -289,8 +292,7 @@
                 document.getElementById(`z-count-${id}`).innerText = data.count;
                 document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
                 document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
-                const total = data.count || 1;
-                const pctMiss = (data.active / total) * 100;
+                const pctMiss = (data.active / data.count) * 100;
                 document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
                 document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
             }
@@ -306,14 +308,14 @@
         });
     }
 
-    // --- 2. SCAN ECONOMY ---
+    // --- 2. SCAN ECONOMY V36 ---
     async function startEconomyScan() {
         stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
-        ECO_DATA = { demand: {total:0}, supply: {total:0}, dovx_burn: 0, scanned:0 };
+        ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0 }, scanned: 0 };
         
-        log("Audit Financier en cours...", "#fff");
+        log("Audit Financier V36 en cours...", "#fff");
         try {
-            // DEMANDE
+            // DEMANDE (DIVISIONS)
             let nextKey = ""; let hasMore = true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
@@ -322,15 +324,21 @@
                     ECO_DATA.scanned++;
                     const zID = getProp(row, ['zoneID', 'zone_id']);
                     const zInfo = ZONE_DB[zID];
-                    if(zInfo) {
-                        if(zInfo.cost > 0) ECO_DATA.demand.total += (zInfo.cost*4);
-                        if(zInfo.costX > 0) ECO_DATA.dovx_burn += zInfo.costX;
+                    const busy = isBusy(row);
+                    if(zInfo && busy) {
+                        if(zInfo.cost > 0) { 
+                            ECO_DATA.demand.fuel += zInfo.cost;
+                            ECO_DATA.demand.health += zInfo.cost;
+                            ECO_DATA.demand.repair += zInfo.cost;
+                            ECO_DATA.demand.supply += zInfo.cost;
+                        }
+                        if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
                     }
                 }
                 updateEcoDisplay();
                 if(data.more) nextKey=data.next_key; else hasMore=false;
             }
-            // OFFRE
+            // OFFRE (BATIMENTS)
             nextKey=""; hasMore=true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovutilstake", "buildings", nextKey);
@@ -339,7 +347,13 @@
                     ECO_DATA.scanned++;
                     let p = parseFloat(Array.isArray(b.power)?b.power[0]:b.power)||0;
                     let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0;
-                    ECO_DATA.supply.total += p; ECO_DATA.dovx_burn += i;
+                    let pType = Array.isArray(b.power)?b.power[0]:b.power;
+                    
+                    ECO_DATA.dovx.buildings += i;
+                    if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p;
+                    if(pType.includes("DOVH")) ECO_DATA.supply.health += p;
+                    if(pType.includes("DOVR")) ECO_DATA.supply.repair += p;
+                    if(pType.includes("DOVS")) ECO_DATA.supply.supply += p;
                 }
                 updateEcoDisplay();
                 if(data.more) nextKey=data.next_key; else hasMore=false;
@@ -353,21 +367,25 @@
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
-        const dTU = ECO_DATA.demand.total; const sTU = ECO_DATA.supply.total; const dBurn = ECO_DATA.dovx_burn;
-        
-        document.getElementById('valDemandTU').innerText = fmt(dTU) + " TU";
-        document.getElementById('valDemandUSD').innerText = fmtUSD(dTU * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
-        
-        document.getElementById('valSupplyTU').innerText = fmt(sTU) + " TU";
-        document.getElementById('valSupplyUSD').innerText = fmtUSD(sTU * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
-        
-        document.getElementById('valDovxBurn').innerText = fmt(dBurn) + " DOVX";
-        document.getElementById('valDovxUSD').innerText = fmtUSD(dBurn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h";
+        const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
+        let html = "";
+        tokens.forEach(t => {
+            let s = ECO_DATA.supply[t.key];
+            let d = ECO_DATA.demand[t.key];
+            let bal = s - d;
+            let valUSD = s * RATES.TU_WAX * RATES.WAX_USD;
+            let balClass = bal >= 0 ? "bal-pos" : "bal-neg";
+            let balTxt = bal >= 0 ? "SURPLUS" : "DÉFICIT";
+            html += `<div class="matrix-col" style="border-top:3px solid ${t.color}"><div class="mx-head" style="background:${t.color}">${t.label}</div><div class="mx-body"><div><div class="mx-row"><span class="mx-lbl">Production</span> <span class="mx-val">${fmt(s)}</span></div><div class="mx-row"><span class="mx-lbl">Besoin</span> <span class="mx-val">${fmt(d)}</span></div><div style="text-align:right; margin-top:2px" class="mx-usd">Val. Prod: ${fmtUSD(valUSD)}</div></div><div class="mx-bal ${balClass}">${balTxt} ${fmt(bal)}</div></div></div>`;
+        });
+        document.getElementById('tokenMatrix').innerHTML = html;
 
-        const max = Math.max(dTU, sTU) || 1;
-        document.getElementById('barDemand').style.width = (dTU/max*100)+"%";
-        document.getElementById('barSupply').style.width = (sTU/max*100)+"%";
-        document.getElementById('ratioTxt').innerHTML = (dTU>sTU)?`<span style="color:var(--alert)">DÉFICIT</span>`:`<span style="color:var(--main)">SURPLUS</span>`;
+        document.getElementById('valCityDovx').innerText = fmt(ECO_DATA.dovx.cities);
+        document.getElementById('usdCityDovx').innerText = fmtUSD(ECO_DATA.dovx.cities * RATES.DOVX_WAX * RATES.WAX_USD);
+        document.getElementById('valBuildDovx').innerText = fmt(ECO_DATA.dovx.buildings);
+        document.getElementById('usdBuildDovx').innerText = fmtUSD(ECO_DATA.dovx.buildings * RATES.DOVX_WAX * RATES.WAX_USD);
+        let totalDovx = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+        document.getElementById('totalDovxBurn').innerText = fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")";
     }
 
     // --- 3. TARGET TOOLS (SNIPER) ---
@@ -400,7 +418,10 @@
             rows.forEach(b => {
                 let p = Array.isArray(b.power)?b.power[0]:b.power;
                 let ready = (now > (parseFloat(b.last_claim)+parseFloat(b.delay)));
-                html += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${ready?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div class="b-pow">${p}</div></div></div>`;
+                let typeColor = "#fff";
+                if(p.includes("DOVF")) typeColor = "var(--fuel)"; else if(p.includes("DOVH")) typeColor = "var(--health)";
+                else if(p.includes("DOVR")) typeColor = "var(--repair)"; else if(p.includes("DOVS")) typeColor = "var(--supply)";
+                html += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${ready?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${p}</div></div></div>`;
             });
             view.innerHTML = html;
         } catch(e){ log(e.message, "red"); }
