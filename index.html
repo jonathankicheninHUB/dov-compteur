@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V70 (TARGET FIX)</title>
+    <title>DoV - COMMAND V71 (REAL ACTIVE PROD)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -24,9 +24,9 @@
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; } .inp-money { color: var(--money); font-weight: bold; }
         
-        /* UI V69/70 */
+        /* UI V71 */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
-        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); }
+        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); } /* Warn color car focus Actif */
         .g-mc-left { font-size: 16px; font-weight: bold; }
         .g-mc-right { text-align:right; }
         .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; font-weight:bold; }
@@ -41,7 +41,7 @@
         .g-cost-section { text-align:center; margin-bottom:10px; }
         .g-mini-cost { font-size:14px; color: var(--dovx); font-weight:bold; }
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
-        .c-act { color: var(--warn); } .c-rdy { color: var(--main); }
+        .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; } /* Grisé car ne compte pas */
 
         /* RESTE DU CSS */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -92,7 +92,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V70 TARGET FIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V71 REAL ACTIVE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -120,7 +120,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (24H)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (24H ACTIF)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -209,7 +209,7 @@
                 <div class="g-dashboard">
                     <div class="g-main-count">
                         <div class="g-mc-left">
-                            <div>SCAN GLOBAL (CYCLE 24H)</div>
+                            <div>SCAN GLOBAL (ACTIF SEULEMENT)</div>
                             <div style="font-size:12px; color:#555; margin-top:2px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
@@ -217,29 +217,63 @@
                             <div class="g-cost-val" id="gTotalCost">0</div>
                         </div>
                     </div>
+                    <div class="g-status-row">
+                        <div class="g-stat-box" style="border-color:var(--warn)">
+                            <div class="val c-act" id="gTotalAct">0</div>
+                            <div class="lbl">ACTIFS (EN PROD)</div>
+                        </div>
+                        <div class="g-stat-box" style="border-color:var(--main)">
+                            <div class="val c-rdy" id="gTotalRdy">0</div>
+                            <div class="lbl">PRÊTS À RÉCOLTER</div>
+                        </div>
+                    </div>
                     <div class="g-detail-grid">
                         <div class="g-card" style="border-top:3px solid var(--fuel)">
                             <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
-                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span><span class="g-prod-lbl">PROD / JOUR (24H)</span></div>
-                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-F">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span>
+                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-F">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--health)">
                             <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
-                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span><span class="g-prod-lbl">PROD / JOUR (24H)</span></div>
-                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-H">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span>
+                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-H">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--repair)">
                             <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
-                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span><span class="g-prod-lbl">PROD / JOUR (24H)</span></div>
-                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-R">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span>
+                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-R">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
                         </div>
                         <div class="g-card" style="border-top:3px solid var(--supply)">
                             <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
-                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span><span class="g-prod-lbl">PROD / JOUR (24H)</span></div>
-                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-S">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-prod-section">
+                                <span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span>
+                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
+                            </div>
+                            <div class="g-cost-section">
+                                <div class="g-mini-cost" id="cost-S">0</div>
+                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
+                            </div>
                             <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
                         </div>
                     </div>
@@ -251,7 +285,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V70. Target Fix & 24H Logic Loaded.</div>
+<div class="logs" id="console">> V71. Filtre Active Only.</div>
 
 <script>
     // FACTEUR DE COUT DOV-X
@@ -306,7 +340,7 @@
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
-                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } // ADDED UPPER_BOUND FOR EXACT MATCH
+                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; }
                 const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
@@ -315,41 +349,42 @@
         throw new Error("Arrêt.");
     }
 
-    // --- SCAN GLOBAL MATRIX (V69) ---
+    // --- SCAN GLOBAL MATRIX (V71 - ONLY ACTIVE PROD) ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
-        log("🌍 SCAN GLOBAL (CYCLE 24H) DÉMARRÉ...", "#fff");
+        log("🌍 SCAN GLOBAL (ACTIVE ONLY) DÉMARRÉ...", "#fff");
         let nextKey = ""; let hasMore = true; const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
-        let stats = { total: 0, active: 0, ready: 0, totalDovxCost24: 0, F: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, H: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, R: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 }, S: { count: 0, power: 0, cost: 0, act: 0, rdy: 0 } };
+        
+        let stats = { total: 0, active: 0, ready: 0, totalDovxCost24: 0, F: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, H: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, R: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, S: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 } };
         try { while(hasMore && !stopSignal) { await new Promise(r => setTimeout(r, 10)); const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows || data.rows.length === 0) break; const now = Date.now()/1000;
             for(let b of data.rows) { stats.total++; let pVal = extractPower(b); let rawP = Array.isArray(b.power) ? b.power[0] : b.power; let pType = null;
                 if(typeof rawP === 'string') { if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S'; }
-                if(pType) { stats[pType].power += pVal; stats[pType].count++; let dailyProd = pVal * 24; let dailyCost = dailyProd * DOVX_COST_RATIO; stats[pType].cost += dailyCost; let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > readyTime; if(isReady) { stats.ready++; stats[pType].rdy++; } else { stats.active++; stats[pType].act++; stats.totalDovxCost24 += dailyCost; } } }
-            setTextSafe('globalCount', fmt(stats.total) + " Bâtiments"); setTextSafe('gTotalCost', fmt(stats.totalDovxCost24)); ['F','H','R','S'].forEach(t => { setTextSafe(`cnt-${t}`, fmt(stats[t].count)); setTextSafe(`pwr-${t}`, fmt(stats[t].power * 24) + " TU"); setTextSafe(`cost-${t}`, fmt(stats[t].cost)); setTextSafe(`act-${t}`, fmt(stats[t].act)); setTextSafe(`rdy-${t}`, fmt(stats[t].rdy)); });
+                if(pType) { 
+                    stats[pType].count++; 
+                    let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > readyTime; 
+                    if(isReady) { 
+                        stats.ready++; stats[pType].rdy++; 
+                        // READY = IDLE = NO PROD, NO COST
+                    } else { 
+                        stats.active++; stats[pType].act++; 
+                        // ACTIVE = PROD
+                        stats[pType].activePower += pVal; 
+                        let dailyProd = pVal * 24;
+                        let dailyCost = dailyProd * DOVX_COST_RATIO;
+                        stats[pType].cost += dailyCost;
+                        stats.totalDovxCost24 += dailyCost; 
+                    } 
+                } 
+            }
+            setTextSafe('globalCount', fmt(stats.total) + " Bâtiments"); setTextSafe('gTotalCost', fmt(stats.totalDovxCost24)); 
+            ['F','H','R','S'].forEach(t => { setTextSafe(`cnt-${t}`, fmt(stats[t].count)); setTextSafe(`pwr-${t}`, fmt(stats[t].activePower * 24) + " TU"); setTextSafe(`cost-${t}`, fmt(stats[t].cost)); setTextSafe(`act-${t}`, fmt(stats[t].act)); setTextSafe(`rdy-${t}`, fmt(stats[t].rdy)); });
             if(stats.total % 1000 === 0) document.getElementById('globalLogs').innerHTML = `> ${fmt(stats.total)} scannés...<br>` + document.getElementById('globalLogs').innerHTML; if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ SCAN FINI : ${fmt(stats.total)} Bâtiments.`, "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); document.getElementById('btnStop').style.display='none'; }
     }
 
-    // --- REPAIRED TARGET FUNCTION ---
-    async function startTarget() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('targetView');
-        const view = document.getElementById('targetView');
-        view.innerHTML="Recherche des divisions pour " + user + "...";
-        try {
-            // FIX: UTILISATION DE L'INDEX SECONDAIRE (2) ET DU TYPE i64
-            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); 
-            
-            const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : [];
-            let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`;
-            rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; });
-            view.innerHTML = htmlBuffer;
-        } catch(e){ log("Erreur Target: "+e.message, "red"); }
-    }
-
-    // ... (Reste des fonctions inchangées: startBuildings, startZoneScan, etc.)
+    async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
     async function startBuildings() { /* Code identique */ const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Scan Joueur (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; let counts = { total: 0, ready: 0, busy: 0, types: { F:0, H:0, R:0, S:0 } }; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let p = extractPower(b); let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > readyTime; if(isReady) counts.ready++; else counts.busy++; counts.total++; let pRaw = Array.isArray(b.power)?b.power[0]:b.power; let typeColor = "#fff"; if(pRaw.includes("DOVF")) { counts.types.F++; typeColor = "var(--fuel)"; } else if(pRaw.includes("DOVH")) { counts.types.H++; typeColor = "var(--health)"; } else if(pRaw.includes("DOVR")) { counts.types.R++; typeColor = "var(--repair)"; } else if(pRaw.includes("DOVS")) { counts.types.S++; typeColor = "var(--supply)"; } let card = `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${isReady?'<span class="b-badge-claim">STACKÉ</span>':'<span class="b-badge-ok">ACTIVITÉ</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); let html = `<div class="stats-row" style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;"><div class="stat"><span class="stat-val">${counts.total}</span><span class="stat-lbl">TOTAL</span></div><div class="stat"><span class="stat-val" style="color:var(--main)">${counts.ready}</span><span class="stat-lbl">READY</span></div><div class="stat"><span class="stat-val" style="color:var(--warn)">${counts.busy}</span><span class="stat-lbl">ACTIVE</span></div><div class="stat" style="font-size:10px; display:flex; flex-direction:column; justify-content:center; gap:3px;"><span style="color:var(--fuel)">F: ${counts.types.F}</span><span style="color:var(--health)">H: ${counts.types.H}</span><span style="color:var(--repair)">R: ${counts.types.R}</span><span style="color:var(--supply)">S: ${counts.types.S}</span></div></div>`; document.getElementById('buildDash').innerHTML = html; if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ Terminé.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
     async function startZoneScan() { /* Code identique */ stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); try { while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } } if (stats.divs % 200 === 0) updateZoneDash(stats); if(data.more) nextKey = data.next_key; else hasMore = false; } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } }
     function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; const pctMiss = data.count > 0 ? (data.active / data.count) * 100 : 0; document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%"; document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%"; } }); }
