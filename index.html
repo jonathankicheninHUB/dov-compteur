@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V54 (RESTAURATION)</title>
+    <title>DoV - COMMAND V55 (AUDIT FIXED)</title>
     <style>
+        /* --- DESIGN SYSTEM V43 (PERFECT ALIGN) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -99,7 +100,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V54 RESTAURATION</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V55 AUDIT FIXED</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -113,7 +114,12 @@
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
             <label class="inp-label">Parité TU [F/H/R/S] (en WAX)</label>
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
-            <div style="font-size:9px; color:#666; margin-top:5px; text-align:center">Modification instantanée</div>
+            
+            <div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
+                <label class="inp-label">CORS Proxy (Optionnel)</label>
+                <input type="text" id="inpProxy" value="https://corsproxy.io/?" placeholder="https://your-proxy.com/?">
+                <div style="font-size:9px; color:#666;">Laisser vide pour Direct, ou mettez votre propre proxy.</div>
+            </div>
         </div>
 
         <div class="box">
@@ -227,29 +233,24 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V54 RESTAURATION. Retour au code de la V51 fonctionnelle.</div>
+<div class="logs" id="console">> V55 AUDIT FIXED. Sécurité Proxy + Parsing Power + Centralisation Config.</div>
 
 <script>
-    // --- 1. CONFIGURATION ---
+    // --- 1. CONFIGURATION (GAME RULES & SETTINGS) ---
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     
-    // RÈGLES DOVX (SEUILS)
-    const DOVX_CLAIM_LEVELS = [
-        { name: "WIN",  minPower: 1200, coeff: 1.0 },
-        { name: "DRAW", minPower: 500,  coeff: 0.5 },
-        { name: "LOST", minPower: 0,    coeff: 0.25 }
-    ];
+    // RÈGLES DU JEU (CENTRALISÉES - AUDIT POINT 6)
+    const GAME_RULES = {
+        DOVX_LEVELS: [
+            { name: "WIN",  minPower: 1200, coeff: 1.0 },
+            { name: "DRAW", minPower: 500,  coeff: 0.5 },
+            { name: "LOST", minPower: 0,    coeff: 0.25 }
+        ]
+    };
 
-    function computeDovxReward(baseReward, divisionPower) {
-        for (let lvl of DOVX_CLAIM_LEVELS) {
-            if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff;
-        }
-        return 0; 
-    }
-
-    // BASE DE DONNÉES ZONES (2025 - Valeurs Mises à Jour)
+    // BASE DE DONNÉES ZONES (2025)
     const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, // MAJ
+        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
         2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
         3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
         4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
@@ -268,16 +269,13 @@
         17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
         18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
         19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
+        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 }
     };
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    
-    // TECH CONFIG
-    const PROXY = "https://corsproxy.io/?";
     const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com", "https://api-wax.eosarabia.net"];
+
     let stopSignal = false;
     let rpcIndex = 0; 
-    
     let ECO_DATA = { 
         demand: { fuel:0, health:0, repair:0, supply:0 },
         supply: { fuel:0, health:0, repair:0, supply:0 },
@@ -285,17 +283,34 @@
         scanned: 0 
     };
 
-    // --- 2. UTILS ---
+    // --- 2. HELPERS (AUDIT POINT 2) ---
+    
+    // SAFE POWER PARSER (Regex fix)
+    function extractPower(row) {
+        let val = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr);
+        if (typeof val === 'string') {
+            val = val.replace(/[^0-9.]/g, ''); // Enlève " DOVX" ou autre texte
+        }
+        return parseFloat(val) || 0;
+    }
+
+    function computeDovxReward(baseReward, divisionPower) {
+        for (let lvl of GAME_RULES.DOVX_LEVELS) {
+            if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff;
+        }
+        return 0; 
+    }
+
+    // --- 3. CORE FUNCTIONS ---
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
-        c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML;
+        const t = new Date().toLocaleTimeString();
+        c.innerHTML = `<div style="color:${color}">[${t}] ${msg}</div>` + c.innerHTML;
     }
     function showStatus(msg) { document.getElementById('statusMsg').style.display='block'; document.getElementById('statusMsg').innerText=msg; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
-    // 🔥 ROBUST GETTER
     function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
     function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
-    function getId(row) { return row.asset_id || row.id || row.division_id || 0; }
     function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
     function setHtmlSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerHTML = txt; }
 
@@ -307,21 +322,28 @@
         log("Taux mis à jour.", "#ffd700");
     }
 
-    // --- ROBUST FETCH (ENGINE V51) ---
+    // --- ROBUST FETCH (AUDIT POINT 1: PROXY CONFIG) ---
     async function robustFetch(code, table, lowerBound, limit=300, indexPosition=1, keyType="") {
         let attempts = 0;
+        const customProxy = document.getElementById('inpProxy').value.trim();
+        
         while(attempts < 10 && !stopSignal) {
             const server = RPCS[rpcIndex % RPCS.length];
             let url = server + "/v1/chain/get_table_rows";
-            let useProxy = (attempts > 0); 
-            if(useProxy) url = PROXY + encodeURIComponent(url);
+            
+            // Gestion Proxy Sécurisée
+            if(attempts > 0 && customProxy.length > 5) {
+                url = customProxy + encodeURIComponent(url);
+            }
+
             try {
                 if(document.getElementById('rpcStatus')) {
-                    document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
+                    document.getElementById('rpcStatus').innerText = (attempts > 0 ? "PROXY":"DIRECT")+": "+new URL(server).hostname;
                 }
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; }
+                
                 const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP");
                 return await res.json();
@@ -356,9 +378,8 @@
                             if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; }
                             stats.totalCostX += zInfo.costX; 
                             
-                            // CALCUL DOVX CAPACITÉ (V51 Logic - Ensures Display)
-                            let powerRaw = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr);
-                            const power = parseFloat(powerRaw) || 0;
+                            // CALCUL DE CAPACITÉ (Yield)
+                            const power = extractPower(row);
                             if(zInfo.reward > 0) {
                                 stats.totalGain += computeDovxReward(zInfo.reward, power);
                             }
@@ -366,7 +387,6 @@
                     }
                 }
                 
-                // OPTIMISATION VISUELLE V43 (Affichage tous les 100 items)
                 if (stats.divs % 100 === 0 || !data.more) updateZoneDash(stats);
                 
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
@@ -387,8 +407,7 @@
         setTextSafe('lSupply', "-" + fmt(stats.burn.supply));
         
         ZONE_ORDER.forEach(id => {
-            const data = stats.zones[id];
-            const card = document.getElementById(`z-card-${id}`);
+            const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`);
             if(card && data) {
                 if(data.count > 0) card.classList.add('active');
                 document.getElementById(`z-count-${id}`).innerText = data.count;
@@ -412,7 +431,7 @@
         grid.innerHTML = htmlBuffer;
     }
 
-    // --- 2. SCAN ECONOMY (CFO - PATCH V44 INTÉGRÉ) ---
+    // --- 2. SCAN ECONOMY (CFO - AUDIT FIXED) ---
     async function startEconomyScan() {
         stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
         
@@ -423,7 +442,7 @@
             scanned: 0 
         };
         
-        log("Audit Financier V54 (Restauration) en cours...", "#fff");
+        log("Audit Financier V55 (Security & Logic Fix) en cours...", "#fff");
         try {
             // DEMANDE (DIVISIONS)
             let nextKey = ""; let hasMore = true;
@@ -436,7 +455,7 @@
                     const zInfo = ZONE_DB[zID];
                     const busy = isBusy(row);
                     if(zInfo) {
-                        // BURN (Lié à l'activité)
+                        // BURN (Activité)
                         if(busy) {
                             if(zInfo.cost > 0) { 
                                 ECO_DATA.demand.fuel += zInfo.cost;
@@ -447,9 +466,8 @@
                             if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
                         }
                         
-                        // MINT (Lié à la puissance - CORRECTION DOVX)
-                        let powerRaw = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr);
-                        const power = parseFloat(powerRaw) || 0;
+                        // MINT (Capacité Structurelle - FIX POWER PARSING)
+                        const power = extractPower(row);
                         if(zInfo.reward > 0) {
                             const realReward = computeDovxReward(zInfo.reward, power);
                             ECO_DATA.dovx.rewards += realReward;
@@ -466,7 +484,7 @@
                 if(!data.rows) break;
                 for(let b of data.rows) {
                     ECO_DATA.scanned++;
-                    let p = parseFloat(Array.isArray(b.power)?b.power[0]:b.power)||0;
+                    let p = extractPower(b); // Utilisation du fix parsing ici aussi
                     let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0;
                     let pType = Array.isArray(b.power)?b.power[0]:b.power;
                     
@@ -551,13 +569,12 @@
         const view = document.getElementById('targetView'); view.innerHTML="Recherche...";
         try {
             const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
-            const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : [];
+            const rows = data.rows ? data.rows.filter(r => getProp(r,['owner','user','account'])===user) : [];
             let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
             rows.forEach(r => {
                 const zID = getProp(r, ['zoneID', 'zone_id']);
                 const busy = isBusy(r);
-                const dID = getId(r);
-                htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`;
+                htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${r.division_id}</div><div style="color:var(--sec)">${ZONE_DB[zID].name}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`;
             });
             view.innerHTML = htmlBuffer;
         } catch(e){ log(e.message, "red"); }
