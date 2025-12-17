@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V61 (INDUSTRIAL CFO)</title>
+    <title>DoV - COMMAND V62 (RESTORED V43)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -13,57 +13,64 @@
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
-        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
+        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
-        .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; }
-        .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; }
+        .btn-zone { background: var(--main); color: #000; } 
+        .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; }
         .btn-stop { background: var(--alert); color: #fff; display: none; }
+        .btn-target { background: var(--sec); color: #000; }
+        .btn-build { background: #9b59b6; color: #fff; }
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .eco-card { background: #111; border: 1px solid #333; padding: 15px; border-top: 3px solid #444; min-height: 80px; }
+        .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; border-top: 3px solid #444; }
+        .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
         .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
-        .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; }
+        .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
+        .mx-bal { text-align: center; padding: 5px; font-weight: bold; margin-top: 5px; border-radius: 3px; }
+        .bal-pos { background: rgba(0, 230, 118, 0.1); color: var(--main); border: 1px solid var(--main); }
+        .bal-neg { background: rgba(255, 23, 68, 0.1); color: var(--alert); border: 1px solid var(--alert); }
         .balance-container { background:#111; padding:15px; border:1px solid #333; margin-bottom:20px; }
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; }
         .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
-        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
-        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; white-space: pre-wrap; }
         .view-section { display: none; } .view-active { display: block; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
+        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
+        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V61 INDUSTRIAL</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V62 RESTORED</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <div class="box">
-            <div class="box-title">MARCHÉ ($)</div>
+            <div class="box-title">CONFIGURATION MARCHÉ</div>
             <input type="number" id="inpWax" value="0.00786" step="0.00001" onchange="updateRates()">
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
         </div>
         <div class="box">
-            <div class="box-title">GLOBAL MONITORING</div>
-            <button class="btn-zone" onclick="switchView('zoneView'); startZoneScan();">SCAN ZONES (MAP)</button>
-            <button class="btn-eco" onclick="switchView('ecoView'); startEconomyScan();">SCAN ECONOMY ($)</button>
+            <button class="btn-zone" onclick="startZoneScan()">SCAN ZONES (MAP)</button>
+            <button class="btn-eco" onclick="startEconomyScan()">SCAN ECONOMY ($)</button>
             <button class="btn-stop" id="btnStop" onclick="stopSignal=true">ARRÊT</button>
         </div>
         <div class="box">
-            <div class="box-title">TARGET PLAYER</div>
+            <div class="box-title">PLAYER ANALYST</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
             <button class="btn-target" onclick="startTarget()">SCAN DIVISIONS</button>
             <button class="btn-build" onclick="startBuildings()">SCAN BÂTIMENTS</button>
@@ -72,11 +79,12 @@
 
     <main class="main-view">
         <div id="zoneView" class="view-section view-active">
+            <div class="stats-row" id="zoneStatsHeader"></div>
             <div class="zones-grid" id="zonesArea"></div>
         </div>
         <div id="ecoView" class="view-section">
-            <div class="eco-grid" id="ecoSummary"></div>
-            <div class="balance-container" id="ecoBalance"></div>
+            <div class="eco-grid" id="ecoCards"></div>
+            <div class="balance-container" id="ecoRatio"></div>
             <div class="matrix-grid" id="tokenMatrix"></div>
         </div>
         <div id="targetView" class="view-section"></div>
@@ -84,14 +92,13 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V61 : Audit industriel complet activé.</div>
+<div class="logs" id="console">> V62 : Interface V43 restaurée avec succès. Calculs conformes Excel Janvier 2025.</div>
 
 <script>
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     let stopSignal = false;
     let rpcIndex = 0;
-    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com"];
-    
+    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
     const ZONE_DB = {
         1: { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 },
         2: { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
@@ -102,11 +109,6 @@
         17: { name: "City 1", cost: 0, costX: 1664, reward: 0 },
         20: { name: "City 4", cost: 0, costX: 29120, reward: 0 }
     };
-
-    function log(msg, color="#aaa") {
-        const c = document.getElementById('console');
-        c.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML;
-    }
 
     function switchView(id) {
         document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
@@ -126,9 +128,8 @@
     }
 
     async function startZoneScan() {
-        stopSignal = false; document.getElementById('btnStop').style.display = 'block';
-        log("Scan des divisions...", "#fff");
-        let nextKey = ""; let stats = {};
+        switchView('zoneView'); stopSignal = false; document.getElementById('btnStop').style.display = 'block';
+        let stats = {}; let nextKey = "";
         while(!stopSignal) {
             const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
             if(!data || !data.rows) break;
@@ -138,8 +139,7 @@
                 if(r.end_time > (Date.now()/1000)) stats[zid].act++;
             });
             renderZones(stats);
-            if(!data.more) break;
-            nextKey = data.next_key;
+            if(!data.more) break; nextKey = data.next_key;
         }
         document.getElementById('btnStop').style.display = 'none';
     }
@@ -152,46 +152,29 @@
             const burnX = (z.costX * RATES.DOVX_WAX * RATES.WAX_USD) * s.act;
             const win = (z.reward * RATES.DOVX_WAX * RATES.WAX_USD) * s.act;
             let displayBurn = z.cost > 0 ? `-$${burn.toFixed(3)}` : `-$${burnX.toFixed(3)} (DOVX)`;
-            area.innerHTML += `
-                <div class="zone">
-                    <b>${z.name}</b>
-                    <div class="z-finance">
-                        <div style="color:var(--alert)">BURN: ${displayBurn}</div>
-                        <div style="color:var(--main)">WIN: +$${win.toFixed(3)}</div>
-                    </div>
-                    <div style="font-size:9px">${s.act} Divisions Actives</div>
-                </div>`;
+            area.innerHTML += `<div class="zone ${s.act>0?'active':''}"><b>${z.name}</b><div class="z-finance"><div style="color:var(--alert)">BURN: ${displayBurn}</div><div style="color:var(--main)">WIN: +$${win.toFixed(3)}</div></div><div style="font-size:9px">${s.act} En Mission</div></div>`;
         });
     }
 
     async function startTarget() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('targetView'); document.getElementById('targetView').innerText = "Audit " + user + "...";
-        try {
-            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
-            let html = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()}</div>`;
-            data.rows.forEach(r => {
-                const busy = r.end_time > (Date.now()/1000);
-                html += `<div style="padding:5px; border-bottom:1px solid #222; font-size:11px">Div #${r.division_id} | ${busy?'MISSION':'PRÊT'}</div>`;
-            });
-            document.getElementById('targetView').innerHTML = html;
-        } catch(e) { log("Erreur Target", "red"); }
+        switchView('targetView'); const u = document.getElementById('targetIn').value.toLowerCase();
+        document.getElementById('targetView').innerText = "Audit " + u + "...";
+        const d = await robustFetch("dovpvecontrl", "sdivisions", u, 500, 2, "i64");
+        let h = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${u.toUpperCase()}</div>`;
+        d.rows.forEach(r => h += `<div style="padding:5px; border-bottom:1px solid #222; font-size:11px">Div #${r.division_id} | ${r.end_time>(Date.now()/1000)?'MISSION':'PRÊT'}</div>`);
+        document.getElementById('targetView').innerHTML = h;
     }
 
     async function startBuildings() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('buildingView'); document.getElementById('buildingView').innerText = "Audit Usines " + user + "...";
-        try {
-            const data = await robustFetch("dovutilstake", "buildings", user, 500, 2, "i64");
-            let html = `<div style="background:#111; padding:10px; color:#9b59b6">BÂTIMENTS : ${user.toUpperCase()}</div>`;
-            data.rows.forEach(b => {
-                html += `<div style="padding:5px; border-bottom:1px solid #222; font-size:11px">Asset #${b.asset_id} | Power: ${b.power[0]}</div>`;
-            });
-            document.getElementById('buildingView').innerHTML = html;
-        } catch(e) { log("Erreur Bâtiments", "red"); }
+        switchView('buildingView'); const u = document.getElementById('targetIn').value.toLowerCase();
+        document.getElementById('buildingView').innerText = "Audit Usines " + u + "...";
+        const d = await robustFetch("dovutilstake", "buildings", u, 500, 2, "i64");
+        let h = `<div style="background:#111; padding:10px; color:#9b59b6">USINES : ${u.toUpperCase()}</div>`;
+        d.rows.forEach(b => h += `<div style="padding:5px; border-bottom:1px solid #222; font-size:11px">Asset #${b.asset_id} | Power: ${b.power[0]}</div>`);
+        document.getElementById('buildingView').innerHTML = h;
     }
 
-    init();
+    renderZones({});
 </script>
 </body>
 </html>
