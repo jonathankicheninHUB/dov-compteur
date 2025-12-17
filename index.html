@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoV - Scanner Ultimate</title>
+    <style>
+        /* Design sombre type "Hacker/Crypto" */
+        body { background-color: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .main-box { background: #1a1a1a; width: 100%; max-width: 800px; border: 1px solid #333; border-radius: 8px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
+        h1 { text-align: center; color: #00e676; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .input-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        input { background: #000; color: #fff; border: 1px solid #444; padding: 12px; width: 60%; border-radius: 4px; font-family: monospace; }
+        button { background: #00e676; color: #000; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #00c853; }
+        button:disabled { background: #555; cursor: wait; }
+
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .dash-card { background: #222; padding: 15px; text-align: center; border-radius: 4px; border: 1px solid #333; }
+        .dash-val { font-size: 2em; font-weight: bold; color: #29b6f6; }
+        .dash-label { font-size: 0.8em; color: #888; text-transform: uppercase; }
+
+        .console { background: #000; border: 1px solid #333; height: 150px; overflow-y: auto; padding: 10px; font-size: 12px; color: #aaa; margin-bottom: 20px; font-family: monospace; }
+        .log-success { color: #00e676; }
+        .log-error { color: #ff5252; }
+        .log-info { color: #29b6f6; }
+
+        .results { border-top: 2px solid #333; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #2a2a2a; transition: background 0.2s; }
+        .row:hover { background: #222; }
+        
+        .badge { font-size: 10px; padding: 3px 6px; border-radius: 3px; text-transform: uppercase; font-weight: bold; margin-right: 8px; min-width: 60px; text-align: center; display: inline-block; }
+        .badge-officer { background: #e67e22; color: #000; }
+        .badge-combat { background: #e74c3c; color: #fff; }
+        .badge-support { background: #3498db; color: #fff; }
+        .badge-other { background: #95a5a6; color: #000; }
+
+        .link { color: #29b6f6; text-decoration: none; border: 1px solid #29b6f6; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+        .link:hover { background: #29b6f6; color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="main-box">
+    <h1>Scanner DoV 3000</h1>
+    
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ex: u2d2k.c.wam" value="u2d2k.c.wam">
+        <button id="btn" onclick="startEngine()">Lancer le Scan</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="dash-card">
+            <div class="dash-val" id="totalDivs">0</div>
+            <div class="dash-label">Divisions Trouvées</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-val" id="totalUnits">0</div>
+            <div class="dash-label">Unités (Cartes)</div>
+        </div>
+    </div>
+
+    <div class="console" id="logs"> > Système prêt. En attente de l'utilisateur...</div>
+
+    <div class="results" id="list"></div>
+</div>
+
+<script>
+    // 1. LA LISTE COMPLÈTE DES RPC (ORDRE DE FIABILITÉ)
+    const RPC_NODES = [
+        "https://wax.greymass.com",
+        "https://wax.eosn.io",
+        "https://api.wax.alohaeos.com",
+        "https://wax.pink.gg",
+        "https://api.waxsweden.org", 
+        "https://wax.dapplica.io",
+        "https://wax.eosphere.io",
+        "https://api.wax.liquidstudios.io",
+        "https://wax-bp.wizardsguild.one",
+        "https://wax.cryptolions.io"
+    ];
+
+    // Fonctions utilitaires pour l'affichage
+    function log(msg, type = "") {
+        const c = document.getElementById('logs');
+        let colorClass = "";
+        if(type === "success") colorClass = "log-success";
+        if(type === "error") colorClass = "log-error";
+        if(type === "info") colorClass = "log-info";
+        
+        c.innerHTML += `<div class="${colorClass}">> ${msg}</div>`;
+        c.scrollTop = c.scrollHeight;
+    }
+
+    // Le Cerveau du Scan
+    async function startEngine() {
+        const user = document.getElementById('userInput').value.trim().toLowerCase();
+        const listDiv = document.getElementById('list');
+        const btn = document.getElementById('btn');
+
+        if(!user) return alert("Veuillez entrer un nom de compte !");
+
+        // Reset UI
+        btn.disabled = true;
+        listDiv.innerHTML = "";
+        document.getElementById('totalDivs').innerText = "0";
+        document.getElementById('totalUnits').innerText = "0";
+        document.getElementById('logs').innerHTML = "";
+
+        log(`Démarrage de l'analyse pour : ${user}`, "info");
+
+        // 2. TROUVER UN SERVEUR QUI MARCHE
+        let activeRpc = "";
+        for (let rpc of RPC_NODES) {
+            try {
+                log(`Test de connexion vers ${rpc}...`);
+                // Petit ping pour voir si le serveur répond
+                await fetch(rpc + "/v1/chain/get_info", { method: 'POST' });
+                activeRpc = rpc;
+                log(`Connexion établie avec ${rpc} !`, "success");
+                break;
+            } catch (e) {
+                // On ignore et on passe au suivant
+            }
+        }
+
+        if (!activeRpc) {
+            log("ERREUR CRITIQUE : Aucun serveur ne répond. Vérifiez votre connexion internet.", "error");
+            btn.disabled = false;
+            return;
+        }
+
+        // 3. BOUCLE DE RÉCUPÉRATION (SCANNER SOUPLE)
+        let divisions = [];
+        let nextKey = user;
+        let keepScanning = true;
+        const url = activeRpc + "/v1/chain/get_table_rows";
+
+        try {
+            while(keepScanning) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true,
+                        code: "dovpvecontrl",
+                        scope: "dovpvecontrl",
+                        table: "sdivisions",
+                        index_position: 2,     // Index 2 = Owner
+                        key_type: "name",      // Format Nom
+                        lower_bound: nextKey,  // Commencer ici
+                        limit: 200             // Paquets de 200
+                        // PAS DE UPPER_BOUND pour éviter les bugs
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.rows || data.rows.length === 0) {
+                    keepScanning = false;
+                    break;
+                }
+
+                // Filtrage manuel intelligent
+                let countInBatch = 0;
+                for (let row of data.rows) {
+                    // On gère le nom de la colonne (owner)
+                    const rowOwner = row.owner || row.user;
+
+                    if (rowOwner === user) {
+                        divisions.push(row);
+                        countInBatch++;
+                    } else {
+                        // Si le nom qu'on lit est alphabétiquement après le tien, c'est fini.
+                        // Ex: on cherche "u2d2k", on tombe sur "u3..." -> STOP.
+                        if (rowOwner.localeCompare(user) > 0) {
+                            keepScanning = false; 
+                            log(`Fin de la zone utilisateur atteinte (${rowOwner}).`, "info");
+                            break;
+                        }
+                    }
+                }
+
+                log(`Batch reçu : ${data.rows.length} lignes. ${countInBatch} vous appartiennent.`);
+
+                // Gestion pagination
+                if (keepScanning && data.more && data.next_key) {
+                    nextKey = data.next_key;
+                } else {
+                    keepScanning = false;
+                }
+            }
+
+            // 4. AFFICHAGE FINAL
+            if (divisions.length === 0) {
+                log("Aucune division trouvée. Vérifiez que les unités sont bien stakées.", "error");
+            } else {
+                log(`SCAN TERMINÉ. ${divisions.length} divisions récupérées.`, "success");
+                renderDivisions(divisions);
+            }
+
+        } catch (e) {
+            log(`Erreur pendant le scan : ${e.message}`, "error");
+        }
+
+        btn.disabled = false;
+    }
+
+    function renderDivisions(data) {
+        const container = document.getElementById('list');
+        let totalUnits = 0;
+        let html = "";
+
+        data.forEach(div => {
+            // On gère le nom de la liste (units)
+            const units = div.units || div.asset_ids || [];
+
+            if (units.length > 0) {
+                totalUnits += units.length;
+                
+                units.forEach(u => {
+                    let id = u;
+                    let roleRaw = "Unité";
+                    
+                    // Gestion objet {key, value}
+                    if (typeof u === 'object') {
+                        id = u.value;
+                        roleRaw = u.key;
+                    }
+
+                    // Mise en forme du badge
+                    let badgeClass = "badge-other";
+                    let roleDisplay = roleRaw;
+                    
+                    if(roleRaw.includes("combat")) { badgeClass = "badge-combat"; roleDisplay = "COMBAT"; }
+                    else if(roleRaw.includes("officer")) { badgeClass = "badge-officer"; roleDisplay = "OFFICIER"; }
+                    else if(roleRaw.includes("support")) { badgeClass = "badge-support"; roleDisplay = "SUPPORT"; }
+
+                    html += `
+                    <div class="row">
+                        <div style="display:flex; align-items:center;">
+                            <span class="badge ${badgeClass}">${roleDisplay}</span>
+                            <span style="font-family:monospace; font-size:1.1em; color:#fff;">${id}</span>
+                            <span style="color:#666; font-size:12px; margin-left:10px;">(Div #${div.division_id})</span>
+                        </div>
+                        <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" class="link">Voir Carte ↗</a>
+                    </div>
+                    `;
+                });
+            }
+        });
+
+        document.getElementById('totalDivs').innerText = data.length;
+        document.getElementById('totalUnits').innerText = totalUnits;
+        container.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
