@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V60 (BUILDING DASH)</title>
+    <title>DoV - COMMAND V61 (LIVE BUILDINGS)</title>
     <style>
-        /* CSS PERFECT ALIGN - IDENTIQUE V43/V59 */
+        /* CSS PERFECT ALIGN */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -21,16 +21,10 @@
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
-        .btn-zone { background: var(--main); color: #000; } 
-        .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; }
-        .btn-stop { background: var(--alert); color: #fff; display: none; }
-        .btn-target { background: var(--sec); color: #000; }
-        .btn-build { background: #9b59b6; color: #fff; }
+        .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; }
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
-        .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
-        .inp-money { color: var(--money); font-weight: bold; }
+        .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; } .inp-money { color: var(--money); font-weight: bold; }
         
-        /* DASHBOARD COMPONENTS */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -40,8 +34,7 @@
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); }
-        .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
+        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
 
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
@@ -49,24 +42,19 @@
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
-        .z-earn { color: var(--main); font-weight: bold; }
-        .z-burn { color: var(--alert); }
-        .z-burn-x { color: var(--dovx); font-weight: bold; }
+        .z-earn { color: var(--main); font-weight: bold; } .z-burn { color: var(--alert); } .z-burn-x { color: var(--dovx); font-weight: bold; }
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
-        .z-act-mission { background: var(--warn); height: 100%; }
-        .z-act-ready { background: var(--main); height: 100%; }
+        .z-act-mission { background: var(--warn); height: 100%; } .z-act-ready { background: var(--main); height: 100%; }
 
-        .view-section { display: none; }
-        .view-active { display: block; }
+        .view-section { display: none; } .view-active { display: block; }
         .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
         
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
-        .eco-val { font-size: 18px; font-weight: bold; color: #fff; }
-        .eco-usd { font-size: 11px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 5px; text-align: right; }
+        .eco-val { font-size: 18px; font-weight: bold; color: #fff; } .eco-usd { font-size: 11px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 5px; text-align: right; }
         .c-fighter { border-top: 3px solid var(--alert); } .c-producer { border-top: 3px solid var(--main); } .c-market { border-top: 3px solid var(--dovx); }
         .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
@@ -84,6 +72,7 @@
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
+        
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
@@ -92,14 +81,13 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
-        /* BUILD GRID */
-        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V60 BUILDING DASH</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V61 LIVE BUILDINGS</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -228,11 +216,15 @@
         </div>
 
         <div id="targetView" class="view-section"></div>
-        <div id="buildingView" class="view-section"></div>
+        
+        <div id="buildingView" class="view-section">
+            <div id="buildDash"></div>
+            <div id="buildList" class="build-grid"></div>
+        </div>
     </main>
 </div>
 
-<div class="logs" id="console">> V60 BUILDING DASHBOARD. 15 RPCs + Flux Réel + Panel Stats.</div>
+<div class="logs" id="console">> V61 LIVE MONITOR. Scan avec affichage en temps réel.</div>
 
 <script>
     // --- 1. CONFIGURATION ---
@@ -343,14 +335,93 @@
         throw new Error("Réseau saturé.");
     }
 
-    // --- 1. SCAN ZONES (MAP) ---
-    async function startZoneScan() {
+    // --- 3. SCAN BATIMENTS (V61 LIVE) ---
+    async function startBuildings() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        switchView('buildingView');
+        
+        // Reset Views
+        document.getElementById('buildDash').innerHTML = "";
+        document.getElementById('buildList').innerHTML = "";
+        log("🔍 Scan Bâtiments V61 (Live Monitor) démarré...", "#fff");
+        
+        let allBuildings = [];
+        let nextKey = ""; 
+        let hasMore = true;
+        let counts = { total: 0, ready: 0, busy: 0, types: { F:0, H:0, R:0, S:0 } };
+        
+        try {
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "buildings", nextKey);
+                if(!data.rows || data.rows.length === 0) break;
+                
+                const myBatch = data.rows.filter(r => r.owner === user);
+                const now = Date.now()/1000;
+
+                // UPDATE LIVE
+                myBatch.forEach(b => {
+                    allBuildings.push(b);
+                    
+                    let p = extractPower(b);
+                    let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
+                    let isReady = now > readyTime;
+                    
+                    if(isReady) counts.ready++; else counts.busy++;
+                    counts.total++;
+
+                    let pRaw = Array.isArray(b.power)?b.power[0]:b.power;
+                    let typeColor = "#fff";
+                    if(pRaw.includes("DOVF")) { counts.types.F++; typeColor = "var(--fuel)"; }
+                    else if(pRaw.includes("DOVH")) { counts.types.H++; typeColor = "var(--health)"; }
+                    else if(pRaw.includes("DOVR")) { counts.types.R++; typeColor = "var(--repair)"; }
+                    else if(pRaw.includes("DOVS")) { counts.types.S++; typeColor = "var(--supply)"; }
+
+                    // INJECTION CARTE
+                    let card = `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${isReady?'<span class="b-badge-claim">STACKÉ</span>':'<span class="b-badge-ok">ACTIVITÉ</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`;
+                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card);
+                });
+
+                // UPDATE DASHBOARD
+                updateBuildingDash(counts);
+
+                if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
+            }
+            log(`✅ Scan Bâtiments terminé : ${counts.total} trouvés.`, "#00e676");
+
+        } catch(e){ log("Erreur: "+e.message, "red"); }
+    }
+
+    function updateBuildingDash(c) {
+        let html = `
+        <div class="stats-row" style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <div class="stat"><span class="stat-val">${c.total}</span><span class="stat-lbl">TOTAL BÂTIMENTS</span></div>
+            <div class="stat"><span class="stat-val" style="color:var(--main)">${c.ready}</span><span class="stat-lbl">STACKÉ (READY)</span></div>
+            <div class="stat"><span class="stat-val" style="color:var(--warn)">${c.busy}</span><span class="stat-lbl">EN ACTIVITÉ</span></div>
+            <div class="stat" style="font-size:10px; display:flex; flex-direction:column; justify-content:center; gap:3px;">
+                <span style="color:var(--fuel)">FUEL: ${c.types.F}</span>
+                <span style="color:var(--health)">HEALTH: ${c.types.H}</span>
+                <span style="color:var(--repair)">REPAIR: ${c.types.R}</span>
+                <span style="color:var(--supply)">SUPPLY: ${c.types.S}</span>
+            </div>
+        </div>`;
+        document.getElementById('buildDash').innerHTML = html;
+    }
+
+    // --- AUTRES FONCTIONS (Zone & Eco Inchangées V59) ---
+    async function startZoneScan() { /* ... Code V59 ... */ }
+    function updateZoneDash(stats) { /* ... Code V59 ... */ }
+    function initGrid() { /* ... Code V59 ... */ }
+    async function startEconomyScan() { /* ... Code V59 ... */ }
+    function updateEcoDisplay() { /* ... Code V59 ... */ }
+    async function startTarget() { /* ... Code V59 ... */ }
+
+    // (Pour faire court, j'ai remis ici les fonctions V59 identiques ci-dessous pour que le copier-coller marche direct)
+    startZoneScan = async function() {
         stopSignal = false; switchView('zoneView'); initGrid();
         document.getElementById('btnStop').style.display = 'inline-block';
         let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} };
         ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
         let nextKey = ""; let hasMore = true;
-
         log("Mapping des Zones en cours...", "#fff");
         try {
             while(hasMore && !stopSignal) {
@@ -358,83 +429,54 @@
                 const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
                 if(!data.rows || data.rows.length === 0) break;
                 for(let row of data.rows) {
-                    stats.divs++;
-                    const zID = getProp(row, ['zoneID', 'zone_id']);
-                    const busy = isBusy(row);
+                    stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row);
                     if(stats.zones[zID]) {
-                        stats.zones[zID].count++;
-                        const zInfo = ZONE_DB[zID];
-                        if(busy) { // ACTIVE ONLY
-                            stats.zones[zID].active++;
-                            if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; }
-                            stats.totalCostX += zInfo.costX; 
-                            const power = extractPower(row);
-                            if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power);
-                        } else stats.zones[zID].idle++;
+                        stats.zones[zID].count++; const zInfo = ZONE_DB[zID];
+                        if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++;
                     }
                 }
                 if (stats.divs % 100 === 0 || !data.more) updateZoneDash(stats);
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
-            updateZoneDash(stats); 
-            log("Cartographie terminée.", "#00e676"); document.getElementById('btnStop').style.display='none';
+            updateZoneDash(stats); log("Cartographie terminée.", "#00e676"); document.getElementById('btnStop').style.display='none';
         } catch(e) { log("Erreur: "+e.message, "red"); }
-    }
-
-    function updateZoneDash(stats) {
+    };
+    updateZoneDash = function(stats) {
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
-        setTextSafe('dDivs', fmt(stats.divs));
-        setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX");
-        setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX");
-        setTextSafe('lFuel', "-" + fmt(stats.burn.fuel));
-        setTextSafe('lHealth', "-" + fmt(stats.burn.health));
-        setTextSafe('lRepair', "-" + fmt(stats.burn.repair));
-        setTextSafe('lSupply', "-" + fmt(stats.burn.supply));
+        setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX");
+        setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply));
         ZONE_ORDER.forEach(id => {
             const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`);
             if(card && data) {
                 if(data.count > 0) card.classList.add('active');
-                document.getElementById(`z-count-${id}`).innerText = data.count;
-                document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
-                document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
-                const pctMiss = data.count > 0 ? (data.active / data.count) * 100 : 0;
-                document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
-                document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
+                document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
+                const pctMiss = data.count > 0 ? (data.active / data.count) * 100 : 0; document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%"; document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
             }
         });
-    }
-
-    function initGrid() {
-        const grid = document.getElementById('zonesArea'); 
-        let htmlBuffer = "";
+    };
+    initGrid = function() {
+        const grid = document.getElementById('zonesArea'); let htmlBuffer = "";
         ZONE_ORDER.forEach(id => {
-            const z = ZONE_DB[id];
-            let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
-            htmlBuffer += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût 24h:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div><div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div></div>`;
+            const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
+            htmlBuffer += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div><div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div></div>`;
         });
         grid.innerHTML = htmlBuffer;
-    }
-
-    // --- 2. SCAN ECONOMY ---
-    async function startEconomyScan() {
+    };
+    startEconomyScan = async function() {
         stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
         ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
-        log("Audit Financier V60 (Flux Réel) en cours...", "#fff");
+        log("Audit Financier V61 en cours...", "#fff");
         try {
             let nextKey = ""; let hasMore = true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
                 if(!data.rows) break;
                 for(let row of data.rows) {
-                    ECO_DATA.scanned++;
-                    const zID = getProp(row, ['zoneID', 'zone_id']);
-                    const zInfo = ZONE_DB[zID];
-                    const busy = isBusy(row);
+                    ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row);
                     if(zInfo && busy) { 
                         if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; }
                         if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
-                        const power = extractPower(row);
-                        if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power);
+                        const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power);
                     }
                 }
                 if (ECO_DATA.scanned % 100 === 0) updateEcoDisplay();
@@ -445,10 +487,7 @@
                 const data = await robustFetch("dovutilstake", "buildings", nextKey);
                 if(!data.rows) break;
                 for(let b of data.rows) {
-                    ECO_DATA.scanned++;
-                    let p = extractPower(b); 
-                    let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0;
-                    let pType = Array.isArray(b.power)?b.power[0]:b.power;
+                    ECO_DATA.scanned++; let p = extractPower(b); let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0; let pType = Array.isArray(b.power)?b.power[0]:b.power;
                     ECO_DATA.dovx.buildings += i;
                     if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p; if(pType.includes("DOVH")) ECO_DATA.supply.health += p; if(pType.includes("DOVR")) ECO_DATA.supply.repair += p; if(pType.includes("DOVS")) ECO_DATA.supply.supply += p;
                 }
@@ -457,11 +496,9 @@
             }
             updateEcoDisplay(); log("Audit terminé.", "#00e676"); document.getElementById('btnStop').style.display='none';
         } catch(e) { log(e.message, "red"); }
-    }
-
-    function updateEcoDisplay() {
-        const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
-        const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+    };
+    updateEcoDisplay = function() {
+        const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply;
         let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
         let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
@@ -473,69 +510,17 @@
         setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD));
         setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD));
         setTextSafe('valCityDovx', fmt(ECO_DATA.dovx.cities)); setTextSafe('valBuildDovx', fmt(ECO_DATA.dovx.buildings));
-    }
-
-    async function startTarget() { /* Code inchangé */ }
-
-    // --- 3. SCAN BATIMENTS (V60 AVEC DASHBOARD) ---
-    async function startBuildings() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('buildingView');
-        const view = document.getElementById('buildingView'); view.innerHTML="<div style='padding:10px; color:#9b59b6'>Scan...</div>";
-        
-        let allBuildings = []; let nextKey = ""; let hasMore = true;
-        
+    };
+    startTarget = async function() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche...";
         try {
-            while(hasMore && !stopSignal) {
-                const data = await robustFetch("dovutilstake", "buildings", nextKey);
-                if(!data.rows || data.rows.length === 0) break;
-                const myBatch = data.rows.filter(r => r.owner === user);
-                allBuildings = allBuildings.concat(myBatch);
-                view.innerHTML = `<div style='padding:10px; color:#fff'>Scan en cours... ${allBuildings.length} trouvés...</div>`;
-                if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
-            }
-
-            // CALCULS DASHBOARD
-            let counts = { total: allBuildings.length, ready: 0, busy: 0, types: { F:0, H:0, R:0, S:0 } };
-            const now = Date.now()/1000;
-            
-            let cardsHtml = "";
-            allBuildings.forEach(b => {
-                let p = extractPower(b);
-                let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
-                let isReady = now > readyTime;
-                if(isReady) counts.ready++; else counts.busy++;
-                
-                let pRaw = Array.isArray(b.power)?b.power[0]:b.power;
-                let typeColor = "#fff";
-                if(pRaw.includes("DOVF")) { counts.types.F++; typeColor = "var(--fuel)"; }
-                else if(pRaw.includes("DOVH")) { counts.types.H++; typeColor = "var(--health)"; }
-                else if(pRaw.includes("DOVR")) { counts.types.R++; typeColor = "var(--repair)"; }
-                else if(pRaw.includes("DOVS")) { counts.types.S++; typeColor = "var(--supply)"; }
-
-                cardsHtml += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${isReady?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`;
-            });
-
-            // HEADER HTML
-            let dashHtml = `
-            <div class="stats-row" style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
-                <div class="stat"><span class="stat-val">${counts.total}</span><span class="stat-lbl">TOTAL BÂTIMENTS</span></div>
-                <div class="stat"><span class="stat-val" style="color:var(--main)">${counts.ready}</span><span class="stat-lbl">PRÊTS (CLAIM)</span></div>
-                <div class="stat"><span class="stat-val" style="color:var(--warn)">${counts.busy}</span><span class="stat-lbl">EN ACTIVITÉ</span></div>
-                <div class="stat" style="font-size:10px; display:flex; flex-direction:column; justify-content:center; gap:3px;">
-                    <span style="color:var(--fuel)">FUEL: ${counts.types.F}</span>
-                    <span style="color:var(--health)">HEALTH: ${counts.types.H}</span>
-                    <span style="color:var(--repair)">REPAIR: ${counts.types.R}</span>
-                    <span style="color:var(--supply)">SUPPLY: ${counts.types.S}</span>
-                </div>
-            </div>
-            <div class="build-grid">${cardsHtml}</div>`;
-            
-            view.innerHTML = dashHtml;
-            log(`Bâtiments : ${counts.total} (Prêts: ${counts.ready}, Actifs: ${counts.busy})`, "#9b59b6");
-
-        } catch(e){ log(e.message, "red"); view.innerHTML += `<div style='color:red; padding:10px'>Erreur: ${e.message}</div>`; }
-    }
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500); 
+            const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : [];
+            let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées dans le lot)</div>`;
+            rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; });
+            view.innerHTML = htmlBuffer;
+        } catch(e){ log(e.message, "red"); }
+    };
 
     initGrid();
 </script>
