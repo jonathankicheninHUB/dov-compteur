@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - MONITORING V3 (STABLE)</title>
+    <title>DoV - MONITORING V3.2 (Configured)</title>
     <style>
         :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --bg: #111; --panel: #1a1a1a; }
         body { background-color: var(--bg); color: #ddd; font-family: monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -56,7 +56,7 @@
 <body>
 
 <header>
-    <h1>DoV WAR ROOM <span style="color:#666; font-size:12px">v3.1 Stable</span></h1>
+    <h1>DoV WAR ROOM <span style="color:#666; font-size:12px">v3.2 Configured</span></h1>
     <span class="rpc-status" id="rpcDisplay">Déconnecté</span>
 </header>
 
@@ -82,7 +82,7 @@
                 <div class="stat"><span class="stat-val" id="valDivs">0</span><span class="stat-lbl">Divisions</span></div>
                 <div class="stat"><span class="stat-val" id="valPower">0</span><span class="stat-lbl">Puissance</span></div>
                 <div class="stat"><span class="stat-val" id="valUnits">0</span><span class="stat-lbl">Unités</span></div>
-                <div class="stat"><span class="stat-val" id="valZones">0</span><span class="stat-lbl">Zones</span></div>
+                <div class="stat"><span class="stat-val" id="valZones">0</span><span class="stat-lbl">Zones Actives</span></div>
             </div>
             <div class="zones-grid" id="zonesArea">
                 <div style="color:#444">Cliquez sur "LANCER SCAN" pour charger la carte.</div>
@@ -92,10 +92,10 @@
     </main>
 </div>
 
-<div class="logs" id="console">> Système prêt.</div>
+<div class="logs" id="console">> Système prêt. Configuration zones chargée.</div>
 
 <script>
-    // LISTE DES SERVEURS (On en choisira un seul au démarrage)
+    // LISTE DES SERVEURS
     const RPCS = [
         "https://wax.greymass.com",
         "https://wax.eosn.io",
@@ -104,65 +104,51 @@
         "https://api.waxsweden.org"
     ];
 
+    // CONFIGURATION DES ZONES (Basée sur ta liste)
+    // On assume que Beach 1 = ID 1, Beach 2 = ID 2, etc.
+    const ZONE_LIST = [
+        "Beach 1", "Beach 2", "Beach 3", "Bunker",
+        "Forest 1", "Forest 2", "Forest 3", "Camp",
+        "Hill 1", "Hill 2", "Hill 3", "Radar",
+        "Plain 1", "Plain 2", "Plain 3", "HQ",
+        "city 1", "city 2", "city 3", "city 4"
+    ];
+
+    // Création du dictionnaire ID -> Nom
+    let zoneNames = {};
+    ZONE_LIST.forEach((name, index) => {
+        zoneNames[index + 1] = name; // ID commence à 1
+    });
+
     let currentRPC = null;
     let stopSignal = false;
-    let zoneNames = {};
 
-    // --- LOGS ---
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
         const t = new Date().toLocaleTimeString();
         c.innerHTML = `<div style="color:${color}">[${t}] ${msg}</div>` + c.innerHTML;
     }
 
-    // --- 1. CONNEXION INTELLIGENTE ---
+    // --- 1. CONNEXION ---
     async function initConnection() {
-        if(currentRPC) return currentRPC; // Déjà connecté
+        if(currentRPC) return currentRPC;
         
-        log("Test de connexion aux serveurs...", "#29b6f6");
+        log("Connexion au réseau WAX...", "#29b6f6");
         for(let rpc of RPCS) {
             try {
-                // Petit ping rapide
                 await fetch(rpc + "/v1/chain/get_info", { method: 'POST' });
                 currentRPC = rpc;
                 document.getElementById('rpcDisplay').innerText = "Connecté : " + new URL(rpc).hostname;
                 document.getElementById('rpcDisplay').style.color = "#00e676";
-                log(`Connexion établie sur ${rpc}`, "#00e676");
+                log(`Connecté sur ${rpc}`, "#00e676");
                 return rpc;
-            } catch(e) { /* On passe au suivant */ }
+            } catch(e) {}
         }
-        log("ERREUR CRITIQUE : Aucun serveur ne répond. Vérifiez votre internet.", "#ff1744");
+        log("ERREUR CRITIQUE : Aucun serveur RPC ne répond.", "#ff1744");
         throw new Error("No RPC");
     }
 
-    // --- 2. RECUPERATION ZONES (SANS BLOQUER) ---
-    async function loadZonesSafe() {
-        try {
-            const rpc = await initConnection();
-            log("Chargement topographie...", "#888");
-            
-            // On tente de lire la table 'zones'
-            const res = await fetch(rpc + "/v1/chain/get_table_rows", {
-                method: 'POST',
-                body: JSON.stringify({ json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "zones", limit: 100 })
-            });
-            const data = await res.json();
-            
-            if(data.rows && data.rows.length > 0) {
-                data.rows.forEach(z => {
-                    // Adaptabilité aux noms de colonnes
-                    const id = z.id || z.zone_id || z.key;
-                    const name = z.name || z.zone_name;
-                    if(id && name) zoneNames[id] = name;
-                });
-                log(`Topographie chargée : ${Object.keys(zoneNames).length} zones nommées.`, "#29b6f6");
-            }
-        } catch(e) {
-            log("Impossible de nommer les zones (Scan ID uniquement).", "orange");
-        }
-    }
-
-    // --- 3. SCAN GLOBAL (LE COEUR) ---
+    // --- 2. SCAN GLOBAL ---
     async function runGlobal() {
         stopSignal = false;
         
@@ -173,18 +159,14 @@
         document.getElementById('btnStop').style.display = 'inline-block';
         document.getElementById('zonesArea').innerHTML = "";
 
-        // Reset Stats
         let stats = { divs: 0, power: 0, units: 0, zones: {} };
 
         try {
-            // Étape A : Connexion & Zones (Si ça plante, on continue quand même)
-            await loadZonesSafe();
-
             const rpc = await initConnection();
             let nextKey = "";
             let hasMore = true;
 
-            log("DÉMARRAGE DU SCAN GLOBAL...", "#fff");
+            log("DÉMARRAGE DU MONITORING...", "#fff");
 
             while(hasMore && !stopSignal) {
                 document.getElementById('statusTxt').innerText = `Scan... (${stats.divs} divs)`;
@@ -193,14 +175,14 @@
                     method: 'POST',
                     body: JSON.stringify({
                         json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "sdivisions",
-                        limit: 200, lower_bound: nextKey
+                        limit: 300, lower_bound: nextKey // Gros paquets pour aller vite
                     })
                 });
 
                 const data = await res.json();
                 if(!data.rows || data.rows.length === 0) break;
 
-                // --- TRAITEMENT RAPIDE ---
+                // TRAITEMENT
                 for(let row of data.rows) {
                     stats.divs++;
                     const p = parseInt(row.power || 0);
@@ -215,27 +197,25 @@
                     stats.zones[zID].power += p;
                 }
 
-                // Mise à jour visuelle
                 updateUI(stats);
 
                 if(data.more && data.next_key) nextKey = data.next_key;
                 else hasMore = false;
             }
             
-            if(stopSignal) log("Scan interrompu par l'utilisateur.", "orange");
-            else log(`SCAN TERMINÉ COMPLET.`, "#00e676");
+            if(stopSignal) log("Arrêt manuel.", "orange");
+            else log(`SCAN COMPLET TERMINÉ.`, "#00e676");
 
         } catch(e) {
-            log("Erreur pendant le scan: " + e.message, "red");
+            log("Erreur: " + e.message, "red");
         }
 
-        // Fin
         document.getElementById('btnStop').style.display = 'none';
         document.getElementById('btnRun').style.display = 'inline-block';
         document.getElementById('statusTxt').innerText = "Terminé";
     }
 
-    // --- 4. SCAN CIBLE ---
+    // --- 3. SCAN CIBLE ---
     async function runTarget() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         if(!user) return;
@@ -243,7 +223,7 @@
         document.getElementById('dashView').style.display = 'none';
         const view = document.getElementById('targetView');
         view.style.display = 'flex';
-        view.innerHTML = `<div style="padding:20px; color:#888">Recherche de ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; color:#888">Analyse tactique de ${user}...</div>`;
 
         try {
             const rpc = await initConnection();
@@ -270,10 +250,10 @@
                 if(searching && data.more) nextKey = data.next_key; else searching = false;
             }
 
-            // Rendu Liste
-            let html = `<h3 style="padding:10px; border-bottom:1px solid #333; margin:0">RAPPORT : ${user} (${rows.length} Divs)</h3>`;
+            // Rendu Liste Target
+            let html = `<h3 style="padding:10px; border-bottom:1px solid #333; margin:0; color:var(--sec)">${user} : ${rows.length} Divisions Engagées</h3>`;
             
-            if(rows.length === 0) html += `<div style="padding:20px; color:orange">Aucune division trouvée.</div>`;
+            if(rows.length === 0) html += `<div style="padding:20px; color:orange">Aucune présence détectée.</div>`;
 
             rows.forEach(r => {
                 let badges = "";
@@ -283,25 +263,28 @@
                     let cls = "b-sup";
                     if(role.includes('combat')) cls = "b-com";
                     if(role.includes('officer')) cls = "b-off";
-                    badges += `<span class="badge ${cls}"></span>`;
+                    badges += `<span class="badge ${cls}"></span>`; // Carrés de couleur
                 });
+                
+                // Nom de la zone pour le joueur
+                const zName = zoneNames[r.zoneID] || ("Zone " + r.zoneID);
 
                 html += `
                 <div class="t-row">
-                    <div style="width:80px; color:var(--main)">#${r.division_id}</div>
-                    <div style="flex:1">${badges} <span style="color:#666">(${units.length} u)</span></div>
-                    <div style="color:var(--sec)">Zone ${r.zoneID}</div>
+                    <div style="width:70px; color:var(--main)">#${r.division_id}</div>
+                    <div style="flex:1">${badges} <span style="color:#666; font-size:10px">(${units.length})</span></div>
+                    <div style="color:var(--sec); width:100px; text-align:right">${zName}</div>
                 </div>`;
             });
             view.innerHTML = html;
-            log(`Rapport généré pour ${user}`, "#29b6f6");
+            log(`Rapport tactique : ${user}`, "#29b6f6");
 
         } catch(e) {
             log("Erreur cible: " + e.message, "red");
         }
     }
 
-    // --- MISE A JOUR VISUELLE ---
+    // --- MISE A JOUR UI ---
     function updateUI(stats) {
         document.getElementById('valDivs').innerText = stats.divs.toLocaleString();
         document.getElementById('valPower').innerText = stats.power.toLocaleString();
@@ -311,7 +294,7 @@
         const grid = document.getElementById('zonesArea');
         let html = "";
         
-        // Trier zones par population
+        // Tri par nombre de divisions
         const sorted = Object.keys(stats.zones).sort((a,b) => stats.zones[b].count - stats.zones[a].count);
         const max = sorted.length ? stats.zones[sorted[0]].count : 1;
 
@@ -321,7 +304,7 @@
             const pct = (z.count / max) * 100;
             
             html += `
-            <div class="zone">
+            <div class="zone" title="ID: ${id}">
                 <div class="z-head"><span>${name}</span><span>${z.count}</span></div>
                 <div class="z-sub">Puissance: ${z.power.toLocaleString()}</div>
                 <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
