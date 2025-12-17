@@ -147,3 +147,44 @@
         }
         
         btn.disabled = false;
+    }
+
+    function afficherResultats(divisions) {
+        const list = document.getElementById('resultList');
+        let totalAssets = 0;
+        let html = "";
+
+        divisions.forEach(div => {
+            // --- CORRECTION CRUCIALE 2 ---
+            // Le dump a montré que la liste s'appelle "units", pas "asset_ids"
+            if(div.units && div.units.length > 0) {
+                totalAssets += div.units.length;
+                
+                div.units.forEach(unit => {
+                    // Structure: { key: "role", value: "asset_id" }
+                    const assetId = unit.value; 
+                    const role = unit.key;
+
+                    html += `
+                        <div class="item">
+                            <div>
+                                <span class="tag-role">${role}</span>
+                                <strong>${assetId}</strong> 
+                                <span class="tag-div">(Div #${div.division_id})</span>
+                            </div>
+                            <a href="https://wax.atomichub.io/explorer/asset/${assetId}" target="_blank" class="link-btn">Voir sur AtomicHub</a>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        document.getElementById('divCount').innerText = divisions.length;
+        document.getElementById('assetCount').innerText = totalAssets;
+        
+        list.innerHTML = html || "<div style='padding:20px; text-align:center'>Divisions vides trouvées.</div>";
+    }
+</script>
+
+</body>
+</html>
