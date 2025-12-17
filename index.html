@@ -2,116 +2,334 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - GLOBAL WAR ROOM</title>
+    <title>DoV - MONITORING V3 (STABLE)</title>
     <style>
-        /* DESIGN "SALLE DE GUERRE" */
-        :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --bg: #050505; --panel: #121212; --border: #333; }
-        body { background-color: var(--bg); color: #ccc; font-family: 'Segoe UI', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --bg: #111; --panel: #1a1a1a; }
+        body { background-color: var(--bg); color: #ddd; font-family: monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* HEADER */
-        header { height: 50px; background: #000; border-bottom: 1px solid var(--main); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
-        h1 { color: var(--main); font-size: 20px; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
-        .live-indicator { font-size: 10px; color: var(--alert); font-weight: bold; animation: blink 1s infinite; display: none; }
-        @keyframes blink { 50% { opacity: 0; } }
+        header { height: 50px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
+        h1 { color: var(--main); margin: 0; font-size: 18px; letter-spacing: 2px; }
+        .rpc-status { font-size: 10px; color: #666; }
 
         /* LAYOUT */
         .layout { display: flex; flex: 1; overflow: hidden; }
-        
-        /* SIDEBAR */
-        .sidebar { width: 280px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .control-box { background: #000; border: 1px solid var(--border); padding: 10px; border-radius: 4px; }
-        .control-title { color: var(--sec); font-size: 12px; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        
-        input { background: #111; border: 1px solid #444; color: #fff; padding: 8px; width: 100%; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
-        button { width: 100%; padding: 10px; border: none; font-weight: bold; cursor: pointer; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; transition: 0.2s; }
-        .btn-green { background: var(--main); color: #000; } .btn-green:hover { background: #00c853; }
-        .btn-blue { background: var(--sec); color: #000; } .btn-blue:hover { background: #0288d1; }
-        .btn-red { background: var(--alert); color: #fff; display: none; }
+        .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 20px; }
+        .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
 
-        /* MAIN DASHBOARD */
-        .main-view { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        /* CONTROLS */
+        .box { border: 1px solid #444; padding: 10px; background: #000; }
+        .box-title { color: var(--sec); font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px; }
         
-        /* TOP STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .stat-card { background: var(--panel); border: 1px solid var(--border); padding: 15px; text-align: center; position: relative; overflow: hidden; }
-        .stat-val { font-size: 24px; color: #fff; font-weight: bold; }
-        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
-        
-        /* ZONES VISUALIZER */
-        .zones-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .zone-card { background: #0a0a0a; border: 1px solid #333; padding: 10px; border-radius: 4px; transition: 0.2s; cursor: pointer; }
-        .zone-card:hover { border-color: var(--sec); background: #111; }
-        .zone-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .zone-name { color: var(--sec); font-weight: bold; }
-        .zone-pop { color: #fff; font-size: 14px; }
-        .zone-details { font-size: 11px; color: #888; display: flex; flex-direction: column; gap: 3px; }
-        .progress-bg { background: #222; height: 4px; width: 100%; margin-top: 8px; border-radius: 2px; }
-        .progress-fill { background: var(--main); height: 100%; width: 0%; transition: width 0.5s; }
+        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; }
+        .btn-start { background: var(--main); color: #000; } .btn-start:hover { background: #00c853; }
+        .btn-stop { background: var(--alert); color: #fff; display: none; }
+        .btn-target { background: var(--sec); color: #000; }
 
-        /* LOGS */
-        .console { height: 150px; background: #000; border-top: 1px solid var(--border); padding: 10px; font-family: monospace; font-size: 11px; color: #aaa; overflow-y: auto; }
-        
-        /* MODAL LIST */
-        .list-view { display: none; flex-direction: column; gap: 5px; background: #111; padding: 15px; border: 1px solid #444; border-radius: 4px; }
-        .list-row { display: flex; justify-content: space-between; padding: 5px; border-bottom: 1px solid #222; font-size: 12px; }
-        .tag { padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 5px; color: #000; }
-        .t-combat { background: #e74c3c; } .t-officer { background: #f1c40f; } .t-support { background: #3498db; }
+        input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
+
+        /* DASHBOARD */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat { background: #222; padding: 10px; text-align: center; border: 1px solid #333; }
+        .stat-val { display: block; font-size: 22px; color: #fff; font-weight: bold; }
+        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
+
+        /* ZONES */
+        .zones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .zone { background: #151515; border: 1px solid #333; padding: 10px; cursor: pointer; transition: 0.2s; }
+        .zone:hover { border-color: var(--sec); background: #1a1a1a; }
+        .z-head { display: flex; justify-content: space-between; font-weight: bold; color: var(--sec); font-size: 13px; }
+        .z-sub { font-size: 11px; color: #888; margin-top: 5px; }
+        .bar-bg { height: 4px; background: #333; margin-top: 8px; width: 100%; }
+        .bar-fill { height: 100%; background: var(--main); width: 0%; transition: width 0.3s; }
+
+        /* TARGET LIST */
+        .target-area { display: none; flex-direction: column; gap: 5px; }
+        .t-row { display: flex; justify-content: space-between; background: #111; padding: 8px; border-bottom: 1px solid #222; font-size: 12px; }
+        .badge { padding: 2px 5px; border-radius: 3px; font-size: 10px; color: #000; font-weight: bold; margin-right: 5px; }
+        .b-off { background: #f1c40f; } .b-com { background: #e74c3c; } .b-sup { background: #3498db; }
+
+        /* CONSOLE */
+        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #aaa; overflow-y: auto; font-family: monospace; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV Campaign Monitor <span style="font-size:10px; color:#666">v2.0</span></h1>
-    <span class="live-indicator" id="liveTag">● LIVE DATA</span>
+    <h1>DoV WAR ROOM <span style="color:#666; font-size:12px">v3.1 Stable</span></h1>
+    <span class="rpc-status" id="rpcDisplay">Déconnecté</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="control-box">
-            <div class="control-title">Global Monitoring</div>
-            <button class="btn-green" id="btnGlobal" onclick="startGlobalScan()">SCANNER CARTE</button>
-            <button class="btn-red" id="btnStop" onclick="stopScan()">STOP</button>
-            <div id="progText" style="font-size:10px; text-align:center; margin-top:5px; color:#666">Prêt.</div>
+        <div class="box">
+            <div class="box-title">Scanner Global</div>
+            <button class="btn-start" id="btnRun" onclick="runGlobal()">LANCER SCAN</button>
+            <button class="btn-stop" id="btnStop" onclick="stopSignal=true">STOP</button>
+            <div id="statusTxt" style="text-align:center; font-size:10px; color:#666; margin-top:5px">En attente</div>
         </div>
 
-        <div class="control-box">
-            <div class="control-title">Recherche Ciblée</div>
-            <input type="text" id="targetInput" placeholder="Compte (ex: u2d2k.c.wam)" value="u2d2k.c.wam">
-            <button class="btn-blue" onclick="scanTarget()">ANALYSER JOUEUR</button>
+        <div class="box">
+            <div class="box-title">Cible Unique</div>
+            <input type="text" id="targetIn" value="u2d2k.c.wam" placeholder="Nom du compte">
+            <button class="btn-target" onclick="runTarget()">SCANNER JOUEUR</button>
         </div>
     </aside>
 
-    <main class="main-view" id="mainArea">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-val" id="totalDivs">0</div>
-                <div class="stat-label">Divisions Totales</div>
+    <main class="main-view">
+        <div id="dashView">
+            <div class="stats-row">
+                <div class="stat"><span class="stat-val" id="valDivs">0</span><span class="stat-lbl">Divisions</span></div>
+                <div class="stat"><span class="stat-val" id="valPower">0</span><span class="stat-lbl">Puissance</span></div>
+                <div class="stat"><span class="stat-val" id="valUnits">0</span><span class="stat-lbl">Unités</span></div>
+                <div class="stat"><span class="stat-val" id="valZones">0</span><span class="stat-lbl">Zones</span></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-val" id="totalPower">0</div>
-                <div class="stat-label">Puissance Globale</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-val" id="activeZones">0</div>
-                <div class="stat-label">Zones Actives</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-val" id="estFuel">0</div>
-                <div class="stat-label">Conso. Fuel / H (Est.)</div>
+            <div class="zones-grid" id="zonesArea">
+                <div style="color:#444">Cliquez sur "LANCER SCAN" pour charger la carte.</div>
             </div>
         </div>
-
-        <h3 style="color:#666; font-size:12px; border-bottom:1px solid #333; padding-bottom:5px; margin-top:10px">RÉPARTITION GÉOGRAPHIQUE (ZONES)</h3>
-        <div class="zones-container" id="zonesGrid">
-            <div style="color:#444; padding:20px">En attente du scan global...</div>
-        </div>
-        
-        <div id="targetContainer" class="list-view"></div>
+        <div id="targetView" class="target-area"></div>
     </main>
 </div>
 
-<div class="console" id="logs">> Système initialisé.</div>
+<div class="logs" id="console">> Système prêt.</div>
 
 <script>
+    // LISTE DES SERVEURS (On en choisira un seul au démarrage)
     const RPCS = [
-        "https://wax.gre
+        "https://wax.greymass.com",
+        "https://wax.eosn.io",
+        "https://api.wax.alohaeos.com",
+        "https://wax.pink.gg",
+        "https://api.waxsweden.org"
+    ];
+
+    let currentRPC = null;
+    let stopSignal = false;
+    let zoneNames = {};
+
+    // --- LOGS ---
+    function log(msg, color="#aaa") {
+        const c = document.getElementById('console');
+        const t = new Date().toLocaleTimeString();
+        c.innerHTML = `<div style="color:${color}">[${t}] ${msg}</div>` + c.innerHTML;
+    }
+
+    // --- 1. CONNEXION INTELLIGENTE ---
+    async function initConnection() {
+        if(currentRPC) return currentRPC; // Déjà connecté
+        
+        log("Test de connexion aux serveurs...", "#29b6f6");
+        for(let rpc of RPCS) {
+            try {
+                // Petit ping rapide
+                await fetch(rpc + "/v1/chain/get_info", { method: 'POST' });
+                currentRPC = rpc;
+                document.getElementById('rpcDisplay').innerText = "Connecté : " + new URL(rpc).hostname;
+                document.getElementById('rpcDisplay').style.color = "#00e676";
+                log(`Connexion établie sur ${rpc}`, "#00e676");
+                return rpc;
+            } catch(e) { /* On passe au suivant */ }
+        }
+        log("ERREUR CRITIQUE : Aucun serveur ne répond. Vérifiez votre internet.", "#ff1744");
+        throw new Error("No RPC");
+    }
+
+    // --- 2. RECUPERATION ZONES (SANS BLOQUER) ---
+    async function loadZonesSafe() {
+        try {
+            const rpc = await initConnection();
+            log("Chargement topographie...", "#888");
+            
+            // On tente de lire la table 'zones'
+            const res = await fetch(rpc + "/v1/chain/get_table_rows", {
+                method: 'POST',
+                body: JSON.stringify({ json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "zones", limit: 100 })
+            });
+            const data = await res.json();
+            
+            if(data.rows && data.rows.length > 0) {
+                data.rows.forEach(z => {
+                    // Adaptabilité aux noms de colonnes
+                    const id = z.id || z.zone_id || z.key;
+                    const name = z.name || z.zone_name;
+                    if(id && name) zoneNames[id] = name;
+                });
+                log(`Topographie chargée : ${Object.keys(zoneNames).length} zones nommées.`, "#29b6f6");
+            }
+        } catch(e) {
+            log("Impossible de nommer les zones (Scan ID uniquement).", "orange");
+        }
+    }
+
+    // --- 3. SCAN GLOBAL (LE COEUR) ---
+    async function runGlobal() {
+        stopSignal = false;
+        
+        // UI Reset
+        document.getElementById('targetView').style.display = 'none';
+        document.getElementById('dashView').style.display = 'block';
+        document.getElementById('btnRun').style.display = 'none';
+        document.getElementById('btnStop').style.display = 'inline-block';
+        document.getElementById('zonesArea').innerHTML = "";
+
+        // Reset Stats
+        let stats = { divs: 0, power: 0, units: 0, zones: {} };
+
+        try {
+            // Étape A : Connexion & Zones (Si ça plante, on continue quand même)
+            await loadZonesSafe();
+
+            const rpc = await initConnection();
+            let nextKey = "";
+            let hasMore = true;
+
+            log("DÉMARRAGE DU SCAN GLOBAL...", "#fff");
+
+            while(hasMore && !stopSignal) {
+                document.getElementById('statusTxt').innerText = `Scan... (${stats.divs} divs)`;
+
+                const res = await fetch(rpc + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "sdivisions",
+                        limit: 200, lower_bound: nextKey
+                    })
+                });
+
+                const data = await res.json();
+                if(!data.rows || data.rows.length === 0) break;
+
+                // --- TRAITEMENT RAPIDE ---
+                for(let row of data.rows) {
+                    stats.divs++;
+                    const p = parseInt(row.power || 0);
+                    stats.power += p;
+                    
+                    const u = row.units || row.asset_ids || [];
+                    stats.units += u.length;
+
+                    const zID = row.zoneID || 0;
+                    if(!stats.zones[zID]) stats.zones[zID] = { count: 0, power: 0 };
+                    stats.zones[zID].count++;
+                    stats.zones[zID].power += p;
+                }
+
+                // Mise à jour visuelle
+                updateUI(stats);
+
+                if(data.more && data.next_key) nextKey = data.next_key;
+                else hasMore = false;
+            }
+            
+            if(stopSignal) log("Scan interrompu par l'utilisateur.", "orange");
+            else log(`SCAN TERMINÉ COMPLET.`, "#00e676");
+
+        } catch(e) {
+            log("Erreur pendant le scan: " + e.message, "red");
+        }
+
+        // Fin
+        document.getElementById('btnStop').style.display = 'none';
+        document.getElementById('btnRun').style.display = 'inline-block';
+        document.getElementById('statusTxt').innerText = "Terminé";
+    }
+
+    // --- 4. SCAN CIBLE ---
+    async function runTarget() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        if(!user) return;
+
+        document.getElementById('dashView').style.display = 'none';
+        const view = document.getElementById('targetView');
+        view.style.display = 'flex';
+        view.innerHTML = `<div style="padding:20px; color:#888">Recherche de ${user}...</div>`;
+
+        try {
+            const rpc = await initConnection();
+            let rows = [];
+            let nextKey = user;
+            let searching = true;
+
+            while(searching) {
+                const res = await fetch(rpc + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "sdivisions",
+                        index_position: 2, key_type: "name", lower_bound: nextKey, limit: 100
+                    })
+                });
+                const data = await res.json();
+                if(!data.rows || data.rows.length === 0) break;
+
+                for(let r of data.rows) {
+                    const owner = r.owner || r.user;
+                    if(owner === user) rows.push(r);
+                    else if(owner.localeCompare(user) > 0) { searching = false; break; }
+                }
+                if(searching && data.more) nextKey = data.next_key; else searching = false;
+            }
+
+            // Rendu Liste
+            let html = `<h3 style="padding:10px; border-bottom:1px solid #333; margin:0">RAPPORT : ${user} (${rows.length} Divs)</h3>`;
+            
+            if(rows.length === 0) html += `<div style="padding:20px; color:orange">Aucune division trouvée.</div>`;
+
+            rows.forEach(r => {
+                let badges = "";
+                const units = r.units || [];
+                units.forEach(u => {
+                    let role = (typeof u === 'object') ? u.key : 'unit';
+                    let cls = "b-sup";
+                    if(role.includes('combat')) cls = "b-com";
+                    if(role.includes('officer')) cls = "b-off";
+                    badges += `<span class="badge ${cls}"></span>`;
+                });
+
+                html += `
+                <div class="t-row">
+                    <div style="width:80px; color:var(--main)">#${r.division_id}</div>
+                    <div style="flex:1">${badges} <span style="color:#666">(${units.length} u)</span></div>
+                    <div style="color:var(--sec)">Zone ${r.zoneID}</div>
+                </div>`;
+            });
+            view.innerHTML = html;
+            log(`Rapport généré pour ${user}`, "#29b6f6");
+
+        } catch(e) {
+            log("Erreur cible: " + e.message, "red");
+        }
+    }
+
+    // --- MISE A JOUR VISUELLE ---
+    function updateUI(stats) {
+        document.getElementById('valDivs').innerText = stats.divs.toLocaleString();
+        document.getElementById('valPower').innerText = stats.power.toLocaleString();
+        document.getElementById('valUnits').innerText = stats.units.toLocaleString();
+        document.getElementById('valZones').innerText = Object.keys(stats.zones).length;
+
+        const grid = document.getElementById('zonesArea');
+        let html = "";
+        
+        // Trier zones par population
+        const sorted = Object.keys(stats.zones).sort((a,b) => stats.zones[b].count - stats.zones[a].count);
+        const max = sorted.length ? stats.zones[sorted[0]].count : 1;
+
+        sorted.forEach(id => {
+            const z = stats.zones[id];
+            const name = zoneNames[id] || `Zone ${id}`;
+            const pct = (z.count / max) * 100;
+            
+            html += `
+            <div class="zone">
+                <div class="z-head"><span>${name}</span><span>${z.count}</span></div>
+                <div class="z-sub">Puissance: ${z.power.toLocaleString()}</div>
+                <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+            </div>`;
+        });
+        grid.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
