@@ -3,53 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoV - Scanner Final</title>
+    <title>DoV - Scanner FINAL</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: #2d2d2d; width: 100%; max-width: 700px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { text-align: center; color: #e67e22; margin-top: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #222; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: #333; width: 100%; max-width: 750px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { text-align: center; color: #f1c40f; margin-top: 0; }
         
         .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
         input { padding: 12px; width: 60%; background: #444; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; }
-        button { padding: 12px 20px; background-color: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #d35400; }
-        button:disabled { background-color: #7f8c8d; }
+        button { padding: 12px 20px; background-color: #f1c40f; color: #222; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #f39c12; }
+        button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
 
-        .stats { display: flex; justify-content: space-around; background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .stat-box { text-align: center; }
-        .stat-num { font-size: 28px; font-weight: bold; color: #3498db; }
-        .stat-label { font-size: 12px; color: #aaa; text-transform: uppercase; }
-
-        .log { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; margin-bottom: 20px; border-radius: 5px; min-height: 20px; }
+        .log { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; margin-bottom: 20px; border-radius: 5px; min-height: 20px; border: 1px solid #555; }
         
-        .asset-list { max-height: 500px; overflow-y: auto; border-top: 1px solid #444; }
+        .stats-box { display: flex; justify-content: space-around; background: #444; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .stat { text-align: center; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #3498db; }
+
+        .asset-list { max-height: 600px; overflow-y: auto; border-top: 1px solid #555; }
         .item { padding: 12px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
         .item:hover { background-color: #3a3a3a; }
-        .item a { text-decoration: none; color: #e67e22; font-weight: bold; border: 1px solid #e67e22; padding: 5px 10px; border-radius: 4px; }
-        .item a:hover { background: #e67e22; color: white; }
-        .role-tag { background: #555; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-right: 8px; color: #ddd; }
+        
+        .tag-role { background: #555; color: #ddd; font-size: 11px; padding: 3px 6px; border-radius: 4px; margin-right: 8px; text-transform: uppercase; }
+        .tag-div { color: #888; font-size: 12px; margin-left: 10px; }
+        
+        .link-btn { text-decoration: none; background: #2980b9; color: white; padding: 5px 10px; border-radius: 4px; font-size: 13px; }
+        .link-btn:hover { background: #3498db; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Scanner DoV</h1>
+    <h1>Scanner DoV (Corrigé)</h1>
     
     <div class="input-group">
         <input type="text" id="userInput" placeholder="Compte WAX (ex: u2d2k.c.wam)">
         <button id="btn" onclick="lancerScan()">SCANNER</button>
     </div>
 
-    <div class="log" id="logBox">Prêt. Entrez un nom de compte.</div>
+    <div class="log" id="logBox">Prêt. En attente...</div>
 
-    <div class="stats">
-        <div class="stat-box">
-            <div class="stat-num" id="divCount">0</div>
-            <div class="stat-label">Divisions</div>
+    <div class="stats-box">
+        <div class="stat">
+            <div class="stat-val" id="divCount">0</div>
+            <div>Divisions</div>
         </div>
-        <div class="stat-box">
-            <div class="stat-num" id="assetCount">0</div>
-            <div class="stat-label">Cartes Trouvées</div>
+        <div class="stat">
+            <div class="stat-val" id="assetCount">0</div>
+            <div>Cartes</div>
         </div>
     </div>
 
@@ -57,7 +59,12 @@
 </div>
 
 <script>
-    const RPC = "https://api.waxsweden.org/v1/chain/get_table_rows";
+    // Liste de secours au cas où un serveur bloque
+    const RPCS = [
+        "https://api.waxsweden.org/v1/chain/get_table_rows",
+        "https://wax.greymass.com/v1/chain/get_table_rows",
+        "https://wax.eosn.io/v1/chain/get_table_rows"
+    ];
 
     async function lancerScan() {
         const account = document.getElementById('userInput').value.trim().toLowerCase();
@@ -73,38 +80,48 @@
         document.getElementById('divCount').innerText = "0";
         document.getElementById('assetCount').innerText = "0";
         
-        logBox.innerText = `Recherche en cours pour ${account}...`;
-
         let allDivisions = [];
         let more = true;
         let nextKey = "";
+        let rpcIndex = 0;
+
+        logBox.innerText = `Connexion au serveur pour ${account}...`;
 
         try {
             while(more) {
-                const response = await fetch(RPC, {
+                // Tentative de connexion (Failover simple)
+                const currentRPC = RPCS[rpcIndex];
+                
+                const response = await fetch(currentRPC, {
                     method: 'POST',
                     body: JSON.stringify({
                         json: true,
                         code: "dovpvecontrl",
                         scope: "dovpvecontrl",
                         table: "sdivisions",
-                        index_position: 2,     // Index Utilisateur
+                        index_position: 2,     // Index 2 (Owner)
                         key_type: "name",      // Recherche par nom
                         lower_bound: nextKey || account,
                         upper_bound: account,
-                        limit: 200
+                        limit: 500
                     })
                 });
 
-                if(!response.ok) throw new Error("Erreur réseau WAX");
+                if(!response.ok) {
+                    // Si le serveur 1 plante, on essaie le suivant au prochain tour
+                    rpcIndex = (rpcIndex + 1) % RPCS.length;
+                    throw new Error("Erreur serveur, nouvelle tentative...");
+                }
 
                 const data = await response.json();
                 
-                // Filtrage strict
-                const rows = data.rows.filter(r => r.user === account);
+                // --- CORRECTION CRUCIALE ICI ---
+                // Le dump a montré que la colonne s'appelle "owner", pas "user"
+                const rows = data.rows.filter(r => r.owner === account);
+                
                 allDivisions = [...allDivisions, ...rows];
 
-                logBox.innerText = `Analyse... ${allDivisions.length} divisions trouvées.`;
+                logBox.innerText = `Récupéré ${allDivisions.length} divisions... (Chargement suite...)`;
 
                 more = data.more;
                 if(more && data.next_key) {
@@ -114,12 +131,12 @@
                 }
             }
 
-            // --- C'EST ICI QUE LA MAGIE OPÈRE ---
+            // Affichage
             if(allDivisions.length === 0) {
-                logBox.innerText = "Aucune division trouvée.";
+                logBox.innerText = "Aucune division trouvée pour ce compte (colonnes 'owner' vérifiée).";
                 logBox.style.color = "orange";
             } else {
-                logBox.innerText = "Chargement terminé !";
+                logBox.innerText = "Terminé avec succès !";
                 logBox.style.color = "#0f0";
                 afficherResultats(allDivisions);
             }
@@ -130,48 +147,3 @@
         }
         
         btn.disabled = false;
-    }
-
-    function afficherResultats(divisions) {
-        const list = document.getElementById('resultList');
-        let totalAssets = 0;
-        let html = "";
-
-        divisions.forEach(div => {
-            // CORRECTION MAJEURE : On utilise 'units' au lieu de 'asset_ids'
-            if(div.units && div.units.length > 0) {
-                totalAssets += div.units.length;
-                
-                div.units.forEach(unit => {
-                    // unit est un objet {key: "combat%10", value: "1099..."}
-                    // On récupère l'ID dans unit.value
-                    const assetId = unit.value; 
-                    const role = unit.key; // ex: combat%4, officer, etc.
-
-                    html += `
-                        <div class="item">
-                            <div>
-                                <span class="role-tag">${role}</span>
-                                <strong>${assetId}</strong> 
-                                <span style="font-size:12px; color:#888;">(Div #${div.division_id})</span>
-                            </div>
-                            <a href="https://wax.atomichub.io/explorer/asset/${assetId}" target="_blank">Voir</a>
-                        </div>
-                    `;
-                });
-            }
-        });
-
-        document.getElementById('divCount').innerText = divisions.length;
-        document.getElementById('assetCount').innerText = totalAssets;
-        
-        if (totalAssets === 0) {
-            list.innerHTML = "<div style='padding:20px; text-align:center'>Divisions trouvées, mais elles semblent vides (pas d'unités).</div>";
-        } else {
-            list.innerHTML = html;
-        }
-    }
-</script>
-
-</body>
-</html>
