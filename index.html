@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V27 (PRODUCTION)</title>
+    <title>DoV - COMMAND V29 (SNIPER)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -79,14 +79,17 @@
         .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; }
         .b-sub { font-size: 10px; color: #666; }
         .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
-        
+        .b-pow { color: var(--main); }
+        .b-in { color: var(--alert); }
+
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
+        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--main)">V27 PRODUCTION</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V29 SNIPER</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -102,16 +105,18 @@
         <div class="box">
             <div class="box-title">2. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
-            <button class="btn-target" onclick="startTarget()">SCAN DIVISIONS</button>
+            <button class="btn-target" onclick="startTarget()">SCAN JOUEUR</button>
             <button class="btn-build" onclick="startBuildings()">SCAN BÂTIMENTS</button>
         </div>
         
         <div style="font-size:9px; color:#444; padding:10px; text-align:center">
-            Moteur Réseau V23<br>Audit V27 OK
+            Moteur Réseau V23<br>Recherche Indexée (Rapide)
         </div>
     </aside>
 
     <main class="main-view">
+        <div id="statusMsg" class="status-bar"></div>
+
         <div id="dashView" class="view-section view-active">
             <div class="stats-row">
                 <div class="stat"><span class="stat-val" id="dDivs">0</span><span class="stat-lbl">Divisions</span></div>
@@ -144,7 +149,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V27 Prête. Modules d'analyse validés.</div>
+<div class="logs" id="console">> V29 Sniper. Recherche par index (Owner) activée.</div>
 
 <script>
     const PROXY = "https://corsproxy.io/?";
@@ -204,9 +209,15 @@
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active'));
         document.getElementById(id).classList.add('view-active');
     }
+    
+    function showStatus(msg) {
+        const el = document.getElementById('statusMsg');
+        el.style.display = 'block';
+        el.innerText = msg;
+    }
 
-    // --- FETCH TANK ---
-    async function robustFetch(code, table, lowerBound, limit=300) {
+    // --- FETCH AVANCÉ (SNIPER SUPPORT) ---
+    async function robustFetch(code, table, lowerBound, limit=300, indexPosition=1, keyType="") {
         let attempts = 0;
         const maxAttempts = 15;
 
@@ -223,13 +234,22 @@
                 const controller = new AbortController();
                 setTimeout(() => controller.abort(), 8000); 
 
+                const bodyPayload = {
+                    json: true, code: code, scope: code, table: table, 
+                    limit: limit, lower_bound: lowerBound
+                };
+                
+                // AJOUT V29 : INDEXATION SECONDAIRE
+                if(indexPosition > 1) {
+                    bodyPayload.index_position = indexPosition;
+                    bodyPayload.key_type = keyType; // ex: "i64" ou "name"
+                    bodyPayload.upper_bound = lowerBound; // Pour recherche exacte
+                }
+
                 const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        json: true, code: code, scope: code, table: table, 
-                        limit: limit, lower_bound: lowerBound
-                    }),
+                    body: JSON.stringify(bodyPayload),
                     signal: controller.signal
                 });
 
@@ -272,7 +292,7 @@
         });
     }
 
-    // --- 1. SCAN GLOBAL ---
+    // --- 1. SCAN GLOBAL (Rien ne change, ça marche déjà) ---
     async function startGlobal() {
         stopSignal = false;
         switchView('dashView');
@@ -285,7 +305,7 @@
         let nextKey = "";
         let hasMore = true;
 
-        log("Scan Global V27...", "#fff");
+        log("Scan Global V29...", "#fff");
 
         try {
             while(hasMore && !stopSignal) {
@@ -324,70 +344,75 @@
         document.getElementById('scanProg').innerText = "Terminé";
     }
 
-    // --- 2. SCAN TARGET ---
+    // --- 2. SCAN TARGET (V29 : SNIPER MODE) ---
     async function startTarget() {
+        stopSignal = false;
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('targetView');
         const view = document.getElementById('targetView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche divisions de ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche ciblée (Index Owner) pour ${user}...</div>`;
+        
         let rows = [];
-        let nextKey = user;
-        let searching = true;
-
+        
         try {
-            while(searching) {
-                const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 100);
-                if(!data.rows || data.rows.length === 0) break;
-                for(let row of data.rows) {
-                    const owner = getProp(row, ['owner', 'user', 'account']);
-                    if(owner === user) rows.push(row);
-                    else if(owner.localeCompare(user) > 0) { searching = false; break; }
-                }
-                if(searching && data.more) nextKey = data.next_key; else searching = false;
-                await new Promise(r => setTimeout(r, 50)); 
+            // ON UTILISE L'INDEX 2 (Owner)
+            // On demande toutes les lignes où index 2 == user
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
+            
+            if(data.rows && data.rows.length > 0) {
+                // Double vérification au cas où (parfois l'API renvoie large)
+                rows = data.rows.filter(r => getProp(r, ['owner', 'user', 'account']) === user);
+                renderTargetList(rows, user, view);
+                log(`Trouvé ${rows.length} divisions pour ${user}.`, "#00e676");
+            } else {
+                view.innerHTML = `<div style="padding:20px; text-align:center; color:orange">Aucune division trouvée pour ce joueur.</div>`;
+                log("Rien trouvé via l'index Owner.", "orange");
             }
 
-            let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
-            rows.forEach(r => {
-                const zID = getProp(r, ['zoneID', 'zone_id'], 0);
-                const zInfo = ZONE_DB[zID] || { name: "Inconnu", cost: 0, costX: 0, reward: 0 };
-                const busy = isBusy(r);
-                let statusHtml = busy ? `<span class="st-mission">MISSION</span>` : `<span class="st-ready">PRÊT</span>`;
-                let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
-                
-                html += `<div class="t-row"><div style="width:50px; color:var(--main)">#${r.division_id}</div><div style="flex:1; text-align:right;"><span style="font-size:9px; color:#888; margin-right:10px"><span style="color:var(--alert)">${costTxt}</span></span></div><div style="display:flex; align-items:center; margin-left:10px;">${statusHtml}<div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div></div></div>`;
-            });
-            view.innerHTML = html;
         } catch(e) { log("Erreur cible: " + e.message, "red"); }
     }
 
-    // --- 3. SCAN BATIMENTS (PARSING AMÉLIORÉ) ---
+    function renderTargetList(rows, user, view) {
+        let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
+        rows.forEach(r => {
+            const zID = getProp(r, ['zoneID', 'zone_id'], 0);
+            const zInfo = ZONE_DB[zID] || { name: "Inconnu", cost: 0, costX: 0, reward: 0 };
+            const busy = isBusy(r);
+            let statusHtml = busy ? `<span class="st-mission">MISSION</span>` : `<span class="st-ready">PRÊT</span>`;
+            let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
+            
+            html += `<div class="t-row"><div style="width:50px; color:var(--main)">#${r.division_id}</div><div style="flex:1; text-align:right;"><span style="font-size:9px; color:#888; margin-right:10px"><span style="color:var(--alert)">${costTxt}</span></span></div><div style="display:flex; align-items:center; margin-left:10px;">${statusHtml}<div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div></div></div>`;
+        });
+        view.innerHTML = html;
+    }
+
+    // --- 3. SCAN BATIMENTS (V29 : SNIPER MODE) ---
     async function startBuildings() {
+        stopSignal = false;
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
         const view = document.getElementById('buildingView');
-        view.innerHTML = `<div style="padding:20px; text-align:center">Connexion à dovutilstake...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche bâtiments (Index Owner) pour ${user}...</div>`;
 
         try {
-            const data = await robustFetch("dovutilstake", "buildings", "", 500); 
-            if(data.rows) {
-                const found = data.rows.filter(row => JSON.stringify(row).includes(user));
+            // ON UTILISE L'INDEX 2 (Owner)
+            const data = await robustFetch("dovutilstake", "buildings", user, 500, 2, "i64"); 
+            
+            if(data.rows && data.rows.length > 0) {
+                // Filtrage strict
+                const found = data.rows.filter(r => r.owner === user);
                 
                 if(found.length > 0) {
-                    // CALCULATRICE DE RENTABILITÉ BATIMENTS
                     let totalProd = 0;
                     let totalCost = 0;
-
                     let listHtml = "";
+                    
                     found.forEach(b => {
-                        // Nettoyage des données (Ex: "583.2000 DOVH" -> 583.2)
                         let rawPower = Array.isArray(b.power) ? b.power[0] : b.power;
                         let rawIn = Array.isArray(b.token_in) ? b.token_in[0] : b.token_in;
-                        
                         let powerVal = parseFloat(rawPower);
                         let inVal = parseFloat(rawIn);
                         
-                        // Détection du type pour la couleur
                         let typeColor = "#fff";
                         if(rawPower.includes("DOVF")) typeColor = "var(--fuel)";
                         if(rawPower.includes("DOVH")) typeColor = "var(--health)";
@@ -410,7 +435,6 @@
                         </div>`;
                     });
 
-                    // En-tête avec Totaux
                     let headerHtml = `
                     <div style="background:#111; padding:10px; border-bottom:1px solid #333; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center">
                         <span style="color:#9b59b6; font-weight:bold">${found.length} BÂTIMENTS</span>
@@ -421,10 +445,13 @@
                     </div>`;
 
                     view.innerHTML = headerHtml + listHtml;
+                    log(`Trouvé ${found.length} bâtiments.`, "#00e676");
 
                 } else {
-                    view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé.</div>";
+                    view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé (Filtre strict).</div>";
                 }
+            } else {
+                view.innerHTML = "<div style='color:orange; padding:20px; text-align:center'>Aucun bâtiment trouvé via l'index.</div>";
             }
         } catch(e) { log("Erreur Bâtiments : " + e.message, "red"); }
     }
