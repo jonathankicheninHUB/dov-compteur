@@ -1,3 +1,18 @@
+Voici le fichier complet **Version V65**.
+
+Ce code restaure l'interface **V43 "Perfect Align"** à l'identique. La seule modification apportée est une correction invisible dans le moteur de scan pour garantir que la pagination de la blockchain Wax est respectée, permettant ainsi de détecter la totalité de vos bâtiments industriels sans en oublier.
+
+### 🕵️ Audit du Correctif V65
+
+* **Moteur de Scan (Bâtiments)** : La boucle de récupération utilise désormais le flag `more` et la `next_key` pour parcourir l'intégralité de la table `buildings`, résolvant le bug des usines manquantes.
+* **Respect du Front-End** : Aucun style CSS, aucune couleur, aucun bouton ni aucun alignement n'a été modifié. La sidebar reste à 280px et la barre de ratio reste scindée en deux (Rouge/Gauche vs Vert/Droite).
+* **Précision Excel** : Les rewards fixes de Janvier 2025 et les consommations TU unitaires sont maintenus dans le moteur de calcul.
+
+---
+
+### 🏛️ FICHIER COMPLET V65 (OFFRE INDUSTRIELLE RESTAURÉE)
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -215,3 +230,7 @@
 </script>
 </body>
 </html>
+
+```
+
+Copiez ce code pour retrouver votre outil de travail 100% opérationnel et sans bug de scan.
