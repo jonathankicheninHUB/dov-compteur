@@ -2,14 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - MASTER CONTROL V9</title>
+    <title>DoV - WAR ROOM V11 (ULTIMATE)</title>
     <style>
-        /* DESIGN "V7" QUI FONCTIONNAIT BIEN */
-        :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --bg: #000; --panel: #111; --border: #333; }
+        :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --bg: #050505; --panel: #111; --border: #333; }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* HEADER */
-        header { height: 40px; background: #050505; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
+        header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--main); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
         .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
 
@@ -30,19 +29,26 @@
 
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
 
-        /* STATS */
+        /* DASHBOARD STATS */
         .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid var(--sec); }
         .stat-val { display: block; font-size: 20px; color: #fff; font-weight: bold; }
         .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
 
-        /* ZONES GRID (ORDRE STRICT V7) */
+        /* ACTIVITY BAR (GLOBAL STATUS) */
+        .activity-box { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 20px; text-align: center; }
+        .act-title { font-size: 11px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .act-bar-bg { height: 10px; background: #222; border-radius: 5px; overflow: hidden; display: flex; }
+        .act-bar-mission { background: #ff9800; height: 100%; transition: width 0.5s; }
+        .act-bar-ready { background: #4caf50; height: 100%; transition: width 0.5s; }
+        .act-nums { display: flex; justify-content: space-between; font-size: 10px; margin-top: 5px; font-weight: bold; }
+
+        /* ZONES GRID */
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 50px; opacity: 0.6; transition: opacity 0.3s; }
-        .zone.active { opacity: 1; border-color: #555; background: #111; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 50px; opacity: 0.6; }
+        .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         .z-val { font-size: 14px; color: var(--sec); font-weight: bold; margin-top: 5px; }
-        .z-sub { font-size: 9px; color: #666; margin-top: 2px; }
         .bar-bg { height: 3px; background: #222; margin-top: 8px; width: 100%; }
         .bar-fill { height: 100%; background: var(--main); width: 0%; transition: width 0.3s; }
 
@@ -51,10 +57,8 @@
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; }
         .badge { padding: 1px 4px; border-radius: 2px; font-size: 9px; color: #000; font-weight: bold; margin-right: 4px; display: inline-block; width: 25px; text-align: center;}
         .b-off { background: #f1c40f; } .b-com { background: #e74c3c; } .b-sup { background: #3498db; }
-        
-        /* STATUS TAG (NOUVEAUTÉ V8 PRÉSERVÉE MAIS DISCRÈTE) */
-        .status-ok { color: #00e676; font-size: 9px; border: 1px solid #00e676; padding: 0 4px; border-radius: 3px; margin-left: 5px; }
-        .status-busy { color: #ff9800; font-size: 9px; border: 1px solid #ff9800; padding: 0 4px; border-radius: 3px; margin-left: 5px; }
+        .st-mission { color: #ff9800; border: 1px solid #ff9800; padding: 0 4px; border-radius: 3px; font-size: 9px; }
+        .st-ready { color: #4caf50; border: 1px solid #4caf50; padding: 0 4px; border-radius: 3px; font-size: 9px; }
 
         /* CONSOLE */
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
@@ -63,7 +67,7 @@
 <body>
 
 <header>
-    <h1>DoV MASTER V9 <span style="color:var(--sec)">STABLE</span></h1>
+    <h1>DoV MONITOR <span style="color:var(--main)">V11 FINAL</span></h1>
     <span class="rpc-badge" id="rpcStatus">OFFLINE</span>
 </header>
 
@@ -72,18 +76,18 @@
         <div class="box">
             <div class="box-title">1. Réseau (Tunnel)</div>
             <button class="btn-cx" onclick="autoConnect()">ACTIVER LE TUNNEL</button>
-            <div id="cxMsg" style="text-align:center; font-size:10px; color:#666">Requis pour démarrer</div>
+            <div id="cxMsg" style="text-align:center; font-size:10px; color:#666">Cliquez pour démarrer</div>
         </div>
 
         <div class="box">
-            <div class="box-title">2. Global (Carte)</div>
+            <div class="box-title">2. Global</div>
             <button class="btn-start" id="btnGlobal" onclick="startGlobal()" disabled>SCAN GLOBAL</button>
             <button class="btn-stop" id="btnStop" onclick="stopSignal=true">ARRÊT</button>
             <div id="scanProg" style="text-align:center; font-size:10px; color:#666; margin-top:5px">-</div>
         </div>
 
         <div class="box">
-            <div class="box-title">3. Espion (Joueur)</div>
+            <div class="box-title">3. Espion</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
             <button class="btn-target" id="btnTarget" onclick="startTarget()" disabled>SCAN JOUEUR</button>
         </div>
@@ -97,8 +101,21 @@
                 <div class="stat"><span class="stat-val" id="dUnits">0</span><span class="stat-lbl">Unités</span></div>
                 <div class="stat"><span class="stat-val" id="dZones">0</span><span class="stat-lbl">Zones Actives</span></div>
             </div>
+
+            <div class="activity-box">
+                <div class="act-title">État des Troupes (Global)</div>
+                <div class="act-bar-bg">
+                    <div class="act-bar-mission" id="barMission" style="width: 0%"></div>
+                    <div class="act-bar-ready" id="barReady" style="width: 0%"></div>
+                </div>
+                <div class="act-nums">
+                    <span style="color:#ff9800">EN MISSION : <span id="txtMission">0</span></span>
+                    <span style="color:#4caf50">PRÊTES : <span id="txtReady">0</span></span>
+                </div>
+            </div>
+
             <div class="zones-grid" id="zonesArea">
-                <div style="color:#444; grid-column:span 4; text-align:center; padding:50px;">
+                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">
                     En attente de connexion...
                 </div>
             </div>
@@ -108,15 +125,12 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V9 chargée. Ordre des zones verrouillé. Liste RPC complète.</div>
+<div class="logs" id="console">> V11 chargée. Liste complète des serveurs restaurée.</div>
 
 <script>
-    // --- 1. CONFIGURATION ROBUSTE (Rien n'a été supprimé) ---
-    
-    // Le Proxy sauveur
     const PROXY = "https://corsproxy.io/?";
     
-    // La liste complète (15 serveurs)
+    // LISTE COMPLETE RESTAURÉE (15 SERVEURS)
     const RPCS = [
         "https://wax.greymass.com", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
         "https://wax.pink.gg", "https://api.waxsweden.org", "https://wax.dapplica.io",
@@ -125,7 +139,6 @@
         "https://api.hivebp.io", "https://wax.blacklusion.io", "https://wax-public-bp.neftyblocks.com"
     ];
 
-    // L'ordre EXACT demandé
     const ZONE_ORDER = [
         "Beach 1", "Beach 2", "Beach 3", "Bunker",
         "Forest 1", "Forest 2", "Forest 3", "Camp",
@@ -143,28 +156,33 @@
         const t = new Date().toLocaleTimeString();
         c.innerHTML = `<div style="color:${color}">[${t}] ${msg}</div>` + c.innerHTML;
     }
-
     function getProp(obj, keys, def) {
         for(let k of keys) if(obj[k] !== undefined) return obj[k];
         return def;
     }
+    // Détecte si une div est en mission
+    function isBusy(row) {
+        const end = getProp(row, ['end_time', 'end'], 0);
+        const now = Date.now() / 1000;
+        let endSec = end;
+        if (typeof end === 'string' && end.includes('T')) endSec = new Date(end).getTime() / 1000;
+        return endSec > now;
+    }
 
-    // --- 2. MOTEUR DE CONNEXION (V5/V6 - EPROUVÉ) ---
+    // --- 1. CONNEXION ---
     async function autoConnect() {
         const btn = document.querySelector('.btn-cx');
-        btn.disabled = true; btn.innerText = "TEST TUNNEL...";
+        btn.disabled = true; btn.innerText = "TEST...";
         
         for(let rpc of RPCS) {
             try {
-                // On tente via le proxy
                 const url = PROXY + encodeURIComponent(rpc + "/v1/chain/get_info");
                 log(`Test ${new URL(rpc).hostname}...`, "#29b6f6");
                 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                setTimeout(() => controller.abort(), 3000);
                 const res = await fetch(url, { method: 'GET', signal: controller.signal });
-                clearTimeout(timeoutId);
-
+                
                 if(res.ok) {
                     activeRPC = rpc;
                     document.getElementById('rpcStatus').innerText = "TUNNEL ACTIF";
@@ -174,14 +192,13 @@
                     document.getElementById('btnTarget').disabled = false;
                     btn.innerText = "CONNECTÉ";
                     btn.style.background = "#333"; btn.style.color = "#00e676";
-                    
-                    log(`Connecté ! Initialisation grille...`, "#00e676");
-                    initGrid(); // On affiche la grille vide immédiatement
+                    log(`Connecté !`, "#00e676");
+                    initGrid();
                     return;
                 }
             } catch(e) {}
         }
-        log("ECHEC TOTAL PROXY. Réessayez.", "#ff1744");
+        log("ECHEC PROXY. Réessayez.", "#ff1744");
         btn.disabled = false; btn.innerText = "RÉESSAYER";
     }
 
@@ -189,7 +206,6 @@
         const grid = document.getElementById('zonesArea');
         let html = "";
         ZONE_ORDER.forEach((name, index) => {
-            // ID = Index + 1
             html += `
             <div class="zone" id="z-card-${index+1}">
                 <div class="z-head"><span>${name}</span><span id="z-count-${index+1}">0</span></div>
@@ -200,7 +216,7 @@
         grid.innerHTML = html;
     }
 
-    // --- 3. REQUETE SECURISEE ---
+    // --- 2. REQUETE ---
     async function fetchTable(lowerBound = "") {
         const targetUrl = activeRPC + "/v1/chain/get_table_rows";
         const proxyUrl = PROXY + encodeURIComponent(targetUrl);
@@ -216,11 +232,11 @@
             return await res.json();
         } catch (e) {
             await new Promise(r => setTimeout(r, 2000));
-            return fetchTable(lowerBound); // Retry simple
+            return fetchTable(lowerBound);
         }
     }
 
-    // --- 4. SCAN GLOBAL ---
+    // --- 3. SCAN GLOBAL (AVEC STATUS) ---
     async function startGlobal() {
         stopSignal = false;
         document.getElementById('dashView').style.display = 'block';
@@ -228,8 +244,7 @@
         document.getElementById('btnGlobal').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
 
-        let stats = { divs: 0, power: 0, units: 0, zones: {} };
-        // Initialisation à 0 pour l'ordre
+        let stats = { divs: 0, power: 0, units: 0, zones: {}, missions: 0, ready: 0 };
         for(let i=1; i<=ZONE_ORDER.length; i++) stats.zones[i] = { count: 0, power: 0 };
 
         let nextKey = "";
@@ -251,12 +266,15 @@
                     const u = getProp(row, ['units', 'asset_ids'], []);
                     stats.units += u.length;
                     
-                    // Récupération Zone ID
-                    const zID = getProp(row, ['zoneID', 'zone_id', 'zone'], 0);
+                    const zID = getProp(row, ['zoneID', 'zone_id'], 0);
                     if(stats.zones[zID]) {
                         stats.zones[zID].count++;
                         stats.zones[zID].power += p;
                     }
+
+                    // CALCUL STATUT GLOBAL
+                    if(isBusy(row)) stats.missions++;
+                    else stats.ready++;
                 }
 
                 updateDash(stats);
@@ -273,13 +291,13 @@
         document.getElementById('scanProg').innerText = "Terminé";
     }
 
-    // --- 5. SCAN TARGET ---
+    // --- 4. SCAN TARGET ---
     async function startTarget() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         document.getElementById('dashView').style.display = 'none';
         const view = document.getElementById('targetView');
         view.style.display = 'flex';
-        view.innerHTML = `<div style="padding:20px; text-align:center">Recherche de ${user}...</div>`;
+        view.innerHTML = `<div style="padding:20px; text-align:center">Espionnage de ${user}...</div>`;
         
         let rows = [];
         let nextKey = user;
@@ -298,9 +316,8 @@
                 if(searching && data.more) nextKey = data.next_key; else searching = false;
             }
 
-            // HEADER RAPPORT
             let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">
-                JOUEUR : ${user.toUpperCase()} (${rows.length} Divisions)
+                JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)
             </div>`;
             
             rows.forEach(r => {
@@ -308,17 +325,10 @@
                 const zName = ZONE_ORDER[zID - 1] || `Zone ${zID}`;
                 const units = getProp(r, ['units', 'asset_ids'], []);
                 
-                // --- DETECTEUR DE STATUT (V8 - PRÉSERVÉ) ---
-                let statusTag = "";
-                const endTime = getProp(r, ['end_time', 'end'], 0);
-                const now = Date.now() / 1000;
-                let endSec = endTime;
-                // Gestion format date ISO
-                if (typeof endTime === 'string' && endTime.includes('T')) endSec = new Date(endTime).getTime() / 1000;
-                
-                if (endSec > now) statusTag = `<span class="status-busy">MISSION</span>`;
-                else statusTag = `<span class="status-ok">PRÊT</span>`;
-                // ---------------------------------------------
+                // Statut individuel
+                let statusHtml = isBusy(r) ? 
+                    `<span class="st-mission">⏳ EN MISSION</span>` : 
+                    `<span class="st-ready">✅ PRÊT</span>`;
 
                 let badges = "";
                 units.forEach(u => {
@@ -334,7 +344,7 @@
                     <div style="width:50px; color:var(--main)">#${r.division_id}</div>
                     <div style="flex:1">${badges}</div>
                     <div style="display:flex; align-items:center">
-                        ${statusTag}
+                        ${statusHtml}
                         <div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zName}</div>
                     </div>
                 </div>`;
@@ -349,6 +359,14 @@
         document.getElementById('dPow').innerText = stats.power.toLocaleString();
         document.getElementById('dUnits').innerText = stats.units.toLocaleString();
         
+        // Update Activity Bar
+        document.getElementById('txtMission').innerText = stats.missions.toLocaleString();
+        document.getElementById('txtReady').innerText = stats.ready.toLocaleString();
+        const total = stats.missions + stats.ready || 1;
+        document.getElementById('barMission').style.width = ((stats.missions / total) * 100) + "%";
+        document.getElementById('barReady').style.width = ((stats.ready / total) * 100) + "%";
+
+        // Update Zones
         let activeZones = 0;
         let maxCount = 0;
         for(let id in stats.zones) {
@@ -358,20 +376,16 @@
         document.getElementById('dZones').innerText = activeZones;
         if(maxCount === 0) maxCount = 1;
 
-        // Mise à jour case par case (Ordre fixe 1 à 20)
         ZONE_ORDER.forEach((name, index) => {
             const id = index + 1;
             const data = stats.zones[id];
-            
             const card = document.getElementById(`z-card-${id}`);
             const cnt = document.getElementById(`z-count-${id}`);
             const pow = document.getElementById(`z-pow-${id}`);
             const bar = document.getElementById(`z-bar-${id}`);
 
             if(card && data) {
-                if(data.count > 0) {
-                    card.classList.add('active');
-                }
+                if(data.count > 0) card.classList.add('active');
                 cnt.innerText = data.count;
                 pow.innerText = "⚡ " + data.power.toLocaleString();
                 bar.style.width = ((data.count / maxCount) * 100) + "%";
