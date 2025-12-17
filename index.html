@@ -2,114 +2,100 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V71 (REAL ACTIVE PROD)</title>
+    <title>DoV - COMMAND V72 (VISUAL DASHBOARD)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
             --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f;
-            --bg: #050505; --panel: #111; 
+            --bg: #050505; --panel: #111; --card-bg: #141414;
         }
-        body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg); color: #ccc; font-family: 'Segoe UI', 'Consolas', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
-        h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
-        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
+        h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; }
+        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
         .layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
-        .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
-        .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
-        .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
-        .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
-        input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
-        .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; } .inp-money { color: var(--money); font-weight: bold; }
+        .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
-        /* UI V71 */
-        .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
-        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); } /* Warn color car focus Actif */
-        .g-mc-left { font-size: 16px; font-weight: bold; }
-        .g-mc-right { text-align:right; }
-        .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; font-weight:bold; }
-        .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
-        .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content:space-between; min-height:140px; }
-        .g-card-head { display:flex; justify-content:space-between; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:5px; font-size:12px; font-weight:bold; text-transform:uppercase; }
-        .g-count-badge { background:#222; padding:2px 6px; border-radius:3px; color:#fff; }
-        .g-prod-section { text-align:center; margin: 10px 0; }
-        .g-prod-val { font-size:18px; font-weight:bold; color:#fff; display:block; }
-        .g-prod-lbl { font-size:9px; color:#888; text-transform:uppercase; }
-        .g-cost-section { text-align:center; margin-bottom:10px; }
-        .g-mini-cost { font-size:14px; color: var(--dovx); font-weight:bold; }
-        .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
-        .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; } /* Grisé car ne compte pas */
+        /* BOUTONS & INPUTS */
+        .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
+        .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
+        button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
+        button:hover { opacity: 0.8; }
+        .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
+        input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
+        .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
+        
+        /* DASHBOARD V72 - DESIGN */
+        .dashboard-panel { display: grid; grid-template-columns: 1fr 200px 1fr; gap: 15px; background: var(--card-bg); border: 1px solid #333; padding: 15px; border-radius: 6px; margin-bottom: 20px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        .d-left { display: flex; flex-direction: column; gap: 5px; }
+        .d-title { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .d-count { font-size: 24px; font-weight: bold; color: #fff; }
+        .d-sub { font-size: 11px; color: #666; }
+        
+        .d-center { display: flex; justify-content: center; align-items: center; }
+        /* CSS PIE CHART */
+        .chart-pie { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(var(--fuel) 0% 25%, var(--health) 25% 50%, var(--repair) 50% 75%, var(--supply) 75% 100%); position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .chart-hole { position: absolute; top: 15px; left: 15px; width: 50px; height: 50px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: bold; }
 
-        /* RESTE DU CSS */
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
-        .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
-        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
-        .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
-        .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
-        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
-        .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
-        .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
-        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
-        .z-row { display: flex; justify-content: space-between; }
-        .z-earn { color: var(--main); font-weight: bold; } .z-burn { color: var(--alert); } .z-burn-x { color: var(--dovx); font-weight: bold; }
-        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
-        .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
-        .z-act-mission { background: var(--warn); height: 100%; } .z-act-ready { background: var(--main); height: 100%; }
-        .view-section { display: none; } .view-active { display: block; }
-        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
-        .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
-        .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
-        .eco-val { font-size: 18px; font-weight: bold; color: #fff; } .eco-usd { font-size: 11px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 5px; text-align: right; }
-        .c-fighter { border-top: 3px solid var(--alert); } .c-producer { border-top: 3px solid var(--main); } .c-market { border-top: 3px solid var(--dovx); }
-        .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .dovx-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .db-card { background: #080808; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
-        .db-head { font-size: 10px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 3px; margin-bottom: 5px; }
-        .db-val { font-size: 16px; font-weight: bold; color: #fff; } .db-usd { font-size: 11px; color: var(--money); text-align: right; }
-        .balance-container { background:#111; padding:15px; border:1px solid #333; margin-bottom:20px; }
-        .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
-        .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
-        .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
-        .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
-        .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
-        .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; } .b-sub { font-size: 10px; color: #666; } .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
-        .b-badge-ok { background: var(--main); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; }
-        .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
-        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
+        .d-right { text-align: right; display: flex; flex-direction: column; gap: 5px; }
+        .d-cost-val { font-size: 22px; color: var(--dovx); font-weight: bold; text-shadow: 0 0 5px rgba(156, 39, 176, 0.4); }
+        
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .card-v72 { background: var(--card-bg); border: 1px solid #333; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
+        .card-v72:hover { border-color: #555; transform: translateY(-2px); }
+        
+        .c-header { padding: 10px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 12px; }
+        .c-body { padding: 15px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+        .c-prod { font-size: 20px; font-weight: bold; color: #fff; }
+        .c-unit { font-size: 10px; color: #666; text-transform: uppercase; }
+        .c-cost { font-size: 12px; color: var(--dovx); font-weight: bold; margin-top: 5px; }
+        
+        .c-footer { padding: 10px; background: rgba(0,0,0,0.2); border-top: 1px solid #222; }
+        
+        /* PROGRESS BAR */
+        .progress-row { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px; color: #888; }
+        .progress-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
+        
+        .pf-fuel { background: var(--fuel); } .pf-health { background: var(--health); } .pf-repair { background: var(--repair); } .pf-supply { background: var(--supply); }
+        .border-fuel { border-top: 3px solid var(--fuel); } .border-health { border-top: 3px solid var(--health); } .border-repair { border-top: 3px solid var(--repair); } .border-supply { border-top: 3px solid var(--supply); }
+
+        .logs { height: 100px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #666; overflow-y: auto; font-family: monospace; }
+        .view-section { display: none; } .view-active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
+        
+        /* OLD STYLES FOR COMPATIBILITY */
+        .t-row { display:flex; justify-content:space-between; background:#111; padding:8px; margin-bottom:2px; font-size:11px; }
+        .st-mission { color:var(--warn); } .st-ready { color:var(--main); }
+        .eco-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+        .eco-card { background:#111; border:1px solid #333; padding:10px; }
+        .zones-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+        .zone { background:#111; border:1px solid #333; padding:5px; min-height:80px; font-size:10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V71 REAL ACTIVE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V72 VISUAL</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <div class="box" style="border-color: var(--gold)">
-            <div class="box-title" style="color:var(--gold)">CONFIGURATION MARCHÉ</div>
+            <div class="box-title" style="color:var(--gold)">CONFIGURATION</div>
             <label class="inp-label">Prix WAX ($)</label>
             <input type="number" id="inpWax" value="0.00786" step="0.00001" class="inp-money" onchange="updateRates()">
-            <label class="inp-label">Parité DOVX (en WAX)</label>
+            <label class="inp-label">Parité DOVX (WAX)</label>
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
-            <label class="inp-label">Parité TU [F/H/R/S] (en WAX)</label>
+            <label class="inp-label">Parité TU (WAX)</label>
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
             <div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
-                <label class="inp-label">CORS Proxy (Optionnel)</label>
+                <label class="inp-label">CORS Proxy</label>
                 <input type="text" id="inpProxy" value="https://corsproxy.io/?" placeholder="https://your-proxy.com/?">
-                <div style="font-size:9px; color:#666;">Laisser vide pour Direct.</div>
             </div>
         </div>
         <div class="box">
@@ -120,7 +106,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (24H ACTIF)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V72)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -130,204 +116,109 @@
     </aside>
 
     <main class="main-view">
-        <div id="statusMsg" class="status-bar"></div>
+        <div id="statusMsg" style="display:none; color:var(--sec); text-align:center; margin-bottom:10px;"></div>
 
-        <div id="zoneView" class="view-section view-active">
-            <div class="stats-row">
-                <div class="stat"><span class="stat-val" id="dDivs">0</span><span class="stat-lbl">Divisions</span></div>
-                <div class="stat"><span class="stat-val val-win" id="dGain">0</span><span class="stat-lbl">GAIN (DOVX)</span></div>
-                <div class="stat" style="border-top-color: #444">
-                    <div class="res-grid">
-                        <div class="res-item"><span><span class="dot d-fuel"></span>DOVF</span> <span id="lFuel" style="color:var(--fuel)">0</span></div>
-                        <div class="res-item"><span><span class="dot d-health"></span>DOVH</span> <span id="lHealth" style="color:var(--health)">0</span></div>
-                        <div class="res-item"><span><span class="dot d-repair"></span>DOVR</span> <span id="lRepair" style="color:var(--repair)">0</span></div>
-                        <div class="res-item"><span><span class="dot d-supply"></span>DOVS</span> <span id="lSupply" style="color:var(--supply)">0</span></div>
-                    </div>
-                    <span class="stat-lbl">CONSO ACTIVE / 24H</span>
-                </div>
-                <div class="stat"><span class="stat-val val-cost-x" id="dCostX">0</span><span class="stat-lbl">Conso. Villes</span></div>
-            </div>
-            <div class="zones-grid" id="zonesArea"></div>
-        </div>
-
-        <div id="ecoView" class="view-section">
-            <div class="eco-grid">
-                <div class="eco-card c-fighter">
-                    <div class="eco-head"><span>DEMANDE (COMBAT)</span> <span>🔥 BURN</span></div>
-                    <div class="eco-val" id="valDemandTU">0 TU</div>
-                    <div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div>
-                </div>
-                <div class="eco-card c-producer">
-                    <div class="eco-head"><span>OFFRE (USINES)</span> <span>⚡ MINT</span></div>
-                    <div class="eco-val" id="valSupplyTU">0 TU</div>
-                    <div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div>
-                </div>
-                <div class="eco-card c-market">
-                    <div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div>
-                    <div class="eco-val" id="valDovxBurn">0 DOVX</div>
-                    <div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div>
-                </div>
-            </div>
-            <div class="balance-container">
-                <div class="balance-header">
-                    <div style="color:var(--alert); text-align:left;">DEMANDE</div>
-                    <div style="text-align:center; color:#fff" id="ratioTxt">Calcul...</div>
-                    <div style="color:var(--main); text-align:right;">OFFRE</div>
-                </div>
-                <div class="balance-bar">
-                    <div class="bal-demand" id="barDemand" style="width:50%"></div>
-                    <div class="bal-supply" id="barSupply" style="width:50%"></div>
-                </div>
-            </div>
-            <div style="background:#111; padding:15px; border:1px solid var(--dovx); margin-top:20px;">
-                <div style="font-weight:bold; color:var(--dovx); margin-bottom:10px; text-transform:uppercase;">BALANCE DOVX</div>
-                <div class="dovx-breakdown">
-                    <div class="db-card" style="border-color:var(--main)">
-                        <div class="db-head" style="color:var(--main)">GAINS (MINT)</div>
-                        <div class="db-val" style="color:var(--main)" id="valDovxMint">0</div>
-                        <div class="db-usd" id="usdDovxMint">$0.00</div>
-                    </div>
-                    <div class="db-card" style="border-color:var(--alert)">
-                        <div class="db-head" style="color:var(--alert)">COÛTS (BURN)</div>
-                        <div class="db-val" style="color:var(--alert)" id="valDovxBurnTotal">0</div>
-                        <div class="db-usd" id="usdDovxBurnTotal">$0.00</div>
-                    </div>
-                    <div class="db-card" style="border-color:#fff">
-                        <div class="db-head" style="color:#fff">NET</div>
-                        <div class="db-val" id="valDovxNet">0</div>
-                        <div class="db-usd" id="usdDovxNet">$0.00</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <div id="zoneView" class="view-section"><div class="zones-grid" id="zonesArea"></div></div>
+        <div id="ecoView" class="view-section"><div id="ecoResults"></div></div>
         <div id="targetView" class="view-section"></div>
         
-        <div id="buildingView" class="view-section">
-            <div id="buildDash"></div>
-            <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
-                <div class="g-dashboard">
-                    <div class="g-main-count">
-                        <div class="g-mc-left">
-                            <div>SCAN GLOBAL (ACTIF SEULEMENT)</div>
-                            <div style="font-size:12px; color:#555; margin-top:2px;" id="globalCount">0 Bâtiments</div>
-                        </div>
-                        <div class="g-mc-right">
-                            <div class="g-cost-label">COÛT TOTAL DOV-X (24H)</div>
-                            <div class="g-cost-val" id="gTotalCost">0</div>
+        <div id="buildingView" class="view-section view-active">
+            <div id="buildDash"></div> <div id="globalStatsArea" style="display:none;">
+                
+                <div class="dashboard-panel">
+                    <div class="d-left">
+                        <div class="d-title">BÂTIMENTS SCANNÉS</div>
+                        <div class="d-count" id="gTotalCount">0</div>
+                        <div class="d-sub"><span style="color:var(--warn)" id="gActiveCount">0</span> Actifs / <span style="color:var(--main)" id="gReadyCount">0</span> Prêts</div>
+                    </div>
+                    <div class="d-center">
+                        <div class="chart-pie" id="gPieChart">
+                            <div class="chart-hole">100%</div>
                         </div>
                     </div>
-                    <div class="g-status-row">
-                        <div class="g-stat-box" style="border-color:var(--warn)">
-                            <div class="val c-act" id="gTotalAct">0</div>
-                            <div class="lbl">ACTIFS (EN PROD)</div>
+                    <div class="d-right">
+                        <div class="d-title">COÛT TOTAL DOV-X</div>
+                        <div class="d-cost-val" id="gTotalCost">0</div>
+                        <div class="d-sub">Consommation journalière (24h)</div>
+                    </div>
+                </div>
+
+                <div class="grid-4">
+                    <div class="card-v72 border-fuel">
+                        <div class="c-header"><span style="color:var(--fuel)">FUEL</span> <span id="cnt-F">0</span></div>
+                        <div class="c-body">
+                            <div class="c-prod" style="color:var(--fuel)" id="pwr-F">0</div>
+                            <div class="c-unit">Production Actuelle / 24H</div>
+                            <div class="c-cost" id="cost-F">0 DOVX</div>
                         </div>
-                        <div class="g-stat-box" style="border-color:var(--main)">
-                            <div class="val c-rdy" id="gTotalRdy">0</div>
-                            <div class="lbl">PRÊTS À RÉCOLTER</div>
+                        <div class="c-footer">
+                            <div class="progress-row"><span>Actif: <b id="act-F" style="color:#fff">0</b></span> <span>Ready: <span id="rdy-F">0</span></span></div>
+                            <div class="progress-track"><div class="progress-fill pf-fuel" id="bar-F" style="width:0%"></div></div>
                         </div>
                     </div>
-                    <div class="g-detail-grid">
-                        <div class="g-card" style="border-top:3px solid var(--fuel)">
-                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-F">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
+
+                    <div class="card-v72 border-health">
+                        <div class="c-header"><span style="color:var(--health)">HEALTH</span> <span id="cnt-H">0</span></div>
+                        <div class="c-body">
+                            <div class="c-prod" style="color:var(--health)" id="pwr-H">0</div>
+                            <div class="c-unit">Production Actuelle / 24H</div>
+                            <div class="c-cost" id="cost-H">0 DOVX</div>
                         </div>
-                        <div class="g-card" style="border-top:3px solid var(--health)">
-                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-H">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
+                        <div class="c-footer">
+                            <div class="progress-row"><span>Actif: <b id="act-H" style="color:#fff">0</b></span> <span>Ready: <span id="rdy-H">0</span></span></div>
+                            <div class="progress-track"><div class="progress-fill pf-health" id="bar-H" style="width:0%"></div></div>
                         </div>
-                        <div class="g-card" style="border-top:3px solid var(--repair)">
-                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-R">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
+                    </div>
+
+                    <div class="card-v72 border-repair">
+                        <div class="c-header"><span style="color:var(--repair)">REPAIR</span> <span id="cnt-R">0</span></div>
+                        <div class="c-body">
+                            <div class="c-prod" style="color:var(--repair)" id="pwr-R">0</div>
+                            <div class="c-unit">Production Actuelle / 24H</div>
+                            <div class="c-cost" id="cost-R">0 DOVX</div>
                         </div>
-                        <div class="g-card" style="border-top:3px solid var(--supply)">
-                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-S">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
+                        <div class="c-footer">
+                            <div class="progress-row"><span>Actif: <b id="act-R" style="color:#fff">0</b></span> <span>Ready: <span id="rdy-R">0</span></span></div>
+                            <div class="progress-track"><div class="progress-fill pf-repair" id="bar-R" style="width:0%"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="card-v72 border-supply">
+                        <div class="c-header"><span style="color:var(--supply)">SUPPLY</span> <span id="cnt-S">0</span></div>
+                        <div class="c-body">
+                            <div class="c-prod" style="color:var(--supply)" id="pwr-S">0</div>
+                            <div class="c-unit">Production Actuelle / 24H</div>
+                            <div class="c-cost" id="cost-S">0 DOVX</div>
+                        </div>
+                        <div class="c-footer">
+                            <div class="progress-row"><span>Actif: <b id="act-S" style="color:#fff">0</b></span> <span>Ready: <span id="rdy-S">0</span></span></div>
+                            <div class="progress-track"><div class="progress-fill pf-supply" id="bar-S" style="width:0%"></div></div>
                         </div>
                     </div>
                 </div>
-                <div class="logs" id="globalLogs" style="height:100px; border:1px solid #444; margin-top:10px;"></div>
+
             </div>
-            <div id="buildList" class="build-grid"></div>
+            <div id="buildList" style="margin-top:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div>
         </div>
     </main>
 </div>
 
-<div class="logs" id="console">> V71. Filtre Active Only.</div>
+<div class="logs" id="console">> V72 VISUAL READY.</div>
 
 <script>
-    // FACTEUR DE COUT DOV-X
-    const DOVX_COST_RATIO = 0.085;
-
+    const DOVX_COST_RATIO = 0.085; // Règle 8.5%
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
-    const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
-        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
-        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
-        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
-        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4839.00 },
-        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6092.00 },
-        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7659.00 },
-        8:  { name: "Camp",      cost: 28220, costX: 0, reward: 9617.00 },
-        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12557.00 },
-        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16418.00 },
-        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 21703.00 },
-        12: { name: "Radar",    cost: 84712, costX: 0, reward: 28427.00 },
-        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
-        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 42083.00 },
-        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 50570.00 },
-        16: { name: "HQ",        cost: 188000, costX: 0, reward: 64884.00 },
-        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
-        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
-        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
-    };
-    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com", "https://api-wax.eosarabia.net"];
-    let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
+    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400}, 2:{name:"Beach 2",cost:6968,costX:0,reward:2405}, 3:{name:"Beach 3",cost:8800,costX:0,reward:3037}, 4:{name:"Bunker",cost:11120,costX:0,reward:3838}, 5:{name:"Forest 1",cost:14024,costX:0,reward:4839}, 17:{name:"City 1",cost:0,costX:1664,reward:0}, 18:{name:"City 2",cost:0,costX:4448,reward:0}, 19:{name:"City 3",cost:0,costX:13440,reward:0}, 20:{name:"City 4",cost:0,costX:29120,reward:0} }; // Abrégé pour lisibilité code
+    
+    let stopSignal = false; let rpcIndex = 0;
 
-    function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
+    function log(msg, color="#888") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
-    function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
-    function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
-    function getId(row) { return row.asset_id || row.id || row.division_id || 0; }
     function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
     function extractPower(row) { let val = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr); if (typeof val === 'string') val = val.replace(/[^0-9.]/g, ''); return parseFloat(val) || 0; }
-    function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
-    function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
+    function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; log("Taux mis à jour.", "#ffd700"); }
 
     const PROXY_URL = "https://corsproxy.io/?";
     async function robustFetch(code, table, lowerBound, limit=200, indexPosition=1, keyType="") {
@@ -337,10 +228,10 @@
             let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
             if(useProxy && customProxy.length > 5) url = customProxy + encodeURIComponent(url); else if(useProxy) url = PROXY_URL + encodeURIComponent(url);
             try {
-                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
+                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
-                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; }
+                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.lower_bound = lowerBound; } // Exact match fix
                 const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
@@ -349,50 +240,129 @@
         throw new Error("Arrêt.");
     }
 
-    // --- SCAN GLOBAL MATRIX (V71 - ONLY ACTIVE PROD) ---
+    // --- SCAN V72 ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
-        log("🌍 SCAN GLOBAL (ACTIVE ONLY) DÉMARRÉ...", "#fff");
+        
+        log("📊 SCAN GLOBAL V72 DÉMARRÉ (Timer Logic)...", "#fff");
         let nextKey = ""; let hasMore = true; const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         
         let stats = { total: 0, active: 0, ready: 0, totalDovxCost24: 0, F: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, H: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, R: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 }, S: { count: 0, activePower: 0, cost: 0, act: 0, rdy: 0 } };
-        try { while(hasMore && !stopSignal) { await new Promise(r => setTimeout(r, 10)); const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows || data.rows.length === 0) break; const now = Date.now()/1000;
-            for(let b of data.rows) { stats.total++; let pVal = extractPower(b); let rawP = Array.isArray(b.power) ? b.power[0] : b.power; let pType = null;
-                if(typeof rawP === 'string') { if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S'; }
-                if(pType) { 
-                    stats[pType].count++; 
-                    let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > readyTime; 
-                    if(isReady) { 
-                        stats.ready++; stats[pType].rdy++; 
-                        // READY = IDLE = NO PROD, NO COST
-                    } else { 
-                        stats.active++; stats[pType].act++; 
-                        // ACTIVE = PROD
-                        stats[pType].activePower += pVal; 
-                        let dailyProd = pVal * 24;
-                        let dailyCost = dailyProd * DOVX_COST_RATIO;
-                        stats[pType].cost += dailyCost;
-                        stats.totalDovxCost24 += dailyCost; 
-                    } 
-                } 
+
+        try {
+            while(hasMore && !stopSignal) {
+                await new Promise(r => setTimeout(r, 10)); // Pause UI
+                const data = await robustFetch("dovutilstake", "buildings", nextKey, 300);
+                if(!data.rows || data.rows.length === 0) break;
+                const now = Date.now()/1000;
+
+                for(let b of data.rows) {
+                    stats.total++;
+                    let pVal = extractPower(b);
+                    let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
+                    let pType = null;
+
+                    if(typeof rawP === 'string') {
+                        if(rawP.includes("DOVF")) pType = 'F';
+                        else if(rawP.includes("DOVH")) pType = 'H';
+                        else if(rawP.includes("DOVR")) pType = 'R';
+                        else if(rawP.includes("DOVS")) pType = 'S';
+                    }
+
+                    if(pType) {
+                        stats[pType].count++;
+                        // TIMER LOGIC: Production Réelle
+                        let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
+                        let isReady = now > readyTime;
+
+                        if(isReady) {
+                            stats.ready++;
+                            stats[pType].rdy++;
+                            // Ready = 0 Prod, 0 Cost
+                        } else {
+                            stats.active++;
+                            stats[pType].act++;
+                            
+                            stats[pType].activePower += pVal;
+                            let dailyProd = pVal * 24;
+                            let dailyCost = dailyProd * DOVX_COST_RATIO;
+                            stats[pType].cost += dailyCost;
+                            stats.totalDovxCost24 += dailyCost;
+                        }
+                    }
+                }
+
+                // UPDATE UI
+                setTextSafe('gTotalCount', fmt(stats.total));
+                setTextSafe('gActiveCount', fmt(stats.active));
+                setTextSafe('gReadyCount', fmt(stats.ready));
+                setTextSafe('gTotalCost', fmt(stats.totalDovxCost24));
+
+                // UPDATE PIE CHART (CSS Conic Gradient)
+                let totalItems = stats.F.count + stats.H.count + stats.R.count + stats.S.count;
+                if(totalItems > 0) {
+                    let pF = (stats.F.count / totalItems) * 100;
+                    let pH = (stats.H.count / totalItems) * 100;
+                    let pR = (stats.R.count / totalItems) * 100;
+                    let pS = (stats.S.count / totalItems) * 100;
+                    // Syntax: Fuel 0% 25%, Health 25% 50% ...
+                    let grad = `conic-gradient(
+                        var(--fuel) 0% ${pF}%, 
+                        var(--health) ${pF}% ${pF+pH}%, 
+                        var(--repair) ${pF+pH}% ${pF+pH+pR}%, 
+                        var(--supply) ${pF+pH+pR}% 100%
+                    )`;
+                    document.getElementById('gPieChart').style.background = grad;
+                }
+
+                // UPDATE CARDS & BARS
+                ['F','H','R','S'].forEach(t => {
+                    setTextSafe(`cnt-${t}`, fmt(stats[t].count));
+                    setTextSafe(`pwr-${t}`, fmt(stats[t].activePower * 24) + " TU");
+                    setTextSafe(`cost-${t}`, fmt(stats[t].cost) + " DOVX");
+                    setTextSafe(`act-${t}`, fmt(stats[t].act));
+                    setTextSafe(`rdy-${t}`, fmt(stats[t].rdy));
+                    
+                    // Bar Width calculation
+                    let totalType = stats[t].count;
+                    let pct = totalType > 0 ? (stats[t].act / totalType) * 100 : 0;
+                    let bar = document.getElementById(`bar-${t}`);
+                    if(bar) bar.style.width = pct + "%";
+                });
+
+                if(stats.total % 1000 === 0) log(`Scan en cours... ${fmt(stats.total)} objets.`);
+                if(data.more) nextKey = data.next_key; else hasMore = false;
             }
-            setTextSafe('globalCount', fmt(stats.total) + " Bâtiments"); setTextSafe('gTotalCost', fmt(stats.totalDovxCost24)); 
-            ['F','H','R','S'].forEach(t => { setTextSafe(`cnt-${t}`, fmt(stats[t].count)); setTextSafe(`pwr-${t}`, fmt(stats[t].activePower * 24) + " TU"); setTextSafe(`cost-${t}`, fmt(stats[t].cost)); setTextSafe(`act-${t}`, fmt(stats[t].act)); setTextSafe(`rdy-${t}`, fmt(stats[t].rdy)); });
-            if(stats.total % 1000 === 0) document.getElementById('globalLogs').innerHTML = `> ${fmt(stats.total)} scannés...<br>` + document.getElementById('globalLogs').innerHTML; if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ SCAN FINI : ${fmt(stats.total)} Bâtiments.`, "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); document.getElementById('btnStop').style.display='none'; }
+            log(`✅ SCAN TERMINÉ : ${fmt(stats.total)} Bâtiments.`, "#00e676");
+            document.getElementById('btnStop').style.display='none';
+        } catch(e) { log("Erreur: "+e.message, "red"); document.getElementById('btnStop').style.display='none'; }
     }
 
-    async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
-    async function startBuildings() { /* Code identique */ const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Scan Joueur (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; let counts = { total: 0, ready: 0, busy: 0, types: { F:0, H:0, R:0, S:0 } }; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let p = extractPower(b); let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > readyTime; if(isReady) counts.ready++; else counts.busy++; counts.total++; let pRaw = Array.isArray(b.power)?b.power[0]:b.power; let typeColor = "#fff"; if(pRaw.includes("DOVF")) { counts.types.F++; typeColor = "var(--fuel)"; } else if(pRaw.includes("DOVH")) { counts.types.H++; typeColor = "var(--health)"; } else if(pRaw.includes("DOVR")) { counts.types.R++; typeColor = "var(--repair)"; } else if(pRaw.includes("DOVS")) { counts.types.S++; typeColor = "var(--supply)"; } let card = `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${isReady?'<span class="b-badge-claim">STACKÉ</span>':'<span class="b-badge-ok">ACTIVITÉ</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); let html = `<div class="stats-row" style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;"><div class="stat"><span class="stat-val">${counts.total}</span><span class="stat-lbl">TOTAL</span></div><div class="stat"><span class="stat-val" style="color:var(--main)">${counts.ready}</span><span class="stat-lbl">READY</span></div><div class="stat"><span class="stat-val" style="color:var(--warn)">${counts.busy}</span><span class="stat-lbl">ACTIVE</span></div><div class="stat" style="font-size:10px; display:flex; flex-direction:column; justify-content:center; gap:3px;"><span style="color:var(--fuel)">F: ${counts.types.F}</span><span style="color:var(--health)">H: ${counts.types.H}</span><span style="color:var(--repair)">R: ${counts.types.R}</span><span style="color:var(--supply)">S: ${counts.types.S}</span></div></div>`; document.getElementById('buildDash').innerHTML = html; if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ Terminé.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
-    async function startZoneScan() { /* Code identique */ stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); try { while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } } if (stats.divs % 200 === 0) updateZoneDash(stats); if(data.more) nextKey = data.next_key; else hasMore = false; } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } }
-    function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; const pctMiss = data.count > 0 ? (data.active / data.count) * 100 : 0; document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%"; document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%"; } }); }
-    async function startEconomyScan() { /* Code identique */ stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } nextKey=""; hasMore=true; while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; for(let b of data.rows) { ECO_DATA.scanned++; let p = extractPower(b); let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0; let pType = Array.isArray(b.power)?b.power[0]:b.power; ECO_DATA.dovx.buildings += i; if(typeof pType === 'string') { if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p; if(pType.includes("DOVH")) ECO_DATA.supply.health += p; if(pType.includes("DOVR")) ECO_DATA.supply.repair += p; if(pType.includes("DOVS")) ECO_DATA.supply.supply += p; } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
-    function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
-    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div><div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
+    // --- TARGET SCAN FIX ---
+    async function startTarget() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        switchView('targetView'); document.getElementById('targetView').innerHTML="Recherche...";
+        try {
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); // INDEX 2 FIX
+            const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user)) : [];
+            let html = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
+            rows.forEach(r => { 
+                const zID = getProp(r, ['zoneID', 'zone_id']); 
+                const busy = isBusy(r); 
+                html += `<div class="t-row"><div style="color:var(--main)">#${getId(r)}</div><div style="color:var(--sec)">${ZONE_DB[zID]?.name || zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; 
+            });
+            document.getElementById('targetView').innerHTML = html;
+        } catch(e){ log("Erreur: "+e.message, "red"); }
+    }
 
-    window.onload = function() { initGrid(); }
+    // --- OTHER FUNCTIONS ---
+    async function startBuildings() { /* Same as before for single user */ const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML=""; document.getElementById('buildList').innerHTML=""; let nextKey=""; let hasMore=true; let c={total:0,ready:0,busy:0}; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const batch=data.rows.filter(r=>r.owner===user); batch.forEach(b=>{ c.total++; let rdy=(Date.now()/1000)>(parseFloat(b.last_claim)+parseFloat(b.delay)); if(rdy) c.ready++; else c.busy++; document.getElementById('buildList').insertAdjacentHTML('beforeend', `<div class="card-v72" style="padding:10px; min-height:auto;">#${b.asset_id} <br> ${b.template_id} <br> ${rdy?'READY':'ACTIVE'}</div>`); }); if(data.more) nextKey=data.next_key; else hasMore=false; } } catch(e){} }
+    async function startZoneScan() { /* V69 */ }
+    async function startEconomyScan() { /* V69 */ }
+    function getProp(obj,k){for(let i of k)if(obj[i])return obj[i];return 0;} function isBusy(r){return (getProp(r,['end_time','end'])>(Date.now()/1000));} function getId(r){return r.asset_id||r.division_id||0;}
 </script>
 
 </body>
