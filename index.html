@@ -2,187 +2,192 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoV - Scanner FINAL</title>
+    <title>DoV - Scanner Audit</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #222; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: #333; width: 100%; max-width: 750px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { text-align: center; color: #f1c40f; margin-top: 0; }
+        body { background: #111; color: #eee; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .box { background: #222; padding: 20px; border-radius: 8px; width: 100%; max-width: 800px; border: 1px solid #444; }
+        input { padding: 10px; width: 60%; background: #000; color: #fff; border: 1px solid #555; }
+        button { padding: 10px; background: #e67e22; color: white; border: none; cursor: pointer; font-weight: bold; }
         
-        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        input { padding: 12px; width: 60%; background: #444; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; }
-        button { padding: 12px 20px; background-color: #f1c40f; color: #222; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #f39c12; }
-        button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
+        .debug-log { 
+            background: #000; 
+            border: 1px solid #333; 
+            padding: 10px; 
+            margin-top: 10px; 
+            font-family: monospace; 
+            font-size: 12px; 
+            height: 150px; 
+            overflow-y: auto; 
+            color: #ccc;
+        }
 
-        .log { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; margin-bottom: 20px; border-radius: 5px; min-height: 20px; border: 1px solid #555; }
+        .result-item { 
+            display: flex; justify-content: space-between; 
+            padding: 8px; border-bottom: 1px solid #333; 
+        }
+        .result-item a { color: #3498db; text-decoration: none; }
         
-        .stats-box { display: flex; justify-content: space-around; background: #444; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .stat { text-align: center; }
-        .stat-val { font-size: 24px; font-weight: bold; color: #3498db; }
-
-        .asset-list { max-height: 600px; overflow-y: auto; border-top: 1px solid #555; }
-        .item { padding: 12px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
-        .item:hover { background-color: #3a3a3a; }
-        
-        .tag-role { background: #555; color: #ddd; font-size: 11px; padding: 3px 6px; border-radius: 4px; margin-right: 8px; text-transform: uppercase; }
-        .tag-div { color: #888; font-size: 12px; margin-left: 10px; }
-        
-        .link-btn { text-decoration: none; background: #2980b9; color: white; padding: 5px 10px; border-radius: 4px; font-size: 13px; }
-        .link-btn:hover { background: #3498db; }
+        .role { color: #f1c40f; font-size: 0.8em; margin-right: 10px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Scanner DoV (Corrigé)</h1>
+<div class="box">
+    <h2 style="text-align:center; margin-top:0;">SCANNER CORRIGÉ</h2>
     
-    <div class="input-group">
-        <input type="text" id="userInput" placeholder="Compte WAX (ex: u2d2k.c.wam)">
-        <button id="btn" onclick="lancerScan()">SCANNER</button>
+    <div style="text-align:center; margin-bottom:15px;">
+        <input type="text" id="userInput" placeholder="toncompte.wam">
+        <button onclick="runScan()">LANCER</button>
     </div>
 
-    <div class="log" id="logBox">Prêt. En attente...</div>
-
-    <div class="stats-box">
-        <div class="stat">
-            <div class="stat-val" id="divCount">0</div>
-            <div>Divisions</div>
-        </div>
-        <div class="stat">
-            <div class="stat-val" id="assetCount">0</div>
-            <div>Cartes</div>
-        </div>
+    <div style="display:flex; justify-content:space-around; margin-bottom:10px;">
+        <div>Divisions: <b id="divTotal">0</b></div>
+        <div>Cartes: <b id="cardTotal">0</b></div>
     </div>
 
-    <div class="asset-list" id="resultList"></div>
+    <div class="debug-log" id="debug">En attente...</div>
+
+    <div id="results" style="margin-top:20px;"></div>
 </div>
 
 <script>
-    // Liste de secours au cas où un serveur bloque
-    const RPCS = [
-        "https://api.waxsweden.org/v1/chain/get_table_rows",
-        "https://wax.greymass.com/v1/chain/get_table_rows",
-        "https://wax.eosn.io/v1/chain/get_table_rows"
-    ];
+    const RPC = "https://api.waxsweden.org/v1/chain/get_table_rows";
 
-    async function lancerScan() {
-        const account = document.getElementById('userInput').value.trim().toLowerCase();
-        const logBox = document.getElementById('logBox');
-        const list = document.getElementById('resultList');
-        const btn = document.getElementById('btn');
+    function log(msg) {
+        const d = document.getElementById('debug');
+        d.innerHTML = `> ${msg}<br>` + d.innerHTML;
+    }
 
-        if(!account) return alert("Nom manquant");
+    async function runScan() {
+        const user = document.getElementById('userInput').value.trim().toLowerCase();
+        const list = document.getElementById('results');
+        
+        if(!user) return alert("Mets un nom !");
 
         // Reset
-        btn.disabled = true;
         list.innerHTML = "";
-        document.getElementById('divCount').innerText = "0";
-        document.getElementById('assetCount').innerText = "0";
+        document.getElementById('divTotal').innerText = "0";
+        document.getElementById('cardTotal').innerText = "0";
+        document.getElementById('debug').innerHTML = "";
         
-        let allDivisions = [];
-        let more = true;
-        let nextKey = "";
-        let rpcIndex = 0;
+        log(`Démarrage pour : ${user}`);
 
-        logBox.innerText = `Connexion au serveur pour ${account}...`;
+        let nextKey = user; 
+        let hasMore = true;
+        let myDivisions = [];
 
         try {
-            while(more) {
-                // Tentative de connexion (Failover simple)
-                const currentRPC = RPCS[rpcIndex];
-                
-                const response = await fetch(currentRPC, {
+            while(hasMore) {
+                log(`Recherche à partir de : ${nextKey}`);
+
+                const response = await fetch(RPC, {
                     method: 'POST',
                     body: JSON.stringify({
                         json: true,
                         code: "dovpvecontrl",
                         scope: "dovpvecontrl",
                         table: "sdivisions",
-                        index_position: 2,     // Index 2 (Owner)
-                        key_type: "name",      // Recherche par nom
-                        lower_bound: nextKey || account,
-                        upper_bound: account,
-                        limit: 500
+                        index_position: 2,     // Index Owner
+                        key_type: "name",
+                        lower_bound: nextKey,  // On commence ici
+                        limit: 100             // On prend par paquets de 100
+                        // J'AI ENLEVÉ UPPER_BOUND : C'est ça qui bloquait !
                     })
                 });
 
-                if(!response.ok) {
-                    // Si le serveur 1 plante, on essaie le suivant au prochain tour
-                    rpcIndex = (rpcIndex + 1) % RPCS.length;
-                    throw new Error("Erreur serveur, nouvelle tentative...");
+                const data = await response.json();
+
+                if(!data.rows || data.rows.length === 0) {
+                    log("Plus de résultats reçus.");
+                    hasMore = false;
+                    break;
                 }
 
-                const data = await response.json();
-                
-                // --- CORRECTION CRUCIALE ICI ---
-                // Le dump a montré que la colonne s'appelle "owner", pas "user"
-                const rows = data.rows.filter(r => r.owner === account);
-                
-                allDivisions = [...allDivisions, ...rows];
+                // Inspection technique (pour être sûr des colonnes)
+                const first = data.rows[0];
+                if(myDivisions.length === 0) {
+                    log(`INFO TECHNIQUE - Colonnes trouvées : ${Object.keys(first).join(", ")}`);
+                }
 
-                logBox.innerText = `Récupéré ${allDivisions.length} divisions... (Chargement suite...)`;
+                // Filtrage manuel (Le "Scanner Souple")
+                let foundInThisBatch = 0;
+                
+                for(let row of data.rows) {
+                    // On vérifie si c'est 'owner' ou 'user' (ceinture et bretelles)
+                    const rowOwner = row.owner || row.user;
 
-                more = data.more;
-                if(more && data.next_key) {
+                    if (rowOwner === user) {
+                        myDivisions.push(row);
+                        foundInThisBatch++;
+                    } else {
+                        // Si on tombe sur un nom qui est alphabétiquement APRÈS le tien
+                        // et qui n'est pas le tien, on peut arrêter.
+                        // Exemple : on cherche "toto", on tombe sur "tutu". C'est fini.
+                        // (Petite sécurité : on vérifie juste que ce n'est pas le même nom)
+                        if (rowOwner.localeCompare(user) > 0) {
+                            log(`Arrivé au compte ${rowOwner}, arrêt du scan.`);
+                            hasMore = false;
+                            break;
+                        }
+                    }
+                }
+
+                log(`Batch reçu : ${data.rows.length} lignes. ${foundInThisBatch} sont à toi.`);
+
+                if (hasMore && data.more && data.next_key) {
                     nextKey = data.next_key;
                 } else {
-                    more = false;
+                    hasMore = false;
                 }
             }
 
-            // Affichage
-            if(allDivisions.length === 0) {
-                logBox.innerText = "Aucune division trouvée pour ce compte (colonnes 'owner' vérifiée).";
-                logBox.style.color = "orange";
-            } else {
-                logBox.innerText = "Terminé avec succès !";
-                logBox.style.color = "#0f0";
-                afficherResultats(allDivisions);
-            }
+            // Affichage Final
+            log(`FINI. Total divisions trouvées : ${myDivisions.length}`);
+            afficherCartes(myDivisions);
 
         } catch (e) {
-            logBox.innerText = "Erreur: " + e.message;
-            logBox.style.color = "red";
+            log(`ERREUR CRITIQUE : ${e.message}`);
         }
-        
-        btn.disabled = false;
     }
 
-    function afficherResultats(divisions) {
-        const list = document.getElementById('resultList');
-        let totalAssets = 0;
+    function afficherCartes(divisions) {
+        const container = document.getElementById('results');
+        let totalCards = 0;
         let html = "";
 
         divisions.forEach(div => {
-            // --- CORRECTION CRUCIALE 2 ---
-            // Le dump a montré que la liste s'appelle "units", pas "asset_ids"
-            if(div.units && div.units.length > 0) {
-                totalAssets += div.units.length;
-                
-                div.units.forEach(unit => {
-                    // Structure: { key: "role", value: "asset_id" }
-                    const assetId = unit.value; 
-                    const role = unit.key;
+            // On gère le cas où la colonne s'appelle 'units' OU 'asset_ids'
+            const units = div.units || div.asset_ids || [];
+
+            if (units.length > 0) {
+                totalCards += units.length;
+                units.forEach(u => {
+                    // On gère si c'est un objet {key, value} ou juste un ID
+                    let assetId = u;
+                    let role = "Unité";
+
+                    if (typeof u === 'object') {
+                        assetId = u.value;
+                        role = u.key;
+                    }
 
                     html += `
-                        <div class="item">
+                        <div class="result-item">
                             <div>
-                                <span class="tag-role">${role}</span>
-                                <strong>${assetId}</strong> 
-                                <span class="tag-div">(Div #${div.division_id})</span>
+                                <span class="role">${role}</span>
+                                <strong>${assetId}</strong>
+                                <span style="color:#666; font-size:12px"> (Div #${div.division_id})</span>
                             </div>
-                            <a href="https://wax.atomichub.io/explorer/asset/${assetId}" target="_blank" class="link-btn">Voir sur AtomicHub</a>
+                            <a href="https://wax.atomichub.io/explorer/asset/${assetId}" target="_blank">Voir</a>
                         </div>
                     `;
                 });
             }
         });
 
-        document.getElementById('divCount').innerText = divisions.length;
-        document.getElementById('assetCount').innerText = totalAssets;
-        
-        list.innerHTML = html || "<div style='padding:20px; text-align:center'>Divisions vides trouvées.</div>";
+        document.getElementById('divTotal').innerText = divisions.length;
+        document.getElementById('cardTotal').innerText = totalCards;
+        container.innerHTML = html || "<div style='text-align:center'>Aucune carte trouvée.</div>";
     }
 </script>
 
