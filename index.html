@@ -2,9 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V66.2 (CERTIFIED CFO)</title>
+    <title>DoV - COMMAND V43 (PERFECT ALIGN)</title>
     <style>
-        /* DESIGN V43 PERFECT ALIGN - AUCUNE MODIFICATION VISUELLE */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -12,201 +11,565 @@
             --bg: #050505; --panel: #111; 
         }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
-        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
+        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
+
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
+
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
         .btn-zone { background: var(--main); color: #000; } 
-        .btn-eco { background: var(--gold); color: #000; }
+        .btn-eco { background: var(--gold); color: #000; text-shadow: 0px 0px 1px #fff; }
         .btn-stop { background: var(--alert); color: #fff; display: none; }
+        .btn-target { background: var(--sec); color: #000; }
+        .btn-build { background: #9b59b6; color: #fff; }
+
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
+        .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
+        .inp-money { color: var(--money); font-weight: bold; }
+
+        /* ECONOMY GLOBAL CARDS */
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .eco-card { background: #111; border: 1px solid #333; padding: 15px; border-top: 3px solid #444; min-height: 80px; display: flex; flex-direction: column; justify-content: space-between; }
+        .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
+        .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
+        .eco-val { font-size: 18px; font-weight: bold; color: #fff; }
+        .eco-usd { font-size: 11px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 5px; text-align: right; }
+        
+        .c-fighter { border-top: 3px solid var(--alert); }
+        .c-producer { border-top: 3px solid var(--main); }
+        .c-market { border-top: 3px solid var(--dovx); }
+
+        /* MATRICE */
+        .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
+        .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
+        .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
+        .mx-row { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        .mx-val { color: #fff; font-weight: bold; }
+        .mx-usd { color: var(--money); font-size: 10px; font-weight: bold; }
+        .mx-lbl { color: #666; }
+        .mx-bal { text-align: center; padding: 5px; font-weight: bold; margin-top: 5px; border-radius: 3px; }
+        .bal-pos { background: rgba(0, 230, 118, 0.1); color: var(--main); border: 1px solid var(--main); }
+        .bal-neg { background: rgba(255, 23, 68, 0.1); color: var(--alert); border: 1px solid var(--alert); }
+
+        /* DOVX P&L */
+        .dovx-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .db-card { background: #080808; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
+        .db-head { font-size: 10px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 3px; margin-bottom: 5px; }
+        .db-val { font-size: 16px; font-weight: bold; color: #fff; }
+        .db-usd { font-size: 11px; color: var(--money); text-align: right; }
+
+        /* RATIO BAR V43 */
         .balance-container { background:#111; padding:15px; border:1px solid #333; margin-bottom:20px; }
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; }
         .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
-        .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
-        .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
-        .mx-body { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+        /* COMMON & MAP */
+        .view-section { display: none; }
+        .view-active { display: block; }
+        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+        .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); }
+        .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
+        
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
+        .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
+        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
+        .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
+
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
-        .zone.active { opacity: 1; border-color: #444; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
+        .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
+        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
+        .z-row { display: flex; justify-content: space-between; }
+        .z-earn { color: var(--main); font-weight: bold; }
+        .z-burn { color: var(--alert); }
+        .z-burn-x { color: var(--dovx); font-weight: bold; }
+        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
+        .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
+        .z-act-mission { background: var(--warn); height: 100%; }
+        .z-act-ready { background: var(--main); height: 100%; }
+        
+        .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
+        .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; }
+        .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
+
+        .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; }
+        .b-sub { font-size: 10px; color: #666; }
+        .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
+        .b-badge-ok { background: var(--main); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; }
+        .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
-        .view-section { display: none; } .view-active { display: block; }
-        .integrity-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V66.2 CERTIFIED CFO</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V43 PERFECT ALIGN</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <div class="box" style="border-color: var(--gold)">
-            <div class="box-title">CONFIGURATION MARCHÉ</div>
-            <input type="number" id="inpWax" value="0.00786" step="0.00001" onchange="updateRates()">
+            <div class="box-title" style="color:var(--gold)">CONFIGURATION MARCHÉ</div>
+            <label class="inp-label">Prix WAX ($)</label>
+            <input type="number" id="inpWax" value="0.00786" step="0.00001" class="inp-money" onchange="updateRates()">
+            <label class="inp-label">Parité DOVX (en WAX)</label>
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
+            <label class="inp-label">Parité TU [F/H/R/S] (en WAX)</label>
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
+            <div style="font-size:9px; color:#666; margin-top:5px; text-align:center">Modification instantanée</div>
         </div>
+
         <div class="box">
+            <div class="box-title">1. Global (Monde)</div>
             <button class="btn-zone" onclick="startZoneScan()">SCAN ZONES (MAP)</button>
             <button class="btn-eco" onclick="startEconomyScan()">SCAN ECONOMY ($)</button>
             <button class="btn-stop" id="btnStop" onclick="stopSignal=true">ARRÊT</button>
+            <div id="scanProg" style="text-align:center; font-size:10px; color:#666; margin-top:5px">-</div>
+        </div>
+
+        <div class="box">
+            <div class="box-title">2. Joueur (Target)</div>
+            <input type="text" id="targetIn" value="u2d2k.c.wam">
+            <button class="btn-target" onclick="startTarget()">SCAN DIVISIONS</button>
+            <button class="btn-build" onclick="startBuildings()">SCAN BÂTIMENTS</button>
         </div>
     </aside>
 
     <main class="main-view">
+        <div id="statusMsg" class="status-bar"></div>
+
         <div id="zoneView" class="view-section view-active">
-            <div class="zones-grid" id="zonesArea"></div>
+            <div class="stats-row">
+                <div class="stat"><span class="stat-val" id="dDivs">0</span><span class="stat-lbl">Divisions</span></div>
+                <div class="stat"><span class="stat-val val-win" id="dGain">0</span><span class="stat-lbl">Gain Max (DOVX)</span></div>
+                <div class="stat" style="border-top-color: #444">
+                    <div class="res-grid">
+                        <div class="res-item"><span><span class="dot d-fuel"></span>DOVF</span> <span id="lFuel" style="color:var(--fuel)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-health"></span>DOVH</span> <span id="lHealth" style="color:var(--health)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-repair"></span>DOVR</span> <span id="lRepair" style="color:var(--repair)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-supply"></span>DOVS</span> <span id="lSupply" style="color:var(--supply)">0</span></div>
+                    </div>
+                    <span class="stat-lbl">CONSO / 24H (PAR TOKEN)</span>
+                </div>
+                <div class="stat"><span class="stat-val val-cost-x" id="dCostX">0</span><span class="stat-lbl">Conso. Villes (DOVX)</span></div>
+            </div>
+            <div class="zones-grid" id="zonesArea">
+                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">Cliquez sur SCAN ZONES.</div>
+            </div>
         </div>
+
         <div id="ecoView" class="view-section">
-            <div id="integrityContainer" style="text-align:right; margin-bottom:10px"></div>
-            <div class="eco-grid" id="ecoCards"></div>
-            <div class="balance-container" id="ecoRatio"></div>
-            <div class="matrix-grid" id="tokenMatrix"></div>
-            <div id="dovxAnalysis" style="background:#111; padding:15px; border:1px solid var(--dovx); margin-top:20px;"></div>
+            <div id="ecoResults">
+                
+                <div class="eco-grid">
+                    <div class="eco-card c-fighter">
+                        <div class="eco-head"><span>DEMANDE (COMBATTANTS)</span> <span>🔥 BURN</span></div>
+                        <div class="eco-val" id="valDemandTU">0 TU</div>
+                        <div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div>
+                    </div>
+                    <div class="eco-card c-producer">
+                        <div class="eco-head"><span>OFFRE (PRODUCTEURS)</span> <span>⚡ MINT</span></div>
+                        <div class="eco-val" id="valSupplyTU">0 TU</div>
+                        <div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div>
+                    </div>
+                    <div class="eco-card c-market">
+                        <div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div>
+                        <div class="eco-val" id="valDovxBurn">0 DOVX</div>
+                        <div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div>
+                    </div>
+                </div>
+
+                <div class="balance-container">
+                    <div class="balance-header">
+                        <div style="color:var(--alert); text-align:left;">DEMANDE (BURN)</div>
+                        <div style="text-align:center; color:#fff" id="ratioTxt">Calcul...</div>
+                        <div style="color:var(--main); text-align:right;">OFFRE (MINT)</div>
+                    </div>
+                    <div class="balance-bar">
+                        <div class="bal-demand" id="barDemand" style="width:50%"></div>
+                        <div class="bal-supply" id="barSupply" style="width:50%"></div>
+                    </div>
+                </div>
+
+                <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; color:#fff; font-weight:bold; display:flex; justify-content:space-between">
+                    <span>MATRICE OFFRE (Usines) / DEMANDE (Combattants)</span>
+                    <span style="font-size:10px; color:#666">VALORISATIONS EN TEMPS RÉEL</span>
+                </div>
+                
+                <div class="matrix-grid" id="tokenMatrix"></div>
+                
+                <div style="background:#111; padding:15px; border:1px solid var(--dovx); margin-top:20px;">
+                    <div style="font-weight:bold; color:var(--dovx); margin-bottom:10px; text-transform:uppercase;">BALANCE DOVX (MINT vs BURN)</div>
+                    <div class="dovx-breakdown">
+                        <div class="db-card" style="border-color:var(--main)">
+                            <div class="db-head" style="color:var(--main)">GAINS COMBATS (MINT)</div>
+                            <div class="db-val" style="color:var(--main)" id="valDovxMint">0</div>
+                            <div class="db-usd" id="usdDovxMint">$0.00</div>
+                        </div>
+                        <div class="db-card" style="border-color:var(--alert)">
+                            <div class="db-head" style="color:var(--alert)">COÛTS VILLES + USINES</div>
+                            <div class="db-val" style="color:var(--alert)" id="valDovxBurnTotal">0</div>
+                            <div class="db-usd" id="usdDovxBurnTotal">$0.00</div>
+                        </div>
+                        <div class="db-card" style="border-color:#fff">
+                            <div class="db-head" style="color:#fff">RÉSULTAT NET</div>
+                            <div class="db-val" id="valDovxNet">0</div>
+                            <div class="db-usd" id="usdDovxNet">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:15px; border-top:1px solid #222; padding-top:10px; display:flex; justify-content:space-between; font-size:10px; color:#666;">
+                        <div>Consommation Villes: <span style="color:var(--dovx)" id="valCityDovx">0</span></div>
+                        <div>Consommation Usines: <span style="color:var(--dovx)" id="valBuildDovx">0</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div id="targetView" class="view-section"></div>
+        <div id="buildingView" class="view-section"></div>
     </main>
 </div>
 
-<div class="logs" id="console">> V66.2 : Evidence-Grade Engine. Calculs certifiés par scan intégral.</div>
+<div class="logs" id="console">> V43 Aligned. Interface cohérente (Rouge/Gauche vs Vert/Droite).</div>
 
 <script>
+    // --- DEFAULT CONFIG ---
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
-    let stopSignal = false;
-    let rpcIndex = 0;
-    let rpcConsecutiveErrors = 0;
-    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
-
-    // 🔐 PALIER DE VÉRITÉ ON-CHAIN
-    const DOVX_CLAIM_LEVELS = {
-        win:   { minPower: 100, reward: 400.00 },
-        draw:  { minPower: 60,  reward: 200.00 },
-        lost:  { minPower: 1,   reward: 50.00 }
-    };
-
+    
+    // --- DATABASE ---
     const ZONE_DB = {
-        1: { name: "Beach 1", cost: 1160, costX: 0 },
-        16: { name: "HQ", cost: 188000, costX: 0 },
-        17: { name: "City 1", cost: 0, costX: 1664 }
+        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 13.92 }, 2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 27.29 },
+        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 54.59 }, 4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 108.53 },
+        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 218.35 }, 6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 341.18 },
+        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 450.00 }, 8:  { name: "Camp",     cost: 28220, costX: 0, reward: 511.76 },
+        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 694.78 }, 10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 868.55 },
+        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 1085.69 }, 12: { name: "Radar",    cost: 84712, costX: 0, reward: 1357.04 },
+        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 1696.33 }, 14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 1865.84 },
+        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 2051.96 }, 16: { name: "HQ",       cost: 188000, costX: 0, reward: 2494.23 },
+        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 }, 18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
+        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 }, 20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
     };
+    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    const PROXY = "https://corsproxy.io/?";
+    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com", "https://api-wax.eosarabia.net"];
 
+    let stopSignal = false;
+    let rpcIndex = 0; 
+    
+    // GLOBAL DATA STORE
     let ECO_DATA = { 
-        demand: { fuel:0, health:0, repair:0, supply:0 }, 
-        supply: { fuel:0, health:0, repair:0, supply:0 }, 
-        dovx: { rewards:0, burn:0 },
-        scanned: { buildings:0, divisions:0, totalExpected: 0 }
+        demand: { fuel:0, health:0, repair:0, supply:0 },
+        supply: { fuel:0, health:0, repair:0, supply:0 },
+        dovx: { cities:0, buildings:0, rewards:0 },
+        scanned: 0 
     };
 
-    function getDovxClaim(power) {
-        if (power >= DOVX_CLAIM_LEVELS.win.minPower) return "win";
-        if (power >= DOVX_CLAIM_LEVELS.draw.minPower) return "draw";
-        if (power >= DOVX_CLAIM_LEVELS.lost.minPower) return "lost";
-        return null;
-    }
-
-    async function robustFetch(code, table, lowerBound, limit=500) {
-        const server = RPCS[rpcIndex % RPCS.length];
-        try {
-            document.getElementById('rpcStatus').innerText = "RPC: " + new URL(server).hostname;
-            const res = await fetch(server + "/v1/chain/get_table_rows", {
-                method: 'POST',
-                body: JSON.stringify({ json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound })
-            });
-            const data = await res.json();
-            rpcConsecutiveErrors = 0;
-            return data;
-        } catch(e) { 
-            rpcIndex++; 
-            rpcConsecutiveErrors++;
-            if(rpcConsecutiveErrors > 5) log("ALERTE : Tunnels RPC dégradés. Scan à risque.", "var(--alert)");
-            return null; 
-        }
-    }
-
-    async function startEconomyScan() {
-        switchView('ecoView'); stopSignal = false; document.getElementById('btnStop').style.display = 'block';
-        ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { rewards:0, burn:0 }, scanned: { buildings:0, divisions:0, totalExpected: 0 }};
-        
-        let nextKey = ""; let hasMore = true;
-        log("Initialisation Audit CFO (Evidence-Grade)...", "var(--gold)");
-
-        // 🏗️ SCAN EXHAUSTIF BÂTIMENTS
-        while(hasMore && !stopSignal) {
-            const d = await robustFetch("dovutilstake", "buildings", nextKey);
-            if(!d || !d.rows) break;
-            d.rows.forEach(b => {
-                let p = b.power[0]; let v = parseFloat(p) || 0;
-                if(p.includes("DOVF")) ECO_DATA.supply.fuel += v;
-                else if(p.includes("DOVH")) ECO_DATA.supply.health += v;
-                else if(p.includes("DOVR")) ECO_DATA.supply.repair += v;
-                else if(p.includes("DOVS")) ECO_DATA.supply.supply += v;
-                ECO_DATA.scanned.buildings++;
-            });
-            updateEcoUI(d.more);
-            if(d.more) nextKey = d.next_key; else hasMore = false;
-        }
-
-        // 🎖️ SCAN EXHAUSTIF DIVISIONS
-        nextKey = ""; hasMore = true;
-        while(hasMore && !stopSignal) {
-            const d = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
-            if(!d || !d.rows) break;
-            d.rows.forEach(r => {
-                const zid = r.zone_id || r.zoneID;
-                const busy = r.end_time > (Date.now()/1000);
-                if(busy && ZONE_DB[zid]) {
-                    const z = ZONE_DB[zid];
-                    ECO_DATA.demand.fuel += z.cost; ECO_DATA.demand.health += z.cost;
-                    ECO_DATA.demand.repair += z.cost; ECO_DATA.demand.supply += z.cost;
-                    ECO_DATA.dovx.burn += z.costX;
-                    const power = r.power || r.min_power || 0;
-                    const claim = getDovxClaim(power);
-                    if(claim) ECO_DATA.dovx.rewards += DOVX_CLAIM_LEVELS[claim].reward;
-                }
-                ECO_DATA.scanned.divisions++;
-            });
-            updateEcoUI(d.more);
-            if(d.more) nextKey = d.next_key; else hasMore = false;
-        }
-        log("Audit Certifié : " + (ECO_DATA.scanned.buildings + ECO_DATA.scanned.divisions) + " objets scannés.", "var(--main)");
-        document.getElementById('btnStop').style.display = 'none';
-    }
-
-    function updateEcoUI(isStillScanning) {
-        // Logique de rendu visuel V43
-        let statusColor = isStillScanning ? "var(--warn)" : "var(--main)";
-        let statusText = isStillScanning ? "🕒 SCAN IN PROGRESS" : "🟢 100% INTEGRITY";
-        if(rpcConsecutiveErrors > 3) { statusColor = "var(--alert)"; statusText = "🔴 RPC DEGRADED"; }
-
-        document.getElementById('integrityContainer').innerHTML = `<span class="integrity-badge" style="background:rgba(0,0,0,0.5); border:1px solid ${statusColor}; color:${statusColor}">${statusText} (${ECO_DATA.scanned.buildings + ECO_DATA.scanned.divisions} rows)</span>`;
-    }
-
-    function switchView(id) {
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
-        document.getElementById(id).classList.add('view-active');
-    }
-
+    // --- UTILS ---
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
-        c.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML;
+        const t = new Date().toLocaleTimeString();
+        c.innerHTML = `<div style="color:${color}">[${t}] ${msg}</div>` + c.innerHTML;
+    }
+    function showStatus(msg) { document.getElementById('statusMsg').style.display='block'; document.getElementById('statusMsg').innerText=msg; }
+    function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
+    function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
+    function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
+    function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
+    function setHtmlSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerHTML = txt; }
+
+    // --- UPDATE RATES ---
+    function updateRates() {
+        RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0;
+        RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0;
+        RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0;
+        if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay();
+        log("Taux mis à jour.", "#ffd700");
     }
 
-    function init() {
-        document.getElementById('zonesArea').innerHTML = "<div style='color:#444; padding:20px;'>En attente de scan certifié.</div>";
+    // --- TANK ENGINE ---
+    async function robustFetch(code, table, lowerBound, limit=300, indexPosition=1, keyType="") {
+        let attempts = 0;
+        while(attempts < 10 && !stopSignal) {
+            const server = RPCS[rpcIndex % RPCS.length];
+            let url = server + "/v1/chain/get_table_rows";
+            let useProxy = (attempts > 0); 
+            if(useProxy) url = PROXY + encodeURIComponent(url);
+            try {
+                if(document.getElementById('rpcStatus')) {
+                    document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
+                }
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); 
+                const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
+                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; }
+                const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
+                if(!res.ok) throw new Error("HTTP");
+                return await res.json();
+            } catch(e) { rpcIndex++; attempts++; await new Promise(r => setTimeout(r, 200)); }
+        }
+        throw new Error("Réseau saturé.");
     }
-    init();
+
+    // --- 1. SCAN ZONES (MAP) ---
+    async function startZoneScan() {
+        stopSignal = false; switchView('zoneView'); initGrid();
+        document.getElementById('btnStop').style.display = 'inline-block';
+        let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} };
+        ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
+        let nextKey = ""; let hasMore = true;
+
+        log("Mapping des Zones en cours...", "#fff");
+        try {
+            while(hasMore && !stopSignal) {
+                document.getElementById('scanProg').innerText = `Divs: ${stats.divs}`;
+                const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
+                if(!data.rows || data.rows.length === 0) break;
+                for(let row of data.rows) {
+                    stats.divs++;
+                    const zID = getProp(row, ['zoneID', 'zone_id']);
+                    const busy = isBusy(row);
+                    if(stats.zones[zID]) {
+                        stats.zones[zID].count++;
+                        const zInfo = ZONE_DB[zID];
+                        if(busy) {
+                            stats.zones[zID].active++;
+                            if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; }
+                            stats.totalCostX += zInfo.costX; stats.totalGain += zInfo.reward;
+                        } else stats.zones[zID].idle++;
+                    }
+                }
+                updateZoneDash(stats);
+                if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false;
+            }
+            log("Cartographie terminée.", "#00e676"); document.getElementById('btnStop').style.display='none';
+        } catch(e) { log("Erreur: "+e.message, "red"); }
+    }
+
+    function updateZoneDash(stats) {
+        const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
+        setTextSafe('dDivs', fmt(stats.divs));
+        setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX");
+        setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX");
+        setTextSafe('lFuel', "-" + fmt(stats.burn.fuel));
+        setTextSafe('lHealth', "-" + fmt(stats.burn.health));
+        setTextSafe('lRepair', "-" + fmt(stats.burn.repair));
+        setTextSafe('lSupply', "-" + fmt(stats.burn.supply));
+        
+        ZONE_ORDER.forEach(id => {
+            const data = stats.zones[id];
+            const card = document.getElementById(`z-card-${id}`);
+            if(card && data) {
+                if(data.count > 0) card.classList.add('active');
+                document.getElementById(`z-count-${id}`).innerText = data.count;
+                document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
+                document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
+                const pctMiss = (data.active / data.count) * 100;
+                document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
+                document.getElementById(`z-br-${id}`).style.width = (100 - pctMiss) + "%";
+            }
+        });
+    }
+
+    function initGrid() {
+        const grid = document.getElementById('zonesArea'); grid.innerHTML = "";
+        ZONE_ORDER.forEach(id => {
+            const z = ZONE_DB[id];
+            let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
+            grid.innerHTML += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût 24h:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div><div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div></div>`;
+        });
+    }
+
+    // --- 2. SCAN ECONOMY (CFO) ---
+    async function startEconomyScan() {
+        stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
+        
+        ECO_DATA = { 
+            demand: { fuel:0, health:0, repair:0, supply:0 },
+            supply: { fuel:0, health:0, repair:0, supply:0 },
+            dovx: { cities:0, buildings:0, rewards:0 },
+            scanned: 0 
+        };
+        
+        log("Audit Financier V43 en cours...", "#fff");
+        try {
+            // DEMANDE (DIVISIONS)
+            let nextKey = ""; let hasMore = true;
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
+                if(!data.rows) break;
+                for(let row of data.rows) {
+                    ECO_DATA.scanned++;
+                    const zID = getProp(row, ['zoneID', 'zone_id']);
+                    const zInfo = ZONE_DB[zID];
+                    const busy = isBusy(row);
+                    if(zInfo && busy) {
+                        if(zInfo.cost > 0) { 
+                            ECO_DATA.demand.fuel += zInfo.cost;
+                            ECO_DATA.demand.health += zInfo.cost;
+                            ECO_DATA.demand.repair += zInfo.cost;
+                            ECO_DATA.demand.supply += zInfo.cost;
+                        }
+                        if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
+                        if(zInfo.reward > 0) ECO_DATA.dovx.rewards += zInfo.reward;
+                    }
+                }
+                updateEcoDisplay();
+                if(data.more) nextKey=data.next_key; else hasMore=false;
+            }
+            // OFFRE (BATIMENTS)
+            nextKey=""; hasMore=true;
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "buildings", nextKey);
+                if(!data.rows) break;
+                for(let b of data.rows) {
+                    ECO_DATA.scanned++;
+                    let p = parseFloat(Array.isArray(b.power)?b.power[0]:b.power)||0;
+                    let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0;
+                    let pType = Array.isArray(b.power)?b.power[0]:b.power;
+                    
+                    ECO_DATA.dovx.buildings += i;
+                    if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p;
+                    if(pType.includes("DOVH")) ECO_DATA.supply.health += p;
+                    if(pType.includes("DOVR")) ECO_DATA.supply.repair += p;
+                    if(pType.includes("DOVS")) ECO_DATA.supply.supply += p;
+                }
+                updateEcoDisplay();
+                if(data.more) nextKey=data.next_key; else hasMore=false;
+            }
+            log("Audit terminé.", "#00e676"); document.getElementById('btnStop').style.display='none';
+        } catch(e) { log(e.message, "red"); }
+    }
+
+    function updateEcoDisplay() {
+        showStatus(`Objets analysés: ${ECO_DATA.scanned}`);
+        const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
+        const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+        
+        // GLOBAL CARDS
+        let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply;
+        let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
+        let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+
+        setTextSafe('valDemandTU', fmt(totalD) + " TU");
+        setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setTextSafe('valSupplyTU', fmt(totalS) + " TU");
+        setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX");
+        setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
+
+        // --- V43 RATIO BAR ALIGNMENT ---
+        let totalVol = totalD + totalS || 1; 
+        let pctD = (totalD / totalVol) * 100;
+        let pctS = (totalS / totalVol) * 100;
+        
+        let barD = document.getElementById('barDemand'); if(barD) barD.style.width = pctD + "%";
+        let barS = document.getElementById('barSupply'); if(barS) barS.style.width = pctS + "%";
+        
+        let diff = totalS - totalD;
+        let diffTxt = diff >= 0 ? `SURPLUS (+${fmt(diff)})` : `DÉFICIT (${fmt(diff)})`;
+        let diffColor = diff >= 0 ? "var(--main)" : "var(--alert)";
+        
+        setHtmlSafe('ratioTxt', `<span style="color:${diffColor}">${diffTxt}</span>`);
+        // ------------------------------
+
+        // MATRIX
+        const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
+        let html = "";
+        tokens.forEach(t => {
+            let s = ECO_DATA.supply[t.key];
+            let d = ECO_DATA.demand[t.key];
+            let bal = s - d;
+            let valProd = s * RATES.TU_WAX * RATES.WAX_USD;
+            let valDem = d * RATES.TU_WAX * RATES.WAX_USD;
+            let balClass = bal >= 0 ? "bal-pos" : "bal-neg";
+            let balTxt = bal >= 0 ? "SURPLUS" : "DÉFICIT";
+            html += `<div class="matrix-col" style="border-top:3px solid ${t.color}"><div class="mx-head" style="background:${t.color}">${t.label}</div><div class="mx-body"><div><div class="mx-row"><span class="mx-lbl">Production</span> <span class="mx-val">${fmt(s)}</span></div><div style="text-align:right; margin-bottom:5px" class="mx-usd">Val. Prod: ${fmtUSD(valProd)}</div><div class="mx-row"><span class="mx-lbl">Besoin</span> <span class="mx-val">${fmt(d)}</span></div><div style="text-align:right" class="mx-usd">Val. Besoin: ${fmtUSD(valDem)}</div></div><div class="mx-bal ${balClass}">${balTxt} ${fmt(bal)}</div></div></div>`;
+        });
+        let matrixEl = document.getElementById('tokenMatrix');
+        if(matrixEl) matrixEl.innerHTML = html;
+
+        // DOVX P&L
+        let mint = ECO_DATA.dovx.rewards;
+        let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+        let net = mint - burn;
+        let colorNet = net >= 0 ? "var(--main)" : "var(--alert)";
+
+        setTextSafe('valDovxMint', "+ " + fmt(mint));
+        setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD));
+        setTextSafe('valDovxBurnTotal', "- " + fmt(burn));
+        setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD));
+        setTextSafe('valDovxNet', fmt(net));
+        if(document.getElementById('valDovxNet')) document.getElementById('valDovxNet').style.color = colorNet;
+        setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD));
+
+        setTextSafe('valCityDovx', fmt(ECO_DATA.dovx.cities));
+        setTextSafe('usdCityDovx', fmtUSD(ECO_DATA.dovx.cities * RATES.DOVX_WAX * RATES.WAX_USD));
+        setTextSafe('valBuildDovx', fmt(ECO_DATA.dovx.buildings));
+        setTextSafe('usdBuildDovx', fmtUSD(ECO_DATA.dovx.buildings * RATES.DOVX_WAX * RATES.WAX_USD));
+        
+        let totalDovx = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+        setTextSafe('totalDovxBurn', fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")");
+    }
+
+    // --- 3. TARGET TOOLS (SNIPER) ---
+    async function startTarget() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        switchView('targetView');
+        const view = document.getElementById('targetView'); view.innerHTML="Recherche...";
+        try {
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
+            const rows = data.rows ? data.rows.filter(r => getProp(r,['owner','user','account'])===user) : [];
+            let html = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`;
+            rows.forEach(r => {
+                const zID = getProp(r, ['zoneID', 'zone_id']);
+                const busy = isBusy(r);
+                html += `<div class="t-row"><div style="color:var(--main)">#${r.division_id}</div><div style="color:var(--sec)">${ZONE_DB[zID].name}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`;
+            });
+            view.innerHTML = html;
+        } catch(e){ log(e.message, "red"); }
+    }
+
+    async function startBuildings() {
+        const user = document.getElementById('targetIn').value.trim().toLowerCase();
+        switchView('buildingView');
+        const view = document.getElementById('buildingView'); view.innerHTML="Recherche...";
+        try {
+            const data = await robustFetch("dovutilstake", "buildings", user, 500, 2, "i64");
+            const rows = data.rows ? data.rows.filter(r => r.owner===user) : [];
+            let html = `<div style="background:#111; padding:10px; color:#9b59b6">BÂTIMENTS : ${rows.length}</div>`;
+            const now = Date.now()/1000;
+            rows.forEach(b => {
+                let p = Array.isArray(b.power)?b.power[0]:b.power;
+                let ready = (now > (parseFloat(b.last_claim)+parseFloat(b.delay)));
+                let typeColor = "#fff";
+                if(p.includes("DOVF")) typeColor = "var(--fuel)"; else if(p.includes("DOVH")) typeColor = "var(--health)";
+                else if(p.includes("DOVR")) typeColor = "var(--repair)"; else if(p.includes("DOVS")) typeColor = "var(--supply)";
+                html += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${ready?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${p}</div></div></div>`;
+            });
+            view.innerHTML = html;
+        } catch(e){ log(e.message, "red"); }
+    }
+
+    initGrid();
 </script>
+
 </body>
 </html>
