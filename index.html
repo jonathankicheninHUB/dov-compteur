@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V45 (REALITY CHECK)</title>
+    <title>DoV - COMMAND V51 (JAN 2025 UPDATE)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -72,25 +72,9 @@
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; }
         .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
 
-        /* COMMON & MAP */
-        .view-section { display: none; }
-        .view-active { display: block; }
-        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
-        .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); }
-        .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
-        
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
-        .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
-        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
-        .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
-
-        /* ZONES V45 : HIGH PRECISION */
+        /* ZONES V51 */
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 120px; opacity: 0.7; display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.3s; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 140px; opacity: 0.7; display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.3s; }
         .zone.active { opacity: 1; border-color: #555; background: #111; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
@@ -101,15 +85,18 @@
         .z-fin-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
         .z-fin-val { font-weight: bold; }
         
+        .z-calc-detail { font-size: 9px; color:#666; font-style:italic; text-align:right; margin-bottom:2px; }
+
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 5px; color: #666; }
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; }
         .z-act-ready { background: var(--main); height: 100%; }
         
+        /* COMMON */
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
-
+        
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; }
         .b-sub { font-size: 10px; color: #666; }
@@ -118,13 +105,27 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        .view-section { display: none; }
+        .view-active { display: block; }
+        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
+        .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
+        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
+        .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+        .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); }
+        .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
+
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V45 REALITY CHECK</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V51 JAN 2025 UPDATE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -215,7 +216,7 @@
 
                 <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; color:#fff; font-weight:bold; display:flex; justify-content:space-between">
                     <span>MATRICE OFFRE (Usines) / DEMANDE (Combattants)</span>
-                    <span style="font-size:10px; color:#666">VALORISATIONS EN TEMPS RÉEL</span>
+                    <span style="font-size:10px; color:#666">VALORISATIONS EN TEMPS RÉEL (BASE x POIDS)</span>
                 </div>
                 
                 <div class="matrix-grid" id="tokenMatrix"></div>
@@ -253,24 +254,37 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V45 Reality Check. Zone Precision & High Decimals.</div>
+<div class="logs" id="console">> V51 Jan 2025 Update. Base de données certifiée.</div>
 
 <script>
     // --- DEFAULT CONFIG ---
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     
-    // --- DATABASE ---
+    // --- OFFICIAL DATABASE V51 (JAN 2025 UPDATE TABLE) ---
+    // Costs are Cost/Resource (e.g. 1160 H, 1160 S...)
+    // Rewards are the "Win" column from your Excel
     const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 13.92 }, 2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 27.29 },
-        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 54.59 }, 4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 108.53 },
-        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 218.35 }, 6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 341.18 },
-        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 450.00 }, 8:  { name: "Camp",     cost: 28220, costX: 0, reward: 511.76 },
-        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 694.78 }, 10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 868.55 },
-        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 1085.69 }, 12: { name: "Radar",    cost: 84712, costX: 0, reward: 1357.04 },
-        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 1696.33 }, 14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 1865.84 },
-        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 2051.96 }, 16: { name: "HQ",       cost: 188000, costX: 0, reward: 2494.23 },
-        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 }, 18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
-        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 }, 20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
+        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 },
+        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
+        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
+        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
+        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4840.00 },
+        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6110.00 },
+        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7714.00 },
+        8:  { name: "Camp",     cost: 28220, costX: 0, reward: 9739.00 },
+        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12788.00 },
+        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16791.00 },
+        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 22266.00 },
+        12: { name: "Radar",    cost: 84712, costX: 0, reward: 29236.00 },
+        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
+        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 43385.00 },
+        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 52171.00 },
+        16: { name: "HQ",       cost: 188000, costX: 0, reward: 64884.00 },
+        // Cities: costX is the DOVX entry cost. Rewards are not clearly defined as PVE wins in same table context usually, kept 0 for safety or update if needed.
+        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
+        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
+        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
+        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
     };
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     const PROXY = "https://corsproxy.io/?";
@@ -322,15 +336,15 @@
         throw new Error("Réseau saturé.");
     }
 
-    // --- 1. SCAN ZONES (MAP) ---
+    // --- 1. SCAN ZONES (MAP V51) ---
     async function startZoneScan() {
         stopSignal = false; switchView('zoneView'); initGrid();
         document.getElementById('btnStop').style.display = 'inline-block';
         let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} };
-        ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
+        ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0, weightSum: 0 });
         let nextKey = ""; let hasMore = true;
 
-        log("Mapping des Zones en cours...", "#fff");
+        log("Mapping des Zones (avec Poids)...", "#fff");
         try {
             while(hasMore && !stopSignal) {
                 document.getElementById('scanProg').innerText = `Divs: ${stats.divs}`;
@@ -340,13 +354,27 @@
                     stats.divs++;
                     const zID = getProp(row, ['zoneID', 'zone_id']);
                     const busy = isBusy(row);
+                    const weight = parseFloat(row.weight) || 1;
+
                     if(stats.zones[zID]) {
                         stats.zones[zID].count++;
                         const zInfo = ZONE_DB[zID];
                         if(busy) {
                             stats.zones[zID].active++;
-                            if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; }
-                            stats.totalCostX += zInfo.costX; stats.totalGain += zInfo.reward;
+                            stats.zones[zID].weightSum += weight;
+                            
+                            // V51: BURN = Cost * Weight
+                            if(zInfo.cost > 0) { 
+                                let weightedCost = zInfo.cost * weight; 
+                                stats.burn.fuel+=weightedCost; stats.burn.health+=weightedCost; 
+                                stats.burn.repair+=weightedCost; stats.burn.supply+=weightedCost; 
+                            }
+                            // V51: GAIN = Reward * Weight
+                            if(zInfo.reward > 0) {
+                                stats.totalGain += (zInfo.reward * weight);
+                            }
+                            
+                            stats.totalCostX += zInfo.costX * weight; 
                         } else stats.zones[zID].idle++;
                     }
                 }
@@ -362,7 +390,7 @@
 
     function updateZoneDash(stats) {
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
-        const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:4, maximumFractionDigits:4}); // V45: 4 decimals
+        const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:4, maximumFractionDigits:4});
 
         setTextSafe('dDivs', fmt(stats.divs));
         setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX");
@@ -386,21 +414,23 @@
                 let bm = document.getElementById(`z-bm-${id}`); if(bm) bm.style.width = pctMiss + "%";
                 let br = document.getElementById(`z-br-${id}`); if(br) br.style.width = (100 - pctMiss) + "%";
 
-                let burnUSD = 0;
-                if(zInfo.cost > 0) burnUSD = (zInfo.cost * 4 * RATES.TU_WAX * RATES.WAX_USD) * data.active;
-                else if(zInfo.costX > 0) burnUSD = (zInfo.costX * RATES.DOVX_WAX * RATES.WAX_USD) * data.active;
-                
-                // V45 : SHOW TOTAL POTENTIAL WIN USD (IF ALL ACTIVE WON)
-                let unitWinUSD = zInfo.reward * RATES.DOVX_WAX * RATES.WAX_USD;
-                let totalWinUSD = unitWinUSD * data.active; 
+                let activeWeight = data.weightSum;
+                let avgWeight = data.active > 0 ? (data.weightSum / data.active).toFixed(1) : "-";
+                setTextSafe(`z-w-avg-${id}`, "Poids Moy: " + avgWeight);
 
-                // V45 : ROI CALCULATION
+                let burnUSD = 0;
+                if(zInfo.cost > 0) burnUSD = (zInfo.cost * activeWeight * 4 * RATES.TU_WAX * RATES.WAX_USD);
+                else if(zInfo.costX > 0) burnUSD = (zInfo.costX * activeWeight * RATES.DOVX_WAX * RATES.WAX_USD);
+                
+                let totalWinUSD = (zInfo.reward * activeWeight * RATES.DOVX_WAX * RATES.WAX_USD);
+
                 let roi = burnUSD > 0 ? ((totalWinUSD - burnUSD) / burnUSD) * 100 : 0;
                 let roiTxt = roi.toFixed(0) + "%";
                 let roiColor = roi >= 0 ? "var(--main)" : "var(--alert)";
+                let roiSign = roi >= 0 ? "+" : "";
 
                 setTextSafe(`z-burn-usd-${id}`, "-" + fmtUSD(burnUSD));
-                setHtmlSafe(`z-win-usd-${id}`, `<span style="color:#fff">${fmtUSD(totalWinUSD)}</span> <span style="color:${roiColor}; font-size:9px; border:1px solid ${roiColor}; padding:0 2px; border-radius:2px; margin-left:3px">ROI ${roiTxt}</span>`);
+                setHtmlSafe(`z-win-usd-${id}`, `<span style="color:#fff">${fmtUSD(totalWinUSD)}</span> <span style="color:${roiColor}; font-size:9px; border:1px solid ${roiColor}; padding:0 2px; border-radius:2px; margin-left:3px">ROI ${roiSign}${roiTxt}</span>`);
             }
         });
     }
@@ -422,6 +452,7 @@
                     <div class="z-fin-row"><span>BURN ($):</span> <span class="z-fin-val" style="color:var(--alert)" id="z-burn-usd-${id}">$0.00</span></div>
                     <div class="z-fin-row"><span>POTENTIAL ($):</span> <span class="z-fin-val" style="color:var(--main)" id="z-win-usd-${id}">$0.00</span></div>
                 </div>
+                <div class="z-weight-bar" id="z-w-avg-${id}">Poids Moy: -</div>
 
                 <div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div>
                 <div class="z-activity"><div class="z-act-mission" id="z-bm-${id}" style="width:0%"></div><div class="z-act-ready" id="z-br-${id}" style="width:0%"></div></div>
@@ -444,13 +475,16 @@
                     const zID = getProp(row, ['zoneID', 'zone_id']);
                     const zInfo = ZONE_DB[zID];
                     const busy = isBusy(row);
+                    const weight = parseFloat(row.weight) || 1;
+
                     if(zInfo && busy) {
                         if(zInfo.cost > 0) { 
-                            ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost;
-                            ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost;
+                            let wCost = zInfo.cost * weight;
+                            ECO_DATA.demand.fuel += wCost; ECO_DATA.demand.health += wCost;
+                            ECO_DATA.demand.repair += wCost; ECO_DATA.demand.supply += wCost;
                         }
-                        if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
-                        if(zInfo.reward > 0) ECO_DATA.dovx.rewards += zInfo.reward;
+                        if(zInfo.costX > 0) ECO_DATA.dovx.cities += (zInfo.costX * weight);
+                        if(zInfo.reward > 0) ECO_DATA.dovx.rewards += (zInfo.reward * weight);
                     }
                 }
                 updateEcoDisplay();
