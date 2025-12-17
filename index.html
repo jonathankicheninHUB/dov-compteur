@@ -2,29 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - WAR ROOM V20 (HYBRID)</title>
+    <title>DoV - WAR ROOM V22 (UNBLOCKABLE)</title>
     <style>
         :root { 
-            --main: #00e676; 
-            --alert: #ff1744; 
-            --sec: #29b6f6; 
-            --warn: #ff9800; 
-            --dovx: #9c27b0; 
-            
-            /* COULEURS SPECIFIQUES DOV */
-            --fuel: #e67e22;   /* DOVF */
-            --health: #e74c3c; /* DOVH */
-            --repair: #bdc3c7; /* DOVR */
-            --supply: #f1c40f; /* DOVS */
-
-            --bg: #050505; 
-            --panel: #111; 
+            --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
+            --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f;
+            --bg: #050505; --panel: #111; 
         }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--main); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
-        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
+        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
 
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 250px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
@@ -41,17 +30,15 @@
 
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
 
-        /* DASHBOARD LOGISTIQUE V20 */
+        /* DASHBOARD LOGISTIQUE */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.8fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
         .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
         
-        /* Grille des 4 Ressources */
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
         
-        /* Indicateurs visuels */
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .d-fuel { background: var(--fuel); box-shadow: 0 0 5px var(--fuel); }
         .d-health { background: var(--health); box-shadow: 0 0 5px var(--health); }
@@ -89,15 +76,15 @@
 <body>
 
 <header>
-    <h1>DoV MONITOR <span style="color:var(--sec)">V20 HYBRID</span></h1>
-    <span class="rpc-badge" id="rpcStatus">OFFLINE</span>
+    <h1>DoV MONITOR <span style="color:var(--main)">V22 UNBLOCKABLE</span></h1>
+    <span class="rpc-badge" id="rpcStatus">RÉSEAU: ATTENTE</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <div class="box">
             <div class="box-title">1. Réseau</div>
-            <button class="btn-cx" onclick="autoConnect()">CONNEXION INTELLIGENTE</button>
+            <button class="btn-cx" onclick="startNetworkTest()">LANCER MOTEUR RÉSEAU</button>
             <div id="cxMsg" style="text-align:center; font-size:10px; color:#666">Cliquez pour démarrer</div>
         </div>
 
@@ -119,64 +106,39 @@
         <div id="dashView">
             <div class="stats-row">
                 <div class="stat"><span class="stat-val" id="dDivs">0</span><span class="stat-lbl">Divisions</span></div>
-                
                 <div class="stat"><span class="stat-val val-win" id="dGain">0</span><span class="stat-lbl">Gain Max (DOVX)</span></div>
-                
                 <div class="stat" style="border-top-color: #444">
                     <div class="res-grid">
-                        <div class="res-item">
-                            <span><span class="dot d-fuel"></span>DOVF</span> 
-                            <span id="lFuel" style="color:var(--fuel)">0</span>
-                        </div>
-                        <div class="res-item">
-                            <span><span class="dot d-health"></span>DOVH</span> 
-                            <span id="lHealth" style="color:var(--health)">0</span>
-                        </div>
-                        <div class="res-item">
-                            <span><span class="dot d-repair"></span>DOVR</span> 
-                            <span id="lRepair" style="color:var(--repair)">0</span>
-                        </div>
-                        <div class="res-item">
-                            <span><span class="dot d-supply"></span>DOVS</span> 
-                            <span id="lSupply" style="color:var(--supply)">0</span>
-                        </div>
+                        <div class="res-item"><span><span class="dot d-fuel"></span>DOVF</span> <span id="lFuel" style="color:var(--fuel)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-health"></span>DOVH</span> <span id="lHealth" style="color:var(--health)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-repair"></span>DOVR</span> <span id="lRepair" style="color:var(--repair)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-supply"></span>DOVS</span> <span id="lSupply" style="color:var(--supply)">0</span></div>
                     </div>
                     <span class="stat-lbl" style="margin-top:8px">CONSO / 24H (PAR TOKEN)</span>
                 </div>
-
                 <div class="stat"><span class="stat-val val-cost-x" id="dCostX">0</span><span class="stat-lbl">Conso. Villes (DOVX)</span></div>
             </div>
-
             <div class="zones-grid" id="zonesArea">
-                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">
-                    En attente de connexion...
-                </div>
+                <div style="color:#444; grid-column:span 4; text-align:center; padding:30px;">En attente de connexion...</div>
             </div>
         </div>
-        
         <div id="targetView" class="target-area"></div>
     </main>
 </div>
 
-<div class="logs" id="console">> V20 Hybride. Terminologie F/H/R/S + Correction Réseau.</div>
+<div class="logs" id="console">> V22 Prête. Stratégie réseau Hybride (Direct Prioritaire + Fallback Tunnel).</div>
 
 <script>
     const PROXY = "https://corsproxy.io/?";
+    // LISTE DES 15 RPC (Priorité aux rapides)
     const RPCS = [
-        "https://wax.greymass.com", 
-        "https://wax.eosn.io", 
-        "https://api.wax.alohaeos.com",
-        "https://wax.pink.gg", 
-        "https://api.waxsweden.org", 
-        "https://wax.dapplica.io",
-        "https://wax.eosphere.io", 
-        "https://api.wax.liquidstudios.io",
-        "https://api-wax.eosarabia.net", 
-        "https://wax.eu.eosamsterdam.net",
-        "https://wax.cryptolions.io"
+        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", 
+        "https://api.wax.alohaeos.com", "https://wax.pink.gg", "https://wax.dapplica.io",
+        "https://wax.eosphere.io", "https://api.wax.liquidstudios.io", "https://wax-bp.wizardsguild.one",
+        "https://api-wax.eosarabia.net", "https://wax.eu.eosamsterdam.net", "https://wax.cryptolions.io",
+        "https://api.hivebp.io", "https://wax.blacklusion.io", "https://wax-public-bp.neftyblocks.com"
     ];
 
-    // CONFIGURATION EXACTE
     const ZONE_DB = {
         1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 13.92 },
         2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 27.29 },
@@ -199,11 +161,11 @@
         19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
         20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
     };
-
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
-    let activeEndpoint = null; // URL complète (avec ou sans proxy)
+    // Variables globales
     let stopSignal = false;
+    let availableNodes = []; // Liste des noeuds qui marchent
 
     function log(msg, color="#aaa") {
         const c = document.getElementById('console');
@@ -222,59 +184,93 @@
         return endSec > now;
     }
 
-    // --- 1. CONNEXION INTELLIGENTE (DIRECT -> PUIS PROXY) ---
-    async function checkRPC(rpcUrl, useProxy) {
-        const baseUrl = useProxy ? (PROXY + encodeURIComponent(rpcUrl + "/v1/chain/get_info")) : (rpcUrl + "/v1/chain/get_info");
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 sec timeout
-        
-        try {
-            const res = await fetch(baseUrl, { method: 'GET', signal: controller.signal });
-            clearTimeout(timeoutId);
-            if(res.ok) return true;
-        } catch(e) {}
-        return false;
-    }
-
-    async function autoConnect() {
+    // --- MOTEUR RESEAU V22 : TESTEUR DE NOEUDS ---
+    async function startNetworkTest() {
         const btn = document.querySelector('.btn-cx');
-        btn.disabled = true; btn.innerText = "RECHERCHE...";
+        btn.disabled = true; btn.innerText = "CALIBRAGE...";
+        availableNodes = [];
         
-        // Etape 1 : Essai Direct (Le plus stable)
-        log("Tentative connexion DIRECTE (plus rapide)...", "#fff");
-        for(let rpc of RPCS) {
-            if(await checkRPC(rpc, false)) {
-                activeEndpoint = rpc; // Pas de proxy
-                onConnected("DIRECT", rpc);
-                return;
+        log("Test de latence des 15 serveurs...", "#fff");
+        
+        // On teste les serveurs un par un pour trouver ceux qui acceptent le CORS Direct
+        let promises = RPCS.map(async (rpc) => {
+            try {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 2000); // 2s max pour répondre
+                const res = await fetch(rpc + "/v1/chain/get_info", { method: 'POST', signal: controller.signal });
+                if(res.ok) {
+                    availableNodes.push({ url: rpc, proxy: false }); // Direct OK
+                    log(`[OK] ${new URL(rpc).hostname} (Direct)`, "#00e676");
+                }
+            } catch(e) {
+                // Si échec direct, on note pour le proxy, mais on priorise le direct
             }
+        });
+
+        await Promise.all(promises);
+
+        // Si aucun direct ne marche, on ajoute la méthode proxy pour tous
+        if(availableNodes.length < 2) {
+            log("Connexions directes faibles. Activation du Tunnel de secours.", "orange");
+            RPCS.forEach(rpc => {
+                availableNodes.push({ url: rpc, proxy: true });
+            });
         }
 
-        // Etape 2 : Essai Proxy (Secours)
-        log("Connexion Directe échouée. Tentative TUNNEL...", "orange");
-        for(let rpc of RPCS) {
-            if(await checkRPC(rpc, true)) {
-                activeEndpoint = PROXY + encodeURIComponent(rpc); // Avec proxy
-                onConnected("TUNNEL", rpc);
-                return;
-            }
+        if(availableNodes.length > 0) {
+            btn.innerText = "RÉSEAU STABLE (" + availableNodes.length + " noeuds)";
+            btn.style.background = "#333"; btn.style.color = "#00e676";
+            document.getElementById('rpcStatus').innerText = "ONLINE";
+            document.getElementById('rpcStatus').style.color = "#00e676";
+            document.getElementById('btnGlobal').disabled = false;
+            document.getElementById('btnTarget').disabled = false;
+            document.getElementById('cxMsg').innerText = "Prêt.";
+            initGrid();
+        } else {
+            log("ERREUR CRITIQUE : Impossible de joindre le réseau.", "#ff1744");
+            btn.disabled = false; btn.innerText = "RÉESSAYER";
         }
-
-        log("ERREUR FATALE : Aucun réseau disponible.", "#ff1744");
-        btn.disabled = false; btn.innerText = "RÉESSAYER";
     }
 
-    function onConnected(mode, rpc) {
-        const btn = document.querySelector('.btn-cx');
-        document.getElementById('rpcStatus').innerText = mode + " ACTIF";
-        document.getElementById('rpcStatus').style.color = "#00e676";
-        document.getElementById('cxMsg').innerText = "OK : " + new URL(rpc).hostname;
-        document.getElementById('btnGlobal').disabled = false;
-        document.getElementById('btnTarget').disabled = false;
-        btn.innerText = "CONNECTÉ (" + mode + ")";
-        btn.style.background = "#333"; btn.style.color = "#00e676";
-        log(`Connecté via ${mode} !`, "#00e676");
-        initGrid();
+    // --- FETCH INTELLIGENT AVEC ROTATION ---
+    async function smartFetch(table, lowerBound, limit=300) {
+        // On essaie 3 noeuds aléatoires parmi ceux qui marchent
+        for(let i=0; i<5; i++) {
+            if(stopSignal) break;
+            
+            // Choix aléatoire d'un noeud sain
+            const node = availableNodes[Math.floor(Math.random() * availableNodes.length)];
+            let fetchUrl = node.url + "/v1/chain/get_table_rows";
+            
+            // Si ce noeud nécessite le proxy
+            if(node.proxy) fetchUrl = PROXY + encodeURIComponent(fetchUrl);
+
+            try {
+                document.getElementById('rpcStatus').innerText = "REQ: " + new URL(node.url).hostname;
+                
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 10000); // 10s max
+
+                const res = await fetch(fetchUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: table,
+                        limit: limit, lower_bound: lowerBound
+                    }),
+                    signal: controller.signal
+                });
+
+                if(!res.ok) throw new Error("HTTP " + res.status);
+                return await res.json();
+
+            } catch(e) {
+                // Echec silencieux, on essaie un autre noeud de la boucle
+                console.warn("Echec noeud " + node.url);
+                await new Promise(r => setTimeout(r, 200)); // Petite pause
+            }
+        }
+        throw new Error("Réseau instable. Réessayez.");
     }
 
     function initGrid() {
@@ -282,14 +278,8 @@
         let html = "";
         ZONE_ORDER.forEach(id => {
             const z = ZONE_DB[id];
-            
-            let costDisplay = "";
-            if (z.cost > 0) costDisplay = `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>`;
-            else if (z.costX > 0) costDisplay = `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
-            
-            let rewardDisplay = "";
-            if (z.reward > 0) rewardDisplay = `<span class="z-earn">+${z.reward.toLocaleString()}</span>`;
-            else rewardDisplay = `<span style="color:#aaa">POOL</span>`;
+            let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`;
+            let rewardDisplay = z.reward > 0 ? `<span class="z-earn">+${z.reward.toLocaleString()}</span>` : `<span style="color:#aaa">POOL</span>`;
 
             html += `
             <div class="zone" id="z-card-${id}">
@@ -311,51 +301,6 @@
         grid.innerHTML = html;
     }
 
-    // --- REQUETE UNIVERSELLE ---
-    async function fetchTableRPC(table, lowerBound, limit=300) {
-        // Construction URL intelligente
-        // Si activeEndpoint contient déjà le proxy (http...), on l'utilise tel quel
-        // Sinon on ajoute juste le endpoint
-        let fullUrl = activeEndpoint.startsWith("http") ? activeEndpoint : ("https://" + activeEndpoint);
-        
-        // Cas spécial : si activeEndpoint est l'URL du proxy qui encode l'URL cible
-        if(activeEndpoint.includes("corsproxy")) {
-            // L'URL est déjà formatée dans autoConnect
-             fullUrl = activeEndpoint + "%2Fv1%2Fchain%2Fget_table_rows"; // Hack pour concaténer sur l'URL encodée
-             // Correction : Le proxy attend l'URL cible encodée en paramètre.
-             // Simplification : on refait la logique propre ici.
-        } else {
-             fullUrl = activeEndpoint + "/v1/chain/get_table_rows";
-        }
-
-        // RE-LOGIQUE PLUS PROPRE POUR EVITER LES ERREURS D'URL
-        let fetchUrl;
-        if(activeEndpoint.includes("corsproxy")) {
-             // On doit extraire l'URL RPC de base pour reconstruire la requête spécifique
-             const rawRpc = activeEndpoint.split("?")[1]; // C'est l'URL encodée
-             const decodedRpc = decodeURIComponent(rawRpc);
-             const target = decodedRpc + "/v1/chain/get_table_rows";
-             fetchUrl = PROXY + encodeURIComponent(target);
-        } else {
-             fetchUrl = activeEndpoint + "/v1/chain/get_table_rows";
-        }
-
-        try {
-            const res = await fetch(fetchUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: table,
-                    limit: limit, lower_bound: lowerBound
-                })
-            });
-            return await res.json();
-        } catch(e) {
-            console.error(e);
-            throw e;
-        }
-    }
-
     async function startGlobal() {
         stopSignal = false;
         document.getElementById('dashView').style.display = 'block';
@@ -366,21 +311,22 @@
         let stats = { 
             divs: 0, 
             burn: { fuel: 0, health: 0, repair: 0, supply: 0 },
-            totalCostX: 0, 
-            totalGain: 0, 
-            zones: {} 
+            totalCostX: 0, totalGain: 0, zones: {} 
         };
         ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 });
 
         let nextKey = "";
         let hasMore = true;
 
-        log("Scan Logistique en cours...", "#fff");
+        log("Scan V22 (Multi-Noeuds) démarré...", "#fff");
 
         try {
             while(hasMore && !stopSignal) {
                 document.getElementById('scanProg').innerText = `Divs: ${stats.divs}`;
-                const data = await fetchTableRPC("sdivisions", nextKey);
+                
+                // Utilisation Smart Fetch
+                const data = await smartFetch("sdivisions", nextKey);
+                
                 if(!data.rows || data.rows.length === 0) break;
 
                 for(let row of data.rows) {
@@ -395,26 +341,31 @@
                         
                         if(busy) {
                             zStats.active++;
-                            // Calculs Economiques
                             if (zInfo.cost > 0) {
                                 stats.burn.fuel += zInfo.cost;
                                 stats.burn.health += zInfo.cost;
                                 stats.burn.repair += zInfo.cost;
                                 stats.burn.supply += zInfo.cost;
                             }
-                            stats.totalCostX += zInfo.costX; // DOVX (Villes)
-                            stats.totalGain += zInfo.reward; // Gain
+                            stats.totalCostX += zInfo.costX;
+                            stats.totalGain += zInfo.reward;
                         } else {
                             zStats.idle++;
                         }
                     }
                 }
                 updateDash(stats);
+                
+                // PAUSE ANTI-BAN (Important)
+                await new Promise(r => setTimeout(r, 100)); 
+
                 if(data.more && data.next_key) nextKey = data.next_key;
                 else hasMore = false;
             }
-            log("Scan terminé.", "#00e676");
-        } catch(e) { log("Erreur Scan (Réessayez): " + e.message, "red"); }
+            log("Scan terminé avec succès.", "#00e676");
+        } catch(e) { 
+            log("Erreur : " + e.message, "red"); 
+        }
 
         document.getElementById('btnStop').style.display = 'none';
         document.getElementById('btnGlobal').style.display = 'inline-block';
@@ -434,7 +385,7 @@
 
         try {
             while(searching) {
-                const data = await fetchTableRPC("sdivisions", nextKey, 100);
+                const data = await smartFetch("sdivisions", nextKey, 100);
                 if(!data.rows || data.rows.length === 0) break;
                 for(let row of data.rows) {
                     const owner = getProp(row, ['owner', 'user', 'account']);
@@ -442,6 +393,7 @@
                     else if(owner.localeCompare(user) > 0) { searching = false; break; }
                 }
                 if(searching && data.more) nextKey = data.next_key; else searching = false;
+                await new Promise(r => setTimeout(r, 50)); 
             }
 
             let html = `<div style="background:#111; padding:10px; border-bottom:1px solid #333; color:var(--sec)">
@@ -452,25 +404,19 @@
                 const zInfo = ZONE_DB[zID] || { name: "Inconnu", cost: 0, costX: 0, reward: 0 };
                 const busy = isBusy(r);
                 
-                let statusHtml = "";
-                let ecoHtml = "";
-                
-                if (busy) {
-                    statusHtml = `<span class="st-mission">MISSION</span>`;
-                    let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
-                    let gainTxt = zInfo.reward > 0 ? `+${zInfo.reward}` : "POOL";
-                    ecoHtml = `<span style="font-size:9px; color:#888; margin-right:10px">
-                        Conso: <span style="color:var(--alert)">${costTxt}</span> | 
-                        Gain: <span style="color:var(--main)">${gainTxt}</span>
-                    </span>`;
-                } else {
-                    statusHtml = `<span class="st-ready">PRÊT</span>`;
-                }
+                let statusHtml = busy ? `<span class="st-mission">MISSION</span>` : `<span class="st-ready">PRÊT</span>`;
+                let costTxt = zInfo.cost > 0 ? `-${zInfo.cost} TU` : `-${zInfo.costX} DOVX`;
+                let gainTxt = zInfo.reward > 0 ? `+${zInfo.reward}` : "POOL";
                 
                 html += `
                 <div class="t-row">
                     <div style="width:50px; color:var(--main)">#${r.division_id}</div>
-                    <div style="flex:1; text-align:right;">${ecoHtml}</div>
+                    <div style="flex:1; text-align:right;">
+                       <span style="font-size:9px; color:#888; margin-right:10px">
+                        <span style="color:var(--alert)">${costTxt}</span> | 
+                        <span style="color:var(--main)">${gainTxt}</span>
+                       </span>
+                    </div>
                     <div style="display:flex; align-items:center; margin-left:10px;">
                         ${statusHtml}
                         <div style="width:80px; text-align:right; color:var(--sec); margin-left:10px">${zInfo.name}</div>
@@ -483,13 +429,9 @@
 
     function updateDash(stats) {
         document.getElementById('dDivs').innerText = stats.divs.toLocaleString();
-        
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits: 0});
-        
         document.getElementById('dGain').innerText = "+ " + fmt(stats.totalGain) + " DOVX";
         document.getElementById('dCostX').innerText = "- " + fmt(stats.totalCostX) + " DOVX";
-
-        // Mise à jour de la logistique détaillée avec les nouveaux noms
         document.getElementById('lFuel').innerText = "-" + fmt(stats.burn.fuel);
         document.getElementById('lHealth').innerText = "-" + fmt(stats.burn.health);
         document.getElementById('lRepair').innerText = "-" + fmt(stats.burn.repair);
@@ -498,14 +440,11 @@
         ZONE_ORDER.forEach(id => {
             const data = stats.zones[id];
             const card = document.getElementById(`z-card-${id}`);
-            
             if(card && data) {
                 if(data.count > 0) card.classList.add('active');
-                
                 document.getElementById(`z-count-${id}`).innerText = data.count;
                 document.getElementById(`z-miss-${id}`).innerText = data.active + " Act.";
                 document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy";
-
                 const total = data.count || 1;
                 const pctMiss = (data.active / total) * 100;
                 document.getElementById(`z-bm-${id}`).style.width = pctMiss + "%";
