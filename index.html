@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V38 (EXECUTIVE)</title>
+    <title>DoV - COMMAND V39 (STABLE)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -34,7 +34,18 @@
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         .inp-money { color: var(--money); font-weight: bold; }
 
-        /* MATRICE ECONOMIQUE */
+        /* ECONOMY */
+        .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
+        .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
+        .eco-val { font-size: 18px; font-weight: bold; color: #fff; }
+        .eco-usd { font-size: 11px; color: var(--money); font-weight: bold; margin-top: auto; padding-top: 5px; text-align: right; }
+        
+        .c-fighter { border-top: 3px solid var(--alert); }
+        .c-producer { border-top: 3px solid var(--main); }
+        .c-market { border-top: 3px solid var(--dovx); }
+
+        /* MATRICE */
         .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .matrix-col { background: #111; border: 1px solid #333; display: flex; flex-direction: column; }
         .mx-head { padding: 8px; font-weight: bold; text-align: center; color: #000; font-size: 12px; }
@@ -54,6 +65,11 @@
         .db-val { font-size: 16px; font-weight: bold; color: #fff; }
         .db-usd { font-size: 11px; color: var(--money); text-align: right; }
 
+        /* COMMON */
+        .view-section { display: none; }
+        .view-active { display: block; }
+        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
+        
         /* ZONES & TARGET STYLES */
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
@@ -93,17 +109,13 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* COMMON */
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
-        .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        .view-section { display: none; }
-        .view-active { display: block; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--gold)">V38 EXECUTIVE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V39 STABLE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -161,6 +173,25 @@
 
         <div id="ecoView" class="view-section">
             <div id="ecoResults">
+                
+                <div class="eco-grid">
+                    <div class="eco-card c-fighter">
+                        <div class="eco-head"><span>DEMANDE (COMBATTANTS)</span> <span>🔥 BURN</span></div>
+                        <div class="eco-val" id="valDemandTU">0 TU</div>
+                        <div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div>
+                    </div>
+                    <div class="eco-card c-producer">
+                        <div class="eco-head"><span>OFFRE (PRODUCTEURS)</span> <span>⚡ MINT</span></div>
+                        <div class="eco-val" id="valSupplyTU">0 TU</div>
+                        <div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div>
+                    </div>
+                    <div class="eco-card c-market">
+                        <div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div>
+                        <div class="eco-val" id="valDovxBurn">0 DOVX</div>
+                        <div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div>
+                    </div>
+                </div>
+
                 <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; color:#fff; font-weight:bold; display:flex; justify-content:space-between">
                     <span>MATRICE OFFRE (Usines) / DEMANDE (Combattants)</span>
                     <span style="font-size:10px; color:#666">VALORISATIONS EN TEMPS RÉEL</span>
@@ -201,7 +232,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V38 Executive. All Systems Operational.</div>
+<div class="logs" id="console">> V39 Stable. Correctif interface appliqué. Tunnel OK.</div>
 
 <script>
     // --- DEFAULT CONFIG ---
@@ -356,7 +387,7 @@
             scanned: 0 
         };
         
-        log("Audit Financier en cours...", "#fff");
+        log("Audit Financier V39 en cours...", "#fff");
         try {
             // DEMANDE (DIVISIONS)
             let nextKey = ""; let hasMore = true;
@@ -411,6 +442,18 @@
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
         const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
+        // GLOBAL CARDS (V39 FIX)
+        let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply;
+        let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
+        let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+
+        document.getElementById('valDemandTU').innerText = fmt(totalD) + " TU";
+        document.getElementById('valDemandUSD').innerText = fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
+        document.getElementById('valSupplyTU').innerText = fmt(totalS) + " TU";
+        document.getElementById('valSupplyUSD').innerText = fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h";
+        document.getElementById('valDovxBurn').innerText = fmt(totalDovxIn) + " DOVX";
+        document.getElementById('valDovxUSD').innerText = fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h";
+
         // MATRIX
         const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
         let html = "";
@@ -444,7 +487,6 @@
         document.getElementById('usdCityDovx').innerText = fmtUSD(ECO_DATA.dovx.cities * RATES.DOVX_WAX * RATES.WAX_USD);
         document.getElementById('valBuildDovx').innerText = fmt(ECO_DATA.dovx.buildings);
         document.getElementById('usdBuildDovx').innerText = fmtUSD(ECO_DATA.dovx.buildings * RATES.DOVX_WAX * RATES.WAX_USD);
-        
         let totalDovx = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
         document.getElementById('totalDovxBurn').innerText = fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")";
     }
