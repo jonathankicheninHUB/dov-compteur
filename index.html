@@ -2,275 +2,374 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - Dashboard STABLE</title>
+    <title>DoV - GLOBAL WAR ROOM</title>
     <style>
-        body { background-color: #0b0c10; color: #c5c6c7; font-family: 'Segoe UI', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
-        .main-container { width: 100%; max-width: 900px; }
+        /* Design "Salle de Contrôle" */
+        :root { --main: #00e676; --sec: #29b6f6; --bg: #050505; --panel: #111; }
+        body { background-color: var(--bg); color: #ddd; font-family: 'Consolas', 'Courier New', monospace; padding: 0; margin: 0; display: flex; flex-direction: column; height: 100vh; }
         
-        h1 { text-align: center; color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        /* HEADER */
+        header { background: #000; border-bottom: 2px solid var(--main); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 20px rgba(0,230,118,0.2); }
+        h1 { margin: 0; color: var(--main); text-transform: uppercase; letter-spacing: 3px; font-size: 24px; }
+        .status-led { width: 12px; height: 12px; background: #333; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 5px #000; }
+        .led-on { background: #f00; box-shadow: 0 0 10px #f00; animation: pulse 1s infinite; }
         
-        .control-panel { background: #1f2833; padding: 15px; border-radius: 8px; border: 1px solid #45a29e; display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        input { background: #0b0c10; border: 1px solid #45a29e; color: #fff; padding: 10px; width: 60%; font-family: monospace; }
-        button { background: #45a29e; color: #0b0c10; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #66fcf1; }
-        button:disabled { background: #555; cursor: not-allowed; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #1f2833; padding: 10px; border-radius: 5px; text-align: center; border-left: 3px solid #45a29e; }
-        .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
-        .stat-label { font-size: 0.7em; color: #888; text-transform: uppercase; }
-
-        .log-box { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 11px; height: 80px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; }
-
-        .division-card { background: #151515; border: 1px solid #333; margin-bottom: 15px; border-radius: 5px; overflow: hidden; }
-        .div-header { background: #222; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .div-info { display: flex; gap: 15px; align-items: center; }
-        .badge-info { font-size: 0.8em; color: #aaa; background: #333; padding: 2px 6px; border-radius: 3px; }
-
-        .units-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; }
-        .unit-item { background: #000; padding: 5px 8px; border-radius: 3px; display: flex; align-items: center; border: 1px solid #222; font-size: 0.9em; }
-        .role-tag { font-size: 0.7em; padding: 1px 4px; border-radius: 2px; margin-right: 5px; font-weight: bold; color: #000; text-transform: uppercase; }
+        /* LAYOUT */
+        .layout { display: flex; flex: 1; overflow: hidden; }
         
-        /* Couleurs des rôles */
-        .r-combat { background: #e74c3c; }
-        .r-officer { background: #f1c40f; }
-        .r-support { background: #3498db; }
-        .r-godmother { background: #9b59b6; }
-        .r-other { background: #95a5a6; }
-
-        .lnk { color: #45a29e; text-decoration: none; margin-left: 8px; border: 1px solid #45a29e; padding: 0 4px; border-radius: 3px; font-size: 0.8em; }
-        .lnk:hover { background: #45a29e; color: #000; }
+        /* SIDEBAR (Contrôles) */
+        .sidebar { width: 300px; background: var(--panel); border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
         
-        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .dot-green { background: #00e676; box-shadow: 0 0 5px #00e676; }
-        .dot-red { background: #ff3d00; box-shadow: 0 0 5px #ff3d00; }
+        .panel { background: #1a1a1a; border: 1px solid #444; padding: 15px; border-radius: 4px; }
+        .panel h3 { margin-top: 0; color: var(--sec); font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        input { background: #000; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; font-family: monospace; margin-bottom: 10px; }
+        
+        .btn { width: 100%; padding: 10px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 5px; text-transform: uppercase; font-family: monospace; transition: 0.2s; }
+        .btn-scan { background: var(--main); color: #000; }
+        .btn-scan:hover { background: #00c853; }
+        .btn-target { background: var(--sec); color: #000; }
+        .btn-target:hover { background: #039be5; }
+        .btn-stop { background: #d32f2f; color: #fff; display: none; }
+
+        /* MAIN CONTENT (Visuel) */
+        .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
+        
+        /* DASHBOARD GLOBAL */
+        .global-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #111; border: 1px solid #333; padding: 15px; text-align: center; }
+        .stat-num { font-size: 28px; color: #fff; font-weight: bold; display: block; }
+        .stat-tit { font-size: 10px; color: #888; text-transform: uppercase; }
+
+        /* ZONE GRID */
+        .zone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .zone-card { background: #0a0a0a; border: 1px solid #333; padding: 10px; position: relative; overflow: hidden; }
+        .zone-card:hover { border-color: var(--sec); }
+        .zone-id { font-size: 1.5em; font-weight: bold; color: var(--sec); }
+        .zone-bar-bg { background: #222; height: 4px; width: 100%; margin-top: 10px; }
+        .zone-bar-fill { background: var(--main); height: 100%; width: 0%; transition: width 0.5s; }
+        
+        /* LOG CONSOLE */
+        .console { position: absolute; bottom: 0; left: 0; right: 0; height: 150px; background: #000; border-top: 2px solid #333; padding: 10px; font-size: 11px; color: #aaa; overflow-y: auto; font-family: monospace; z-index: 100; opacity: 0.9; }
+
+        /* TARGET LIST */
+        .target-list { display: none; flex-direction: column; gap: 5px; }
+        .unit-row { background: #111; border-bottom: 1px solid #222; padding: 8px; display: flex; justify-content: space-between; }
+        .unit-row:hover { background: #222; }
+        .tag { padding: 2px 5px; font-size: 10px; border-radius: 2px; color: #000; font-weight: bold; margin-right: 5px; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <h1>DoV Dashboard V3 (Stable)</h1>
-    
-    <div class="control-panel">
-        <input type="text" id="userInput" placeholder="u2d2k.c.wam" value="u2d2k.c.wam">
-        <button id="btn" onclick="run()">LANCER ANALYSE</button>
+<header>
+    <div style="display:flex; align-items:center">
+        <span class="status-led" id="led"></span>
+        <h1>DoV Campaign Monitor</h1>
     </div>
+    <div style="font-size:12px; color:#666">Smart Contract: dovpvecontrl</div>
+</header>
 
-    <div class="stats-bar">
-        <div class="stat-card">
-            <div class="stat-val" id="sDivs">0</div>
-            <div class="stat-label">Divisions</div>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="panel">
+            <h3>MONITEUR DE GUERRE</h3>
+            <p style="font-size:11px; color:#aaa; margin-bottom:10px">Scanner l'intégralité de la carte pour voir la répartition des forces.</p>
+            <button class="btn btn-scan" id="btnGlobal" onclick="startGlobalScan()">SCAN GLOBAL</button>
+            <button class="btn btn-stop" id="btnStop" onclick="stopScan()">ARRÊT D'URGENCE</button>
+            <div id="progressText" style="font-size:10px; text-align:center; margin-top:5px; color:#666">En attente...</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-val" id="sPower">0</div>
-            <div class="stat-label">Puissance</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-val" id="sUnits">0</div>
-            <div class="stat-label">Unités</div>
-        </div>
-    </div>
 
-    <div class="log-box" id="logs">> Prêt. Cliquez sur lancer.</div>
+        <div class="panel">
+            <h3>ESPIONNAGE JOUEUR</h3>
+            <input type="text" id="targetUser" placeholder="Compte (ex: u2d2k.c.wam)" value="u2d2k.c.wam">
+            <button class="btn btn-target" onclick="startTargetScan()">SCANNER CIBLE</button>
+        </div>
+    </aside>
 
-    <div id="list"></div>
+    <main class="main-view" id="mainView">
+        
+        <div id="dashboardView">
+            <div class="global-stats">
+                <div class="stat-box">
+                    <span class="stat-num" id="gDivs">0</span>
+                    <span class="stat-tit">Total Divisions</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num" id="gPower">0</span>
+                    <span class="stat-tit">Puissance Globale</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num" id="gUnits">0</span>
+                    <span class="stat-tit">Unités Engagées</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num" id="gZones">0</span>
+                    <span class="stat-tit">Zones Actives</span>
+                </div>
+            </div>
+
+            <h3 style="color:#666; border-bottom:1px solid #333; padding-bottom:5px">RÉPARTITION PAR ZONE</h3>
+            <div class="zone-grid" id="zoneContainer">
+                <div style="color:#444; padding:20px">En attente du scan global...</div>
+            </div>
+        </div>
+
+        <div id="targetView" class="target-list"></div>
+
+    </main>
 </div>
 
+<div class="console" id="logs">> Système prêt. Sélectionnez un mode de scan.</div>
+
 <script>
-    // Liste priorisée des serveurs (Greymass en premier car très stable)
+    // --- CONFIGURATION ---
     const RPCS = [
         "https://wax.greymass.com",
         "https://wax.eosn.io",
         "https://api.wax.alohaeos.com",
         "https://wax.pink.gg",
-        "https://api.waxsweden.org",
-        "https://wax.dapplica.io"
+        "https://api.waxsweden.org"
     ];
 
-    function log(msg, color = "#0f0") {
+    let isScanning = false;
+    let shouldStop = false;
+
+    // --- FONCTIONS LOG & UI ---
+    function log(msg, color="#aaa") {
         const c = document.getElementById('logs');
-        c.innerHTML = `<div style="color:${color}">> ${msg}</div>` + c.innerHTML;
+        const time = new Date().toLocaleTimeString();
+        c.innerHTML = `<div style="color:${color}">[${time}] ${msg}</div>` + c.innerHTML;
     }
 
-    async function run() {
-        const user = document.getElementById('userInput').value.trim().toLowerCase();
-        const btn = document.getElementById('btn');
-        const listDiv = document.getElementById('list');
+    function toggleLed(state) {
+        const led = document.getElementById('led');
+        if(state) led.classList.add('led-on');
+        else led.classList.remove('led-on');
+    }
 
-        if(!user) return alert("Compte requis");
+    function switchView(mode) {
+        document.getElementById('dashboardView').style.display = (mode === 'global') ? 'block' : 'none';
+        document.getElementById('targetView').style.display = (mode === 'target') ? 'flex' : 'none';
+    }
 
-        // RESET
-        btn.disabled = true;
-        listDiv.innerHTML = "";
-        document.getElementById('sDivs').innerText = "0";
-        document.getElementById('sPower').innerText = "0";
-        document.getElementById('sUnits').innerText = "0";
-        document.getElementById('logs').innerHTML = ""; // Clear logs
+    function stopScan() {
+        shouldStop = true;
+        document.getElementById('btnStop').style.display = 'none';
+        document.getElementById('btnGlobal').style.display = 'block';
+        log("Arrêt demandé...", "orange");
+    }
 
-        log(`Démarrage pour : ${user}`);
-
-        // 1. TROUVER LE BON SERVEUR (Le cœur de la stabilité)
-        let activeRPC = "";
-        for (let rpc of RPCS) {
+    // --- MOTEUR DE CONNEXION ---
+    async function getActiveRpc() {
+        for(let rpc of RPCS) {
             try {
-                log(`Test connexion vers ${rpc}...`, "#888");
-                // On tente juste de lire une ligne de la table pour voir si ça passe
-                await fetch(rpc + "/v1/chain/get_table_rows", {
-                    method: 'POST',
-                    body: JSON.stringify({ json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1 })
-                });
-                activeRPC = rpc;
-                log(`CONNEXION OK : ${rpc}`, "#fff");
-                break; // On sort dès qu'on en trouve un bon
-            } catch (e) {
-                // Échec silencieux, on passe au suivant
-            }
+                await fetch(rpc + "/v1/chain/get_info", {method: 'POST'});
+                return rpc;
+            } catch(e) {}
         }
+        throw new Error("Aucun serveur disponible");
+    }
 
-        if (!activeRPC) {
-            log("ERREUR : Aucun serveur ne répond. Vérifie ta connexion.", "red");
-            btn.disabled = false;
-            return;
-        }
+    // --- SCANNER GLOBAL (MONITORING) ---
+    async function startGlobalScan() {
+        if(isScanning) return;
+        isScanning = true;
+        shouldStop = false;
+        
+        switchView('global');
+        toggleLed(true);
+        document.getElementById('btnGlobal').style.display = 'none';
+        document.getElementById('btnStop').style.display = 'block';
+        document.getElementById('zoneContainer').innerHTML = ""; // Clear grid
 
-        // 2. SCAN DES DONNÉES
-        let divisions = [];
-        let nextKey = user;
-        let searching = true;
-        let globalPower = 0;
-        let globalUnits = 0;
+        // Reset Stats
+        let stats = { divs: 0, power: 0, units: 0, zones: {} };
+        
+        log("INITIALISATION DU MONITORING GLOBAL...", "#00e676");
 
         try {
-            while(searching) {
-                const res = await fetch(activeRPC + "/v1/chain/get_table_rows", {
+            const rpc = await getActiveRpc();
+            const url = rpc + "/v1/chain/get_table_rows";
+            let nextKey = "";
+            let hasMore = true;
+
+            while(hasMore && !shouldStop) {
+                document.getElementById('progressText').innerText = `Scan en cours... (Divisions: ${stats.divs})`;
+
+                const res = await fetch(url, {
                     method: 'POST',
                     body: JSON.stringify({
                         json: true,
                         code: "dovpvecontrl",
                         scope: "dovpvecontrl",
                         table: "sdivisions",
-                        index_position: 2,    // Par Owner
-                        key_type: "name",
-                        lower_bound: nextKey, // Start here
-                        limit: 200
+                        limit: 300, // Gros paquets pour aller vite
+                        lower_bound: nextKey
                     })
                 });
-                
+
                 const data = await res.json();
-                if (!data.rows || data.rows.length === 0) {
-                    searching = false; break;
+                
+                if(!data.rows || data.rows.length === 0) {
+                    hasMore = false; break;
                 }
 
-                // Filtrage Manuel (L'étau souple)
-                let batchCount = 0;
-                for (let row of data.rows) {
-                    const owner = row.owner || row.user; // Sécurité double nom
+                // TRAITEMENT DES DONNÉES EN TEMPS RÉEL
+                for(let row of data.rows) {
+                    // 1. Stats globales
+                    stats.divs++;
+                    if(row.power) stats.power += parseInt(row.power);
+                    
+                    // 2. Unités
+                    const units = row.units || row.asset_ids || [];
+                    stats.units += units.length;
 
-                    if (owner === user) {
-                        divisions.push(row);
-                        batchCount++;
-                        
-                        // Calculs stats
-                        if(row.power) globalPower += parseInt(row.power);
-                        if(row.units) globalUnits += row.units.length;
-
-                    } else if (owner.localeCompare(user) > 0) {
-                        // On a dépassé le nom dans l'alphabet
-                        searching = false;
-                        log(`Fin de zone trouvée à ${owner}`, "#ccc");
-                        break;
-                    }
+                    // 3. Zones (Le cœur du monitoring)
+                    const zID = row.zoneID || "Inconnue";
+                    if(!stats.zones[zID]) stats.zones[zID] = { count: 0, power: 0 };
+                    stats.zones[zID].count++;
+                    if(row.power) stats.zones[zID].power += parseInt(row.power);
                 }
 
-                log(`Batch reçu : ${data.rows.length} lignes. ${batchCount} gardées.`);
+                // MISE À JOUR UI (Pour que ça bouge à l'écran)
+                updateDashboard(stats);
 
-                if (searching && data.more && data.next_key) {
-                    nextKey = data.next_key;
-                } else {
-                    searching = false;
-                }
+                if(data.more && data.next_key) nextKey = data.next_key;
+                else hasMore = false;
             }
 
-            // 3. AFFICHAGE
-            if(divisions.length === 0) {
-                log("Aucune division trouvée pour ce compte.", "orange");
-            } else {
-                log(`SCAN TERMINÉ. ${divisions.length} divisions affichées.`, "#fff");
-                document.getElementById('sDivs').innerText = divisions.length;
-                document.getElementById('sPower').innerText = globalPower;
-                document.getElementById('sUnits').innerText = globalUnits;
-                render(divisions);
-            }
+            log(`SCAN TERMINÉ. ${stats.divs} divisions analysées.`, "#00e676");
+            renderZones(stats.zones); // Rendu final propre
 
-        } catch (e) {
-            log(`CRASH : ${e.message}`, "red");
+        } catch(e) {
+            log("ERREUR: " + e.message, "red");
         }
-        
-        btn.disabled = false;
+
+        isScanning = false;
+        toggleLed(false);
+        document.getElementById('btnStop').style.display = 'none';
+        document.getElementById('btnGlobal').style.display = 'block';
+        document.getElementById('progressText').innerText = "Prêt.";
     }
 
-    function render(rows) {
-        const list = document.getElementById('list');
-        const now = Date.now() / 1000;
-        let html = "";
+    // --- SCANNER CIBLE (INDIVIDUEL) ---
+    async function startTargetScan() {
+        const user = document.getElementById('targetUser').value.trim().toLowerCase();
+        if(!user) return alert("Nom requis");
+        
+        switchView('target');
+        document.getElementById('targetView').innerHTML = "<div style='padding:20px'>Scan de la cible...</div>";
+        log(`Espionnage de : ${user}`, "#29b6f6");
 
-        rows.forEach(div => {
-            // Calcul statut temps
-            let isReady = true;
-            let statusTxt = "PRÊTE";
-            if (div.end_time) {
-                // WAX renvoie parfois "2023-10..." parfois un nombre. On gère les deux.
-                let end = new Date(div.end_time).getTime() / 1000;
-                if(isNaN(end)) end = 0; // Sécurité si date invalide
-                if (end > now) {
-                    isReady = false;
-                    statusTxt = "EN MISSION";
+        try {
+            const rpc = await getActiveRpc();
+            let allRows = [];
+            let nextKey = user;
+            let searching = true;
+
+            while(searching) {
+                const res = await fetch(rpc + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "sdivisions",
+                        index_position: 2, key_type: "name", lower_bound: nextKey, limit: 100
+                    })
+                });
+                const data = await res.json();
+                
+                if(!data.rows || data.rows.length === 0) break;
+
+                for(let row of data.rows) {
+                    const owner = row.owner || row.user;
+                    if(owner === user) allRows.push(row);
+                    else if(owner.localeCompare(user) > 0) { searching = false; break; }
                 }
+                if(searching && data.more) nextKey = data.next_key;
+                else searching = false;
             }
 
-            const dotClass = isReady ? "dot-green" : "dot-red";
+            renderTargetList(allRows);
+            log(`Cible analysée : ${allRows.length} divisions trouvées.`, "#29b6f6");
+
+        } catch(e) {
+            log("Erreur cible : " + e.message, "red");
+        }
+    }
+
+    // --- FONCTIONS DE RENDU (VISUEL) ---
+
+    function updateDashboard(stats) {
+        document.getElementById('gDivs').innerText = stats.divs.toLocaleString();
+        document.getElementById('gPower').innerText = stats.power.toLocaleString();
+        document.getElementById('gUnits').innerText = stats.units.toLocaleString();
+        document.getElementById('gZones').innerText = Object.keys(stats.zones).length;
+        
+        // On rafraichit la grille des zones tous les 500 items pour ne pas lagger
+        if(stats.divs % 500 === 0) renderZones(stats.zones);
+    }
+
+    function renderZones(zonesMap) {
+        const container = document.getElementById('zoneContainer');
+        let html = "";
+        
+        // Trier les zones par ID
+        const sortedKeys = Object.keys(zonesMap).sort((a,b) => parseInt(a) - parseInt(b));
+
+        // Trouver la zone la plus peuplée pour la barre de progression relative
+        let maxCount = 0;
+        for(let z in zonesMap) if(zonesMap[z].count > maxCount) maxCount = zonesMap[z].count;
+
+        sortedKeys.forEach(z => {
+            const zData = zonesMap[z];
+            const percent = (zData.count / maxCount) * 100;
             
-            // Unités
-            let unitsHtml = "";
-            const units = div.units || [];
-            units.forEach(u => {
-                let id = u.value;
-                let role = u.key.replace(/%\d+/g, '').replace('combat', 'CMBT');
-                
-                // Couleur badge
-                let rClass = "r-other";
-                if(role.includes("CMBT")) rClass = "r-combat";
-                if(role.includes("officer")) { role = "OFF"; rClass = "r-officer"; }
-                if(role.includes("support")) { role = "SUP"; rClass = "r-support"; }
-                if(role.includes("godmother")) { role = "GOD"; rClass = "r-godmother"; }
-
-                unitsHtml += `
-                    <div class="unit-item">
-                        <span class="role-tag ${rClass}">${role}</span>
-                        ${id}
-                        <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" class="lnk">voir</a>
-                    </div>
-                `;
-            });
-
             html += `
-                <div class="division-card">
-                    <div class="div-header">
-                        <div style="font-weight:bold; color:#fff">
-                            <span class="status-dot ${dotClass}"></span> Div #${div.division_id}
-                        </div>
-                        <div class="div-info">
-                            <span class="badge-info">⚡ ${div.power || 0}</span>
-                            <span class="badge-info">🌍 Zone ${div.zoneID || '?'}</span>
-                            <span class="badge-info" style="color:${isReady?'#00e676':'#ff3d00'}">${statusTxt}</span>
-                        </div>
+                <div class="zone-card">
+                    <div style="display:flex; justify-content:space-between">
+                        <span class="zone-id">ZONE ${z}</span>
+                        <span style="font-size:12px; color:#666">${zData.count} Divs</span>
                     </div>
-                    <div class="units-grid">${unitsHtml}</div>
+                    <div style="font-size:11px; color:#888; margin-top:5px">Puissance: ${zData.power.toLocaleString()}</div>
+                    <div class="zone-bar-bg">
+                        <div class="zone-bar-fill" style="width:${percent}%"></div>
+                    </div>
                 </div>
             `;
         });
+        container.innerHTML = html;
+    }
 
-        list.innerHTML = html;
+    function renderTargetList(rows) {
+        const div = document.getElementById('targetView');
+        if(rows.length === 0) { div.innerHTML = "Aucune division trouvée."; return; }
+        
+        let html = "";
+        rows.forEach(r => {
+            const units = r.units || [];
+            let uHtml = "";
+            units.forEach(u => {
+                let role = (typeof u === 'object') ? u.key.replace(/%\d+/,'') : 'unit';
+                let id = (typeof u === 'object') ? u.value : u;
+                let color = "#777";
+                if(role.includes('combat')) color = "#e74c3c";
+                if(role.includes('officer')) color = "#f1c40f";
+                
+                uHtml += `<a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" style="text-decoration:none; color:#ddd; margin-right:10px; font-size:11px;">
+                    <span style="background:${color}" class="tag">${role.substring(0,3).toUpperCase()}</span>${id}
+                </a>`;
+            });
+
+            html += `
+                <div class="unit-row">
+                    <div style="width:150px; font-weight:bold; color:#29b6f6">Div #${r.division_id}</div>
+                    <div style="flex:1">${uHtml}</div>
+                    <div style="width:80px; text-align:right; color:#888">Z: ${r.zoneID}</div>
+                </div>
+            `;
+        });
+        div.innerHTML = html;
     }
 </script>
 
