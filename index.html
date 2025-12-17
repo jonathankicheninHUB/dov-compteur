@@ -2,59 +2,277 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - Command Center</title>
+    <title>DoV - Dashboard STABLE</title>
     <style>
-        /* Style Futuriste / Militaire */
-        body { background-color: #0b0c10; color: #c5c6c7; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        body { background-color: #0b0c10; color: #c5c6c7; font-family: 'Segoe UI', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
         .main-container { width: 100%; max-width: 900px; }
         
-        h1 { text-align: center; color: #66fcf1; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 30px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); }
+        h1 { text-align: center; color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         
-        .control-panel { background: #1f2833; padding: 20px; border-radius: 10px; border: 1px solid #45a29e; display: flex; gap: 10px; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 30px; }
-        input { background: #0b0c10; border: 1px solid #45a29e; color: #fff; padding: 12px; width: 60%; border-radius: 5px; font-size: 16px; letter-spacing: 1px; }
-        button { background: #45a29e; color: #0b0c10; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; transition: 0.3s; }
-        button:hover { background: #66fcf1; box-shadow: 0 0 15px #66fcf1; }
-        button:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+        .control-panel { background: #1f2833; padding: 15px; border-radius: 8px; border: 1px solid #45a29e; display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        input { background: #0b0c10; border: 1px solid #45a29e; color: #fff; padding: 10px; width: 60%; font-family: monospace; }
+        button { background: #45a29e; color: #0b0c10; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #66fcf1; }
+        button:disabled { background: #555; cursor: not-allowed; }
 
-        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: #1f2833; padding: 15px; border-radius: 5px; text-align: center; border-left: 4px solid #45a29e; }
-        .stat-val { font-size: 2em; font-weight: bold; color: #fff; }
-        .stat-label { font-size: 0.8em; color: #888; text-transform: uppercase; }
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #1f2833; padding: 10px; border-radius: 5px; text-align: center; border-left: 3px solid #45a29e; }
+        .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 0.7em; color: #888; text-transform: uppercase; }
 
-        .log-box { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; height: 100px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; border-radius: 5px; }
+        .log-box { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 11px; height: 80px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; }
 
-        /* Carte de Division */
-        .division-card { background: #1a1a1d; border: 1px solid #333; margin-bottom: 20px; border-radius: 8px; overflow: hidden; position: relative; }
-        .div-header { background: #2c3e50; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #45a29e; }
-        .div-title { font-size: 1.2em; font-weight: bold; color: #fff; }
-        .div-stats { display: flex; gap: 20px; font-size: 0.9em; }
-        .stat-badge { background: #000; padding: 5px 10px; border-radius: 4px; border: 1px solid #555; }
+        .division-card { background: #151515; border: 1px solid #333; margin-bottom: 15px; border-radius: 5px; overflow: hidden; }
+        .div-header { background: #222; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .div-info { display: flex; gap: 15px; align-items: center; }
+        .badge-info { font-size: 0.8em; color: #aaa; background: #333; padding: 2px 6px; border-radius: 3px; }
+
+        .units-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; }
+        .unit-item { background: #000; padding: 5px 8px; border-radius: 3px; display: flex; align-items: center; border: 1px solid #222; font-size: 0.9em; }
+        .role-tag { font-size: 0.7em; padding: 1px 4px; border-radius: 2px; margin-right: 5px; font-weight: bold; color: #000; text-transform: uppercase; }
         
-        /* Indicateur de Status */
-        .status-indicator { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .status-ready { background-color: #00e676; box-shadow: 0 0 8px #00e676; }
-        .status-busy { background-color: #ff3d00; box-shadow: 0 0 8px #ff3d00; }
+        /* Couleurs des rôles */
+        .r-combat { background: #e74c3c; }
+        .r-officer { background: #f1c40f; }
+        .r-support { background: #3498db; }
+        .r-godmother { background: #9b59b6; }
+        .r-other { background: #95a5a6; }
 
-        /* Grille des unités */
-        .units-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; padding: 15px; }
-        .unit-item { background: #151515; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
-        .unit-item:hover { border-color: #45a29e; }
+        .lnk { color: #45a29e; text-decoration: none; margin-left: 8px; border: 1px solid #45a29e; padding: 0 4px; border-radius: 3px; font-size: 0.8em; }
+        .lnk:hover { background: #45a29e; color: #000; }
         
-        .role-badge { font-size: 10px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; font-weight: bold; width: 60px; text-align: center; }
-        .role-combat { background: #e74c3c; color: white; }
-        .role-officer { background: #f1c40f; color: black; }
-        .role-support { background: #3498db; color: white; }
-        .role-tactic { background: #9b59b6; color: white; }
-        .role-godmother { background: #e67e22; color: white; }
-
-        .atomic-link { color: #45a29e; text-decoration: none; font-size: 0.85em; border: 1px solid #45a29e; padding: 2px 8px; border-radius: 4px; }
-        .atomic-link:hover { background: #45a29e; color: #000; }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dot-green { background: #00e676; box-shadow: 0 0 5px #00e676; }
+        .dot-red { background: #ff3d00; box-shadow: 0 0 5px #ff3d00; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <h1>DoV Command Center</h1>
+    <h1>DoV Dashboard V3 (Stable)</h1>
     
     <div class="control-panel">
-        <input type="text" id="userInput" placeholder="Nom du compte (ex: u2d2k.c.wam)" value="u2d2k.c.wam">
+        <input type="text" id="userInput" placeholder="u2d2k.c.wam" value="u2d2k.c.wam">
+        <button id="btn" onclick="run()">LANCER ANALYSE</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-val" id="sDivs">0</div>
+            <div class="stat-label">Divisions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="sPower">0</div>
+            <div class="stat-label">Puissance</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="sUnits">0</div>
+            <div class="stat-label">Unités</div>
+        </div>
+    </div>
+
+    <div class="log-box" id="logs">> Prêt. Cliquez sur lancer.</div>
+
+    <div id="list"></div>
+</div>
+
+<script>
+    // Liste priorisée des serveurs (Greymass en premier car très stable)
+    const RPCS = [
+        "https://wax.greymass.com",
+        "https://wax.eosn.io",
+        "https://api.wax.alohaeos.com",
+        "https://wax.pink.gg",
+        "https://api.waxsweden.org",
+        "https://wax.dapplica.io"
+    ];
+
+    function log(msg, color = "#0f0") {
+        const c = document.getElementById('logs');
+        c.innerHTML = `<div style="color:${color}">> ${msg}</div>` + c.innerHTML;
+    }
+
+    async function run() {
+        const user = document.getElementById('userInput').value.trim().toLowerCase();
+        const btn = document.getElementById('btn');
+        const listDiv = document.getElementById('list');
+
+        if(!user) return alert("Compte requis");
+
+        // RESET
+        btn.disabled = true;
+        listDiv.innerHTML = "";
+        document.getElementById('sDivs').innerText = "0";
+        document.getElementById('sPower').innerText = "0";
+        document.getElementById('sUnits').innerText = "0";
+        document.getElementById('logs').innerHTML = ""; // Clear logs
+
+        log(`Démarrage pour : ${user}`);
+
+        // 1. TROUVER LE BON SERVEUR (Le cœur de la stabilité)
+        let activeRPC = "";
+        for (let rpc of RPCS) {
+            try {
+                log(`Test connexion vers ${rpc}...`, "#888");
+                // On tente juste de lire une ligne de la table pour voir si ça passe
+                await fetch(rpc + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: JSON.stringify({ json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1 })
+                });
+                activeRPC = rpc;
+                log(`CONNEXION OK : ${rpc}`, "#fff");
+                break; // On sort dès qu'on en trouve un bon
+            } catch (e) {
+                // Échec silencieux, on passe au suivant
+            }
+        }
+
+        if (!activeRPC) {
+            log("ERREUR : Aucun serveur ne répond. Vérifie ta connexion.", "red");
+            btn.disabled = false;
+            return;
+        }
+
+        // 2. SCAN DES DONNÉES
+        let divisions = [];
+        let nextKey = user;
+        let searching = true;
+        let globalPower = 0;
+        let globalUnits = 0;
+
+        try {
+            while(searching) {
+                const res = await fetch(activeRPC + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        json: true,
+                        code: "dovpvecontrl",
+                        scope: "dovpvecontrl",
+                        table: "sdivisions",
+                        index_position: 2,    // Par Owner
+                        key_type: "name",
+                        lower_bound: nextKey, // Start here
+                        limit: 200
+                    })
+                });
+                
+                const data = await res.json();
+                if (!data.rows || data.rows.length === 0) {
+                    searching = false; break;
+                }
+
+                // Filtrage Manuel (L'étau souple)
+                let batchCount = 0;
+                for (let row of data.rows) {
+                    const owner = row.owner || row.user; // Sécurité double nom
+
+                    if (owner === user) {
+                        divisions.push(row);
+                        batchCount++;
+                        
+                        // Calculs stats
+                        if(row.power) globalPower += parseInt(row.power);
+                        if(row.units) globalUnits += row.units.length;
+
+                    } else if (owner.localeCompare(user) > 0) {
+                        // On a dépassé le nom dans l'alphabet
+                        searching = false;
+                        log(`Fin de zone trouvée à ${owner}`, "#ccc");
+                        break;
+                    }
+                }
+
+                log(`Batch reçu : ${data.rows.length} lignes. ${batchCount} gardées.`);
+
+                if (searching && data.more && data.next_key) {
+                    nextKey = data.next_key;
+                } else {
+                    searching = false;
+                }
+            }
+
+            // 3. AFFICHAGE
+            if(divisions.length === 0) {
+                log("Aucune division trouvée pour ce compte.", "orange");
+            } else {
+                log(`SCAN TERMINÉ. ${divisions.length} divisions affichées.`, "#fff");
+                document.getElementById('sDivs').innerText = divisions.length;
+                document.getElementById('sPower').innerText = globalPower;
+                document.getElementById('sUnits').innerText = globalUnits;
+                render(divisions);
+            }
+
+        } catch (e) {
+            log(`CRASH : ${e.message}`, "red");
+        }
+        
+        btn.disabled = false;
+    }
+
+    function render(rows) {
+        const list = document.getElementById('list');
+        const now = Date.now() / 1000;
+        let html = "";
+
+        rows.forEach(div => {
+            // Calcul statut temps
+            let isReady = true;
+            let statusTxt = "PRÊTE";
+            if (div.end_time) {
+                // WAX renvoie parfois "2023-10..." parfois un nombre. On gère les deux.
+                let end = new Date(div.end_time).getTime() / 1000;
+                if(isNaN(end)) end = 0; // Sécurité si date invalide
+                if (end > now) {
+                    isReady = false;
+                    statusTxt = "EN MISSION";
+                }
+            }
+
+            const dotClass = isReady ? "dot-green" : "dot-red";
+            
+            // Unités
+            let unitsHtml = "";
+            const units = div.units || [];
+            units.forEach(u => {
+                let id = u.value;
+                let role = u.key.replace(/%\d+/g, '').replace('combat', 'CMBT');
+                
+                // Couleur badge
+                let rClass = "r-other";
+                if(role.includes("CMBT")) rClass = "r-combat";
+                if(role.includes("officer")) { role = "OFF"; rClass = "r-officer"; }
+                if(role.includes("support")) { role = "SUP"; rClass = "r-support"; }
+                if(role.includes("godmother")) { role = "GOD"; rClass = "r-godmother"; }
+
+                unitsHtml += `
+                    <div class="unit-item">
+                        <span class="role-tag ${rClass}">${role}</span>
+                        ${id}
+                        <a href="https://wax.atomichub.io/explorer/asset/${id}" target="_blank" class="lnk">voir</a>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="division-card">
+                    <div class="div-header">
+                        <div style="font-weight:bold; color:#fff">
+                            <span class="status-dot ${dotClass}"></span> Div #${div.division_id}
+                        </div>
+                        <div class="div-info">
+                            <span class="badge-info">⚡ ${div.power || 0}</span>
+                            <span class="badge-info">🌍 Zone ${div.zoneID || '?'}</span>
+                            <span class="badge-info" style="color:${isReady?'#00e676':'#ff3d00'}">${statusTxt}</span>
+                        </div>
+                    </div>
+                    <div class="units-grid">${unitsHtml}</div>
+                </div>
+            `;
+        });
+
+        list.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
