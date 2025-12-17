@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V63 (STABLE GLOBAL)</title>
+    <title>DoV - COMMAND V64 (DETAILED SCAN)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -24,17 +24,32 @@
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; } .inp-money { color: var(--money); font-weight: bold; }
         
+        /* LAYOUT SPECIFIQUE V64 */
+        .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
+        .g-main-count { background: #fff; color: #000; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 4px; }
+        
+        .g-status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .g-stat-box { background: #1a1a1a; border: 1px solid #333; padding: 10px; text-align: center; }
+        .g-stat-box .val { font-size: 20px; font-weight: bold; }
+        .g-stat-box .lbl { font-size: 10px; color: #888; text-transform: uppercase; }
+        .c-act { color: var(--warn); } .c-rdy { color: var(--main); }
+
+        .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .g-card-head { font-size: 11px; font-weight: bold; text-align: center; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .g-big-val { font-size: 14px; font-weight: bold; text-align: center; margin: 5px 0; }
+        .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 5px; }
+        
+        /* RESTE DU CSS STANDARD */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
         .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
         .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
-        
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
-
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
         .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
@@ -45,11 +60,9 @@
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; } .z-act-ready { background: var(--main); height: 100%; }
-
         .view-section { display: none; } .view-active { display: block; }
         .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
-        
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
@@ -64,21 +77,19 @@
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
-        
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; } .b-sub { font-size: 10px; color: #666; } .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
         .b-badge-ok { background: var(--main); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; }
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
-        
         .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V63 STABLE GLOBAL</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V64 DETAILED SCAN</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -109,7 +120,7 @@
 
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (ALL)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (DÉTAILLÉ)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -195,23 +206,64 @@
         <div id="buildingView" class="view-section">
             <div id="buildDash"></div>
             <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
-                <div style="background:#fff; color:#000; padding:10px; text-align:center; font-weight:bold; margin-bottom:10px; border-radius:3px;">
-                    SCAN GLOBAL EN COURS : <span id="globalCount">0</span> Bâtiments trouvés
+                <div class="g-dashboard">
+                    <div class="g-main-count">
+                        SCAN GLOBAL EN COURS : <span id="globalCount">0</span> BÂTIMENTS
+                    </div>
+                    <div class="g-status-row">
+                        <div class="g-stat-box" style="border-color:var(--warn)">
+                            <div class="val c-act" id="gTotalAct">0</div>
+                            <div class="lbl">ACTIFS (EN PROD)</div>
+                        </div>
+                        <div class="g-stat-box" style="border-color:var(--main)">
+                            <div class="val c-rdy" id="gTotalRdy">0</div>
+                            <div class="lbl">PRÊTS À RÉCOLTER</div>
+                        </div>
+                    </div>
+                    
+                    <div class="g-detail-grid">
+                        <div class="g-card" style="border-top:3px solid var(--fuel)">
+                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span id="cnt-F">0</span></div>
+                            <div class="g-big-val" style="color:var(--fuel)" id="pwr-F">0</div>
+                            <div class="g-split">
+                                <span class="c-act">Act: <b id="act-F">0</b></span>
+                                <span class="c-rdy">Rdy: <b id="rdy-F">0</b></span>
+                            </div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--health)">
+                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span id="cnt-H">0</span></div>
+                            <div class="g-big-val" style="color:var(--health)" id="pwr-H">0</div>
+                            <div class="g-split">
+                                <span class="c-act">Act: <b id="act-H">0</b></span>
+                                <span class="c-rdy">Rdy: <b id="rdy-H">0</b></span>
+                            </div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--repair)">
+                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span id="cnt-R">0</span></div>
+                            <div class="g-big-val" style="color:var(--repair)" id="pwr-R">0</div>
+                            <div class="g-split">
+                                <span class="c-act">Act: <b id="act-R">0</b></span>
+                                <span class="c-rdy">Rdy: <b id="rdy-R">0</b></span>
+                            </div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--supply)">
+                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span id="cnt-S">0</span></div>
+                            <div class="g-big-val" style="color:var(--supply)" id="pwr-S">0</div>
+                            <div class="g-split">
+                                <span class="c-act">Act: <b id="act-S">0</b></span>
+                                <span class="c-rdy">Rdy: <b id="rdy-S">0</b></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stats-row">
-                    <div class="stat"><span class="stat-val" style="color:var(--fuel)" id="gFuel">0</span><span class="stat-lbl">PROD. FUEL</span></div>
-                    <div class="stat"><span class="stat-val" style="color:var(--health)" id="gHealth">0</span><span class="stat-lbl">PROD. HEALTH</span></div>
-                    <div class="stat"><span class="stat-val" style="color:var(--repair)" id="gRepair">0</span><span class="stat-lbl">PROD. REPAIR</span></div>
-                    <div class="stat"><span class="stat-val" style="color:var(--supply)" id="gSupply">0</span><span class="stat-lbl">PROD. SUPPLY</span></div>
-                </div>
-                <div class="logs" id="globalLogs" style="height:150px; border:1px solid #444;"></div>
+                <div class="logs" id="globalLogs" style="height:100px; border:1px solid #444; margin-top:10px;"></div>
             </div>
             <div id="buildList" class="build-grid"></div>
         </div>
     </main>
 </div>
 
-<div class="logs" id="console">> V63 STABLE. Système Prêt.</div>
+<div class="logs" id="console">> V64 DETAILED. Prêt.</div>
 
 <script>
     // --- 1. CONFIGURATION ---
@@ -293,7 +345,7 @@
         log("Taux mis à jour.", "#ffd700");
     }
 
-    // --- ROBUST FETCH (STABLE) ---
+    // --- ROBUST FETCH ---
     const PROXY_URL = "https://corsproxy.io/?";
     async function robustFetch(code, table, lowerBound, limit=200, indexPosition=1, keyType="") {
         let attempts = 0;
@@ -317,56 +369,92 @@
         throw new Error("Réseau saturé ou arrêt demandé.");
     }
 
-    // --- FONCTION CIBLE : GLOBAL SCAN BUILDINGS ---
+    // --- GLOBAL SCAN DETAIL (V64 LOGIC) ---
     async function startGlobalBuildings() {
         stopSignal = false;
         switchView('buildingView');
         
-        // Setup UI pour Global
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('buildDash').innerHTML = ""; 
         document.getElementById('globalLogs').innerHTML = "";
         document.getElementById('btnStop').style.display = 'inline-block';
 
-        log("🌍 SCAN GLOBAL (ALL) DÉMARRÉ...", "#fff");
+        log("🌍 SCAN GLOBAL DÉTAILLÉ DÉMARRÉ...", "#fff");
         
         let nextKey = ""; 
         let hasMore = true;
-        let totalCount = 0;
-        let globalProd = { F: 0, H: 0, R: 0, S: 0 };
         const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0});
+        
+        // Nouvelle structure de stats
+        let stats = {
+            total: 0,
+            active: 0,
+            ready: 0,
+            F: { count: 0, power: 0, act: 0, rdy: 0 },
+            H: { count: 0, power: 0, act: 0, rdy: 0 },
+            R: { count: 0, power: 0, act: 0, rdy: 0 },
+            S: { count: 0, power: 0, act: 0, rdy: 0 }
+        };
 
         try {
             while(hasMore && !stopSignal) {
-                // Pause pour laisser l'interface respirer (Anti-Freeze)
+                // Pause anti-freeze
                 await new Promise(r => setTimeout(r, 10));
 
                 const data = await robustFetch("dovutilstake", "buildings", nextKey, 200);
                 if(!data.rows || data.rows.length === 0) break;
+                
+                const now = Date.now()/1000;
 
                 for(let b of data.rows) {
-                    totalCount++;
+                    stats.total++;
+                    
+                    // 1. Détection Type et Puissance
                     let p = extractPower(b);
                     let pRaw = Array.isArray(b.power) ? b.power[0] : b.power;
-                    
+                    let type = null;
+
                     if(typeof pRaw === 'string') {
-                        if(pRaw.includes("DOVF")) globalProd.F += p;
-                        else if(pRaw.includes("DOVH")) globalProd.H += p;
-                        else if(pRaw.includes("DOVR")) globalProd.R += p;
-                        else if(pRaw.includes("DOVS")) globalProd.S += p;
+                        if(pRaw.includes("DOVF")) type = 'F';
+                        else if(pRaw.includes("DOVH")) type = 'H';
+                        else if(pRaw.includes("DOVR")) type = 'R';
+                        else if(pRaw.includes("DOVS")) type = 'S';
+                    }
+
+                    if(type) {
+                        stats[type].power += p;
+                        stats[type].count++;
+                        
+                        // 2. Détection Statut (Active vs Ready)
+                        let readyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
+                        let isReady = now > readyTime;
+
+                        if(isReady) {
+                            stats.ready++;
+                            stats[type].rdy++;
+                        } else {
+                            stats.active++;
+                            stats[type].act++;
+                        }
                     }
                 }
 
-                // Update UI en temps réel
-                setTextSafe('globalCount', fmt(totalCount));
-                setTextSafe('gFuel', fmt(globalProd.F));
-                setTextSafe('gHealth', fmt(globalProd.H));
-                setTextSafe('gRepair', fmt(globalProd.R));
-                setTextSafe('gSupply', fmt(globalProd.S));
+                // Update UI par paquets
+                setTextSafe('globalCount', fmt(stats.total));
+                setTextSafe('gTotalAct', fmt(stats.active));
+                setTextSafe('gTotalRdy', fmt(stats.ready));
 
-                if(totalCount % 1000 === 0) {
-                    document.getElementById('globalLogs').innerHTML = `> ${fmt(totalCount)} scannés...<br>` + document.getElementById('globalLogs').innerHTML;
+                // Update Details
+                ['F','H','R','S'].forEach(t => {
+                    setTextSafe(`cnt-${t}`, "(" + fmt(stats[t].count) + ")");
+                    setTextSafe(`pwr-${t}`, fmt(stats[t].power) + " TU");
+                    setTextSafe(`act-${t}`, fmt(stats[t].act));
+                    setTextSafe(`rdy-${t}`, fmt(stats[t].rdy));
+                });
+
+                if(stats.total % 1000 === 0) {
+                    document.getElementById('globalLogs').innerHTML = `> ${fmt(stats.total)} scannés...<br>` + document.getElementById('globalLogs').innerHTML;
                 }
 
                 if(data.more && data.next_key && data.next_key !== nextKey) {
@@ -375,7 +463,7 @@
                     hasMore = false;
                 }
             }
-            log(`✅ SCAN GLOBAL FINI : ${fmt(totalCount)} BÂTIMENTS.`, "#00e676");
+            log(`✅ SCAN FINI : ${fmt(stats.total)} Bâtiments.`, "#00e676");
             document.getElementById('btnStop').style.display='none';
 
         } catch(e) {
@@ -384,8 +472,7 @@
         }
     }
 
-    // --- FONCTIONS CLASSIQUES (Joueur / Zones / Eco) ---
-
+    // --- FONCTIONS CLASSIQUES ---
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
@@ -402,7 +489,6 @@
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovutilstake", "buildings", nextKey, 200);
                 if(!data.rows || data.rows.length === 0) break;
-                
                 const myBatch = data.rows.filter(r => r.owner === user);
                 const now = Date.now()/1000;
 
@@ -412,22 +498,17 @@
                     let isReady = now > readyTime;
                     if(isReady) counts.ready++; else counts.busy++;
                     counts.total++;
-
                     let pRaw = Array.isArray(b.power)?b.power[0]:b.power;
                     let typeColor = "#fff";
                     if(pRaw.includes("DOVF")) { counts.types.F++; typeColor = "var(--fuel)"; }
                     else if(pRaw.includes("DOVH")) { counts.types.H++; typeColor = "var(--health)"; }
                     else if(pRaw.includes("DOVR")) { counts.types.R++; typeColor = "var(--repair)"; }
                     else if(pRaw.includes("DOVS")) { counts.types.S++; typeColor = "var(--supply)"; }
-
                     let card = `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${isReady?'<span class="b-badge-claim">STACKÉ</span>':'<span class="b-badge-ok">ACTIVITÉ</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`;
                     document.getElementById('buildList').insertAdjacentHTML('beforeend', card);
                 });
-                
-                // Update dash stats
                 let html = `<div class="stats-row" style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;"><div class="stat"><span class="stat-val">${counts.total}</span><span class="stat-lbl">TOTAL</span></div><div class="stat"><span class="stat-val" style="color:var(--main)">${counts.ready}</span><span class="stat-lbl">READY</span></div><div class="stat"><span class="stat-val" style="color:var(--warn)">${counts.busy}</span><span class="stat-lbl">ACTIVE</span></div><div class="stat" style="font-size:10px; display:flex; flex-direction:column; justify-content:center; gap:3px;"><span style="color:var(--fuel)">F: ${counts.types.F}</span><span style="color:var(--health)">H: ${counts.types.H}</span><span style="color:var(--repair)">R: ${counts.types.R}</span><span style="color:var(--supply)">S: ${counts.types.S}</span></div></div>`;
                 document.getElementById('buildDash').innerHTML = html;
-
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
             log(`✅ Terminé.`, "#00e676");
@@ -479,7 +560,6 @@
         log("Audit Eco...", "#fff");
         try {
             let nextKey = ""; let hasMore = true;
-            // Scan 1: Divisions
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200);
                 if(!data.rows) break;
@@ -494,7 +574,6 @@
                 if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay();
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
-            // Scan 2: Buildings
             nextKey=""; hasMore=true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovutilstake", "buildings", nextKey, 200);
@@ -547,7 +626,6 @@
         if(grid) grid.innerHTML = htmlBuffer;
     }
 
-    // INIT
     window.onload = function() { initGrid(); }
 </script>
 
