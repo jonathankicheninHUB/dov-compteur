@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V58 (EXTENDED)</title>
+    <title>DoV - COMMAND V59 (FULL PATCH)</title>
     <style>
         /* CSS V43 PERFECT ALIGN - INCHANGÉ */
         :root { 
@@ -95,7 +95,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V58 EXTENDED</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V59 FULL PATCH</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -109,7 +109,12 @@
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
             <label class="inp-label">Parité TU [F/H/R/S] (en WAX)</label>
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
-            <div style="font-size:9px; color:#666; margin-top:5px; text-align:center">Modification instantanée</div>
+            
+            <div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
+                <label class="inp-label">CORS Proxy (Optionnel)</label>
+                <input type="text" id="inpProxy" value="https://corsproxy.io/?" placeholder="https://your-proxy.com/?">
+                <div style="font-size:9px; color:#666;">Laisser vide pour Direct.</div>
+            </div>
         </div>
 
         <div class="box">
@@ -223,7 +228,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V58 EXTENDED. Liste de 15 RPCs active.</div>
+<div class="logs" id="console">> V59 FULL PATCH. 15 RPCs + Pagination Bâtiments + Flux Réel.</div>
 
 <script>
     // --- 1. CONFIGURATION ---
@@ -268,27 +273,16 @@
         17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
         18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
         19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 }
+        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
     };
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     
-    // 🔥 LISTE COMPLÈTE RPC
+    // 🔥 LISTE 15 RPC
     const RPCS = [
-        "https://wax.greymass.com",
-        "https://api.waxsweden.org",
-        "https://wax.eosn.io",
-        "https://api.wax.alohaeos.com",
-        "https://api-wax.eosarabia.net",
-        "https://wax.bountyblok.io",
-        "https://wax.eu.eosamsterdam.net",
-        "https://api.wax.liquidstudios.io",
-        "https://wax.eosphere.io",
-        "https://wax.cryptolions.io",
-        "https://api-wax.bountyblok.io",
-        "https://wax.eosusa.news",
-        "https://wax-bp.wizardsguild.one",
-        "https://api.hivebp.io",
-        "https://wax.blacklusion.io"
+        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
+        "https://api-wax.eosarabia.net", "https://wax.bountyblok.io", "https://wax.eu.eosamsterdam.net", "https://api.wax.liquidstudios.io",
+        "https://wax.eosphere.io", "https://wax.cryptolions.io", "https://api-wax.bountyblok.io", "https://wax.eosusa.news",
+        "https://wax-bp.wizardsguild.one", "https://api.hivebp.io", "https://wax.blacklusion.io"
     ];
 
     let stopSignal = false;
@@ -325,20 +319,20 @@
     const PROXY_URL = "https://corsproxy.io/?";
     async function robustFetch(code, table, lowerBound, limit=300, indexPosition=1, keyType="") {
         let attempts = 0;
-        while(attempts < 15 && !stopSignal) { // Plus d'essais car plus de RPCs
+        const customProxy = document.getElementById('inpProxy').value.trim();
+        while(attempts < 15 && !stopSignal) {
             const server = RPCS[rpcIndex % RPCS.length];
             let url = server + "/v1/chain/get_table_rows";
-            let useProxy = (attempts > 2); // On tente 2 fois en direct, puis proxy
-            if(useProxy) url = PROXY_URL + encodeURIComponent(url);
+            let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
+            if(useProxy && customProxy.length > 5) url = customProxy + encodeURIComponent(url);
+            else if(useProxy) url = PROXY_URL + encodeURIComponent(url);
             try {
-                if(document.getElementById('rpcStatus')) {
-                    document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
-                }
+                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; }
                 const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
-                if(!res.ok) throw new Error("HTTP");
+                if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
             } catch(e) { rpcIndex++; attempts++; await new Promise(r => setTimeout(r, 200)); }
         }
@@ -370,15 +364,11 @@
                             stats.zones[zID].active++;
                             if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; }
                             stats.totalCostX += zInfo.costX; 
-                            
                             const power = extractPower(row);
-                            if(zInfo.reward > 0) {
-                                stats.totalGain += computeDovxReward(zInfo.reward, power);
-                            }
+                            if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power);
                         } else stats.zones[zID].idle++;
                     }
                 }
-                
                 if (stats.divs % 100 === 0 || !data.more) updateZoneDash(stats);
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
@@ -396,7 +386,6 @@
         setTextSafe('lHealth', "-" + fmt(stats.burn.health));
         setTextSafe('lRepair', "-" + fmt(stats.burn.repair));
         setTextSafe('lSupply', "-" + fmt(stats.burn.supply));
-        
         ZONE_ORDER.forEach(id => {
             const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`);
             if(card && data) {
@@ -422,20 +411,14 @@
         grid.innerHTML = htmlBuffer;
     }
 
-    // --- 2. SCAN ECONOMY (CFO - ACTIVE ONLY + LOGS) ---
+    // --- 2. SCAN ECONOMY (CFO - ACTIVE ONLY) ---
     async function startEconomyScan() {
         stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
         
-        ECO_DATA = { 
-            demand: { fuel:0, health:0, repair:0, supply:0 },
-            supply: { fuel:0, health:0, repair:0, supply:0 },
-            dovx: { cities:0, buildings:0, rewards:0 },
-            scanned: 0 
-        };
-        
-        log("Audit Financier V58 (Active Flow + Logs) en cours...", "#fff");
+        ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
+        log("Audit Financier V59 (Flux Réel) en cours...", "#fff");
         try {
-            // DEMANDE (DIVISIONS)
+            // DIVISIONS
             let nextKey = ""; let hasMore = true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey);
@@ -446,31 +429,16 @@
                     const zInfo = ZONE_DB[zID];
                     const busy = isBusy(row);
                     if(zInfo && busy) { 
-                        if(zInfo.cost > 0) { 
-                            ECO_DATA.demand.fuel += zInfo.cost;
-                            ECO_DATA.demand.health += zInfo.cost;
-                            ECO_DATA.demand.repair += zInfo.cost;
-                            ECO_DATA.demand.supply += zInfo.cost;
-                        }
+                        if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; }
                         if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX;
-                        
-                        // 🔥 MINT AVEC PREUVE
                         const power = extractPower(row);
-                        if(zInfo.reward > 0) {
-                            const reward = computeDovxReward(zInfo.reward, power);
-                            ECO_DATA.dovx.rewards += reward;
-                            
-                            // LOG DE PREUVE (Limit pour ne pas spammer)
-                            if(reward > 0 && ECO_DATA.dovx.rewards < 5000) {
-                                log(`💰 Div Active (Pwr: ${power}) -> +${reward} DOVX`, "var(--gold)");
-                            }
-                        }
+                        if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power);
                     }
                 }
                 if (ECO_DATA.scanned % 100 === 0) updateEcoDisplay();
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
-            // OFFRE (BATIMENTS)
+            // BUILDINGS
             nextKey=""; hasMore=true;
             while(hasMore && !stopSignal) {
                 const data = await robustFetch("dovutilstake", "buildings", nextKey);
@@ -480,18 +448,13 @@
                     let p = extractPower(b); 
                     let i = parseFloat(Array.isArray(b.token_in)?b.token_in[0]:b.token_in)||0;
                     let pType = Array.isArray(b.power)?b.power[0]:b.power;
-                    
                     ECO_DATA.dovx.buildings += i;
-                    if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p;
-                    if(pType.includes("DOVH")) ECO_DATA.supply.health += p;
-                    if(pType.includes("DOVR")) ECO_DATA.supply.repair += p;
-                    if(pType.includes("DOVS")) ECO_DATA.supply.supply += p;
+                    if(pType.includes("DOVF")) ECO_DATA.supply.fuel += p; if(pType.includes("DOVH")) ECO_DATA.supply.health += p; if(pType.includes("DOVR")) ECO_DATA.supply.repair += p; if(pType.includes("DOVS")) ECO_DATA.supply.supply += p;
                 }
                 if (ECO_DATA.scanned % 100 === 0) updateEcoDisplay();
                 if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
             }
-            updateEcoDisplay(); 
-            log("Audit terminé.", "#00e676"); document.getElementById('btnStop').style.display='none';
+            updateEcoDisplay(); log("Audit terminé.", "#00e676"); document.getElementById('btnStop').style.display='none';
         } catch(e) { log(e.message, "red"); }
     }
 
@@ -504,16 +467,12 @@
         let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply;
         let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
 
-        setTextSafe('valDemandTU', fmt(totalD) + " TU");
-        setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
-        setTextSafe('valSupplyTU', fmt(totalS) + " TU");
-        setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
-        setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX");
-        setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
+        setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h");
+        setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h");
 
         let totalVol = totalD + totalS || 1; 
-        let pctD = (totalD / totalVol) * 100;
-        let pctS = (totalS / totalVol) * 100;
+        let pctD = (totalD / totalVol) * 100; let pctS = (totalS / totalVol) * 100;
         let barD = document.getElementById('barDemand'); if(barD) barD.style.width = pctD + "%";
         let barS = document.getElementById('barSupply'); if(barS) barS.style.width = pctS + "%";
         let diff = totalS - totalD;
@@ -524,44 +483,28 @@
         const tokens = [ { key: 'fuel', label: 'FUEL', color: 'var(--fuel)' }, { key: 'health', label: 'HEALTH', color: 'var(--health)' }, { key: 'repair', label: 'REPAIR', color: 'var(--repair)' }, { key: 'supply', label: 'SUPPLY', color: 'var(--supply)' } ];
         let html = "";
         tokens.forEach(t => {
-            let s = ECO_DATA.supply[t.key];
-            let d = ECO_DATA.demand[t.key];
-            let bal = s - d;
-            let valProd = s * RATES.TU_WAX * RATES.WAX_USD;
-            let valDem = d * RATES.TU_WAX * RATES.WAX_USD;
-            let balClass = bal >= 0 ? "bal-pos" : "bal-neg";
-            let balTxt = bal >= 0 ? "SURPLUS" : "DÉFICIT";
+            let s = ECO_DATA.supply[t.key]; let d = ECO_DATA.demand[t.key]; let bal = s - d;
+            let valProd = s * RATES.TU_WAX * RATES.WAX_USD; let valDem = d * RATES.TU_WAX * RATES.WAX_USD;
+            let balClass = bal >= 0 ? "bal-pos" : "bal-neg"; let balTxt = bal >= 0 ? "SURPLUS" : "DÉFICIT";
             html += `<div class="matrix-col" style="border-top:3px solid ${t.color}"><div class="mx-head" style="background:${t.color}">${t.label}</div><div class="mx-body"><div><div class="mx-row"><span class="mx-lbl">Production</span> <span class="mx-val">${fmt(s)}</span></div><div style="text-align:right; margin-bottom:5px" class="mx-usd">Val. Prod: ${fmtUSD(valProd)}</div><div class="mx-row"><span class="mx-lbl">Besoin</span> <span class="mx-val">${fmt(d)}</span></div><div style="text-align:right" class="mx-usd">Val. Besoin: ${fmtUSD(valDem)}</div></div><div class="mx-bal ${balClass}">${balTxt} ${fmt(bal)}</div></div></div>`;
         });
         document.getElementById('tokenMatrix').innerHTML = html;
 
-        let mint = ECO_DATA.dovx.rewards;
-        let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
-        let net = mint - burn;
-        let colorNet = net >= 0 ? "var(--main)" : "var(--alert)";
-
-        setTextSafe('valDovxMint', "+ " + fmt(mint));
-        setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD));
-        setTextSafe('valDovxBurnTotal', "- " + fmt(burn));
-        setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD));
-        setTextSafe('valDovxNet', fmt(net));
-        if(document.getElementById('valDovxNet')) document.getElementById('valDovxNet').style.color = colorNet;
+        let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
+        let net = mint - burn; let colorNet = net >= 0 ? "var(--main)" : "var(--alert)";
+        setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD));
+        setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD));
+        setTextSafe('valDovxNet', fmt(net)); if(document.getElementById('valDovxNet')) document.getElementById('valDovxNet').style.color = colorNet;
         setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD));
-
-        setTextSafe('valCityDovx', fmt(ECO_DATA.dovx.cities));
-        setTextSafe('valBuildDovx', fmt(ECO_DATA.dovx.buildings));
-        
-        let totalDovx = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings;
-        setTextSafe('totalDovxBurn', fmt(totalDovx) + " DOVX (" + fmtUSD(totalDovx * RATES.DOVX_WAX * RATES.WAX_USD) + ")");
+        setTextSafe('valCityDovx', fmt(ECO_DATA.dovx.cities)); setTextSafe('valBuildDovx', fmt(ECO_DATA.dovx.buildings));
     }
 
-    // --- 3. TARGET TOOLS (SNIPER) ---
     async function startTarget() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('targetView');
         const view = document.getElementById('targetView'); view.innerHTML="Recherche...";
         try {
-            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64");
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500); 
             const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : [];
             let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées dans le lot)</div>`;
             rows.forEach(r => {
@@ -574,25 +517,38 @@
         } catch(e){ log(e.message, "red"); }
     }
 
+    // 🔥 SCAN BÂTIMENTS FIXÉ (Pagination complète)
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
-        const view = document.getElementById('buildingView'); view.innerHTML="Recherche...";
+        const view = document.getElementById('buildingView'); view.innerHTML="<div style='padding:10px; color:#9b59b6'>Recherche exhaustive...</div>";
+        
+        let allBuildings = [];
+        let nextKey = ""; let hasMore = true;
+        
         try {
-            const data = await robustFetch("dovutilstake", "buildings", user, 500, 2, "i64");
-            const rows = data.rows ? data.rows.filter(r => r.owner===user) : [];
-            let htmlBuffer = `<div style="background:#111; padding:10px; color:#9b59b6">BÂTIMENTS : ${rows.length}</div>`;
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "buildings", nextKey);
+                if(!data.rows || data.rows.length === 0) break;
+                const myBatch = data.rows.filter(r => r.owner === user);
+                allBuildings = allBuildings.concat(myBatch);
+                view.innerHTML = `<div style='padding:10px; color:#fff'>Scan... ${allBuildings.length} trouvés...</div>`;
+                if(data.more && data.next_key && data.next_key !== nextKey) nextKey = data.next_key; else hasMore = false;
+            }
+
+            let htmlBuffer = `<div style="background:#111; padding:10px; color:#9b59b6; margin-bottom:10px; border-bottom:1px solid #444">RÉSULTAT : ${allBuildings.length} BÂTIMENTS</div>`;
             const now = Date.now()/1000;
-            rows.forEach(b => {
-                let p = Array.isArray(b.power)?b.power[0]:b.power;
+            allBuildings.forEach(b => {
+                let p = extractPower(b);
                 let ready = (now > (parseFloat(b.last_claim)+parseFloat(b.delay)));
                 let typeColor = "#fff";
-                if(p.includes("DOVF")) typeColor = "var(--fuel)"; else if(p.includes("DOVH")) typeColor = "var(--health)";
-                else if(p.includes("DOVR")) typeColor = "var(--repair)"; else if(p.includes("DOVS")) typeColor = "var(--supply)";
-                htmlBuffer += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${ready?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${p}</div></div></div>`;
+                let pRaw = Array.isArray(b.power)?b.power[0]:b.power;
+                if(pRaw.includes("DOVF")) typeColor = "var(--fuel)"; else if(pRaw.includes("DOVH")) typeColor = "var(--health)"; else if(pRaw.includes("DOVR")) typeColor = "var(--repair)"; else if(pRaw.includes("DOVS")) typeColor = "var(--supply)";
+                htmlBuffer += `<div class="b-card"><div><div class="b-title">#${b.asset_id}</div><div class="b-sub">${b.template_id}</div></div><div>${ready?'<span class="b-badge-claim">CLAIM!</span>':'<span class="b-badge-ok">EN COURS</span>'}</div><div class="b-stats"><div style="color:${typeColor}">${pRaw}</div></div></div>`;
             });
             view.innerHTML = htmlBuffer;
-        } catch(e){ log(e.message, "red"); }
+            log(`Scan Bâtiments terminé : ${allBuildings.length} trouvés.`, "#9b59b6");
+        } catch(e){ log(e.message, "red"); view.innerHTML += `<div style='color:red; padding:10px'>Erreur: ${e.message}</div>`; }
     }
 
     initGrid();
