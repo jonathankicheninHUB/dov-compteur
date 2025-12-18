@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V83 (NOMINAL DATA MATCH)</title>
+    <title>DoV - COMMAND V85 (TEMPLATE ID DEFINITIVE)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,7 +18,6 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
-        /* UI GLOBAL */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -27,7 +26,7 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD V83 */
+        /* DASHBOARD V85 */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
@@ -49,14 +48,14 @@
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
         .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* LISTE V83 */
+        /* LISTE V85 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
-        .ml-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
+        .ml-row { display: grid; grid-template-columns: 2.5fr 0.8fr 1.2fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
         .ml-name { color: #ccc; font-weight: bold; }
-        .ml-mult { color: var(--sec); font-size:10px; background:#082030; padding:1px 4px; border-radius:3px; margin-left:5px; }
+        .ml-mult { color: var(--sec); font-size:10px; background:#082030; padding:1px 4px; border-radius:3px; margin-left:5px; font-weight:normal; }
         .ml-count { color: var(--warn); text-align: center; }
         .ml-unit { color: #666; text-align: right; }
         .ml-total { color: #fff; font-weight: bold; text-align: right; }
@@ -111,7 +110,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V83 NOMINAL DATA MATCH</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V85 TEMPLATE ID DEFINITIVE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -138,7 +137,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (NOMINAL 24H)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V85)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -229,7 +228,7 @@
                     <div class="g-main-count">
                         <div class="g-mc-left">
                             <span class="live-dot"></span>
-                            <div>SCAN GLOBAL (NOMINAL x24)</div>
+                            <div>SCAN GLOBAL (BY TEMPLATE ID)</div>
                             <div style="font-size:12px; color:#555; margin-left:10px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
@@ -261,14 +260,14 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V83 NOMINAL. Ready to match.</div>
+<div class="logs" id="console">> V85. Initializing Template Map...</div>
 
 <script>
     // ========================================================
-    // --- 1. TABLEAU DE REFERENCE (LA BIBLE) ---
-    // Production Horaire -> { Nom, CoutParClaim(6h) }
+    // --- 1. TABLEAU DE REFERENCE (VOTRE EXCEL) ---
+    // Clé: Valeur de Base "Output" (Power du template unique)
     // ========================================================
-    const REF_CATALOG = {
+    const REF_TABLE = {
         5.40:   { name: "C_1 Common",  cost6h: 0.4590 },
         54.00:  { name: "SC_2 Common", cost6h: 4.5900 },
         12.15:  { name: "C_2 Common",  cost6h: 1.0328 },
@@ -291,13 +290,15 @@
     };
 
     // --- CONFIG ---
-    const DOVX_COST_RATIO = 0.085; // Fallback rule (8.5%)
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const ZONE_DB={1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     const DOVX_CLAIM_LEVELS=[{name:"WIN",minPower:1200,coeff:1.0},{name:"DRAW",minPower:500,coeff:0.5},{name:"LOST",minPower:0,coeff:0.25}];
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
+    
+    // CACHE DYNAMIQUE
+    let TEMPLATE_MAP = {}; // ID -> { baseVal, type }
 
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
@@ -308,45 +309,6 @@
     function extractPower(row){let val=Array.isArray(row.power)?row.power[0]:(row.power||row.pwr);if(typeof val==='string')val=val.replace(/[^0-9.]/g,'');return parseFloat(val)||0;}
     function computeDovxReward(base,pwr){for(let lvl of DOVX_CLAIM_LEVELS){if(pwr>=lvl.minPower)return base*lvl.coeff;}return 0;}
     function updateRates(){RATES.WAX_USD=parseFloat(document.getElementById('inpWax').value)||0;log("Taux mis à jour.","#ffd700");}
-
-    // --- REVERSE MATCH FUNCTION ---
-    function resolveBuilding(rawPower, typeChar) {
-        // 1. Cherche correspondance exacte
-        if (REF_CATALOG[rawPower]) {
-            let ref = REF_CATALOG[rawPower];
-            return {
-                name: ref.name.replace("_", "_" + typeChar),
-                prod24: rawPower * 24,
-                cost24: ref.cost6h * 4,
-                mult: 1
-            };
-        }
-
-        // 2. Cherche multiplicateur (Stack)
-        for (let baseP in REF_CATALOG) {
-            let base = parseFloat(baseP);
-            let ratio = rawPower / base;
-            // Si c'est un entier (ex: 4.0, 12.0)
-            if (ratio > 1 && Math.abs(ratio - Math.round(ratio)) < 0.01) {
-                let mult = Math.round(ratio);
-                let ref = REF_CATALOG[baseP];
-                return { 
-                    name: ref.name.replace("_", "_" + typeChar), 
-                    prod24: (base * 24) * mult, // (Prod Base * 24) * Stack
-                    cost24: (ref.cost6h * 4) * mult, // (Cost Base * 4) * Stack
-                    mult: mult 
-                };
-            }
-        }
-
-        // 3. Inconnu (Fallback)
-        return { 
-            name: `CUSTOM (${rawPower}/h)`, 
-            prod24: rawPower * 24, 
-            cost24: (rawPower * 24) * DOVX_COST_RATIO, 
-            mult: 0 
-        };
-    }
 
     const PROXY_URL="https://corsproxy.io/?";
     async function robustFetch(code,table,lowerBound,limit=200,idx=1,keyType=""){
@@ -369,10 +331,96 @@
         throw new Error("Stop/Err");
     }
 
-    // --- SCAN V83 ---
+    // --- PHASE 1: CHARGER BDATA (SMART CONTRACT) ---
+    async function loadTemplateData() {
+        log("🔄 CHARGEMENT BDATA (Smart Contract)...", "#sec");
+        let nextKey = ""; let hasMore = true; TEMPLATE_MAP = {};
+        try {
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "bdata", nextKey, 1000);
+                if(!data.rows) break;
+                data.rows.forEach(row => {
+                    let tid = row.template_id;
+                    let rawVal = row.output || ""; if(Array.isArray(rawVal)) rawVal = rawVal[0];
+                    let type = null;
+                    if(rawVal.includes("DOVF")) type = 'F'; else if(rawVal.includes("DOVH")) type = 'H'; else if(rawVal.includes("DOVR")) type = 'R'; else if(rawVal.includes("DOVS")) type = 'S';
+                    let val = parseFloat(rawVal.replace(/[^0-9.]/g, '')) || 0;
+                    if(tid) TEMPLATE_MAP[tid] = { base: val, type: type };
+                });
+                if(data.more) nextKey = data.next_key; else hasMore = false;
+            }
+            log(`✅ BDATA OK: ${Object.keys(TEMPLATE_MAP).length} Templates connus.`, "#00e676");
+            return true;
+        } catch(e) { log("Err BDATA: "+e.message, "red"); return false; }
+    }
+
+    // --- LOGIQUE METIER (ID -> BASE -> TABLEAU) ---
+    function resolveBuilding(b) {
+        let tid = b.template_id;
+        let template = TEMPLATE_MAP[tid];
+        let pType, pVal;
+
+        // 1. Lire Base Value depuis le Template ID
+        if(template) {
+            pVal = template.base;
+            pType = template.type;
+        } else {
+            // Fallback si template inconnu (très rare)
+            pVal = extractPower(b);
+            let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
+            if(typeof rawP === 'string') {
+                if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S';
+            }
+        }
+
+        if(!pType) return null;
+
+        // 2. Calculer le Stack (Puissance Réelle / Puissance Base)
+        let currentPower = extractPower(b);
+        let stack = 1;
+        if (pVal > 0) stack = Math.round(currentPower / pVal);
+        if (stack < 1) stack = 1;
+
+        // 3. Chercher dans le Tableau Officiel (REF_TABLE)
+        let ref = REF_TABLE[pVal]; // On cherche la VALEUR DE BASE
+        let name = "CUSTOM";
+        let cost6h = 0;
+
+        if (ref) {
+            name = ref.name.replace("_F", "_" + pType); // Remplace C_F1 par C_H1 si besoin
+            cost6h = ref.cost6h;
+        } else {
+            // Fuzzy search si float diffère légèrement
+            for(let k in REF_TABLE) {
+                if(Math.abs(parseFloat(k) - pVal) < 0.01) {
+                    ref = REF_TABLE[k];
+                    name = ref.name.replace("_F", "_" + pType);
+                    cost6h = ref.cost6h;
+                    break;
+                }
+            }
+        }
+
+        // 4. Calculs Finaux (24H)
+        let finalProd24 = (pVal * 24) * stack;
+        let finalCost24 = (cost6h * 4) * stack;
+
+        return { 
+            name: name, 
+            type: pType, 
+            prod24: finalProd24, 
+            cost24: finalCost24, 
+            stack: stack 
+        };
+    }
+
+    // --- SCAN V85 ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        log("🌍 SCAN GLOBAL V83 (NOMINAL DATA MATCH)...","#fff");
+        
+        await loadTemplateData(); // Load dictionary first
+
+        log("🌍 SCAN GLOBAL V85 (TEMPLATE ID)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
         
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
@@ -381,20 +429,12 @@
         try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
             for(let b of data.rows){
                 stats.total++;
-                let pVal=extractPower(b); 
-                let rawP=Array.isArray(b.power)?b.power[0]:b.power;
-                let pType=null;
-                if(typeof rawP==='string'){if(rawP.includes("DOVF"))pType='F';else if(rawP.includes("DOVH"))pType='H';else if(rawP.includes("DOVR"))pType='R';else if(rawP.includes("DOVS"))pType='S';}
+                let info = resolveBuilding(b);
                 
-                if(pType){
-                    // RESOLUTION VIA TABLEAU
-                    let specs = resolveBuilding(pVal, pType);
-                    let mKey = specs.name;
-                    // Composite Key: Nom + Mult (pour regrouper les x4 et x12 séparément si besoin, ou ensemble)
-                    // Ici on groupe par NOM DE BASE.
-                    // Si on veut séparer les stacks : let listKey = specs.mult > 1 ? `${mKey} (x${specs.mult})` : mKey;
-                    // Si on veut tout grouper : let listKey = mKey;
-                    let listKey = specs.mult > 1 ? `${mKey} <span class="ml-mult">x${specs.mult}</span>` : mKey;
+                if(info){
+                    let pType = info.type;
+                    let mKey = info.name;
+                    let listKey = info.stack > 1 ? `${mKey} <span class="ml-mult">x${info.stack}</span>` : mKey;
 
                     if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0 };
 
@@ -407,19 +447,18 @@
                     }else{
                         stats.active++; stats[pType].act++;
                         
-                        // ON UTILISE LES CHIFFRES CALCULES VIA LA TABLE
-                        stats[pType].activePower += specs.prod24; // Déjà x24 * Mult
-                        stats[pType].cost += specs.cost24;        // Déjà x4 * Mult
-                        stats.totalDovxCost24 += specs.cost24;
+                        stats[pType].activePower += info.prod24;
+                        stats[pType].cost += info.cost24;
+                        stats.totalDovxCost24 += info.cost24;
                         
-                        // STATS DETAIL
                         modelStats[pType][listKey].count++;
-                        modelStats[pType][listKey].dailyProd += specs.prod24;
+                        modelStats[pType][listKey].dailyProd += info.prod24;
                     }
                 }
             }
             setTextSafe('globalCount',fmt(stats.total));setTextSafe('gTotalCost',fmt(stats.totalDovxCost24));
             if(stats.total%500===0 || !data.more) updateDetailedList(modelStats);
+            ['F','H','R','S'].forEach(t=>{setTextSafe(`cnt-${t}`,fmt(stats[t].count));setTextSafe(`pwr-${t}`,fmt(stats[t].activePower)+" TU");setTextSafe(`cost-${t}`,fmt(stats[t].cost)+" DOVX");setTextSafe(`act-${t}`,fmt(stats[t].act));setTextSafe(`rdy-${t}`,fmt(stats[t].rdy));});
             if(stats.total%1000===0)log(`Scan: ${fmt(stats.total)}...`);if(data.more)nextKey=data.next_key;else hasMore=false;
         }
         updateDetailedList(modelStats);
