@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V79 (SMART CATALOG)</title>
+    <title>DoV - COMMAND V82 (FINAL ARCHITECT)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,6 +18,7 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
+        /* UI */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -26,7 +27,7 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD V79 */
+        /* DASHBOARD */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
@@ -48,13 +49,14 @@
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
         .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* LISTE V79 */
+        /* LISTE V82 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
         .ml-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
         .ml-name { color: #ccc; font-weight: bold; }
+        .ml-mult { color: var(--sec); font-size:10px; background:#082030; padding:1px 4px; border-radius:3px; margin-left:5px; }
         .ml-count { color: var(--warn); text-align: center; }
         .ml-unit { color: #666; text-align: right; }
         .ml-total { color: #fff; font-weight: bold; text-align: right; }
@@ -109,7 +111,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V79 SMART CATALOG</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V82 FINAL ARCHITECT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -136,7 +138,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V79)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (ACTIVE FLUX)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -236,19 +238,38 @@
                         </div>
                     </div>
                     
+                    <div class="g-detail-grid">
+                        <div class="g-card" style="border-top:3px solid var(--fuel)">
+                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-F">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--health)">
+                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-H">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--repair)">
+                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-R">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--supply)">
+                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-S">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
+                        </div>
+                    </div>
+
                     <div class="model-list-container">
-                        <div class="ml-col c-f" id="list-F">
-                            <div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-h" id="list-H">
-                            <div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-r" id="list-R">
-                            <div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-s" id="list-S">
-                            <div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div>
-                        </div>
+                        <div class="ml-col c-f" id="list-F"><div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-h" id="list-H"><div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-r" id="list-R"><div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-s" id="list-S"><div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div></div>
                     </div>
 
                 </div>
@@ -259,43 +280,39 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V79 SMART CATALOG. Ready.</div>
+<div class="logs" id="console">> V82 FINAL ARCHITECT. Audit OK.</div>
 
 <script>
     // ========================================================
-    // --- 1. TABLEAU UNIVERSEL (CLE = PUISSANCE HORAIRE) ---
-    // On déduit le modèle à partir de sa puissance
+    // --- 1. TABLEAU COUTS FIXES (SOURCE IMAGE) ---
+    // Clé: Production Horaire (Value from NFT)
     // ========================================================
-    const UNIVERSAL_CATALOG = {
-        5.40:   { baseName: "C_1 (Common)",  costClaim: 0.4590 },
-        54.00:  { baseName: "SC_2 (Common)", costClaim: 4.5900 },
-        12.15:  { baseName: "C_2 (Common)",  costClaim: 1.0328 },
-        121.50: { baseName: "SC_3 (Common)", costClaim: 10.3275 },
-        30.38:  { baseName: "C_3 (Common)",  costClaim: 2.5819 },
-        83.53:  { baseName: "C_4 (Common)",  costClaim: 7.1002 },
-        1458.0: { baseName: "SC_5 (Common)", costClaim: 123.9300 },
-        16.20:  { baseName: "R_1 (Rare)",    costClaim: 1.3770 },
-        36.45:  { baseName: "R_2 (Rare)",    costClaim: 3.0983 },
-        91.13:  { baseName: "R_3 (Rare)",    costClaim: 7.7456 },
-        250.59: { baseName: "R_4 (Rare)",    costClaim: 21.3005 },
-        48.60:  { baseName: "E_1 (Epic)",    costClaim: 4.1310 },
-        109.35: { baseName: "E_2 (Epic)",    costClaim: 9.2948 },
-        273.38: { baseName: "E_3 (Epic)",    costClaim: 23.2369 },
-        751.78: { baseName: "E_4 (Epic)",    costClaim: 63.9014 },
-        145.80: { baseName: "L_1 (Legendary)", costClaim: 12.3930 },
-        328.05: { baseName: "L_2 (Legendary)", costClaim: 27.8843 },
-        820.13: { baseName: "L_3 (Legendary)", costClaim: 69.7106 },
-        2255.34:{ baseName: "L_4 (Legendary)", costClaim: 191.7042 }
+    const COST_DB = {
+        5.40: 0.4590, 54.00: 4.5900, 12.15: 1.0328, 121.50: 10.3275,
+        30.38: 2.5819, 83.53: 7.1002, 1458.0: 123.9300, 16.20: 1.3770,
+        36.45: 3.0983, 91.13: 7.7456, 250.59: 21.3005, 48.60: 4.1310,
+        109.35: 9.2948, 273.38: 23.2369, 751.78: 63.9014, 145.80: 12.3930,
+        328.05: 27.8843, 820.13: 69.7106, 2255.34: 191.7042
+    };
+
+    // --- 2. TABLEAU NOMS DE BASE (POUR DETECTIVE) ---
+    const BASE_NAMES = {
+        5.40: "C_1 Common", 54.00: "SC_2 Common", 12.15: "C_2 Common", 121.50: "SC_3 Common",
+        30.38: "C_3 Common", 83.53: "C_4 Common", 1458.0: "SC_5 Common", 16.20: "R_1 Rare",
+        36.45: "R_2 Rare", 91.13: "R_3 Rare", 250.59: "R_4 Rare", 48.60: "E_1 Epic",
+        109.35: "E_2 Epic", 273.38: "E_3 Epic", 751.78: "E_4 Epic", 145.80: "L_1 Legend",
+        328.05: "L_2 Legend", 820.13: "L_3 Legend", 2255.34: "L_4 Legend"
     };
 
     // --- CONFIG ---
-    const DOVX_COST_RATIO = 0.085; // Fallback rule
+    const DOVX_COST_RATIO = 0.085; // Fallback rule if not in COST_DB
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const ZONE_DB={1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     const DOVX_CLAIM_LEVELS=[{name:"WIN",minPower:1200,coeff:1.0},{name:"DRAW",minPower:500,coeff:0.5},{name:"LOST",minPower:0,coeff:0.25}];
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
+    let TEMPLATE_DB = {}; 
 
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
@@ -306,31 +323,6 @@
     function extractPower(row){let val=Array.isArray(row.power)?row.power[0]:(row.power||row.pwr);if(typeof val==='string')val=val.replace(/[^0-9.]/g,'');return parseFloat(val)||0;}
     function computeDovxReward(base,pwr){for(let lvl of DOVX_CLAIM_LEVELS){if(pwr>=lvl.minPower)return base*lvl.coeff;}return 0;}
     function updateRates(){RATES.WAX_USD=parseFloat(document.getElementById('inpWax').value)||0;log("Taux mis à jour.","#ffd700");}
-
-    // --- SMART LOOKUP ---
-    function getSpecs(hourlyPower, typeChar) {
-        let match = UNIVERSAL_CATALOG[hourlyPower];
-        if (!match) { // Fuzzy
-            for (let k in UNIVERSAL_CATALOG) {
-                if (Math.abs(parseFloat(k) - hourlyPower) < 0.01) { match = UNIVERSAL_CATALOG[k]; break; }
-            }
-        }
-        
-        let dailyProd = hourlyPower * 24;
-        let dailyCost = 0;
-        let modelName = "Inconnu";
-
-        if (match) {
-            // Transforme "C_1" en "C_F1" selon le type détecté (F, H, R, S)
-            modelName = match.baseName.replace("_", "_" + typeChar); 
-            dailyCost = match.costClaim * 4;
-        } else {
-            modelName = `CUSTOM (${hourlyPower}/h)`;
-            dailyCost = dailyProd * DOVX_COST_RATIO;
-        }
-        
-        return { name: modelName, dailyProd: dailyProd, dailyCost: dailyCost };
-    }
 
     const PROXY_URL="https://corsproxy.io/?";
     async function robustFetch(code,table,lowerBound,limit=200,idx=1,keyType=""){
@@ -353,10 +345,94 @@
         throw new Error("Stop/Err");
     }
 
-    // --- SCAN V79 ---
+    // --- PHASE 1 : LOAD OFFICIAL TEMPLATE DATA FROM BDATA ---
+    async function loadOfficialTemplates() {
+        log("📥 CHARGEMENT DES TEMPLATES OFFICIELS (BDATA)...", "#sec");
+        let nextKey = ""; let hasMore = true; TEMPLATE_DB = {};
+        try {
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "bdata", nextKey, 1000);
+                if(!data.rows) break;
+                data.rows.forEach(row => {
+                    let tid = row.template_id;
+                    let rawVal = row.output || ""; 
+                    if(Array.isArray(rawVal)) rawVal = rawVal[0];
+                    let pType = null;
+                    if(rawVal.includes("DOVF")) pType = 'F';
+                    else if(rawVal.includes("DOVH")) pType = 'H';
+                    else if(rawVal.includes("DOVR")) pType = 'R';
+                    else if(rawVal.includes("DOVS")) pType = 'S';
+                    let pVal = parseFloat(rawVal.replace(/[^0-9.]/g, '')) || 0;
+                    if(tid && pType) TEMPLATE_DB[tid] = { type: pType, val: pVal };
+                });
+                if(data.more) nextKey = data.next_key; else hasMore = false;
+            }
+            log(`✅ CATALOGUE CHARGÉ : ${Object.keys(TEMPLATE_DB).length} Modèles.`, "#00e676");
+            return true;
+        } catch(e) { log("Erreur Load Template: "+e.message, "red"); return false; }
+    }
+
+    // --- PHASE 2 : IDENTIFICATION INTELLIGENTE ---
+    function identifyBuilding(b) {
+        let tid = b.template_id;
+        let stats = TEMPLATE_DB[tid];
+        let pVal, pType, modelName, mult;
+
+        if (stats) {
+            pVal = stats.val; pType = stats.type;
+        } else {
+            pVal = extractPower(b);
+            let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
+            if(typeof rawP === 'string') {
+                if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S';
+            }
+        }
+
+        // RECHERCHE NOM & MULTIPLICATEUR (V80 LOGIC)
+        if (BASE_NAMES[pVal]) {
+            modelName = BASE_NAMES[pVal].replace("_", "_" + pType);
+            mult = 1;
+        } else {
+            mult = 0;
+            for (let baseP in BASE_NAMES) {
+                let base = parseFloat(baseP);
+                let ratio = pVal / base;
+                if (ratio > 1 && Math.abs(ratio - Math.round(ratio)) < 0.01) {
+                    mult = Math.round(ratio);
+                    modelName = BASE_NAMES[baseP].replace("_", "_" + pType);
+                    break;
+                }
+            }
+            if (mult === 0) {
+                modelName = `CUSTOM [${tid}] (${pVal}/h)`;
+                mult = 1;
+            }
+        }
+
+        // RECHERCHE COUT EXACT (V82 LOGIC)
+        let singleClaimCost = 0;
+        let baseP_key = (mult > 1) ? (pVal / mult) : pVal; // On cherche le coût de base
+        
+        // On cherche le coût exact du modèle de base dans COST_DB
+        let exactCost = COST_DB[baseP_key] || COST_DB[Object.keys(COST_DB).find(k => Math.abs(parseFloat(k) - baseP_key) < 0.01)];
+
+        if(exactCost) {
+            singleClaimCost = exactCost * mult; // Le coût suit le multiplicateur
+        } else {
+            // Fallback 8.5% Rule si modèle inconnu
+            singleClaimCost = (pVal * 6) * DOVX_COST_RATIO; // (Prod 6h) * 8.5%
+        }
+
+        return { type: pType, hourly: pVal, name: modelName, mult: mult, costClaim: singleClaimCost };
+    }
+
+    // --- SCAN V82 ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        log("🌍 SCAN GLOBAL V79 (SMART CATALOG)...","#fff");
+        
+        await loadOfficialTemplates(); // Charge BDATA
+
+        log("🌍 SCAN GLOBAL V82 (FINAL ARCHITECT)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
         
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
@@ -365,16 +441,13 @@
         try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
             for(let b of data.rows){
                 stats.total++;
-                let pVal=extractPower(b); 
-                let rawP=Array.isArray(b.power)?b.power[0]:b.power;
-                let pType=null;
-                if(typeof rawP==='string'){if(rawP.includes("DOVF"))pType='F';else if(rawP.includes("DOVH"))pType='H';else if(rawP.includes("DOVR"))pType='R';else if(rawP.includes("DOVS"))pType='S';}
-                
+                let info = identifyBuilding(b);
+                let pType = info.type;
+
                 if(pType){
-                    // SMART LOOKUP
-                    let specs = getSpecs(pVal, pType);
-                    let mKey = specs.name;
-                    if(!modelStats[pType][mKey]) modelStats[pType][mKey] = { count:0, dailyProd:0 };
+                    let mKey = info.name;
+                    let listKey = info.mult > 1 ? `${mKey} (x${info.mult})` : mKey;
+                    if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0, tid: b.template_id };
 
                     stats[pType].count++;
                     let rdyTime=(parseFloat(b.last_claim)+parseFloat(b.delay));
@@ -384,21 +457,22 @@
                         stats.ready++; stats[pType].rdy++;
                     }else{
                         stats.active++; stats[pType].act++;
-                        stats[pType].activePower += specs.dailyProd;
-                        stats[pType].cost += specs.dailyCost;
-                        stats.totalDovxCost24 += specs.dailyCost;
                         
-                        // ADD TO MODEL STATS
-                        modelStats[pType][mKey].count++;
-                        modelStats[pType][mKey].dailyProd += specs.dailyProd;
+                        let dailyProd = info.hourly * 24;
+                        let dailyCost = info.costClaim * 4; // 4 claims per 24h
+
+                        stats[pType].activePower += dailyProd;
+                        stats[pType].cost += dailyCost;
+                        stats.totalDovxCost24 += dailyCost;
+                        
+                        modelStats[pType][listKey].count++;
+                        modelStats[pType][listKey].dailyProd += dailyProd;
                     }
                 }
             }
             setTextSafe('globalCount',fmt(stats.total));setTextSafe('gTotalCost',fmt(stats.totalDovxCost24));
-            
-            // UPDATE LISTS
             if(stats.total%500===0 || !data.more) updateDetailedList(modelStats);
-
+            ['F','H','R','S'].forEach(t=>{setTextSafe(`cnt-${t}`,fmt(stats[t].count));setTextSafe(`pwr-${t}`,fmt(stats[t].activePower)+" TU");setTextSafe(`cost-${t}`,fmt(stats[t].cost)+" DOVX");setTextSafe(`act-${t}`,fmt(stats[t].act));setTextSafe(`rdy-${t}`,fmt(stats[t].rdy));});
             if(stats.total%1000===0)log(`Scan: ${fmt(stats.total)}...`);if(data.more)nextKey=data.next_key;else hasMore=false;
         }
         updateDetailedList(modelStats);
@@ -414,7 +488,7 @@
                 let item = ms[t][k];
                 if(item.count > 0) {
                     let unitP = item.count > 0 ? (item.dailyProd / item.count) : 0;
-                    html += `<div class="ml-row"><div class="ml-name">${k}</div><div class="ml-count">${item.count} act.</div><div class="ml-unit">${fmt(unitP)}/u</div><div class="ml-total">${fmt(item.dailyProd)}</div></div>`;
+                    html += `<div class="ml-row"><div class="ml-name">${k}<span class="ml-tid">#${item.tid}</span></div><div class="ml-count">${item.count} act.</div><div class="ml-unit">${fmt(unitP)}/u</div><div class="ml-total">${fmt(item.dailyProd)}</div></div>`;
                 }
             });
             container.innerHTML = html;
