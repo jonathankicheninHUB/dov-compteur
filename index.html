@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V98 (GOLD MASTER)</title>
+    <title>DoV - COMMAND V97 (FULL CENTER)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -37,6 +37,8 @@
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 100px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
         .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
+        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; }
+        .z-row { display: flex; justify-content: space-between; margin-bottom:2px; }
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: auto; }
         
         /* ECO VIEW CSS */
@@ -45,12 +47,9 @@
         .eco-head { font-size: 11px; color: #888; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; font-weight:bold; }
         .eco-val { font-size: 18px; font-weight: bold; color: #fff; }
         
-        /* BUILDING VIEW CSS */
+        /* BUILDING VIEW CSS (V96) */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
-        .live-dot { height: 8px; width: 8px; background-color: var(--alert); border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite; margin-right: 5px; }
-        @keyframes pulse-live { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; min-height:100px; }
         .g-card-head { font-weight:bold; font-size:12px; border-bottom:1px solid #222; padding-bottom:5px; }
@@ -73,15 +72,13 @@
         .c-f { border-left: 4px solid var(--fuel); } .c-h { border-left: 4px solid var(--health); }
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
 
-        .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
-
         .logs { height: 100px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #666; overflow-y: auto; font-family: monospace; margin-top: auto;}
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V98 GOLD MASTER</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V97 FULL CENTER</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -106,7 +103,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. BÂTIMENTS (CERTIFIÉ)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V98)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V97)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. JOUEUR (TARGET)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -159,12 +156,12 @@
 
         <div id="targetView" class="view-section"></div>
 
-        <div class="logs" id="console">> V98 GOLD MASTER. Ready.</div>
+        <div class="logs" id="console">> V97 FULL CENTER. Ready.</div>
     </main>
 </div>
 
 <script>
-    // --- DATA STRICTE ---
+    // --- DATA ---
     const MASTER_TABLE = {
         5.40:{name:"C_F1_PRODUCER_FUEL",cost6h:0.4590}, 54.00:{name:"SC_F2_PRODUCER_FUEL",cost6h:4.5900},
         12.15:{name:"C_F2_PRODUCER_FUEL",cost6h:1.0328}, 121.50:{name:"SC_F3_PRODUCER_FUEL",cost6h:10.3275},
@@ -179,7 +176,7 @@
     };
     const ZONE_DB={1:{name:"Beach 1"},2:{name:"Beach 2"},3:{name:"Beach 3"},4:{name:"Bunker"},5:{name:"Forest 1"},6:{name:"Forest 2"},7:{name:"Forest 3"},8:{name:"Camp"},9:{name:"Hill 1"},10:{name:"Hill 2"},11:{name:"Hill 3"},12:{name:"Radar"},13:{name:"Plain 1"},14:{name:"Plain 2"},15:{name:"Plain 3"},16:{name:"HQ"},17:{name:"City 1"},18:{name:"City 2"},19:{name:"City 3"},20:{name:"City 4"}};
     const ZONE_ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
+    const RPCS=["https://wax.greymass.com","https://api.waxsweden.org"];
     
     let stopSignal=false; let rpcIndex=0; let TEMPLATE_CACHE={};
 
@@ -187,10 +184,8 @@
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
     async function robustFetch(code,table,lowerBound,limit=500){
-        const proxy=document.getElementById('inpProxy').value;
+        const proxy=document.getElementById('inpProxy').value; const server=RPCS[rpcIndex%RPCS.length];
         try{
-            const server=RPCS[rpcIndex%RPCS.length];
-            if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = new URL(server).hostname;
             const res=await fetch(proxy+encodeURIComponent(server+"/v1/chain/get_table_rows"),{method:'POST',body:JSON.stringify({json:true,code,scope:code,table,limit,lower_bound:lowerBound||"0"})});
             if(!res.ok)throw new Error("HTTP"+res.status); return await res.json();
         }catch(e){rpcIndex++; throw e;}
@@ -232,13 +227,13 @@
     async function startEconomyScan(){
         stopSignal=false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
         log("💰 Eco Scan...","#fff");
+        // Logic simplifié pour démo : On compte juste les divisions actives = Burn potentiel
         let next="0"; let more=true; let burn=0;
         try{
             while(more && !stopSignal){
                 const data=await robustFetch("dovpvecontrl","sdivisions",next);
-                if(!data.rows)break;
-                data.rows.forEach(r=>{ if(Date.now()/1000 < parseFloat(r.end_time)) burn+=1; }); 
-                document.getElementById('ecoBurn').innerText = burn.toLocaleString()+" DIVS";
+                data.rows.forEach(r=>{ if(Date.now()/1000 < parseFloat(r.end_time)) burn+=1000; }); // Dummy value
+                document.getElementById('ecoBurn').innerText = burn.toLocaleString()+" TU";
                 if(data.more)next=data.next_key; else more=false;
             }
             log("✅ Eco OK.","#00e676"); document.getElementById('btnStop').style.display='none';
@@ -258,12 +253,11 @@
         }catch(e){log(e.message,"red");}
     }
 
-    // --- 4. GLOBAL BUILDINGS (MOTEUR V96 CERTIFIÉ) ---
+    // --- 4. GLOBAL BUILDINGS (V96 ENGINE) ---
     async function loadTemplateBase(){
         log("Init BDATA...", "#sec"); let next="0"; let more=true;
         while(more && !stopSignal){
             const data=await robustFetch("dovutilstake","bdata",next);
-            if(!data.rows)break;
             data.rows.forEach(r=>{
                 let out=Array.isArray(r.output)?r.output[0]:r.output;
                 let val=parseFloat(out.replace(/[^0-9.]/g,''));
@@ -277,12 +271,9 @@
     function conformBuilding(b){
         let tid=b.template_id; let t=TEMPLATE_CACHE[tid];
         let pBase=0, pType="F";
-        
-        // 1. Identification via ID (Priorité Absolue)
         if(t){ pBase=t.base; pType=t.type; }
         else{ let r=Array.isArray(b.power)?b.power[0]:b.power; pBase=parseFloat(r.replace(/[^0-9.]/g,'')); pType=r.includes("DOVF")?"F":r.includes("DOVH")?"H":r.includes("DOVR")?"R":"S"; }
         
-        // 2. Mapping avec Tableau
         let ref=MASTER_TABLE[pBase];
         if(!ref){ for(let k in MASTER_TABLE) if(Math.abs(parseFloat(k)-pBase)<0.05){ ref=MASTER_TABLE[k]; break; } }
         
@@ -293,23 +284,20 @@
             cost6h=ref.cost6h;
         }
         
-        // 3. Calcul Stack & Prod (Tableau * 24 * Stack)
         let curP=parseFloat((Array.isArray(b.power)?b.power[0]:b.power).replace(/[^0-9.]/g,''));
         let stack=Math.round(curP/pBase)||1;
-        
         return { name, type:pType, prod24:(pBase*24)*stack, cost24:(cost6h*4)*stack, stack, tid };
     }
 
     async function startGlobalBuildings(){
         stopSignal=false; switchView('buildingView'); document.getElementById('btnStop').style.display='inline-block';
         await loadTemplateBase();
-        log("🚀 Scan Buildings V98...", "#fff");
+        log("🚀 Scan Buildings V97...", "#fff");
         let next="0"; let more=true; let groups={F:{},H:{},R:{},S:{}}; let stats={total:0, cost:0, p:{F:0,H:0,R:0,S:0}};
         const now=Date.now()/1000;
 
         while(more && !stopSignal){
             const data=await robustFetch("dovutilstake","buildings",next);
-            if(!data.rows)break;
             data.rows.forEach(b=>{
                 stats.total++;
                 let info=conformBuilding(b);
