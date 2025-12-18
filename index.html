@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V78 (MODEL BREAKDOWN)</title>
+    <title>DoV - COMMAND V79 (SMART CATALOG)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,7 +18,6 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
-        /* UI ELEMENTS */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -27,24 +26,29 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD GLOBAL V72/78 */
-        .dashboard-panel { display: grid; grid-template-columns: 1fr 200px 1fr; gap: 15px; background: var(--card-bg); border: 1px solid #333; padding: 15px; border-radius: 6px; margin-bottom: 20px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .d-left { display: flex; flex-direction: column; gap: 5px; }
-        .d-title { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .d-count { font-size: 24px; font-weight: bold; color: #fff; }
-        .d-sub { font-size: 11px; color: #666; }
-        .d-center { display: flex; justify-content: center; align-items: center; }
-        .chart-pie { width: 80px; height: 80px; border-radius: 50%; background: #222; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .chart-hole { position: absolute; top: 15px; left: 15px; width: 50px; height: 50px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: bold; }
-        .d-right { text-align: right; display: flex; flex-direction: column; gap: 5px; }
-        .d-cost-val { font-size: 22px; color: var(--dovx); font-weight: bold; text-shadow: 0 0 5px rgba(156, 39, 176, 0.4); }
-        
+        /* DASHBOARD V79 */
+        .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
         .live-dot { height: 8px; width: 8px; background-color: var(--alert); border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite; margin-right: 5px; }
         @keyframes pulse-live { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .g-mc-right { text-align:right; }
+        .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; font-weight:bold; }
+        .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
+        
+        .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content:space-between; min-height:140px; }
+        .g-card-head { display:flex; justify-content:space-between; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:5px; font-size:12px; font-weight:bold; text-transform:uppercase; }
+        .g-count-badge { background:#222; padding:2px 6px; border-radius:3px; color:#fff; }
+        .g-prod-section { text-align:center; margin: 10px 0; }
+        .g-prod-val { font-size:18px; font-weight:bold; color:#fff; display:block; }
+        .g-prod-lbl { font-size:9px; color:#888; text-transform:uppercase; }
+        .g-cost-section { text-align:center; margin-bottom:10px; }
+        .g-mini-cost { font-size:14px; color: var(--dovx); font-weight:bold; }
+        .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
+        .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* V78 NEW LIST STYLES */
+        /* LISTE V79 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
@@ -58,24 +62,9 @@
         .c-r { border-left: 3px solid var(--repair); } .c-s { border-left: 3px solid var(--supply); }
 
         /* REST OF CSS */
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .card-v72 { background: var(--card-bg); border: 1px solid #333; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
-        .c-header { padding: 10px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 12px; }
-        .c-body { padding: 15px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
-        .c-prod { font-size: 18px; font-weight: bold; color: #fff; }
-        .c-unit { font-size: 10px; color: #666; text-transform: uppercase; }
-        .c-cost { font-size: 12px; color: var(--dovx); font-weight: bold; margin-top: 5px; }
-        .c-footer { padding: 10px; background: rgba(0,0,0,0.2); border-top: 1px solid #222; }
-        .progress-row { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px; color: #888; }
-        .progress-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
-        .pf-fuel { background: var(--fuel); } .pf-health { background: var(--health); } .pf-repair { background: var(--repair); } .pf-supply { background: var(--supply); }
-        .border-fuel { border-top: 3px solid var(--fuel); } .border-health { border-top: 3px solid var(--health); } .border-repair { border-top: 3px solid var(--repair); } .border-supply { border-top: 3px solid var(--supply); }
-
         .logs { height: 100px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #666; overflow-y: auto; font-family: monospace; }
         .view-section { display: none; } .view-active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
-        
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -120,7 +109,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V78 MODEL BREAKDOWN</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V79 SMART CATALOG</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -147,7 +136,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V78)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V79)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -246,56 +235,6 @@
                             <div class="g-cost-val" id="gTotalCost">0</div>
                         </div>
                     </div>
-                    <div class="g-detail-grid">
-                        <div class="g-card" style="border-top:3px solid var(--fuel)">
-                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-F">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
-                        </div>
-                        <div class="g-card" style="border-top:3px solid var(--health)">
-                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-H">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
-                        </div>
-                        <div class="g-card" style="border-top:3px solid var(--repair)">
-                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-R">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
-                        </div>
-                        <div class="g-card" style="border-top:3px solid var(--supply)">
-                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
-                            <div class="g-prod-section">
-                                <span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span>
-                                <span class="g-prod-lbl">PROD ACTIF / 24H</span>
-                            </div>
-                            <div class="g-cost-section">
-                                <div class="g-mini-cost" id="cost-S">0</div>
-                                <div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div>
-                            </div>
-                            <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
-                        </div>
-                    </div>
                     
                     <div class="model-list-container">
                         <div class="ml-col c-f" id="list-F">
@@ -320,33 +259,33 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V78 MODEL BREAKDOWN. Ready.</div>
+<div class="logs" id="console">> V79 SMART CATALOG. Ready.</div>
 
 <script>
     // ========================================================
-    // --- 1. TABLEAU OFFICIEL COMPLET (NOM + COUT + PROD) ---
-    // Clé: Production Horaire (Sert d'ID Unique)
+    // --- 1. TABLEAU UNIVERSEL (CLE = PUISSANCE HORAIRE) ---
+    // On déduit le modèle à partir de sa puissance
     // ========================================================
-    const OFFICIAL_CATALOG = {
-        5.40:   { name: "C_F1 (Common)", costClaim: 0.4590 },
-        54.00:  { name: "SC_F2 (Common)", costClaim: 4.5900 },
-        12.15:  { name: "C_F2 (Common)", costClaim: 1.0328 },
-        121.50: { name: "SC_F3 (Common)", costClaim: 10.3275 },
-        30.38:  { name: "C_F3 (Common)", costClaim: 2.5819 },
-        83.53:  { name: "C_F4 (Common)", costClaim: 7.1002 },
-        1458.0: { name: "SC_F5 (Common)", costClaim: 123.9300 },
-        16.20:  { name: "R_F1 (Rare)", costClaim: 1.3770 },
-        36.45:  { name: "R_F2 (Rare)", costClaim: 3.0983 },
-        91.13:  { name: "R_F3 (Rare)", costClaim: 7.7456 },
-        250.59: { name: "R_F4 (Rare)", costClaim: 21.3005 },
-        48.60:  { name: "E_F1 (Epic)", costClaim: 4.1310 },
-        109.35: { name: "E_F2 (Epic)", costClaim: 9.2948 },
-        273.38: { name: "E_F3 (Epic)", costClaim: 23.2369 },
-        751.78: { name: "E_F4 (Epic)", costClaim: 63.9014 },
-        145.80: { name: "L_F1 (Legendary)", costClaim: 12.3930 },
-        328.05: { name: "L_F2 (Legendary)", costClaim: 27.8843 },
-        820.13: { name: "L_F3 (Legendary)", costClaim: 69.7106 },
-        2255.34:{ name: "L_F4 (Legendary)", costClaim: 191.7042 }
+    const UNIVERSAL_CATALOG = {
+        5.40:   { baseName: "C_1 (Common)",  costClaim: 0.4590 },
+        54.00:  { baseName: "SC_2 (Common)", costClaim: 4.5900 },
+        12.15:  { baseName: "C_2 (Common)",  costClaim: 1.0328 },
+        121.50: { baseName: "SC_3 (Common)", costClaim: 10.3275 },
+        30.38:  { baseName: "C_3 (Common)",  costClaim: 2.5819 },
+        83.53:  { baseName: "C_4 (Common)",  costClaim: 7.1002 },
+        1458.0: { baseName: "SC_5 (Common)", costClaim: 123.9300 },
+        16.20:  { baseName: "R_1 (Rare)",    costClaim: 1.3770 },
+        36.45:  { baseName: "R_2 (Rare)",    costClaim: 3.0983 },
+        91.13:  { baseName: "R_3 (Rare)",    costClaim: 7.7456 },
+        250.59: { baseName: "R_4 (Rare)",    costClaim: 21.3005 },
+        48.60:  { baseName: "E_1 (Epic)",    costClaim: 4.1310 },
+        109.35: { baseName: "E_2 (Epic)",    costClaim: 9.2948 },
+        273.38: { baseName: "E_3 (Epic)",    costClaim: 23.2369 },
+        751.78: { baseName: "E_4 (Epic)",    costClaim: 63.9014 },
+        145.80: { baseName: "L_1 (Legendary)", costClaim: 12.3930 },
+        328.05: { baseName: "L_2 (Legendary)", costClaim: 27.8843 },
+        820.13: { baseName: "L_3 (Legendary)", costClaim: 69.7106 },
+        2255.34:{ baseName: "L_4 (Legendary)", costClaim: 191.7042 }
     };
 
     // --- CONFIG ---
@@ -358,7 +297,6 @@
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
 
-    // --- HELPER FUNC ---
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
     function setTextSafe(id,txt){let el=document.getElementById(id);if(el)el.innerText=txt;}
@@ -369,19 +307,29 @@
     function computeDovxReward(base,pwr){for(let lvl of DOVX_CLAIM_LEVELS){if(pwr>=lvl.minPower)return base*lvl.coeff;}return 0;}
     function updateRates(){RATES.WAX_USD=parseFloat(document.getElementById('inpWax').value)||0;log("Taux mis à jour.","#ffd700");}
 
-    // --- LOOKUP FUNCTION (TABLE MATCH) ---
-    function getSpecs(hourlyPower) {
-        let match = OFFICIAL_CATALOG[hourlyPower];
-        if (!match) { // Fuzzy match
-            for (let k in OFFICIAL_CATALOG) {
-                if (Math.abs(parseFloat(k) - hourlyPower) < 0.01) { match = OFFICIAL_CATALOG[k]; break; }
+    // --- SMART LOOKUP ---
+    function getSpecs(hourlyPower, typeChar) {
+        let match = UNIVERSAL_CATALOG[hourlyPower];
+        if (!match) { // Fuzzy
+            for (let k in UNIVERSAL_CATALOG) {
+                if (Math.abs(parseFloat(k) - hourlyPower) < 0.01) { match = UNIVERSAL_CATALOG[k]; break; }
             }
         }
+        
+        let dailyProd = hourlyPower * 24;
+        let dailyCost = 0;
+        let modelName = "Inconnu";
+
         if (match) {
-            return { name: match.name, dailyProd: hourlyPower * 24, dailyCost: match.costClaim * 4 };
+            // Transforme "C_1" en "C_F1" selon le type détecté (F, H, R, S)
+            modelName = match.baseName.replace("_", "_" + typeChar); 
+            dailyCost = match.costClaim * 4;
         } else {
-            return { name: "Inconnu ("+hourlyPower+"/h)", dailyProd: hourlyPower * 24, dailyCost: (hourlyPower * 24) * DOVX_COST_RATIO };
+            modelName = `CUSTOM (${hourlyPower}/h)`;
+            dailyCost = dailyProd * DOVX_COST_RATIO;
         }
+        
+        return { name: modelName, dailyProd: dailyProd, dailyCost: dailyCost };
     }
 
     const PROXY_URL="https://corsproxy.io/?";
@@ -405,14 +353,14 @@
         throw new Error("Stop/Err");
     }
 
-    // --- SCAN V78 (MODEL BREAKDOWN) ---
+    // --- SCAN V79 ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        log("🌍 SCAN GLOBAL V78 (MODEL BREAKDOWN)...","#fff");
+        log("🌍 SCAN GLOBAL V79 (SMART CATALOG)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
         
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
-        let modelStats = { F:{}, H:{}, R:{}, S:{} }; // Detail storage
+        let modelStats = { F:{}, H:{}, R:{}, S:{} };
 
         try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
             for(let b of data.rows){
@@ -423,7 +371,8 @@
                 if(typeof rawP==='string'){if(rawP.includes("DOVF"))pType='F';else if(rawP.includes("DOVH"))pType='H';else if(rawP.includes("DOVR"))pType='R';else if(rawP.includes("DOVS"))pType='S';}
                 
                 if(pType){
-                    let specs = getSpecs(pVal);
+                    // SMART LOOKUP
+                    let specs = getSpecs(pVal, pType);
                     let mKey = specs.name;
                     if(!modelStats[pType][mKey]) modelStats[pType][mKey] = { count:0, dailyProd:0 };
 
@@ -439,22 +388,20 @@
                         stats[pType].cost += specs.dailyCost;
                         stats.totalDovxCost24 += specs.dailyCost;
                         
-                        // ADD TO MODEL STATS (Only Active)
+                        // ADD TO MODEL STATS
                         modelStats[pType][mKey].count++;
                         modelStats[pType][mKey].dailyProd += specs.dailyProd;
                     }
                 }
             }
-            // UPDATE MAIN UI
             setTextSafe('globalCount',fmt(stats.total));setTextSafe('gTotalCost',fmt(stats.totalDovxCost24));
-            ['F','H','R','S'].forEach(t=>{setTextSafe(`cnt-${t}`,fmt(stats[t].count));setTextSafe(`pwr-${t}`,fmt(stats[t].activePower)+" TU");setTextSafe(`cost-${t}`,fmt(stats[t].cost)+" DOVX");setTextSafe(`act-${t}`,fmt(stats[t].act));setTextSafe(`rdy-${t}`,fmt(stats[t].rdy));});
             
-            // UPDATE DETAILED LIST (Throttle)
+            // UPDATE LISTS
             if(stats.total%500===0 || !data.more) updateDetailedList(modelStats);
 
             if(stats.total%1000===0)log(`Scan: ${fmt(stats.total)}...`);if(data.more)nextKey=data.next_key;else hasMore=false;
         }
-        updateDetailedList(modelStats); // Final update
+        updateDetailedList(modelStats);
         log(`✅ SCAN FINI.`,"#00e676");document.getElementById('btnStop').style.display='none';}catch(e){log("Err: "+e.message,"red");}}
 
     function updateDetailedList(ms) {
@@ -462,26 +409,18 @@
         ['F','H','R','S'].forEach(t => {
             let container = document.getElementById(`list-${t}`);
             let html = `<div class="ml-header"><span>MODÈLES ${t}</span> <span>(Total 24h)</span></div>`;
-            // Sort by total production
             let sortedKeys = Object.keys(ms[t]).sort((a,b) => ms[t][b].dailyProd - ms[t][a].dailyProd);
-            
             sortedKeys.forEach(k => {
                 let item = ms[t][k];
                 if(item.count > 0) {
                     let unitP = item.count > 0 ? (item.dailyProd / item.count) : 0;
-                    html += `<div class="ml-row">
-                        <div class="ml-name">${k}</div>
-                        <div class="ml-count">${item.count} act.</div>
-                        <div class="ml-unit">${fmt(unitP)}/u</div>
-                        <div class="ml-total">${fmt(item.dailyProd)}</div>
-                    </div>`;
+                    html += `<div class="ml-row"><div class="ml-name">${k}</div><div class="ml-count">${item.count} act.</div><div class="ml-unit">${fmt(unitP)}/u</div><div class="ml-total">${fmt(item.dailyProd)}</div></div>`;
                 }
             });
             container.innerHTML = html;
         });
     }
 
-    // --- OTHER FUNCS ---
     async function startTarget(){const user=document.getElementById('targetIn').value.trim().toLowerCase();switchView('targetView');document.getElementById('targetView').innerHTML="Cherche...";try{const data=await robustFetch("dovpvecontrl","sdivisions",user,500,2,"i64");const rows=data.rows?data.rows.filter(r=>(r.owner===user||r.user===user)):[];let h=`<div style="background:#111;padding:10px;color:var(--sec)">${user.toUpperCase()} (${rows.length} Divs)</div>`;rows.forEach(r=>{const zID=getProp(r,['zoneID','zone_id']);const busy=isBusy(r);let zName=ZONE_DB[zID]?ZONE_DB[zID].name:zID;h+=`<div class="t-row"><div style="color:var(--main)">#${getId(r)}</div><div style="color:var(--sec)">${zName}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`;});document.getElementById('targetView').innerHTML=h;}catch(e){log("Err: "+e.message,"red");}}
     async function startZoneScan(){stopSignal=false;switchView('zoneView');initGrid();document.getElementById('btnStop').style.display='inline-block';let stats={divs:0,burn:{fuel:0,health:0,repair:0,supply:0},totalCostX:0,totalGain:0,zones:{}};ZONE_ORDER.forEach(id=>stats.zones[id]={count:0,active:0,idle:0});let nextKey="";let hasMore=true;try{while(hasMore&&!stopSignal){const data=await robustFetch("dovpvecontrl","sdivisions",nextKey,300);if(!data.rows)break;for(let row of data.rows){stats.divs++;const zID=getProp(row,['zoneID','zone_id']);const busy=isBusy(row);if(stats.zones[zID]){stats.zones[zID].count++;const zInfo=ZONE_DB[zID];if(busy){stats.zones[zID].active++;if(zInfo.cost>0){stats.burn.fuel+=zInfo.cost;stats.burn.health+=zInfo.cost;stats.burn.repair+=zInfo.cost;stats.burn.supply+=zInfo.cost;}stats.totalCostX+=zInfo.costX;const power=extractPower(row);if(zInfo.reward>0)stats.totalGain+=computeDovxReward(zInfo.reward,power);}else stats.zones[zID].idle++;}}if(stats.divs%300===0)updateZoneDash(stats);if(data.more)nextKey=data.next_key;else hasMore=false;}updateZoneDash(stats);log("Map OK.","#00e676");document.getElementById('btnStop').style.display='none';}catch(e){log("Err: "+e.message,"red");}}
     function updateZoneDash(stats){const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});setTextSafe('dDivs',fmt(stats.divs));setTextSafe('dGain',"+ "+fmt(stats.totalGain)+" DOVX");setTextSafe('dCostX',"- "+fmt(stats.totalCostX)+" DOVX");setTextSafe('lFuel',"-"+fmt(stats.burn.fuel));setTextSafe('lHealth',"-"+fmt(stats.burn.health));setTextSafe('lRepair',"-"+fmt(stats.burn.repair));setTextSafe('lSupply',"-"+fmt(stats.burn.supply));ZONE_ORDER.forEach(id=>{const d=stats.zones[id];const c=document.getElementById(`z-card-${id}`);if(c&&d){if(d.count>0)c.classList.add('active');document.getElementById(`z-count-${id}`).innerText=d.count;document.getElementById(`z-miss-${id}`).innerText=d.active+" Act.";document.getElementById(`z-rdy-${id}`).innerText=d.idle+" Rdy";}});}
