@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V86 (ULTIMATE FIX)</title>
+    <title>DoV - COMMAND V87 (ATOMIC LINKS)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,6 +18,7 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
+        /* UI */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -26,7 +27,7 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD V86 */
+        /* DASHBOARD */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--warn); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
@@ -48,13 +49,14 @@
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
         .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* LISTE V86 */
+        /* LISTE V87 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
         .ml-row { display: grid; grid-template-columns: 2.5fr 0.8fr 1.2fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
-        .ml-name { color: #ccc; font-weight: bold; }
+        .ml-name a { color: #ccc; text-decoration: none; border-bottom: 1px dotted #555; transition: 0.2s; }
+        .ml-name a:hover { color: var(--sec); border-bottom-color: var(--sec); }
         .ml-mult { color: var(--sec); font-size:10px; background:#082030; padding:1px 4px; border-radius:3px; margin-left:5px; font-weight:normal; }
         .ml-count { color: var(--warn); text-align: center; }
         .ml-unit { color: #666; text-align: right; }
@@ -110,7 +112,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V86 ULTIMATE FIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V87 ATOMIC LINKS</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -137,7 +139,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (HYBRID SAFE)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V87)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -228,7 +230,7 @@
                     <div class="g-main-count">
                         <div class="g-mc-left">
                             <span class="live-dot"></span>
-                            <div>SCAN GLOBAL (HYBRID SAFE)</div>
+                            <div>SCAN GLOBAL (FLUX ACTIF 24H)</div>
                             <div style="font-size:12px; color:#555; margin-left:10px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
@@ -237,19 +239,38 @@
                         </div>
                     </div>
                     
+                    <div class="g-detail-grid">
+                        <div class="g-card" style="border-top:3px solid var(--fuel)">
+                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-F">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--health)">
+                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-H">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--repair)">
+                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-R">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--supply)">
+                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-S">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
+                        </div>
+                    </div>
+
                     <div class="model-list-container">
-                        <div class="ml-col c-f" id="list-F">
-                            <div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-h" id="list-H">
-                            <div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-r" id="list-R">
-                            <div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-s" id="list-S">
-                            <div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div>
-                        </div>
+                        <div class="ml-col c-f" id="list-F"><div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-h" id="list-H"><div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-r" id="list-R"><div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-s" id="list-S"><div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div></div>
                     </div>
 
                 </div>
@@ -260,12 +281,11 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V86 ULTIMATE FIX. Start by clicking Scan.</div>
+<div class="logs" id="console">> V87 ATOMIC LINKS. Start Scan.</div>
 
 <script>
     // ========================================================
     // --- 1. TABLEAU COUTS FIXES (SOURCE IMAGE) ---
-    // Clé: Production Horaire (Value from NFT)
     // ========================================================
     const REF_CATALOG = {
         5.40:   { name: "C_F1 Common",  cost6h: 0.4590 },
@@ -297,7 +317,6 @@
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
     
-    // CACHE DYNAMIQUE + FALLBACK CONST
     let TEMPLATE_MAP = {}; 
 
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
@@ -321,10 +340,7 @@
             try{
                 if(document.getElementById('rpcStatus'))document.getElementById('rpcStatus').innerText=new URL(server).hostname;
                 const c=new AbortController();setTimeout(()=>c.abort(),10000);
-                // FIX V86 : FORCER lower_bound=0 si vide pour eviter bug API
-                let safeLB = lowerBound;
-                if(safeLB === "") safeLB = "0"; 
-                
+                let safeLB = lowerBound; if(safeLB === "") safeLB = "0"; 
                 const p={json:true,code:code,scope:code,table:table,limit:limit,lower_bound:safeLB};
                 if(idx>1){p.index_position=idx;p.key_type=keyType;p.upper_bound=lowerBound;p.lower_bound=lowerBound;}
                 const res=await fetch(url,{method:'POST',body:JSON.stringify(p),signal:c.signal});
@@ -335,7 +351,6 @@
         throw new Error("Stop/Err");
     }
 
-    // --- PHASE 1: CHARGER BDATA ---
     async function loadTemplateData() {
         log("🔄 CHARGEMENT BDATA...", "#sec");
         let nextKey = ""; let hasMore = true; TEMPLATE_MAP = {};
@@ -358,114 +373,46 @@
         } catch(e) { log("Info: Utilisation Fallback Statique.", "orange"); return false; }
     }
 
-    // --- LOGIQUE METIER HYBRIDE (V86) ---
     function resolveBuildingStrict(b) {
         let tid = b.template_id;
         let template = TEMPLATE_MAP[tid];
         let pType, pVal;
-
-        // 1. Lire Base Value (Priorité BDATA, sinon Fallback lecture NFT)
-        if(template) {
-            pVal = template.base; pType = template.type;
-        } else {
-            pVal = extractPower(b);
-            let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
-            if(typeof rawP === 'string') {
-                if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S';
-            }
-        }
-
+        if(template) { pVal = template.base; pType = template.type; } 
+        else { pVal = extractPower(b); let rawP = Array.isArray(b.power) ? b.power[0] : b.power; if(typeof rawP === 'string') { if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S'; } }
         if(!pType) return null;
-
-        // 2. Calculer le Stack (Puissance Réelle / Puissance Base)
         let currentPower = extractPower(b);
         let stack = 1;
         if (pVal > 0) stack = Math.round(currentPower / pVal);
         if (stack < 1) stack = 1;
-
-        // 3. Chercher dans le TABLEAU OFFICIEL (REF_CATALOG) avec fuzzy logic
-        // pVal doit correspondre à une des clés du tableau (ex: 5.40, 83.53)
         let ref = REF_CATALOG[pVal]; 
-        let name = "CUSTOM";
-        let cost6h = 0;
-
-        if (!ref) {
-            // Si pas de match exact, on cherche la valeur la plus proche (arrondi float)
-            for(let k in REF_CATALOG) {
-                if(Math.abs(parseFloat(k) - pVal) < 0.05) {
-                    ref = REF_CATALOG[k];
-                    break;
-                }
-            }
-        }
-
-        if (ref) {
-            name = ref.name.replace("_F", "_" + pType); // Remplace C_F1 par C_H1 si besoin
-            cost6h = ref.cost6h;
-        } else {
-            name = `Model [${tid}]`;
-            cost6h = (pVal * 6) * 0.085; // Fallback 8.5%
-        }
-
-        // 4. Calculs Finaux (24H)
-        // Production = (Base * 24) * Stack
-        // Cout = (Cout6h * 4) * Stack
-        let finalProd24 = (pVal * 24) * stack;
-        let finalCost24 = (cost6h * 4) * stack;
-
-        return { 
-            name: name, 
-            type: pType, 
-            prod24: finalProd24, 
-            cost24: finalCost24, 
-            stack: stack 
-        };
+        let name = "CUSTOM"; let cost6h = 0;
+        if (!ref) { for(let k in REF_CATALOG) { if(Math.abs(parseFloat(k) - pVal) < 0.05) { ref = REF_CATALOG[k]; break; } } }
+        if (ref) { name = ref.name.replace("_F", "_" + pType); cost6h = ref.cost6h; } 
+        else { name = `Model [${tid}]`; cost6h = (pVal * 6) * 0.085; }
+        return { name: name, type: pType, prod24: (pVal * 24) * stack, cost24: (cost6h * 4) * stack, stack: stack, tid: tid };
     }
 
-    // --- SCAN V86 ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        
-        await loadTemplateData(); // Load dictionary first
-
-        log("🌍 SCAN GLOBAL V86 (ULTIMATE)...","#fff");
+        await loadTemplateData();
+        log("🌍 SCAN GLOBAL V87 (ATOMIC LINKS)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
-        
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
         let modelStats = { F:{}, H:{}, R:{}, S:{} };
-
         try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
-            
-            // DEBUG LOG FIRST BATCH
-            if(stats.total === 0) console.log("First batch received:", data.rows.length);
-
             for(let b of data.rows){
                 stats.total++;
                 let info = resolveBuildingStrict(b);
-                
                 if(info){
                     let pType = info.type;
                     let mKey = info.name;
                     let listKey = info.stack > 1 ? `${mKey} <span class="ml-mult">x${info.stack}</span>` : mKey;
-
                     if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0, tid: b.template_id };
-
                     stats[pType].count++;
                     let rdyTime=(parseFloat(b.last_claim)+parseFloat(b.delay));
                     let isReady=now>rdyTime;
-                    
-                    if(isReady){
-                        stats.ready++; stats[pType].rdy++;
-                    }else{
-                        stats.active++; stats[pType].act++;
-                        
-                        stats[pType].activePower += info.prod24;
-                        stats[pType].cost += info.cost24;
-                        stats.totalDovxCost24 += info.cost24;
-                        
-                        modelStats[pType][listKey].count++;
-                        modelStats[pType][listKey].dailyProd += info.prod24;
-                    }
+                    if(isReady){ stats.ready++; stats[pType].rdy++; }
+                    else{ stats.active++; stats[pType].act++; stats[pType].activePower += info.prod24; stats[pType].cost += info.cost24; stats.totalDovxCost24 += info.cost24; modelStats[pType][listKey].count++; modelStats[pType][listKey].dailyProd += info.prod24; }
                 }
             }
             setTextSafe('globalCount',fmt(stats.total));setTextSafe('gTotalCost',fmt(stats.totalDovxCost24));
@@ -486,7 +433,13 @@
                 let item = ms[t][k];
                 if(item.count > 0) {
                     let unitP = item.count > 0 ? (item.dailyProd / item.count) : 0;
-                    html += `<div class="ml-row"><div class="ml-name">${k}<span class="ml-tid">#${item.tid}</span></div><div class="ml-count">${item.count} act.</div><div class="ml-unit">${fmt(unitP)}/u</div><div class="ml-total">${fmt(item.dailyProd)}</div></div>`;
+                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${item.tid}`;
+                    html += `<div class="ml-row">
+                        <div class="ml-name"><a href="${link}" target="_blank">${k}</a></div>
+                        <div class="ml-count">${item.count} act.</div>
+                        <div class="ml-unit">${fmt(unitP)}/u</div>
+                        <div class="ml-total">${fmt(item.dailyProd)}</div>
+                    </div>`;
                 }
             });
             container.innerHTML = html;
