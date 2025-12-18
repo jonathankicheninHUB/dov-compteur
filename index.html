@@ -1,26 +1,3 @@
-C'est parfaitement compris. C'est la logique fondamentale du "Game Design" de ce jeu : **Une seule grille de statistiques pour 4 ressources différentes.**
-
-Le tableau Excel est une **Matrice Mathématique**.
-
-* Si tu as **5.40** en puissance :
-* Si c'est du Fuel -> C'est un **C_F1_PRODUCER_FUEL**.
-* Si c'est du Health -> C'est un **C_H1_PRODUCER_HEALTH**.
-* Si c'est du Repair -> C'est un **C_R1_PRODUCER_REPAIR**.
-* Si c'est du Supply -> C'est un **C_S1_PRODUCER_SUPPLY**.
-
-
-
-Voici la **Version V92 (UNIVERSAL MATRIX)**.
-
-### La Méthode V92 :
-
-1. **Matrice Neutre :** Le tableau dans le code ne contient plus le mot "FUEL". Il contient juste la structure (ex: `Tier: "C", Level: 1`).
-2. **Générateur de Noms :** J'ai créé une fonction qui prend la puissance et le **Type de Token** (détecté sur la blockchain) pour fabriquer le bon nom dynamiquement.
-3. **Gestion S1/L4 :** Pour la valeur `2255.34`, le code génère le nom **S1_OWNER_{TYPE}** (ex: S1_OWNER_HEALTH) comme demandé précédemment.
-
-Copiez ce code. Il fonctionnera pour **tous** les tokens avec les bons noms.
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -328,5 +305,3 @@ Copiez ce code. Il fonctionnera pour **tous** les tokens avec les bons noms.
 </script>
 </body>
 </html>
-
-```
