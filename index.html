@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V88 (ATOMIC MATCHING)</title>
+    <title>DoV - COMMAND V89 (EXACT NAMES)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,6 +18,7 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
+        /* UI */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -26,11 +27,11 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD V88 */
+        /* DASHBOARD V89 */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
-        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); position: relative; overflow: hidden; }
+        .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--sec); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
-        .live-dot { height: 8px; width: 8px; background-color: var(--main); border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite; margin-right: 5px; }
+        .live-dot { height: 8px; width: 8px; background-color: var(--sec); border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite; margin-right: 5px; }
         @keyframes pulse-live { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         .g-mc-right { text-align:right; }
         .g-cost-label { font-size:10px; color:#666; text-transform:uppercase; font-weight:bold; }
@@ -48,7 +49,7 @@
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
         .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* LISTE V88 */
+        /* LISTE V89 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
@@ -112,7 +113,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V88 ATOMIC MATCHING</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V89 EXACT NAMES</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -139,7 +140,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V88)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V89)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -230,7 +231,7 @@
                     <div class="g-main-count">
                         <div class="g-mc-left">
                             <span class="live-dot"></span>
-                            <div>SCAN GLOBAL (ATOMIC MATCHING)</div>
+                            <div>SCAN GLOBAL (NOMINAGE EXACT)</div>
                             <div style="font-size:12px; color:#555; margin-left:10px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
@@ -239,19 +240,38 @@
                         </div>
                     </div>
                     
+                    <div class="g-detail-grid">
+                        <div class="g-card" style="border-top:3px solid var(--fuel)">
+                            <div class="g-card-head"><span style="color:var(--fuel)">FUEL</span> <span class="g-count-badge" id="cnt-F">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-F">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-F">0</b></span><span class="c-rdy">Rdy: <b id="rdy-F">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--health)">
+                            <div class="g-card-head"><span style="color:var(--health)">HEALTH</span> <span class="g-count-badge" id="cnt-H">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--health)" id="pwr-H">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-H">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-H">0</b></span><span class="c-rdy">Rdy: <b id="rdy-H">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--repair)">
+                            <div class="g-card-head"><span style="color:var(--repair)">REPAIR</span> <span class="g-count-badge" id="cnt-R">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-R">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-R">0</b></span><span class="c-rdy">Rdy: <b id="rdy-R">0</b></span></div>
+                        </div>
+                        <div class="g-card" style="border-top:3px solid var(--supply)">
+                            <div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span> <span class="g-count-badge" id="cnt-S">0</span></div>
+                            <div class="g-prod-section"><span class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</span><span class="g-prod-lbl">PROD ACTIF / 24H</span></div>
+                            <div class="g-cost-section"><div class="g-mini-cost" id="cost-S">0</div><div class="g-prod-lbl" style="color:var(--dovx)">DOVX / JOUR</div></div>
+                            <div class="g-split"><span class="c-act">Act: <b id="act-S">0</b></span><span class="c-rdy">Rdy: <b id="rdy-S">0</b></span></div>
+                        </div>
+                    </div>
+
                     <div class="model-list-container">
-                        <div class="ml-col c-f" id="list-F">
-                            <div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-h" id="list-H">
-                            <div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-r" id="list-R">
-                            <div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div>
-                        </div>
-                        <div class="ml-col c-s" id="list-S">
-                            <div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div>
-                        </div>
+                        <div class="ml-col c-f" id="list-F"><div class="ml-header"><span>MODÈLES FUEL</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-h" id="list-H"><div class="ml-header"><span>MODÈLES HEALTH</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-r" id="list-R"><div class="ml-header"><span>MODÈLES REPAIR</span> <span>(Total 24h)</span></div></div>
+                        <div class="ml-col c-s" id="list-S"><div class="ml-header"><span>MODÈLES SUPPLY</span> <span>(Total 24h)</span></div></div>
                     </div>
 
                 </div>
@@ -262,33 +282,33 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V88 ATOMIC MATCHING. Ready.</div>
+<div class="logs" id="console">> V89 EXACT NAMES. Ready.</div>
 
 <script>
     // ========================================================
-    // --- 1. TABLEAU DE REFERENCE (VOTRE EXCEL) ---
-    // Clé: Puissance Unitaire (Base)
+    // --- 1. TABLEAU DE REFERENCE (NOMS EXACTS) ---
+    // Clé: Production Horaire (Value from NFT)
     // ========================================================
     const REF_CATALOG = {
-        5.40:   { name: "C_F1 Common",  cost6h: 0.4590 },
-        54.00:  { name: "SC_F2 Common", cost6h: 4.5900 },
-        12.15:  { name: "C_F2 Common",  cost6h: 1.0328 },
-        121.50: { name: "SC_F3 Common", cost6h: 10.3275 },
-        30.38:  { name: "C_F3 Common",  cost6h: 2.5819 },
-        83.53:  { name: "C_F4 Common",  cost6h: 7.1002 },
-        1458.0: { name: "SC_F5 Common", cost6h: 123.9300 },
-        16.20:  { name: "R_F1 Rare",    cost6h: 1.3770 },
-        36.45:  { name: "R_F2 Rare",    cost6h: 3.0983 },
-        91.13:  { name: "R_F3 Rare",    cost6h: 7.7456 },
-        250.59: { name: "R_F4 Rare",    cost6h: 21.3005 },
-        48.60:  { name: "E_F1 Epic",    cost6h: 4.1310 },
-        109.35: { name: "E_F2 Epic",    cost6h: 9.2948 },
-        273.38: { name: "E_F3 Epic",    cost6h: 23.2369 },
-        751.78: { name: "E_F4 Epic",    cost6h: 63.9014 },
-        145.80: { name: "L_F1 Legend",  cost6h: 12.3930 },
-        328.05: { name: "L_F2 Legend",  cost6h: 27.8843 },
-        820.13: { name: "L_F3 Legend",  cost6h: 69.7106 },
-        2255.34:{ name: "S1_OWNER",     cost6h: 191.7042 } // S1 / L_F4 have same stats
+        5.40:   { name: "C_F1_PRODUCER_FUEL",  cost6h: 0.4590 },
+        54.00:  { name: "SC_F2_PRODUCER_FUEL", cost6h: 4.5900 },
+        12.15:  { name: "C_F2_PRODUCER_FUEL",  cost6h: 1.0328 },
+        121.50: { name: "SC_F3_PRODUCER_FUEL", cost6h: 10.3275 },
+        30.38:  { name: "C_F3_PRODUCER_FUEL",  cost6h: 2.5819 },
+        83.53:  { name: "C_F4_PRODUCER_FUEL",  cost6h: 7.1002 },
+        1458.0: { name: "SC_F5_PRODUCER_FUEL", cost6h: 123.9300 },
+        16.20:  { name: "R_F1_PRODUCER_FUEL",  cost6h: 1.3770 },
+        36.45:  { name: "R_F2_PRODUCER_FUEL",  cost6h: 3.0983 },
+        91.13:  { name: "R_F3_PRODUCER_FUEL",  cost6h: 7.7456 },
+        250.59: { name: "R_F4_PRODUCER_FUEL",  cost6h: 21.3005 },
+        48.60:  { name: "E_F1_PRODUCER_FUEL",  cost6h: 4.1310 },
+        109.35: { name: "E_F2_PRODUCER_FUEL",  cost6h: 9.2948 },
+        273.38: { name: "E_F3_PRODUCER_FUEL",  cost6h: 23.2369 },
+        751.78: { name: "E_F4_PRODUCER_FUEL",  cost6h: 63.9014 },
+        145.80: { name: "L_F1_PRODUCER_FUEL",  cost6h: 12.3930 },
+        328.05: { name: "L_F2_PRODUCER_FUEL",  cost6h: 27.8843 },
+        820.13: { name: "L_F3_PRODUCER_FUEL",  cost6h: 69.7106 },
+        2255.34:{ name: "L_F4_PRODUCER_FUEL",  cost6h: 191.7042 }
     };
 
     // --- CONFIG ---
@@ -299,6 +319,8 @@
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
     
+    let TEMPLATE_MAP = {}; 
+
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
     function setTextSafe(id,txt){let el=document.getElementById(id);if(el)el.innerText=txt;}
@@ -331,9 +353,40 @@
         throw new Error("Stop/Err");
     }
 
-    // --- IDENTIFICATION DU MODELE PAR TABLE MATCH ---
+    // --- PHASE 1: CHARGER BDATA ---
+    async function loadTemplateData() {
+        log("🔄 CHARGEMENT BDATA...", "#sec");
+        let nextKey = ""; let hasMore = true; TEMPLATE_MAP = {};
+        try {
+            while(hasMore && !stopSignal) {
+                const data = await robustFetch("dovutilstake", "bdata", nextKey, 1000);
+                if(!data.rows) break;
+                data.rows.forEach(row => {
+                    let tid = row.template_id;
+                    let rawVal = row.output || ""; if(Array.isArray(rawVal)) rawVal = rawVal[0];
+                    let type = null;
+                    if(rawVal.includes("DOVF")) type = 'F'; else if(rawVal.includes("DOVH")) type = 'H'; else if(rawVal.includes("DOVR")) type = 'R'; else if(rawVal.includes("DOVS")) type = 'S';
+                    let val = parseFloat(rawVal.replace(/[^0-9.]/g, '')) || 0;
+                    if(tid && type) TEMPLATE_MAP[tid] = { base: val, type: type };
+                });
+                if(data.more) nextKey = data.next_key; else hasMore = false;
+            }
+            log(`✅ BDATA OK: ${Object.keys(TEMPLATE_MAP).length} Templates.`, "#00e676");
+            return true;
+        } catch(e) { log("Info: Utilisation Fallback Statique.", "orange"); return false; }
+    }
+
+    // --- LOGIQUE METIER (IDENTIFICATION ET CONVERSION DE NOM) ---
     function identifyModel(rawPower, typeChar) {
-        // 1. Cherche correspondance exacte ou multiple
+        // Définir les types complets pour le remplacement
+        let fullType = "FUEL";
+        let shortType = "F";
+        
+        if (typeChar === 'H') { fullType = "HEALTH"; shortType = "H"; }
+        if (typeChar === 'R') { fullType = "REPAIR"; shortType = "R"; }
+        if (typeChar === 'S') { fullType = "SUPPLY"; shortType = "S"; }
+
+        // Cherche correspondance exacte ou multiple
         for (let baseP in REF_CATALOG) {
             let base = parseFloat(baseP);
             let ratio = rawPower / base;
@@ -341,8 +394,15 @@
             if (ratio >= 1 && Math.abs(ratio - Math.round(ratio)) < 0.05) {
                 let mult = Math.round(ratio);
                 let ref = REF_CATALOG[baseP];
-                let fixedName = ref.name.replace("_F", "_" + typeChar).replace("OWNER_F", "OWNER_"+typeChar); // Ex: S1_OWNER_FUEL
                 
+                // CONVERSION DU NOM
+                let rawName = ref.name; // ex: C_F1_PRODUCER_FUEL
+                // Remplacer _FUEL par _HEALTH etc.
+                let nameStep1 = rawName.replace("_FUEL", "_" + fullType);
+                // Remplacer _F par _H dans le prefixe (ex: C_F1 -> C_H1)
+                // Attention, on remplace la premiere occurrence de "_F"
+                let fixedName = nameStep1.replace("_F", "_" + shortType);
+
                 return {
                     name: fixedName,
                     mult: mult,
@@ -351,62 +411,60 @@
                 };
             }
         }
-        // Fallback si introuvable (ne devrait pas arriver avec la table complete)
+        // Fallback si introuvable
         return { 
             name: `CUSTOM (${rawPower})`, 
             mult: 1, 
             prod24: rawPower * 24, 
-            cost24: 0 
+            cost24: (rawPower * 24) * 0.085 
         };
     }
 
-    // --- SCAN V88 ---
+    function resolveBuildingStrict(b) {
+        let tid = b.template_id;
+        let template = TEMPLATE_MAP[tid];
+        let pType, pVal;
+        if(template) { pVal = template.base; pType = template.type; } 
+        else { pVal = extractPower(b); let rawP = Array.isArray(b.power) ? b.power[0] : b.power; if(typeof rawP === 'string') { if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S'; } }
+        
+        if(!pType) return null;
+        
+        // Use current power (which includes stacks) for calc
+        let currentPower = extractPower(b); 
+        let info = identifyModel(currentPower, pType);
+
+        return { 
+            name: info.name, 
+            type: pType, 
+            prod24: info.prod24, 
+            cost24: info.cost24, 
+            stack: info.mult, 
+            tid: tid 
+        };
+    }
+
+    // --- SCAN V89 ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        
-        log("🌍 SCAN GLOBAL V88 (ATOMIC MATCHING)...","#fff");
+        await loadTemplateData();
+        log("🌍 SCAN GLOBAL V89 (EXACT NAMES)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
-        
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
         let modelStats = { F:{}, H:{}, R:{}, S:{} };
-
         try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
-            
             for(let b of data.rows){
                 stats.total++;
-                let pVal=extractPower(b); 
-                let rawP=Array.isArray(b.power)?b.power[0]:b.power;
-                let pType=null;
-                if(typeof rawP==='string'){if(rawP.includes("DOVF"))pType='F';else if(rawP.includes("DOVH"))pType='H';else if(rawP.includes("DOVR"))pType='R';else if(rawP.includes("DOVS"))pType='S';}
-                
-                if(pType){
-                    let info = identifyModel(pVal, pType);
+                let info = resolveBuildingStrict(b);
+                if(info){
+                    let pType = info.type;
                     let mKey = info.name;
-                    // Clé unique pour le tableau : Nom + tid (pour avoir le lien atomic)
-                    // Mais on veut regrouper par modèle dans la liste.
-                    // On va stocker par "Nom + Mult" et garder un exemple de tid pour le lien.
-                    let listKey = info.mult > 1 ? `${mKey} (x${info.mult})` : mKey;
-
+                    let listKey = info.stack > 1 ? `${mKey} (x${info.stack})` : mKey;
                     if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0, tid: b.template_id };
-
                     stats[pType].count++;
                     let rdyTime=(parseFloat(b.last_claim)+parseFloat(b.delay));
                     let isReady=now>rdyTime;
-                    
-                    if(isReady){
-                        stats.ready++; stats[pType].rdy++;
-                    }else{
-                        stats.active++; stats[pType].act++;
-                        
-                        stats[pType].activePower += info.prod24;
-                        stats[pType].cost += info.cost24;
-                        stats.totalDovxCost24 += info.cost24;
-                        
-                        modelStats[pType][listKey].count++;
-                        modelStats[pType][listKey].dailyProd += info.prod24;
-                        // On garde le dernier tid actif pour le lien
-                        modelStats[pType][listKey].tid = b.template_id; 
-                    }
+                    if(isReady){ stats.ready++; stats[pType].rdy++; }
+                    else{ stats.active++; stats[pType].act++; stats[pType].activePower += info.prod24; stats[pType].cost += info.cost24; stats.totalDovxCost24 += info.cost24; modelStats[pType][listKey].count++; modelStats[pType][listKey].dailyProd += info.prod24; modelStats[pType][listKey].tid = b.template_id; }
                 }
             }
             setTextSafe('globalCount',fmt(stats.total));setTextSafe('gTotalCost',fmt(stats.totalDovxCost24));
@@ -428,7 +486,6 @@
                 if(item.count > 0) {
                     let unitP = item.count > 0 ? (item.dailyProd / item.count) : 0;
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${item.tid}`;
-                    // Nettoyage du nom pour affichage (retirer (x4) pour le lien si besoin, mais ici on garde tout le texte cliquable)
                     let cleanName = k.split(" (x")[0]; 
                     let multBadge = k.includes("(x") ? `<span class="ml-mult">${k.split(" (")[1].replace(")","")}</span>` : "";
                     
