@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V91 (STRICT ID MAPPING)</title>
+    <title>DoV - COMMAND V92 (ULTIMATE ACCOUNTING)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -18,7 +18,6 @@
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
-        /* UI ELEMENTS */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
         button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition: 0.2s; }
@@ -27,7 +26,7 @@
         input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; border-radius: 2px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* DASHBOARD V91 */
+        /* DASHBOARD V92 */
         .g-dashboard { display: flex; flex-direction: column; gap: 10px; }
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); position: relative; overflow: hidden; }
         .g-mc-left { font-size: 16px; font-weight: bold; display: flex; align-items: center; }
@@ -49,26 +48,31 @@
         .g-split { display: flex; justify-content: space-between; font-size: 10px; border-top: 1px solid #222; padding-top: 8px; margin-top:auto; }
         .c-act { color: var(--warn); font-weight:bold; } .c-rdy { color: #444; }
 
-        /* LISTE V91 */
+        /* LISTE V92 */
         .model-list-container { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
-        .ml-row { display: grid; grid-template-columns: 3fr 0.8fr 1.2fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
+        .ml-row { display: grid; grid-template-columns: 2.5fr 0.8fr 1.2fr 1.5fr; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
         .ml-name a { color: #ccc; text-decoration: none; border-bottom: 1px dotted #555; transition: 0.2s; font-weight:bold; }
         .ml-name a:hover { color: var(--sec); border-bottom-color: var(--sec); }
         .ml-tid { font-size: 9px; color: #555; margin-left:5px; font-family: monospace; }
         .ml-mult { color: var(--main); font-size:10px; background:#003300; padding:1px 4px; border-radius:3px; margin-left:5px; font-weight:bold; border:1px solid var(--main); }
-        .ml-count { color: var(--warn); text-align: center; }
+        
+        .status-badge { font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; text-align: center; display: inline-block; width: 60px; }
+        .s-prod { background: var(--main); color: #000; animation: pulse 2s infinite; }
+        .s-claim { background: var(--warn); color: #000; }
+
         .ml-unit { color: #666; text-align: right; }
         .ml-total { color: #fff; font-weight: bold; text-align: right; }
         .c-f { border-left: 3px solid var(--fuel); } .c-h { border-left: 3px solid var(--health); }
         .c-r { border-left: 3px solid var(--repair); } .c-s { border-left: 3px solid var(--supply); }
 
-        /* REST OF CSS */
         .logs { height: 100px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #666; overflow-y: auto; font-family: monospace; }
         .view-section { display: none; } .view-active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
+        
+        /* RESTE DU CSS (Zone, Eco...) */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -113,7 +117,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V91 STRICT ID MAPPING</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V92 ULTIMATE ACCOUNTING</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -140,7 +144,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V91)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V92)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -231,7 +235,7 @@
                     <div class="g-main-count">
                         <div class="g-mc-left">
                             <span class="live-dot"></span>
-                            <div>SCAN GLOBAL (STRICT ID MAPPING)</div>
+                            <div>SCAN GLOBAL (NOMINAGE ATOMIC)</div>
                             <div style="font-size:12px; color:#555; margin-left:10px;" id="globalCount">0 Bâtiments</div>
                         </div>
                         <div class="g-mc-right">
@@ -282,14 +286,14 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V91 STRICT ID MAPPING. Ready.</div>
+<div class="logs" id="console">> V92. Start.</div>
 
 <script>
     // ========================================================
-    // --- 1. TABLEAU DE REFERENCE (VOTRE EXCEL) ---
-    // Clé: Production Horaire (Valeur Unique par Template)
+    // --- 1. REFERENCE TABLE (VOTRE EXCEL) ---
+    // Clé: Puissance Horaire (Base) -> { NomExact, Cout6h }
     // ========================================================
-    const REF_CATALOG = {
+    const REF_TABLE = {
         5.40:   { name: "C_F1_PRODUCER_FUEL",  cost6h: 0.4590 },
         54.00:  { name: "SC_F2_PRODUCER_FUEL", cost6h: 4.5900 },
         12.15:  { name: "C_F2_PRODUCER_FUEL",  cost6h: 1.0328 },
@@ -309,7 +313,7 @@
         328.05: { name: "L_F2_PRODUCER_FUEL",  cost6h: 27.8843 },
         820.13: { name: "L_F3_PRODUCER_FUEL",  cost6h: 69.7106 },
         2255.34:{ name: "S1_OWNER_FUEL",       cost6h: 191.7042 } 
-        // Note: 2255.34 est aussi L_F4, mais priorité au S1 ou L_F4 selon ID
+        // 2255.34 peut être L_F4 ou S1. BDATA tranchera si besoin, sinon S1 par defaut pour les gros.
     };
 
     // --- CONFIG ---
@@ -320,7 +324,7 @@
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io","https://api.wax.alohaeos.com","https://api-wax.eosarabia.net"];
     let stopSignal=false; let rpcIndex=0; let ECO_DATA={demand:{fuel:0,health:0,repair:0,supply:0},supply:{fuel:0,health:0,repair:0,supply:0},dovx:{cities:0,buildings:0,rewards:0},scanned:0};
     
-    // CACHE BDATA (TEMPLATE ID -> BASE POWER)
+    // CACHE DYNAMIQUE (ID -> Base Power)
     let TEMPLATE_MAP = {}; 
 
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
@@ -355,9 +359,9 @@
         throw new Error("Stop/Err");
     }
 
-    // --- PHASE 1: CHARGER BDATA (MAPPING ID -> BASE POWER) ---
+    // --- PHASE 1: MAPPING BDATA (ID -> BASE POWER) ---
     async function loadTemplateData() {
-        log("🔄 CHARGEMENT BDATA (SMART CONTRACT)...", "#sec");
+        log("🔄 CHARGEMENT BDATA...", "#sec");
         let nextKey = ""; let hasMore = true; TEMPLATE_MAP = {};
         try {
             while(hasMore && !stopSignal) {
@@ -367,140 +371,118 @@
                     let tid = row.template_id;
                     let rawVal = row.output || ""; if(Array.isArray(rawVal)) rawVal = rawVal[0];
                     let type = null;
-                    // Détection Type (F/H/R/S)
                     if(rawVal.includes("DOVF")) type = 'F'; else if(rawVal.includes("DOVH")) type = 'H'; else if(rawVal.includes("DOVR")) type = 'R'; else if(rawVal.includes("DOVS")) type = 'S';
-                    // Extraction Puissance de Base (UNITAIRE)
                     let val = parseFloat(rawVal.replace(/[^0-9.]/g, '')) || 0;
-                    
                     if(tid && type) TEMPLATE_MAP[tid] = { base: val, type: type };
                 });
                 if(data.more) nextKey = data.next_key; else hasMore = false;
             }
             log(`✅ BDATA OK: ${Object.keys(TEMPLATE_MAP).length} Templates.`, "#00e676");
             return true;
-        } catch(e) { log("Info: Erreur BDATA, risque d'erreurs.", "orange"); return false; }
+        } catch(e) { log("Err BDATA: "+e.message, "orange"); return false; }
     }
 
-    // --- PHASE 2: RESOLUTION STRICTE (V91) ---
-    function resolveBuildingStrict(b) {
+    // --- PHASE 2: PROCESSING (ID -> TABLEAU -> CALCUL) ---
+    function processBuilding(b) {
         let tid = b.template_id;
-        let template = TEMPLATE_MAP[tid]; // On a chargé ça depuis la blockchain
-        
-        let pType, pBaseVal;
+        let templateInfo = TEMPLATE_MAP[tid]; // Vient de BDATA
+        let pBase, pType;
 
-        // 1. OBTENIR LA VALEUR DE BASE (UNITAIRE) VIA ID
-        if(template) {
-            pBaseVal = template.base; 
-            pType = template.type;
+        // 1. Trouver la Base Power
+        if (templateInfo) {
+            pBase = templateInfo.base; pType = templateInfo.type;
         } else {
-            // Fallback si ID inconnu (ne devrait pas arriver si BDATA chargé)
+            // Fallback (Rare)
+            pBase = extractPower(b);
             let rawP = Array.isArray(b.power) ? b.power[0] : b.power;
-            pBaseVal = extractPower(b);
             if(typeof rawP === 'string') {
                 if(rawP.includes("DOVF")) pType = 'F'; else if(rawP.includes("DOVH")) pType = 'H'; else if(rawP.includes("DOVR")) pType = 'R'; else if(rawP.includes("DOVS")) pType = 'S';
             }
         }
 
-        if(!pType) return null;
+        if (!pType) return null;
 
-        // 2. CHERCHER LE NOM DANS VOTRE TABLEAU (REF_CATALOG)
-        // On utilise pBaseVal qui est la valeur UNITAIRE (5.40, 83.53, 2255.34...)
-        let ref = REF_CATALOG[pBaseVal];
+        // 2. Trouver le Nom & Coût dans le Tableau de Référence
+        // On cherche pBase (ex: 2255.34)
+        let ref = REF_TABLE[pBase];
         
-        // Si pas de match exact (arrondi float), on cherche le plus proche
+        // Si petit écart float, on cherche le plus proche
         if (!ref) {
-            for(let k in REF_CATALOG) {
-                if(Math.abs(parseFloat(k) - pBaseVal) < 0.05) {
-                    ref = REF_CATALOG[k];
+            for(let k in REF_TABLE) {
+                if(Math.abs(parseFloat(k) - pBase) < 0.05) {
+                    ref = REF_TABLE[k];
                     break;
                 }
             }
         }
 
-        let name = "UNKNOWN_TEMPLATE";
+        let name = "UNKNOWN";
         let cost6h = 0;
 
         if (ref) {
-            // 3. CONSTRUCTION DU NOM EXACT (Remplacer FUEL par HEALTH etc.)
-            let rawName = ref.name; // Ex: "C_F1_PRODUCER_FUEL" ou "S1_OWNER_FUEL"
+            let rawName = ref.name; // ex: S1_OWNER_FUEL
+            // Ajustement du Nom selon le Type (FUEL -> HEALTH, etc.)
+            let target = "FUEL";
+            if(pType === 'H') target = "HEALTH";
+            if(pType === 'R') target = "REPAIR";
+            if(pType === 'S') target = "SUPPLY";
             
-            // Logique de remplacement propre
-            let targetType = "FUEL";
-            if (pType === 'H') targetType = "HEALTH";
-            if (pType === 'R') targetType = "REPAIR";
-            if (pType === 'S') targetType = "SUPPLY";
-
-            // Remplacer "FUEL" par le bon type (ex: S1_OWNER_HEALTH)
-            name = rawName.replace("FUEL", targetType);
-            
-            // Remplacer le prefixe court (ex: C_F1 -> C_H1)
-            // On remplace "_F" par "_H" seulement si ce n'est pas "SC_F" (cas particulier SC_F2 -> SC_H2)
-            // Plus simple : On remplace "_F" par "_"+pType
+            name = rawName.replace("FUEL", target);
+            // Ajustement Prefixe (ex: C_F1 -> C_H1)
             name = name.replace("_F", "_" + pType);
-
+            
             cost6h = ref.cost6h;
         } else {
             name = `CUSTOM [${tid}]`;
-            cost6h = (pBaseVal * 6) * 0.085; // Fallback
+            cost6h = (pBase * 6) * 0.085;
         }
 
-        // 4. CALCUL DU STACK (Combien de cartes ?)
-        let currentTotalPower = extractPower(b);
+        // 3. Calcul du Stack
+        let curPower = extractPower(b);
         let stack = 1;
-        if (pBaseVal > 0) stack = Math.round(currentTotalPower / pBaseVal);
-        if (stack < 1) stack = 1;
+        if(pBase > 0) stack = Math.round(curPower / pBase);
+        if(stack < 1) stack = 1;
 
-        // 5. CALCULS FINAUX
-        // Production 24h = (Base * 24) * Stack
-        let prod24 = (pBaseVal * 24) * stack;
-        // Cout 24h = (Cout6h * 4) * Stack
-        let cost24 = (cost6h * 4) * stack;
+        // 4. Calculs 24H
+        let prod24 = (pBase * 24) * stack; // Base * 24 * Nbre Cartes
+        let cost24 = (cost6h * 4) * stack; // Cout 6h * 4 * Nbre Cartes
 
-        return { 
-            name: name, 
-            type: pType, 
-            prod24: prod24, 
-            cost24: cost24, 
-            stack: stack, 
-            tid: tid 
-        };
+        return { name, type: pType, prod24, cost24, stack, tid };
     }
 
-    // --- SCAN V91 ---
+    // --- SCAN ---
     async function startGlobalBuildings(){
         stopSignal=false;switchView('buildingView');document.getElementById('globalStatsArea').style.display='block';document.getElementById('buildList').style.display='none';document.getElementById('btnStop').style.display='inline-block';
-        
         await loadTemplateData();
-
-        log("🌍 SCAN GLOBAL V91 (STRICT ID MAPPING)...","#fff");
+        log("🌍 SCAN GLOBAL V92 (ACCOUNTING)...","#fff");
         let nextKey="";let hasMore=true;const fmt=(n)=>n.toLocaleString(undefined,{maximumFractionDigits:0});
-        
         let stats={total:0,active:0,ready:0,totalDovxCost24:0,F:{count:0,activePower:0,cost:0,act:0,rdy:0},H:{count:0,activePower:0,cost:0,act:0,rdy:0},R:{count:0,activePower:0,cost:0,act:0,rdy:0},S:{count:0,activePower:0,cost:0,act:0,rdy:0}};
         let modelStats = { F:{}, H:{}, R:{}, S:{} };
+        const now=Date.now()/1000;
 
-        try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;const now=Date.now()/1000;
-            
+        try{while(hasMore&&!stopSignal){await new Promise(r=>setTimeout(r,10));const data=await robustFetch("dovutilstake","buildings",nextKey,300);if(!data.rows||data.rows.length===0)break;
             for(let b of data.rows){
                 stats.total++;
-                let info = resolveBuildingStrict(b);
-                
+                let info = processBuilding(b);
                 if(info){
                     let pType = info.type;
-                    let mKey = info.name;
-                    // Clé de liste : Nom + Stack (pour regrouper les x1, x4, etc.)
-                    let listKey = info.stack > 1 ? `${mKey} (x${info.stack})` : mKey;
-
-                    if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0, tid: b.template_id, stack: info.stack };
+                    // Clé Unique pour Liste: Nom + Stack (pour voir "S1 x1" séparé de "S1 x2" si besoin)
+                    let listKey = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
+                    
+                    if(!modelStats[pType][listKey]) modelStats[pType][listKey] = { count:0, dailyProd:0, tid: info.tid, stack: info.stack };
 
                     stats[pType].count++;
                     let rdyTime=(parseFloat(b.last_claim)+parseFloat(b.delay));
                     let isReady=now>rdyTime;
                     
                     if(isReady){
+                        // STATUT: READY/IDLE (Ne produit pas)
                         stats.ready++; stats[pType].rdy++;
+                        // On peut choisir d'afficher quand même dans la liste mais sans ajouter au total Prod
+                        // Ici, on ajoute au compte, mais Prod = 0 pour le global flow
                     }else{
+                        // STATUT: ACTIVE (Produit)
                         stats.active++; stats[pType].act++;
-                        
                         stats[pType].activePower += info.prod24;
                         stats[pType].cost += info.cost24;
                         stats.totalDovxCost24 += info.cost24;
@@ -529,14 +511,15 @@
                 if(item.count > 0) {
                     let unitP = item.count > 0 ? (item.dailyProd / item.count) : 0;
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${item.tid}`;
+                    let cleanName = k.split(" (x")[0];
+                    let stackBadge = k.includes("(x") ? `<span class="ml-mult">${k.split(" (")[1].replace(")","")}</span>` : "";
                     
-                    // Nettoyage Nom
-                    let displayName = k.split(" (x")[0];
-                    let stackBadge = item.stack > 1 ? `<span class="ml-mult">x${item.stack}</span>` : "";
+                    // STATUS BADGE (Simplified here as active count)
+                    let statusHtml = `<span class="status-badge s-prod">PROD</span>`;
 
                     html += `<div class="ml-row">
-                        <div class="ml-name"><a href="${link}" target="_blank">${displayName}</a>${stackBadge}<span class="ml-tid">#${item.tid}</span></div>
-                        <div class="ml-count">${item.count} act.</div>
+                        <div class="ml-name"><a href="${link}" target="_blank">${cleanName}</a>${stackBadge}<span class="ml-tid">#${item.tid}</span></div>
+                        <div class="ml-count">${item.count} ${statusHtml}</div>
                         <div class="ml-unit">${fmt(unitP)}/u</div>
                         <div class="ml-total">${fmt(item.dailyProd)}</div>
                     </div>`;
