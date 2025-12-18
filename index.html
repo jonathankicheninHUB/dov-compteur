@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V101 (FULL PRODUCTION)</title>
+    <title>DoV - COMMAND V102 (PERFECT FUSION)</title>
     <style>
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
@@ -10,47 +10,53 @@
             --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f;
             --bg: #050505; --panel: #111; --card-bg: #141414;
         }
-        body { background-color: var(--bg); color: #ccc; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg); color: #ccc; font-family: 'Segoe UI', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; }
         .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
-        
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 260px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #080808; }
         
-        /* BOXES & INPUTS */
         .box { border: 1px solid #333; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 4px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; text-transform: uppercase; }
-        button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; transition:0.2s; }
-        button:hover { opacity: 0.8; }
+        button { width: 100%; padding: 8px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; border-radius: 2px; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-global { background: #fff; color: #000; }
-        input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; margin-bottom: 5px; font-family: monospace; }
+        input { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
 
-        /* VUES */
         .view-section { display: none; } .view-active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
 
-        /* ZONE VIEW CSS */
+        /* ZONE VIEW COMPLETE (V77) */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
+        .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
+        .stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 5px; }
+        .val-win { color: var(--main); } .val-cost-x { color: var(--dovx); font-weight: bold; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+        .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
+        
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 100px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; position: relative; min-height: 110px; opacity: 0.6; display: flex; flex-direction: column; justify-content: space-between; }
         .zone.active { opacity: 1; border-color: #444; background: #0e0e0e; }
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
-        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: auto; }
-        
-        /* ECO VIEW CSS */
+        .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
+        .z-row { display: flex; justify-content: space-between; }
+        .z-earn { color: var(--main); font-weight: bold; } .z-burn { color: var(--alert); } .z-burn-x { color: var(--dovx); font-weight: bold; }
+        .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
+
+        /* ECO VIEW */
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; font-weight:bold; }
         .eco-val { font-size: 18px; font-weight: bold; color: #fff; }
-        
-        /* BUILDING VIEW CSS (CERTIFIED) */
+
+        /* BUILDINGS VIEW (V101 STRICT) */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
-        .live-dot { height: 8px; width: 8px; background-color: var(--alert); border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite; margin-right: 5px; }
-        @keyframes pulse-live { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; min-height:100px; }
         .g-card-head { font-weight:bold; font-size:12px; border-bottom:1px solid #222; padding-bottom:5px; }
@@ -74,21 +80,20 @@
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
 
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
-
         .logs { height: 100px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #666; overflow-y: auto; font-family: monospace; margin-top: auto;}
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V101 FULL</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V102 PERFECT FUSION</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="box">
-            <div class="box-title">CONFIGURATION</div>
+        <div class="box" style="border-color: var(--gold)">
+            <div class="box-title" style="color:var(--gold)">CONFIGURATION</div>
             <label class="inp-label">Prix WAX ($)</label>
             <input type="number" id="inpWax" value="0.00786" step="0.00001">
             <label class="inp-label">Parité DOVX</label>
@@ -106,7 +111,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. BÂTIMENTS (CERTIFIÉ)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V101)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN GLOBAL (V102)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. JOUEUR (TARGET)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -118,6 +123,20 @@
         <div id="statusMsg" style="display:none; color:var(--sec); text-align:center; margin-bottom:10px;"></div>
 
         <div id="zoneView" class="view-section">
+            <div class="stats-row">
+                <div class="stat"><span class="stat-val" id="dDivs">0</span><span class="stat-lbl">Divisions</span></div>
+                <div class="stat"><span class="stat-val val-win" id="dGain">0</span><span class="stat-lbl">GAIN (DOVX)</span></div>
+                <div class="stat" style="border-top-color: #444">
+                    <div class="res-grid">
+                        <div class="res-item"><span><span class="dot d-fuel"></span>DOVF</span> <span id="lFuel" style="color:var(--fuel)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-health"></span>DOVH</span> <span id="lHealth" style="color:var(--health)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-repair"></span>DOVR</span> <span id="lRepair" style="color:var(--repair)">0</span></div>
+                        <div class="res-item"><span><span class="dot d-supply"></span>DOVS</span> <span id="lSupply" style="color:var(--supply)">0</span></div>
+                    </div>
+                    <span class="stat-lbl">CONSO ACTIVE / 24H</span>
+                </div>
+                <div class="stat"><span class="stat-val val-cost-x" id="dCostX">0</span><span class="stat-lbl">Conso. Villes</span></div>
+            </div>
             <div class="zones-grid" id="zonesArea"></div>
         </div>
 
@@ -143,14 +162,12 @@
                 <div><span class="live-dot"></span> <b>FLUX ACTIF 24H (CONFORME)</b><br><span id="globalCount">En attente...</span></div>
                 <div style="text-align:right"><small>COÛT DOV-X</small><br><span class="g-cost-val" id="gTotalCost">0</span></div>
             </div>
-            
             <div class="g-detail-grid">
                 <div class="g-card" style="border-top:3px solid var(--fuel)"><div class="g-card-head"><span style="color:var(--fuel)">FUEL</span></div><div class="g-prod-val" style="color:var(--fuel)" id="pwr-F">0</div><div class="g-prod-lbl">PROD / 24H</div></div>
                 <div class="g-card" style="border-top:3px solid var(--health)"><div class="g-card-head"><span style="color:var(--health)">HEALTH</span></div><div class="g-prod-val" style="color:var(--health)" id="pwr-H">0</div><div class="g-prod-lbl">PROD / 24H</div></div>
                 <div class="g-card" style="border-top:3px solid var(--repair)"><div class="g-card-head"><span style="color:var(--repair)">REPAIR</span></div><div class="g-prod-val" style="color:var(--repair)" id="pwr-R">0</div><div class="g-prod-lbl">PROD / 24H</div></div>
                 <div class="g-card" style="border-top:3px solid var(--supply)"><div class="g-card-head"><span style="color:var(--supply)">SUPPLY</span></div><div class="g-prod-val" style="color:var(--supply)" id="pwr-S">0</div><div class="g-prod-lbl">PROD / 24H</div></div>
             </div>
-
             <div class="model-list-container">
                 <div class="ml-col c-f" id="list-F"><div class="ml-header">FUEL - DÉTAIL</div></div>
                 <div class="ml-col c-h" id="list-H"><div class="ml-header">HEALTH - DÉTAIL</div></div>
@@ -161,12 +178,12 @@
 
         <div id="targetView" class="view-section"></div>
 
-        <div class="logs" id="console">> V101 FULL. Ready.</div>
+        <div class="logs" id="console">> V102 PERFECT FUSION. Ready.</div>
     </main>
 </div>
 
 <script>
-    // --- 1. TABLEAU MAITRE (NOMS EXACTS + COUT) ---
+    // --- 1. DONNÉES (BUILDINGS + ZONES) ---
     const MASTER_TABLE = {
         5.40:{name:"C_F1_PRODUCER_FUEL",cost6h:0.4590}, 54.00:{name:"SC_F2_PRODUCER_FUEL",cost6h:4.5900},
         12.15:{name:"C_F2_PRODUCER_FUEL",cost6h:1.0328}, 121.50:{name:"SC_F3_PRODUCER_FUEL",cost6h:10.3275},
@@ -179,67 +196,107 @@
         328.05:{name:"L_F2_PRODUCER_FUEL",cost6h:27.8843}, 820.13:{name:"L_F3_PRODUCER_FUEL",cost6h:69.7106},
         2255.34:{name:"S1_OWNER_FUEL",cost6h:191.7042}
     };
-
-    const ZONE_DB={1:{name:"Beach 1"},2:{name:"Beach 2"},3:{name:"Beach 3"},4:{name:"Bunker"},5:{name:"Forest 1"},6:{name:"Forest 2"},7:{name:"Forest 3"},8:{name:"Camp"},9:{name:"Hill 1"},10:{name:"Hill 2"},11:{name:"Hill 3"},12:{name:"Radar"},13:{name:"Plain 1"},14:{name:"Plain 2"},15:{name:"Plain 3"},16:{name:"HQ"},17:{name:"City 1"},18:{name:"City 2"},19:{name:"City 3"},20:{name:"City 4"}};
+    
+    // ZONES AVEC COUTS ET REWARDS (V77)
+    const ZONE_DB={
+        1:{name:"Beach 1",cost:1160,costX:0,reward:400}, 2:{name:"Beach 2",cost:6968,costX:0,reward:2405},
+        3:{name:"Beach 3",cost:8800,costX:0,reward:3037}, 4:{name:"Bunker",cost:11120,costX:0,reward:3838},
+        5:{name:"Forest 1",cost:14024,costX:0,reward:4839}, 6:{name:"Forest 2",cost:17704,costX:0,reward:6092},
+        7:{name:"Forest 3",cost:22352,costX:0,reward:7659}, 8:{name:"Camp",cost:28220,costX:0,reward:9617},
+        9:{name:"Hill 1",cost:37052,costX:0,reward:12557}, 10:{name:"Hill 2",cost:48652,costX:0,reward:16418},
+        11:{name:"Hill 3",cost:64516,costX:0,reward:21703}, 12:{name:"Radar",cost:84712,costX:0,reward:28427},
+        13:{name:"Plain 1",cost:99384,costX:0,reward:34300}, 14:{name:"Plain 2",cost:125708,costX:0,reward:42083},
+        15:{name:"Plain 3",cost:151164,costX:0,reward:50570}, 16:{name:"HQ",cost:188000,costX:0,reward:64884},
+        17:{name:"City 1",cost:0,costX:1664,reward:0}, 18:{name:"City 2",cost:0,costX:4448,reward:0},
+        19:{name:"City 3",cost:0,costX:13440,reward:0}, 20:{name:"City 4",cost:0,costX:29120,reward:0}
+    };
     const ZONE_ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     const RPCS=["https://wax.greymass.com","https://api.waxsweden.org","https://wax.eosn.io"];
     let stopSignal=false; let rpcIndex=0; let TEMPLATE_CACHE={};
 
+    // --- UTILS ---
     function log(msg,color="#888"){const c=document.getElementById('console');if(c)c.innerHTML=`<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`+c.innerHTML;}
     function switchView(id){document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('view-active'));document.getElementById(id).classList.add('view-active');}
-    
     async function robustFetch(code,table,lowerBound,limit=500){
-        const proxy=document.getElementById('inpProxy').value;
-        const server=RPCS[rpcIndex%RPCS.length];
+        const proxy=document.getElementById('inpProxy').value; const server=RPCS[rpcIndex%RPCS.length];
         try{
             const res=await fetch(proxy+encodeURIComponent(server+"/v1/chain/get_table_rows"),{method:'POST',body:JSON.stringify({json:true,code,scope:code,table,limit,lower_bound:lowerBound||"0"})});
             if(!res.ok)throw new Error("HTTP"+res.status); return await res.json();
         }catch(e){rpcIndex++; throw e;}
     }
+    function setTextSafe(id,txt){let el=document.getElementById(id);if(el)el.innerText=txt;}
 
-    // --- 1. ZONE SCAN ---
+    // --- 1. ZONE SCAN (LOGIQUE V77 AVEC CALCUL COUTS) ---
     async function startZoneScan(){
         stopSignal=false; switchView('zoneView'); document.getElementById('btnStop').style.display='inline-block';
-        initGrid(); log("🌍 Map Scan...","#fff");
-        let next="0"; let more=true; let counts={};
+        initGrid(); log("🌍 Map Scan V102 (Full Calc)...","#fff");
+        let next="0"; let more=true; 
+        let stats = { divs:0, burn:{F:0,H:0,R:0,S:0}, costX:0, gain:0, zones:{} };
+        ZONE_ORDER.forEach(id=>stats.zones[id]={count:0, active:0});
+
         try{
             while(more && !stopSignal){
                 const data=await robustFetch("dovpvecontrl","sdivisions",next);
                 if(!data.rows)break;
                 data.rows.forEach(r=>{
-                    let zid=r.zone_id||r.zoneID;
-                    if(!counts[zid]) counts[zid]={total:0,active:0};
-                    counts[zid].total++;
-                    if(Date.now()/1000 < parseFloat(r.end_time)) counts[zid].active++;
+                    stats.divs++;
+                    let zid=r.zone_id||r.zoneID; let zDef=ZONE_DB[zid];
+                    if(stats.zones[zid]){
+                        stats.zones[zid].count++;
+                        if(Date.now()/1000 < parseFloat(r.end_time)){
+                            stats.zones[zid].active++;
+                            // Calculs financiers V77
+                            if(zDef.cost>0){
+                                stats.burn.F+=zDef.cost; stats.burn.H+=zDef.cost;
+                                stats.burn.R+=zDef.cost; stats.burn.S+=zDef.cost;
+                            }
+                            stats.costX+=zDef.costX;
+                            // Estim Gain (basique)
+                            if(zDef.reward>0) stats.gain+=zDef.reward;
+                        }
+                    }
                 });
-                updateGrid(counts);
+                updateZoneDash(stats);
                 if(data.more)next=data.next_key; else more=false;
             }
             log("✅ Map OK.","#00e676"); document.getElementById('btnStop').style.display='none';
         }catch(e){log(e.message,"red");}
     }
     function initGrid(){
-        let h=""; ZONE_ORDER.forEach(id=>{ h+=`<div class="zone" id="z-${id}"><div class="z-head"><span>${ZONE_DB[id].name}</span><span id="zt-${id}">0</span></div><div class="z-act-text"><span style="color:var(--warn)" id="za-${id}">0 act</span></div></div>`; });
+        let h=""; ZONE_ORDER.forEach(id=>{ 
+            let z=ZONE_DB[id];
+            let cTxt = z.cost>0 ? `-${z.cost}` : `-${z.costX}X`;
+            h+=`<div class="zone" id="z-${id}"><div class="z-head"><span>${z.name}</span><span id="zt-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span><span style="color:#d32f2f">${cTxt}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="za-${id}">0 act</span></div></div>`; 
+        });
         document.getElementById('zonesArea').innerHTML=h;
     }
-    function updateGrid(c){
-        for(let id in c){
-            let d=c[id]; let el=document.getElementById(`z-${id}`);
-            if(el){ el.classList.add('active'); document.getElementById(`zt-${id}`).innerText=d.total; document.getElementById(`za-${id}`).innerText=d.active+" act"; }
+    function updateZoneDash(s){
+        setTextSafe('dDivs',s.divs.toLocaleString());
+        setTextSafe('dGain',"+ "+s.gain.toLocaleString()+" DOVX");
+        setTextSafe('dCostX',"- "+s.costX.toLocaleString()+" DOVX");
+        setTextSafe('lFuel',"-"+s.burn.F.toLocaleString()); setTextSafe('lHealth',"-"+s.burn.H.toLocaleString());
+        setTextSafe('lRepair',"-"+s.burn.R.toLocaleString()); setTextSafe('lSupply',"-"+s.burn.S.toLocaleString());
+        
+        for(let id in s.zones){
+            let d=s.zones[id]; let el=document.getElementById(`z-${id}`);
+            if(el){ el.classList.add('active'); document.getElementById(`zt-${id}`).innerText=d.count; document.getElementById(`za-${id}`).innerText=d.active+" act"; }
         }
     }
 
-    // --- 2. ECO SCAN ---
+    // --- 2. ECO SCAN (LOGIQUE V77) ---
     async function startEconomyScan(){
         stopSignal=false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block';
-        log("💰 Eco Scan...","#fff");
-        let next="0"; let more=true; let burn=0;
+        log("💰 Eco Scan V102...","#fff");
+        let next="0"; let more=true; let burnTotal=0;
         try{
             while(more && !stopSignal){
                 const data=await robustFetch("dovpvecontrl","sdivisions",next);
                 if(!data.rows)break;
-                data.rows.forEach(r=>{ if(Date.now()/1000 < parseFloat(r.end_time)) burn+=1; }); 
-                document.getElementById('ecoBurn').innerText = burn.toLocaleString()+" TU";
+                data.rows.forEach(r=>{ 
+                    let zid=r.zone_id; let z=ZONE_DB[zid];
+                    if(Date.now()/1000 < parseFloat(r.end_time) && z && z.cost>0) burnTotal+=z.cost; 
+                });
+                document.getElementById('ecoBurn').innerText = burnTotal.toLocaleString()+" TU";
                 if(data.more)next=data.next_key; else more=false;
             }
             log("✅ Eco OK.","#00e676"); document.getElementById('btnStop').style.display='none';
@@ -254,12 +311,15 @@
             const data=await robustFetch("dovpvecontrl","sdivisions",u,100);
             let rows=data.rows.filter(r=>r.owner===u||r.user===u);
             let h=`<div style="background:#111;padding:10px;">${u}: ${rows.length} Divs</div>`;
-            rows.forEach(r=>{ h+=`<div class="t-row"><span>${r.division_id}</span><span>${ZONE_DB[r.zone_id]?.name||r.zone_id}</span></div>`; });
+            rows.forEach(r=>{ 
+                let busy = Date.now()/1000 < parseFloat(r.end_time);
+                h+=`<div class="t-row"><span>#${r.division_id} (${ZONE_DB[r.zone_id]?.name})</span><span style="color:${busy?'var(--warn)':'var(--main)'}">${busy?'MISSION':'READY'}</span></div>`; 
+            });
             document.getElementById('targetView').innerHTML=h;
         }catch(e){log(e.message,"red");}
     }
 
-    // --- 4. BUILDINGS SCAN (FIXED V101) ---
+    // --- 4. GLOBAL BUILDINGS (MOTEUR V101 CERTIFIÉ) ---
     async function loadTemplateBase(){
         log("Init BDATA...", "#sec"); let next="0"; let more=true;
         try {
@@ -267,11 +327,9 @@
                 const data=await robustFetch("dovutilstake","bdata",next);
                 if(!data.rows)break;
                 data.rows.forEach(r=>{
-                    // FIX V101 : Protection stricte contre les valeurs vides/null
                     let out = "";
                     if(r.output && typeof r.output === 'string') out = r.output;
                     else if (Array.isArray(r.output) && r.output.length > 0) out = r.output[0];
-                    
                     if (out) {
                         let val=parseFloat(out.replace(/[^0-9.]/g,''));
                         let type=out.includes("DOVF")?"F":out.includes("DOVH")?"H":out.includes("DOVR")?"R":"S";
@@ -280,23 +338,15 @@
                 });
                 if(data.more)next=data.next_key; else more=false;
             }
-            log(`✅ BDATA Chargé: ${Object.keys(TEMPLATE_CACHE).length} Templates.`, "#00e676");
-        } catch(e) { log("⚠️ BDATA Error (Skipped): "+e.message, "orange"); }
+        } catch(e) { log("⚠️ BDATA Error: "+e.message, "orange"); }
     }
 
     function conformBuilding(b){
         let tid=b.template_id; let t=TEMPLATE_CACHE[tid];
         let pBase=0, pType="F";
-        
-        // 1. Identification via ID (Priorité Absolue)
         if(t){ pBase=t.base; pType=t.type; }
-        else{ 
-            let raw = (Array.isArray(b.power)?b.power[0]:b.power) || "0 DOVF";
-            pBase=parseFloat(raw.replace(/[^0-9.]/g,'')); 
-            pType=raw.includes("DOVF")?"F":raw.includes("DOVH")?"H":raw.includes("DOVR")?"R":"S"; 
-        }
+        else{ let raw = (Array.isArray(b.power)?b.power[0]:b.power) || "0 DOVF"; pBase=parseFloat(raw.replace(/[^0-9.]/g,'')); pType=raw.includes("DOVF")?"F":raw.includes("DOVH")?"H":raw.includes("DOVR")?"R":"S"; }
         
-        // 2. Mapping avec Tableau
         let ref=MASTER_TABLE[pBase];
         if(!ref){ for(let k in MASTER_TABLE) if(Math.abs(parseFloat(k)-pBase)<0.05){ ref=MASTER_TABLE[k]; break; } }
         
@@ -307,20 +357,16 @@
             cost6h=ref.cost6h;
         }
         
-        // 3. Calcul Stack & Prod (Tableau * 24 * Stack)
-        let curPStr = (Array.isArray(b.power)?b.power[0]:b.power) || "0";
-        let curP=parseFloat(curPStr.replace(/[^0-9.]/g,''));
-        let stack=1;
-        if(pBase > 0) stack=Math.round(curP/pBase);
-        if(stack < 1) stack=1;
+        let curP=parseFloat((Array.isArray(b.power)?b.power[0]:b.power).replace(/[^0-9.]/g,'') || "0");
+        let stack=1; if(pBase > 0) stack=Math.round(curP/pBase); if(stack < 1) stack=1;
         
         return { name, type:pType, prod24:(pBase*24)*stack, cost24:(cost6h*4)*stack, stack, tid };
     }
 
     async function startGlobalBuildings(){
         stopSignal=false; switchView('buildingView'); document.getElementById('btnStop').style.display='inline-block';
-        await loadTemplateBase(); // Obligatoire
-        log("🚀 Scan Buildings V101...", "#fff");
+        await loadTemplateBase();
+        log("🚀 Scan Buildings V102...", "#fff");
         let next="0"; let more=true; let groups={F:{},H:{},R:{},S:{}}; let stats={total:0, cost:0, p:{F:0,H:0,R:0,S:0}};
         const now=Date.now()/1000;
 
