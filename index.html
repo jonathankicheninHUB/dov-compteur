@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V123 (RAW DATA)</title>
+    <title>DoV - COMMAND V124 (FULL FIX)</title>
     <style>
         /* --- STYLE ORIGINAL V70 --- */
         :root { 
@@ -97,7 +97,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V123 RAW DATA</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V124 RESTORED</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -124,7 +124,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V123)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V124)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -234,12 +234,10 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V123. RAW DATA.</div>
+<div class="logs" id="console">> V124. RESTORED.</div>
 
 <script>
-    // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
-    // Clé = Template ID
-    // Valeur = Nom officiel
+    // --- DICTATURE DU NOMMAGE (LISTE COMPLETE) ---
     const TEMPLATE_NAMES = {
         "490122": "C_F1_PRODUCER_FUEL",  
         "492383": "C_F1_PRODUCER_FUEL",
@@ -260,8 +258,32 @@
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    const ZONE_DB = { 1:{name:"Beach 1"},2:{name:"Beach 2"},3:{name:"Beach 3"},4:{name:"Bunker"},5:{name:"Forest 1"},6:{name:"Forest 2"},7:{name:"Forest 3"},8:{name:"Camp"},9:{name:"Hill 1"},10:{name:"Hill 2"},11:{name:"Hill 3"},12:{name:"Radar"},13:{name:"Plain 1"},14:{name:"Plain 2"},15:{name:"Plain 3"},16:{name:"HQ"},17:{name:"City 1"},18:{name:"City 2"},19:{name:"City 3"},20:{name:"City 4"}};
+    
+    // --- RESTAURATION DE LA DB ZONE V70 COMPLÈTE ---
+    const ZONE_DB = {
+        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
+        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
+        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
+        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
+        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4839.00 },
+        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6092.00 },
+        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7659.00 },
+        8:  { name: "Camp",      cost: 28220, costX: 0, reward: 9617.00 },
+        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12557.00 },
+        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16418.00 },
+        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 21703.00 },
+        12: { name: "Radar",    cost: 84712, costX: 0, reward: 28427.00 },
+        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
+        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 42083.00 },
+        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 50570.00 },
+        16: { name: "HQ",        cost: 188000, costX: 0, reward: 64884.00 },
+        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
+        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
+        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
+        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
+    };
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    
     const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
     let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
@@ -280,165 +302,4 @@
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
         while(attempts < 15 && !stopSignal) {
             const server = RPCS[rpcIndex % RPCS.length]; let url = server + "/v1/chain/get_table_rows";
-            let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
-            if(useProxy && customProxy.length > 5) url = customProxy + encodeURIComponent(url); else if(useProxy) url = PROXY_URL + encodeURIComponent(url);
-            try {
-                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"TUNNEL":"DIRECT")+": "+new URL(server).hostname;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
-                const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
-                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
-                const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
-                if(!res.ok) throw new Error("HTTP " + res.status);
-                return await res.json();
-            } catch(e) { rpcIndex++; attempts++; await new Promise(r => setTimeout(r, 500)); }
-        }
-        throw new Error("Arrêt.");
-    }
-
-    // --- CŒUR DU SYSTÈME V123 : LECTURE BRUTE SANS CALCUL ---
-    function conformBuilding(b) {
-        let tid = b.template_id.toString(); 
-        
-        // 1. STACK : On compte simplement la liste des asset_ids si elle existe
-        let stack = 1;
-        if (b.asset_ids && Array.isArray(b.asset_ids)) {
-            stack = b.asset_ids.length;
-        }
-
-        // 2. PRODUCTION : On lit la valeur 'power' officielle et on x24
-        let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
-        let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
-        let dailyProd = hourlyProd * 24;
-
-        // 3. TYPE
-        let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F";
-        else if(rawStr.includes("DOVH")) pType="H";
-        else if(rawStr.includes("DOVR")) pType="R";
-        else if(rawStr.includes("DOVS")) pType="S";
-
-        // 4. NOM : On regarde le dictionnaire. Si inconnu, on met l'ID.
-        let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
-
-        // 5. COUT (Estimation)
-        let cost24 = hourlyProd * 24 * 0.085; // Formule approx pour info
-
-        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: (stack>0 ? dailyProd/stack : dailyProd) };
-    }
-
-    async function startBuildings() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('buildingView');
-        document.getElementById('globalStatsArea').style.display = 'none';
-        document.getElementById('buildList').style.display = 'grid';
-        document.getElementById('buildDash').innerHTML = ""; 
-        document.getElementById('buildList').innerHTML = "";
-        
-        log(`🔍 Lecture Deck (${user})...`, "#fff");
-        
-        let nextKey = ""; let hasMore = true;
-        try {
-            while(hasMore && !stopSignal) {
-                const data = await robustFetch("dovutilstake", "buildings", nextKey, 200);
-                if(!data.rows) break;
-                const myBatch = data.rows.filter(r => r.owner === user);
-                const now = Date.now()/1000;
-                
-                myBatch.forEach(b => {
-                    let info = conformBuilding(b); 
-                    let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
-                    let isReady = now > rdyTime;
-                    
-                    let typeColor = "#fff";
-                    if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)";
-                    else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)";
-
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`;
-
-                    let card = `<div class="b-card">
-                        <div>
-                            <div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div>
-                            <div class="b-sub">#${b.asset_id}</div>
-                        </div>
-                        <div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div>
-                        <div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div>
-                    </div>`;
-                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card);
-                });
-                
-                if(data.more) nextKey = data.next_key; else hasMore = false;
-            }
-            log(`✅ Deck Joueur affiché.`, "#00e676");
-        } catch(e){ log("Err: "+e.message, "red"); }
-    }
-
-    async function startGlobalBuildings() {
-        stopSignal = false; switchView('buildingView');
-        document.getElementById('globalStatsArea').style.display = 'block';
-        document.getElementById('buildList').style.display = 'none';
-        document.getElementById('btnStop').style.display = 'inline-block';
-        
-        log("🌍 SCAN GLOBAL V123 (RAW)...", "#fff");
-        
-        let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
-        const now = Date.now()/1000;
-
-        try { while (more && !stopSignal) {
-            const data = await robustFetch("dovutilstake", "buildings", next);
-            if (!data.rows) break;
-            
-            data.rows.forEach(b => {
-                stats.total++;
-                let info = conformBuilding(b); 
-                let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
-                
-                if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd };
-                
-                let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
-                if (active) {
-                    groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24;
-                    stats.cost += info.cost24;
-                    stats.p[info.type] += info.prod24;
-                } else { groups[info.type][k].cr++; }
-            });
-            
-            document.getElementById('globalCount').innerText = stats.total.toLocaleString();
-            document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
-            ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-            renderLists(groups);
-            
-            if (data.more) next = data.next_key; else more = false;
-        } log("✅ SCAN FINI.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
-    }
-
-    function renderLists(groups){
-        for(let t in groups){
-            let h=`<div class="ml-header">TYPE ${t}</div>`;
-            let keys=Object.keys(groups[t]).sort((a,b)=>groups[t][b].unitProd - groups[t][a].unitProd);
-            keys.forEach(k=>{
-                let i=groups[t][k];
-                if(i.cp===0 && i.cr===0) return;
-                let link=`https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.tid}`;
-                let st=""; 
-                if(i.cp>0) st+=`<span class="status-badge s-prod">${i.cp} ACTIF</span> `; 
-                if(i.cr>0) st+=`<span class="status-badge s-claim">${i.cr} PRÊT</span>`;
-                let unit=i.cp>0 ? Math.round(i.tp/i.cp) : Math.round(i.unitProd * i.stack); 
-                h+=`<div class="ml-row"><div class="ml-name"><a href="${link}" target="_blank">${i.name}</a> <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${i.stack>1?'<span class="ml-mult">x'+i.stack+'</span>':''} <span style="font-size:9px;color:#555">[${i.tid}]</span></div><div class="ml-count">${st}</div><div class="ml-unit">${unit.toLocaleString()}/u</div><div class="ml-total">${Math.round(i.tp).toLocaleString()}</div></div>`;
-            });
-            let c=document.getElementById('list-'+t); if(c) c.innerHTML=h;
-        }
-    }
-
-    // --- AUTRES FONCTIONS V70 (INTACTES) ---
-    async function startZoneScan() { /* Code V70 */ stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); try { while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } } if (stats.divs % 200 === 0) updateZoneDash(stats); if(data.more) nextKey = data.next_key; else hasMore = false; } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } }
-    function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; } }); }
-    async function startEconomyScan() { /* Code V70 */ stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
-    function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
-    async function startTarget() { /* Code V70 */ const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
-
-    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
-    window.onload = function() { initGrid(); }
-</script>
-
-</body>
-</html>
+            let useProxy = (attempts > 2)
