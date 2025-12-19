@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V122 (TEMPLATE ID FIRST)</title>
+    <title>DoV - COMMAND V123 (RAW DATA)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 (INTACT) --- */
+        /* --- STYLE ORIGINAL V70 --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -18,7 +18,6 @@
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
-        
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
@@ -46,12 +45,11 @@
         .status-badge { font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; display:inline-block; width:60px; text-align:center; }
         .s-prod { background: var(--main); color: #000; animation: pulse 2s infinite; }
         .s-claim { background: var(--warn); color: #000; opacity: 0.8; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         .ml-unit { text-align:right; color:#666; } .ml-total { color: #fff; font-weight: bold; text-align: right; }
         .c-f { border-left: 4px solid var(--fuel); } .c-h { border-left: 4px solid var(--health); }
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
 
-        /* VUES V70 (ZONES, ECO...) */
+        /* VUES COMMUNES */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -88,6 +86,7 @@
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
+        .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .b-title { font-weight: bold; color: #9b59b6; font-size: 13px; } .b-sub { font-size: 10px; color: #666; } .b-stats { text-align: right; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
         .b-badge-ok { background: var(--main); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; }
@@ -98,7 +97,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V122 TEMPLATE ID FIRST</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V123 RAW DATA</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -125,7 +124,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V122)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V123)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -235,73 +234,35 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V122. REGISTRY LOADED.</div>
+<div class="logs" id="console">> V123. RAW DATA.</div>
 
 <script>
-    // --- 1. LE REGISTRE DES TEMPLATES (Source de Vérité) ---
+    // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
     // Clé = Template ID
-    // Valeur = { Nom, BaseProdHeure, CoutDOVX }
-    const TEMPLATE_REGISTRY = {
-        // FUEL
-        "490122": { name: "C_F1_PRODUCER_FUEL",  base: 5.40,   cost: 0.4590 },
-        "492383": { name: "C_F1_PRODUCER_FUEL",  base: 5.40,   cost: 0.4590 },
-        "492373": { name: "C_F1_PRODUCER_FUEL",  base: 5.40,   cost: 0.4590 },
-        "492385": { name: "C_F2_PRODUCER_FUEL",  base: 12.15,  cost: 1.0328 },
-        "492389": { name: "C_F3_PRODUCER_FUEL",  base: 30.38,  cost: 2.5819 },
-        "492377": { name: "SC_F2_PRODUCER_FUEL", base: 54.00,  cost: 4.5900 },
-        "492391": { name: "SC_F3_PRODUCER_FUEL", base: 121.50, cost: 10.3275 },
-        "492368": { name: "L_F1_PRODUCER_FUEL",  base: 145.80, cost: 12.3930 },
-        "492381": { name: "E_F2_PRODUCER_FUEL",  base: 109.35, cost: 9.2948 },
-        "492387": { name: "E_F3_PRODUCER_FUEL",  base: 273.38, cost: 23.2369 },
-        "492379": { name: "R_F1_PRODUCER_FUEL",  base: 16.20,  cost: 1.3770 },
-        "492376": { name: "R_F2_PRODUCER_FUEL",  base: 36.45,  cost: 3.0983 },
-        "492386": { name: "R_F3_PRODUCER_FUEL",  base: 91.13,  cost: 7.7456 },
-        "492390": { name: "R_F4_PRODUCER_FUEL",  base: 250.59, cost: 21.3005 },
-        "544068": { name: "S1_OWNER_FUEL",       base: 2255.34,cost: 191.7042 },
-        // Ajout générique basé sur la logique (si on croise d'autres IDs)
-        // Les inconnus passeront en mode "Fallback Math"
-    };
-
-    // Tableaux de fallback pour les IDs inconnus (Math Guessing)
-    const MATH_TABLE = {
-        5.40:   { name: "C_F1_PRODUCER_FUEL",  cost6h: 0.4590 }, 54.00:  { name: "SC_F2_PRODUCER_FUEL", cost6h: 4.5900 },
-        12.15:  { name: "C_F2_PRODUCER_FUEL",  cost6h: 1.0328 }, 121.50: { name: "SC_F3_PRODUCER_FUEL", cost6h: 10.3275 },
-        30.38:  { name: "C_F3_PRODUCER_FUEL",  cost6h: 2.5819 }, 83.53:  { name: "C_F4_PRODUCER_FUEL",  cost6h: 7.1002 },
-        1458.0: { name: "SC_F5_PRODUCER_FUEL", cost6h: 123.9300 }, 16.20:  { name: "R_F1_PRODUCER_FUEL",  cost6h: 1.3770 },
-        36.45:  { name: "R_F2_PRODUCER_FUEL",  cost6h: 3.0983 }, 91.13:  { name: "R_F3_PRODUCER_FUEL",  cost6h: 7.7456 },
-        250.59: { name: "R_F4_PRODUCER_FUEL",  cost6h: 21.3005 }, 48.60:  { name: "E_F1_PRODUCER_FUEL",  cost6h: 4.1310 },
-        109.35: { name: "E_F2_PRODUCER_FUEL",  cost6h: 9.2948 }, 273.38: { name: "E_F3_PRODUCER_FUEL",  cost6h: 23.2369 },
-        751.78: { name: "E_F4_PRODUCER_FUEL",  cost6h: 63.9014 }, 145.80: { name: "L_F1_PRODUCER_FUEL",  cost6h: 12.3930 },
-        328.05: { name: "L_F2_PRODUCER_FUEL",  cost6h: 27.8843 }, 820.13: { name: "L_F3_PRODUCER_FUEL",  cost6h: 69.7106 },
-        2255.34:{ name: "S1_OWNER_FUEL",       cost6h: 191.7042 } 
+    // Valeur = Nom officiel
+    const TEMPLATE_NAMES = {
+        "490122": "C_F1_PRODUCER_FUEL",  
+        "492383": "C_F1_PRODUCER_FUEL",
+        "492373": "C_F1_PRODUCER_FUEL",
+        "492385": "C_F2_PRODUCER_FUEL",
+        "492389": "C_F3_PRODUCER_FUEL",
+        "492377": "SC_F2_PRODUCER_FUEL",
+        "492391": "SC_F3_PRODUCER_FUEL",
+        "492368": "L_F1_PRODUCER_FUEL",
+        "492381": "E_F2_PRODUCER_FUEL",
+        "492387": "E_F3_PRODUCER_FUEL",
+        "492379": "R_F1_PRODUCER_FUEL",
+        "492376": "R_F2_PRODUCER_FUEL",
+        "492386": "R_F3_PRODUCER_FUEL",
+        "492390": "R_F4_PRODUCER_FUEL",
+        "544068": "S1_OWNER_FUEL"
     };
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
-        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
-        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
-        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
-        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4839.00 },
-        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6092.00 },
-        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7659.00 },
-        8:  { name: "Camp",      cost: 28220, costX: 0, reward: 9617.00 },
-        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12557.00 },
-        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16418.00 },
-        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 21703.00 },
-        12: { name: "Radar",    cost: 84712, costX: 0, reward: 28427.00 },
-        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
-        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 42083.00 },
-        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 50570.00 },
-        16: { name: "HQ",        cost: 188000, costX: 0, reward: 64884.00 },
-        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
-        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
-        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
-    };
+    const ZONE_DB = { 1:{name:"Beach 1"},2:{name:"Beach 2"},3:{name:"Beach 3"},4:{name:"Bunker"},5:{name:"Forest 1"},6:{name:"Forest 2"},7:{name:"Forest 3"},8:{name:"Camp"},9:{name:"Hill 1"},10:{name:"Hill 2"},11:{name:"Hill 3"},12:{name:"Radar"},13:{name:"Plain 1"},14:{name:"Plain 2"},15:{name:"Plain 3"},16:{name:"HQ"},17:{name:"City 1"},18:{name:"City 2"},19:{name:"City 3"},20:{name:"City 4"}};
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com", "https://api-wax.eosarabia.net"];
+    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
     let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
@@ -334,76 +295,37 @@
         throw new Error("Arrêt.");
     }
 
-    // --- LOGIQUE PRINCIPALE : IDENTIFICATION DU TEMPLATE ---
+    // --- CŒUR DU SYSTÈME V123 : LECTURE BRUTE SANS CALCUL ---
     function conformBuilding(b) {
-        let tid = b.template_id.toString(); // Forcer string pour la clé
+        let tid = b.template_id.toString(); 
         
-        // 1. Lire la Puissance Totale Brute (ex: 216513 DOVF)
+        // 1. STACK : On compte simplement la liste des asset_ids si elle existe
+        let stack = 1;
+        if (b.asset_ids && Array.isArray(b.asset_ids)) {
+            stack = b.asset_ids.length;
+        }
+
+        // 2. PRODUCTION : On lit la valeur 'power' officielle et on x24
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
-        let curP = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
-        
-        // 2. Déterminer le Type
+        let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
+        let dailyProd = hourlyProd * 24;
+
+        // 3. TYPE
         let pType = "F";
         if(rawStr.includes("DOVF")) pType="F";
         else if(rawStr.includes("DOVH")) pType="H";
         else if(rawStr.includes("DOVR")) pType="R";
         else if(rawStr.includes("DOVS")) pType="S";
 
-        // 3. RECHERCHE DANS LE REGISTRE (METHODE ID)
-        let def = TEMPLATE_REGISTRY[tid];
-        
-        let name = "INCONNU ["+tid+"]";
-        let pBase = 0;
-        let stack = 1;
-        let cost6h = 0;
+        // 4. NOM : On regarde le dictionnaire. Si inconnu, on met l'ID.
+        let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
 
-        if (def) {
-            // CAS 1: ID CONNU DANS LE REGISTRE -> ON APPLIQUE STRICTEMENT
-            name = def.name;
-            pBase = def.base;
-            cost6h = def.cost;
-            // On recalcule le stack proprement : Total / Base
-            if(pBase > 0) stack = Math.round(curP / pBase);
-            if(stack < 1) stack = 1;
-        } else {
-            // CAS 2: ID INCONNU -> TENTATIVE DE MATHS (SAFE)
-            // On essaie de trouver une base correspondante dans la Master Table
-            // Attention: On trie par base croissante pour matcher les petites cartes d'abord
-            let sortedBases = Object.keys(MATH_TABLE).map(parseFloat).sort((a,b)=>a-b);
-            
-            let found = false;
-            for (let base of sortedBases) {
-                // On ne devine que si la base est raisonnable pour éviter les faux positifs S1
-                let ratio = curP / base;
-                // Si c'est un multiple parfait (ou presque)
-                if (Math.abs(ratio - Math.round(ratio)) < 0.02) {
-                    pBase = base;
-                    stack = Math.round(ratio);
-                    let ref = MATH_TABLE[base];
-                    name = ref.name; // On prend le nom générique
-                    cost6h = ref.cost6h;
-                    found = true;
-                    break; 
-                }
-            }
-            
-            if (!found) {
-                // Vraiment inconnu, on affiche tel quel
-                pBase = curP;
-                cost6h = curP * 6 * 0.085; // Estimation coût
-            }
-            
-            // Re-Nommage propre du type (remplace FUEL par le vrai type)
-            if(name.includes("FUEL")) {
-                let tLong=(pType=="F")?"FUEL":(pType=="H")?"HEALTH":(pType=="R")?"REPAIR":"SUPPLY";
-                name = name.replace("FUEL", tLong).replace("_F", "_"+pType);
-            }
-        }
+        // 5. COUT (Estimation)
+        let cost24 = hourlyProd * 24 * 0.085; // Formule approx pour info
 
-        return { name, type:pType, prod24:(pBase*24)*stack, cost24:(cost6h*4)*stack, stack, tid, unitProd: pBase*24 };
+        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: (stack>0 ? dailyProd/stack : dailyProd) };
     }
 
-    // --- START BUILDINGS (JOUEUR) ---
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
@@ -412,7 +334,7 @@
         document.getElementById('buildDash').innerHTML = ""; 
         document.getElementById('buildList').innerHTML = "";
         
-        log(`🔍 Analyse Deck Joueur (${user})...`, "#fff");
+        log(`🔍 Lecture Deck (${user})...`, "#fff");
         
         let nextKey = ""; let hasMore = true;
         try {
@@ -450,14 +372,13 @@
         } catch(e){ log("Err: "+e.message, "red"); }
     }
 
-    // --- START GLOBAL (MONDE) ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         
-        log("🌍 SCAN GLOBAL V122...", "#fff");
+        log("🌍 SCAN GLOBAL V123 (RAW)...", "#fff");
         
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
