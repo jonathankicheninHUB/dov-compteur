@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V113 (ID AUTHORITY)</title>
+    <title>DoV - COMMAND V116 (ULTIMATE SAFEGUARD)</title>
     <style>
-        /* --- STYLE V70 ORIGINAL (INTACT) --- */
+        /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -18,14 +18,16 @@
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
+        
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
+        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
+        button:hover { opacity:0.8; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* UI BATIMENTS V113 */
+        /* UI BATIMENTS */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
@@ -36,7 +38,7 @@
         .model-list-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top:20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; }
-        .ml-row { display: grid; grid-template-columns: 4fr 0.8fr 1fr 1.2fr; padding: 8px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
+        .ml-row { display: grid; grid-template-columns: 3.5fr 0.8fr 1fr 1.2fr; padding: 8px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
         .ml-name a { color: #ccc; text-decoration: none; border-bottom: 1px dotted #555; font-weight:bold; }
         .ml-name a:hover { color: var(--sec); }
@@ -97,7 +99,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V113 ID AUTHORITY</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V116 ULTIMATE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -124,7 +126,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V113)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V116)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -234,10 +236,10 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V113. ID AUTHORITY.</div>
+<div class="logs" id="console">> V116. ULTIMATE SAFEGUARD.</div>
 
 <script>
-    // --- 1. TABLEAU DE RÉFÉRENCE STRICT ---
+    // --- 1. TABLEAU MAITRE (VOTRE REFERENCE) ---
     const MASTER_TABLE = {
         5.40:   { name: "C_F1_PRODUCER_FUEL",  cost6h: 0.4590 }, 54.00:  { name: "SC_F2_PRODUCER_FUEL", cost6h: 4.5900 },
         12.15:  { name: "C_F2_PRODUCER_FUEL",  cost6h: 1.0328 }, 121.50: { name: "SC_F3_PRODUCER_FUEL", cost6h: 10.3275 },
@@ -251,11 +253,15 @@
         2255.34:{ name: "S1_OWNER_FUEL",       cost6h: 191.7042 } 
     };
 
-    // --- ID FORCE LIST (DICTATURE DE L'ID) ---
+    // --- DICTATURE DE L'ID (SÉCURITÉ N°1) ---
+    // Ces associations sont prioritaires sur tout le reste.
     const KNOWN_TEMPLATES = {
-        "492376": { name: "R_F2_PRODUCER_FUEL", base: 36.45 }, // FIXE LE PROBLEME
-        "544068": { name: "S1_OWNER_FUEL",      base: 2255.34 }
+        "492376": { name: "R_F2_PRODUCER_FUEL", base: 36.45 }, 
+        "544068": { name: "S1_OWNER_FUEL",      base: 2255.34 },
+        "490122": { name: "C_F1_PRODUCER_FUEL", base: 5.40 } 
     };
+
+    let OFFICIAL_TEMPLATE_MAP = {}; 
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
@@ -316,8 +322,36 @@
         throw new Error("Arrêt.");
     }
 
+    // --- PHASE 0 : LIVE API SCAN (SÉCURITÉ N°2) ---
+    async function fetchOfficialTemplates() {
+        log("🔄 Scan AtomicAssets API...", "#fff");
+        const endpoint = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&page=1&limit=100&order=desc&sort=created";
+        const proxy = document.getElementById('inpProxy').value || PROXY_URL;
+        
+        try {
+            const res = await fetch(proxy + encodeURIComponent(endpoint));
+            if (!res.ok) throw new Error("API Error");
+            const json = await res.json();
+            
+            if (json.success && json.data) {
+                let count = 0;
+                json.data.forEach(t => {
+                    if (t.immutable_data && t.immutable_data.name) {
+                        OFFICIAL_TEMPLATE_MAP[t.template_id] = t.immutable_data.name;
+                        count++;
+                    }
+                });
+                log(`✅ ${count} Templates AtomicHub synchronisés.`, "#00e676");
+            }
+        } catch(e) {
+            log("⚠️ API Atomic inaccessible. Utilisation du mode local.", "orange");
+        }
+    }
+
     // --- PHASE 1 : BDATA SAFE LOADER ---
     async function loadTemplateBase(){
+        await fetchOfficialTemplates(); // On tente le live scan
+
         log("Init BDATA...", "#sec"); let next="0"; let more=true;
         try {
             while(more && !stopSignal){
@@ -335,11 +369,11 @@
                 });
                 if(data.more)next=data.next_key; else more=false;
             }
-            log(`✅ BDATA OK: ${Object.keys(TEMPLATE_CACHE).length} Modèles chargés.`, "#00e676");
+            log(`✅ BDATA OK.`, "#00e676");
         } catch(e) { log("⚠️ BDATA Warning: "+e.message, "orange"); }
     }
 
-    // --- PHASE 2 : IDENTIFICATION INTELLIGENTE (AVEC OVERRIDE) ---
+    // --- PHASE 2 : CONFORMITÉ ULTIME ---
     function conformBuilding(b) {
         let tid = b.template_id;
         let t = TEMPLATE_CACHE[tid];
@@ -354,20 +388,32 @@
         let stack = 1;
         let name = "CUSTOM ["+tid+"]";
 
-        // A) PRIORITÉ ABSOLUE : KNOWN_TEMPLATES (ID FORCÉ)
+        // A) SÉCURITÉ N°1 : LISTE HARDCODÉE
         if (KNOWN_TEMPLATES[tid]) {
             let kData = KNOWN_TEMPLATES[tid];
             pBase = kData.base;
             name = kData.name;
-            ref = MASTER_TABLE[pBase]; // On peut retrouver le coût via la base
+            ref = MASTER_TABLE[pBase]; 
         } 
-        // B) SINON BDATA
+        // B) SÉCURITÉ N°2 : API ATOMIC (LIVE)
+        else if (OFFICIAL_TEMPLATE_MAP[tid]) {
+            let officialName = OFFICIAL_TEMPLATE_MAP[tid];
+            name = officialName;
+            for(let k in MASTER_TABLE) {
+                if(MASTER_TABLE[k].name === officialName) {
+                    pBase = parseFloat(k);
+                    ref = MASTER_TABLE[k];
+                    break;
+                }
+            }
+        }
+        // C) SINON BDATA
         else if (t) {
             pBase = t.base;
             ref = MASTER_TABLE[pBase];
             if (!ref) { for(let k in MASTER_TABLE) if(Math.abs(parseFloat(k)-pBase)<0.05){ ref=MASTER_TABLE[k]; break; } }
         } 
-        // C) SINON MATH (Last Resort)
+        // D) SINON MATH (Dernier recours)
         else {
             let sortedBases = Object.keys(MASTER_TABLE).map(parseFloat).sort((a,b)=>b-a);
             for (let base of sortedBases) {
@@ -388,18 +434,18 @@
         }
 
         let cost6h = pBase * 6 * 0.085;
-        if(ref && !KNOWN_TEMPLATES[tid]){
+        if(ref && !KNOWN_TEMPLATES[tid] && !OFFICIAL_TEMPLATE_MAP[tid]){
             let tLong=(pType=="F")?"FUEL":(pType=="H")?"HEALTH":(pType=="R")?"REPAIR":"SUPPLY";
             name=ref.name.replace("FUEL",tLong).replace("_F","_"+pType);
             cost6h = ref.cost6h;
-        } else if (KNOWN_TEMPLATES[tid] && ref) {
-             cost6h = ref.cost6h; // Recup le cout si connu
+        } else if (ref) {
+             cost6h = ref.cost6h; 
         }
         
         return { name, type:pType, prod24:(pBase*24)*stack, cost24:(cost6h*4)*stack, stack, tid, unitProd: pBase*24 };
     }
 
-    // --- FONCTION STARTBUILDINGS (JOUEUR UNIQUE) ---
+    // --- FONCTION STARTBUILDINGS (JOUEUR) - INTACTE V108 ---
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
@@ -436,7 +482,6 @@
                     else if(info.type == "R") typeColor = "var(--repair)";
                     else if(info.type == "S") typeColor = "var(--supply)";
 
-                    // LIEN DE VERIFICATION
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`;
 
                     let card = `<div class="b-card">
@@ -458,7 +503,7 @@
         } catch(e){ log("Err: "+e.message, "red"); }
     }
 
-    // --- FONCTION SCAN GLOBAL (LISTE GENERALE) ---
+    // --- FONCTION SCAN GLOBAL ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
@@ -466,7 +511,7 @@
         document.getElementById('btnStop').style.display = 'inline-block';
         
         await loadTemplateBase();
-        log("🌍 SCAN GLOBAL V113 (ID AUTHORITY)...", "#fff");
+        log("🌍 SCAN GLOBAL V116 (DOUBLE SÉCURITÉ)...", "#fff");
         
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
