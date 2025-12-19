@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V116 (ULTIMATE SAFEGUARD)</title>
+    <title>DoV - COMMAND V117 (THE BRIDGE)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -21,8 +21,7 @@
         
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
-        button:hover { opacity:0.8; }
+        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
@@ -99,7 +98,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V116 ULTIMATE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V117 THE BRIDGE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -126,7 +125,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V116)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V117)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -236,7 +235,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V116. ULTIMATE SAFEGUARD.</div>
+<div class="logs" id="console">> V117. BRIDGE ENABLED.</div>
 
 <script>
     // --- 1. TABLEAU MAITRE (VOTRE REFERENCE) ---
@@ -253,8 +252,7 @@
         2255.34:{ name: "S1_OWNER_FUEL",       cost6h: 191.7042 } 
     };
 
-    // --- DICTATURE DE L'ID (SÉCURITÉ N°1) ---
-    // Ces associations sont prioritaires sur tout le reste.
+    // --- ID FORCE LIST (DICTATURE DE L'ID V114) ---
     const KNOWN_TEMPLATES = {
         "492376": { name: "R_F2_PRODUCER_FUEL", base: 36.45 }, 
         "544068": { name: "S1_OWNER_FUEL",      base: 2255.34 },
@@ -322,10 +320,10 @@
         throw new Error("Arrêt.");
     }
 
-    // --- PHASE 0 : LIVE API SCAN (SÉCURITÉ N°2) ---
+    // --- PHASE 0 : FETCH OFFICIAL TEMPLATES FROM ATOMIC (V115) ---
     async function fetchOfficialTemplates() {
-        log("🔄 Scan AtomicAssets API...", "#fff");
-        const endpoint = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&page=1&limit=100&order=desc&sort=created";
+        log("🔄 Connexion AtomicAssets API...", "#fff");
+        const endpoint = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&page=1&limit=200&order=desc&sort=created";
         const proxy = document.getElementById('inpProxy').value || PROXY_URL;
         
         try {
@@ -341,16 +339,16 @@
                         count++;
                     }
                 });
-                log(`✅ ${count} Templates AtomicHub synchronisés.`, "#00e676");
+                log(`✅ ${count} Templates officiels chargés depuis Atomic!`, "#00e676");
             }
         } catch(e) {
-            log("⚠️ API Atomic inaccessible. Utilisation du mode local.", "orange");
+            log("⚠️ Échec Atomic API (Mode hors ligne activé): " + e.message, "orange");
         }
     }
 
     // --- PHASE 1 : BDATA SAFE LOADER ---
     async function loadTemplateBase(){
-        await fetchOfficialTemplates(); // On tente le live scan
+        await fetchOfficialTemplates(); 
 
         log("Init BDATA...", "#sec"); let next="0"; let more=true;
         try {
@@ -373,7 +371,7 @@
         } catch(e) { log("⚠️ BDATA Warning: "+e.message, "orange"); }
     }
 
-    // --- PHASE 2 : CONFORMITÉ ULTIME ---
+    // --- PHASE 2 : CONFORMITÉ ULTIME (LE PONT) ---
     function conformBuilding(b) {
         let tid = b.template_id;
         let t = TEMPLATE_CACHE[tid];
@@ -395,10 +393,12 @@
             name = kData.name;
             ref = MASTER_TABLE[pBase]; 
         } 
-        // B) SÉCURITÉ N°2 : API ATOMIC (LIVE)
+        // B) SÉCURITÉ N°2 : API ATOMIC (LIVE) AVEC BRIDGE VERS MASTER TABLE
         else if (OFFICIAL_TEMPLATE_MAP[tid]) {
             let officialName = OFFICIAL_TEMPLATE_MAP[tid];
             name = officialName;
+            
+            // THE BRIDGE : Trouver la puissance correspondant à ce nom
             for(let k in MASTER_TABLE) {
                 if(MASTER_TABLE[k].name === officialName) {
                     pBase = parseFloat(k);
@@ -427,7 +427,7 @@
             }
         }
 
-        if (!ref && !KNOWN_TEMPLATES[tid]) {
+        if (!ref && !KNOWN_TEMPLATES[tid] && !OFFICIAL_TEMPLATE_MAP[tid]) {
             pBase = curP; stack = 1;
         } else if (pBase > 0) {
             stack = Math.round(curP / pBase) || 1;
@@ -445,7 +445,7 @@
         return { name, type:pType, prod24:(pBase*24)*stack, cost24:(cost6h*4)*stack, stack, tid, unitProd: pBase*24 };
     }
 
-    // --- FONCTION STARTBUILDINGS (JOUEUR) - INTACTE V108 ---
+    // --- FONCTION STARTBUILDINGS (JOUEUR UNIQUE) ---
     async function startBuildings() {
         const user = document.getElementById('targetIn').value.trim().toLowerCase();
         switchView('buildingView');
@@ -482,6 +482,7 @@
                     else if(info.type == "R") typeColor = "var(--repair)";
                     else if(info.type == "S") typeColor = "var(--supply)";
 
+                    // LIEN DE VERIFICATION
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`;
 
                     let card = `<div class="b-card">
@@ -503,7 +504,7 @@
         } catch(e){ log("Err: "+e.message, "red"); }
     }
 
-    // --- FONCTION SCAN GLOBAL ---
+    // --- FONCTION SCAN GLOBAL (LISTE GENERALE) ---
     async function startGlobalBuildings() {
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
@@ -511,7 +512,7 @@
         document.getElementById('btnStop').style.display = 'inline-block';
         
         await loadTemplateBase();
-        log("🌍 SCAN GLOBAL V116 (DOUBLE SÉCURITÉ)...", "#fff");
+        log("🌍 SCAN GLOBAL V117 (BRIDGE SYSTEM)...", "#fff");
         
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
