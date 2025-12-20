@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V128 (BUGFIX UI)</title>
+    <title>DoV - COMMAND V129 (FULL COLLECTION)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 --- */
+        /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -26,14 +26,13 @@
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* UI BATIMENTS */
+        /* UI GLOBAL */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-mc-left { display: flex; flex-direction: column; }
         .g-mc-right { text-align: right; }
         .scan-stats-row { display: flex; gap: 20px; font-size: 12px; margin-top: 5px; }
         .scan-stat-item b { font-size: 14px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
-        
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content:space-between; min-height:100px; }
         .g-card-head { font-weight:bold; font-size:12px; border-bottom:1px solid #222; padding-bottom:5px; text-align:center; color:#fff; }
@@ -103,7 +102,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V128 BUGFIX UI</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V129 FULL COLLECTION</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -130,7 +129,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V128)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V129)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -246,124 +245,158 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V128. UI FIX APPLIED.</div>
+<div class="logs" id="console">> V129. REGISTRY LOADED.</div>
 
 <script>
-    // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
-    const TEMPLATE_NAMES = {
-        "490122": "C_F1_PRODUCER_FUEL",  
-        "492383": "C_F1_PRODUCER_FUEL",
-        "492373": "C_F1_PRODUCER_FUEL",
-        "492385": "C_F2_PRODUCER_FUEL",
-        "492389": "C_F3_PRODUCER_FUEL",
-        "492377": "SC_F2_PRODUCER_FUEL",
-        "492391": "SC_F3_PRODUCER_FUEL",
-        "492368": "L_F1_PRODUCER_FUEL",
-        "492381": "E_F2_PRODUCER_FUEL",
-        "492387": "E_F3_PRODUCER_FUEL",
-        "492379": "R_F1_PRODUCER_FUEL",
-        "492376": "R_F2_PRODUCER_FUEL",
-        "492386": "R_F3_PRODUCER_FUEL",
-        "492390": "R_F4_PRODUCER_FUEL",
-        "544068": "S1_OWNER_FUEL",
-        "544070": "S1_OWNER_HEALTH",
-        "492546": "E_H3_PRODUCER_HEALTH"
+    // --- 1. LE REGISTRE DES TEMPLATES (Source de Vérité) ---
+    // Clé = Template ID, Valeur = { Nom, BaseProdHeure }
+    const TEMPLATE_REGISTRY = {
+        // --- FUEL ---
+        "492397": { n: "C_F4_PRODUCER_FUEL", b: 83.53 }, // WARNING: ID Shared? Check.
+        "492389": { n: "C_F3_PRODUCER_FUEL", b: 30.38 },
+        "492385": { n: "C_F2_PRODUCER_FUEL", b: 12.15 },
+        "492373": { n: "C_F1_PRODUCER_FUEL", b: 5.40 }, "492383": { n: "C_F1_PRODUCER_FUEL", b: 5.40 }, "490122": { n: "C_F1_PRODUCER_FUEL", b: 5.40 },
+        "492390": { n: "R_F4_PRODUCER_FUEL", b: 250.59 },
+        "492386": { n: "R_F3_PRODUCER_FUEL", b: 91.13 },
+        "492376": { n: "R_F2_PRODUCER_FUEL", b: 36.45 },
+        "492379": { n: "R_F1_PRODUCER_FUEL", b: 16.20 },
+        "492388": { n: "E_F4_PRODUCER_FUEL", b: 751.78 },
+        "492387": { n: "E_F3_PRODUCER_FUEL", b: 273.38 },
+        "492381": { n: "E_F2_PRODUCER_FUEL", b: 109.35 },
+        "492380": { n: "E_F1_PRODUCER_FUEL", b: 48.60 },
+        "492372": { n: "L_F3_PRODUCER_FUEL", b: 820.13 },
+        "492370": { n: "L_F2_PRODUCER_FUEL", b: 328.05 },
+        "492368": { n: "L_F1_PRODUCER_FUEL", b: 145.80 },
+        "544068": { n: "S1_OWNER_FUEL",      b: 2255.34 },
+
+        // --- HEALTH (Confirmed by User) ---
+        "492397": { n: "C_F4_PRODUCER_HEALTH", b: 83.53 }, // Duplicate ID possible?
+        "492396": { n: "C_F3_PRODUCER_HEALTH", b: 30.38 },
+        "492395": { n: "C_F2_PRODUCER_HEALTH", b: 12.15 },
+        "492394": { n: "C_F1_PRODUCER_HEALTH", b: 5.40 },
+        "492537": { n: "R_F4_PRODUCER_HEALTH", b: 250.59 },
+        "492535": { n: "R_F3_PRODUCER_HEALTH", b: 91.13 },
+        "492401": { n: "R_F2_PRODUCER_HEALTH", b: 36.45 },
+        "492399": { n: "R_F1_PRODUCER_HEALTH", b: 16.20 },
+        "492546": { n: "E_F4_PRODUCER_HEALTH", b: 751.78 },
+        "492545": { n: "E_F3_PRODUCER_HEALTH", b: 273.38 },
+        "492543": { n: "E_F2_PRODUCER_HEALTH", b: 109.35 },
+        "492539": { n: "E_F1_PRODUCER_HEALTH", b: 48.60 },
+        "492555": { n: "L_F3_PRODUCER_HEALTH", b: 820.13 },
+        "492554": { n: "L_F2_PRODUCER_HEALTH", b: 328.05 },
+        "492550": { n: "L_F1_PRODUCER_HEALTH", b: 145.80 },
+        "544070": { n: "S1_OWNER_HEALTH",      b: 2255.34 },
+
+        // --- REPAIR ---
+        "492463": { n: "C_F4_PRODUCER_REPAIR", b: 83.53 },
+        "492462": { n: "C_F3_PRODUCER_REPAIR", b: 30.38 },
+        "492461": { n: "C_F2_PRODUCER_REPAIR", b: 12.15 },
+        "492460": { n: "C_F1_PRODUCER_REPAIR", b: 5.40 },
+        "492467": { n: "R_F4_PRODUCER_REPAIR", b: 250.59 },
+        "492466": { n: "R_F3_PRODUCER_REPAIR", b: 91.13 },
+        "492465": { n: "R_F2_PRODUCER_REPAIR", b: 36.45 },
+        "492464": { n: "R_F1_PRODUCER_REPAIR", b: 16.20 },
+        "492473": { n: "E_F4_PRODUCER_REPAIR", b: 751.78 },
+        "492472": { n: "E_F3_PRODUCER_REPAIR", b: 273.38 },
+        "492471": { n: "E_F2_PRODUCER_REPAIR", b: 109.35 },
+        "492469": { n: "E_F1_PRODUCER_REPAIR", b: 48.60 },
+        "492476": { n: "L_F3_PRODUCER_REPAIR", b: 820.13 },
+        "492475": { n: "L_F2_PRODUCER_REPAIR", b: 328.05 },
+        "492474": { n: "L_F1_PRODUCER_REPAIR", b: 145.80 },
+        "544071": { n: "S1_OWNER_REPAIR",      b: 2255.34 },
+
+        // --- SUPPLY ---
+        "492513": { n: "C_F4_PRODUCER_SUPPLY", b: 83.53 },
+        "492511": { n: "C_F3_PRODUCER_SUPPLY", b: 30.38 },
+        "492509": { n: "C_F2_PRODUCER_SUPPLY", b: 12.15 },
+        "492507": { n: "C_F1_PRODUCER_SUPPLY", b: 5.40 },
+        "492523": { n: "R_F4_PRODUCER_SUPPLY", b: 250.59 },
+        "492521": { n: "R_F3_PRODUCER_SUPPLY", b: 91.13 },
+        "492518": { n: "R_F2_PRODUCER_SUPPLY", b: 36.45 },
+        "492515": { n: "R_F1_PRODUCER_SUPPLY", b: 16.20 },
+        "492530": { n: "E_F4_PRODUCER_SUPPLY", b: 751.78 },
+        "492529": { n: "E_F3_PRODUCER_SUPPLY", b: 273.38 },
+        "492528": { n: "E_F2_PRODUCER_SUPPLY", b: 109.35 },
+        "492526": { n: "E_F1_PRODUCER_SUPPLY", b: 48.60 },
+        "492534": { n: "L_F3_PRODUCER_SUPPLY", b: 820.13 },
+        "492533": { n: "L_F2_PRODUCER_SUPPLY", b: 328.05 },
+        "492532": { n: "L_F1_PRODUCER_SUPPLY", b: 145.80 },
+        "544069": { n: "S1_OWNER_SUPPLY",      b: 2255.34 }
     };
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    
-    // --- DB COMPLETE V70 (POUR SCAN ZONE) ---
-    const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
-        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
-        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
-        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
-        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4839.00 },
-        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6092.00 },
-        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7659.00 },
-        8:  { name: "Camp",      cost: 28220, costX: 0, reward: 9617.00 },
-        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12557.00 },
-        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16418.00 },
-        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 21703.00 },
-        12: { name: "Radar",    cost: 84712, costX: 0, reward: 28427.00 },
-        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
-        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 42083.00 },
-        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 50570.00 },
-        16: { name: "HQ",        cost: 188000, costX: 0, reward: 64884.00 },
-        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
-        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
-        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
-    };
+    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    
     const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
     let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
+    function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
     function getProp(obj, keys) { for(let k of keys) if(obj[k] !== undefined) return obj[k]; return 0; }
     function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
     function getId(row) { return row.asset_id || row.id || row.division_id || 0; }
-    function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
     function extractPower(row) { let val = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr); if (typeof val === 'string') val = val.replace(/[^0-9.]/g, ''); return parseFloat(val) || 0; }
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    // --- SYSTEME MULTI-PROXY (V118 RESTORED) ---
     const PROXIES = ["https://corsproxy.io/?", "https://api.allorigins.win/raw?url=", "https://thingproxy.freeboard.io/fetch/", ""];
     
     async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
         while(attempts < 15 && !stopSignal) {
-            const server = RPCS[rpcIndex % RPCS.length]; 
-            let url = server + "/v1/chain/get_table_rows";
-            
+            const server = RPCS[rpcIndex % RPCS.length]; let url = server + "/v1/chain/get_table_rows";
             let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
-            let proxyUrl = PROXIES[0];
-            if(attempts > 3) proxyUrl = PROXIES[1];
-            if(attempts > 6) proxyUrl = PROXIES[2];
-            
-            let finalUrl = url;
-            if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
-            else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
-            
+            let proxyUrl = PROXIES[0]; if(attempts > 3) proxyUrl = PROXIES[1]; if(attempts > 6) proxyUrl = PROXIES[2];
+            let finalUrl = url; if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
             try {
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"PROXY":"DIRECT")+": "+new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 20000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
-                
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
-            } catch(e) { 
-                console.warn("Fetch Fail:", e.message);
-                rpcIndex++; attempts++; 
-                await new Promise(r => setTimeout(r, 1000));
-            }
+            } catch(e) { console.warn("Fetch Fail:", e.message); rpcIndex++; attempts++; await new Promise(r => setTimeout(r, 1000)); }
         }
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- CŒUR DU SYSTÈME V123 : LECTURE BRUTE SANS CALCUL ---
+    // --- CŒUR DU SYSTÈME V129 : LECTURE DICTIONNAIRE ---
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
+        
+        // 1. STACK : On compte la liste
         let stack = 1;
         if (b.asset_ids && Array.isArray(b.asset_ids)) { stack = b.asset_ids.length; }
 
+        // 2. PRODUCTION : On lit la valeur 'power' officielle
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
 
+        // 3. TYPE
         let pType = "F";
         if(rawStr.includes("DOVF")) pType="F";
         else if(rawStr.includes("DOVH")) pType="H";
         else if(rawStr.includes("DOVR")) pType="R";
         else if(rawStr.includes("DOVS")) pType="S";
 
-        let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
+        // 4. NOM : DICTIONNAIRE (Source Sûre)
+        let def = TEMPLATE_REGISTRY[tid];
+        let name = "INCONNU ["+tid+"]";
+        let base = 0;
+        
+        if (def) {
+            name = def.n;
+            base = def.b;
+        } else {
+            // Fallback si ID inconnu mais prod connue (pour éviter le vide)
+            if (hourlyProd > 0 && stack > 0) base = hourlyProd / stack;
+        }
+
+        // 5. COUT (Estimation)
         let cost24 = hourlyProd * 24 * 0.085; 
 
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: (stack>0 ? dailyProd/stack : dailyProd) };
@@ -418,12 +451,11 @@
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         
-        // SECURITE ANTI-CRASH V128
         if(!document.getElementById('cntRows') || !document.getElementById('cntAssets')) {
              log("❌ ERREUR FATALE UI: Rechargez la page.", "red"); return;
         }
 
-        log("🌍 SCAN GLOBAL V128 (DEEP SCAN + COMPTEURS)...", "#fff");
+        log("🌍 SCAN GLOBAL V129 (FULL REGISTRY)...", "#fff");
         
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
@@ -453,7 +485,6 @@
                 } else { groups[info.type][k].cr++; }
             });
             
-            // MISE A JOUR UI SÉCURISÉE (V128)
             document.getElementById('cntRows').innerText = scanRows.toLocaleString();
             document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
             document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
@@ -467,6 +498,7 @@
     function renderLists(groups){
         for(let t in groups){
             let h=`<div class="ml-header">TYPE ${t}</div>`;
+            // TRI PAR UNIT PROD (RARETÉ) DECROISSANT
             let keys=Object.keys(groups[t]).sort((a,b)=>groups[t][b].unitProd - groups[t][a].unitProd);
             keys.forEach(k=>{
                 let i=groups[t][k];
