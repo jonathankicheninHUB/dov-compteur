@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V125 (MULTI-LINK FIX)</title>
+    <title>DoV - COMMAND V127 (COUNTERS)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 --- */
+        /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -26,9 +26,14 @@
         input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* UI GLOBAL */
+        /* UI BATIMENTS (V127 - Compteurs Ajoutés) */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
+        .g-mc-left { display: flex; flex-direction: column; }
+        .g-mc-right { text-align: right; }
+        .scan-stats-row { display: flex; gap: 20px; font-size: 12px; margin-top: 5px; }
+        .scan-stat-item b { font-size: 14px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
+        
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
         .g-card { background: #111; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; justify-content:space-between; min-height:100px; }
         .g-card-head { font-weight:bold; font-size:12px; border-bottom:1px solid #222; padding-bottom:5px; text-align:center; color:#fff; }
@@ -98,7 +103,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V125 MULTI-LINK</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V127 COUNTERS</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -125,7 +130,7 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V125)</button>
+            <button class="btn-global" onclick="startGlobalBuildings()">SCAN MONDE (V127)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -213,7 +218,13 @@
             
             <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
                 <div class="g-main-count">
-                    <div class="g-mc-left"><div>SCAN GLOBAL (CYCLE 24H)</div><div style="font-size:12px; color:#555; margin-top:2px;" id="globalCount">0 Bâtiments</div></div>
+                    <div class="g-mc-left">
+                        <div style="font-weight:bold; color:#fff">SCAN GLOBAL (CYCLE 24H)</div>
+                        <div class="scan-stats-row">
+                            <div class="scan-stat-item"><span style="color:#888">Lignes scannées:</span> <b id="cntRows">0</b></div>
+                            <div class="scan-stat-item"><span style="color:var(--main)">Total Cartes (NFTs):</span> <b id="cntAssets">0</b></div>
+                        </div>
+                    </div>
                     <div class="g-mc-right"><div class="g-cost-label">COÛT TOTAL DOV-X</div><div class="g-cost-val" id="gTotalCost">0</div></div>
                 </div>
                 <div class="g-detail-grid">
@@ -235,7 +246,7 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V125. MULTI-LINK & FULL DB.</div>
+<div class="logs" id="console">> V127. COMPTEURS ACTIFS.</div>
 
 <script>
     // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
@@ -254,7 +265,10 @@
         "492376": "R_F2_PRODUCER_FUEL",
         "492386": "R_F3_PRODUCER_FUEL",
         "492390": "R_F4_PRODUCER_FUEL",
-        "544068": "S1_OWNER_FUEL"
+        "544068": "S1_OWNER_FUEL",
+        // AJOUTS SUITE A L'AUDIT DE VOS SCREENS
+        "544070": "S1_OWNER_HEALTH",
+        "492546": "E_H3_PRODUCER_HEALTH"
     };
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
@@ -298,47 +312,52 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    // --- SYSTEME MULTI-PROXY (V118) ---
     const PROXIES = ["https://corsproxy.io/?", "https://api.allorigins.win/raw?url=", "https://thingproxy.freeboard.io/fetch/", ""];
     
-    async function robustFetch(code, table, lowerBound, limit=200, indexPosition=1, keyType="") {
+    // --- ROBUST FETCH (MULTI-LINK) ---
+    async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
         while(attempts < 15 && !stopSignal) {
-            const server = RPCS[rpcIndex % RPCS.length]; let url = server + "/v1/chain/get_table_rows";
+            const server = RPCS[rpcIndex % RPCS.length]; 
+            let url = server + "/v1/chain/get_table_rows";
             let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
             
-            // Selection du proxy (rotatif si echec)
             let proxyUrl = PROXIES[0];
             if(attempts > 3) proxyUrl = PROXIES[1];
             if(attempts > 6) proxyUrl = PROXIES[2];
             
-            if(useProxy && customProxy.length > 5) url = customProxy + encodeURIComponent(url); 
-            else if(useProxy) url = proxyUrl + encodeURIComponent(url);
+            let finalUrl = url;
+            if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
+            else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
             
             try {
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"PROXY":"DIRECT")+": "+new URL(server).hostname;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 20000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
-                const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
+                const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
-            } catch(e) { rpcIndex++; attempts++; await new Promise(r => setTimeout(r, 500)); }
+            } catch(e) { 
+                console.warn("Fetch Fail:", e.message);
+                rpcIndex++; attempts++; 
+                await new Promise(r => setTimeout(r, 1000));
+            }
         }
-        throw new Error("Arrêt.");
+        throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- CŒUR DU SYSTÈME V123 : LECTURE BRUTE SANS CALCUL ---
+    // --- CŒUR DU SYSTÈME : LECTURE BRUTE SANS CALCUL ---
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
         
-        // 1. STACK
+        // 1. STACK : On compte la liste
         let stack = 1;
         if (b.asset_ids && Array.isArray(b.asset_ids)) {
             stack = b.asset_ids.length;
         }
 
-        // 2. PRODUCTION
+        // 2. PRODUCTION : On lit la valeur 'power' officielle
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
@@ -411,18 +430,24 @@
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         
-        log("🌍 SCAN GLOBAL V125 (MULTI-LINK)...", "#fff");
+        log("🌍 SCAN GLOBAL V127 (DEEP SCAN + COMPTEURS)...", "#fff");
         
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
+        let scanRows = 0;
+        let scanAssets = 0;
 
         try { while (more && !stopSignal) {
-            const data = await robustFetch("dovutilstake", "buildings", next);
+            const data = await robustFetch("dovutilstake", "buildings", next, 1000); 
             if (!data.rows) break;
             
+            scanRows += data.rows.length;
+
             data.rows.forEach(b => {
                 stats.total++;
                 let info = conformBuilding(b); 
+                scanAssets += info.stack; // ON AJOUTE LE STACK AU TOTAL
+
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
                 
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd };
@@ -435,7 +460,10 @@
                 } else { groups[info.type][k].cr++; }
             });
             
-            document.getElementById('globalCount').innerText = stats.total.toLocaleString();
+            // MISE A JOUR UI
+            document.getElementById('cntRows').innerText = scanRows.toLocaleString();
+            document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
+            document.getElementById('globalCount').innerText = scanRows.toLocaleString();
             document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
             ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
             renderLists(groups);
