@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V133 (DEBUG LINK)</title>
+    <title>DoV - COMMAND V135 (CORRECTED IDs)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -23,7 +23,7 @@
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
         button:hover { opacity: 0.8; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
-        input { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
         /* UI BATIMENTS */
@@ -39,7 +39,6 @@
         .g-card-head { font-weight:bold; font-size:12px; border-bottom:1px solid #222; padding-bottom:5px; text-align:center; color:#fff; }
         .g-prod-val { font-size:16px; font-weight:bold; color:#fff; text-align:center; margin-top:10px; }
         .g-prod-lbl { font-size:9px; color:#888; text-align:center; text-transform:uppercase; }
-        
         .model-list-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top:20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; }
@@ -56,7 +55,7 @@
         .c-f { border-left: 4px solid var(--fuel); } .c-h { border-left: 4px solid var(--health); }
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
 
-        /* DEBUG TABLE (AMÉLIORÉ V133) */
+        /* DEBUG TABLE */
         .debug-box { margin-top:30px; border:1px solid #444; background:#080808; padding:10px; }
         .debug-title { font-weight:bold; color:var(--warn); margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px; text-transform:uppercase;}
         .debug-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:5px; font-size:10px; max-height:300px; overflow-y:auto; }
@@ -113,7 +112,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V133 DEBUG LINK</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V135 CORRECTED IDs</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -140,7 +139,16 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <button class="btn-global" onclick="startGlobalScan()">SCAN MASTER (ALL)</button>
+            
+            <label class="inp-label" style="color:var(--sec)">STRATÉGIE DE SCAN</label>
+            <select id="scanStrategy" style="margin-bottom:10px;">
+                <option value="B">B. RPC ROTATION (Rapide & Sûr)</option>
+                <option value="C">C. HYBRIDE (God Mode + Auto-Name)</option>
+                <option value="A">A. Séquentiel (Simple)</option>
+            </select>
+
+            <button class="btn-global" onclick="dispatchGlobalScan()">SCAN MASTER (ALL)</button>
+            
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -172,21 +180,9 @@
 
         <div id="ecoView" class="view-section">
             <div class="eco-grid">
-                <div class="eco-card c-fighter">
-                    <div class="eco-head"><span>DEMANDE (COMBAT)</span> <span>🔥 BURN</span></div>
-                    <div class="eco-val" id="valDemandTU">0 TU</div>
-                    <div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div>
-                </div>
-                <div class="eco-card c-producer">
-                    <div class="eco-head"><span>OFFRE (USINES)</span> <span>⚡ MINT</span></div>
-                    <div class="eco-val" id="valSupplyTU">0 TU</div>
-                    <div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div>
-                </div>
-                <div class="eco-card c-market">
-                    <div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div>
-                    <div class="eco-val" id="valDovxBurn">0 DOVX</div>
-                    <div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div>
-                </div>
+                <div class="eco-card c-fighter"><div class="eco-head"><span>DEMANDE</span> <span>🔥 BURN</span></div><div class="eco-val" id="valDemandTU">0 TU</div><div class="eco-usd" id="valDemandUSD">$0.00 / 24h</div></div>
+                <div class="eco-card c-producer"><div class="eco-head"><span>OFFRE</span> <span>⚡ MINT</span></div><div class="eco-val" id="valSupplyTU">0 TU</div><div class="eco-usd" id="valSupplyUSD">$0.00 / 24h</div></div>
+                <div class="eco-card c-market"><div class="eco-head"><span>PRESSION DOVX</span> <span>📉 INPUT</span></div><div class="eco-val" id="valDovxBurn">0 DOVX</div><div class="eco-usd" id="valDovxUSD">$0.00 / 24h</div></div>
             </div>
             <div class="balance-container">
                 <div class="balance-header">
@@ -194,29 +190,14 @@
                     <div style="text-align:center; color:#fff" id="ratioTxt">Calcul...</div>
                     <div style="color:var(--main); text-align:right;">OFFRE</div>
                 </div>
-                <div class="balance-bar">
-                    <div class="bal-demand" id="barDemand" style="width:50%"></div>
-                    <div class="bal-supply" id="barSupply" style="width:50%"></div>
-                </div>
+                <div class="balance-bar"><div class="bal-demand" id="barDemand" style="width:50%"></div><div class="bal-supply" id="barSupply" style="width:50%"></div></div>
             </div>
             <div style="background:#111; padding:15px; border:1px solid var(--dovx); margin-top:20px;">
                 <div style="font-weight:bold; color:var(--dovx); margin-bottom:10px; text-transform:uppercase;">BALANCE DOVX</div>
                 <div class="dovx-breakdown">
-                    <div class="db-card" style="border-color:var(--main)">
-                        <div class="db-head" style="color:var(--main)">GAINS (MINT)</div>
-                        <div class="db-val" style="color:var(--main)" id="valDovxMint">0</div>
-                        <div class="db-usd" id="usdDovxMint">$0.00</div>
-                    </div>
-                    <div class="db-card" style="border-color:var(--alert)">
-                        <div class="db-head" style="color:var(--alert)">COÛTS (BURN)</div>
-                        <div class="db-val" style="color:var(--alert)" id="valDovxBurnTotal">0</div>
-                        <div class="db-usd" id="usdDovxBurnTotal">$0.00</div>
-                    </div>
-                    <div class="db-card" style="border-color:#fff">
-                        <div class="db-head" style="color:#fff">NET</div>
-                        <div class="db-val" id="valDovxNet">0</div>
-                        <div class="db-usd" id="usdDovxNet">$0.00</div>
-                    </div>
+                    <div class="db-card" style="border-color:var(--main)"><div class="db-head" style="color:var(--main)">GAINS (MINT)</div><div class="db-val" style="color:var(--main)" id="valDovxMint">0</div><div class="db-usd" id="usdDovxMint">$0.00</div></div>
+                    <div class="db-card" style="border-color:var(--alert)"><div class="db-head" style="color:var(--alert)">COÛTS (BURN)</div><div class="db-val" style="color:var(--alert)" id="valDovxBurnTotal">0</div><div class="db-usd" id="usdDovxBurnTotal">$0.00</div></div>
+                    <div class="db-card" style="border-color:#fff"><div class="db-head" style="color:#fff">NET</div><div class="db-val" id="valDovxNet">0</div><div class="db-usd" id="usdDovxNet">$0.00</div></div>
                 </div>
             </div>
         </div>
@@ -229,7 +210,7 @@
             <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
                 <div class="g-main-count">
                     <div class="g-mc-left">
-                        <div style="font-weight:bold; color:#fff">SCAN GLOBAL (CYCLE 24H)</div>
+                        <div style="font-weight:bold; color:#fff" id="scanModeTitle">SCAN GLOBAL (CYCLE 24H)</div>
                         <div class="scan-stats-row">
                             <div class="scan-stat-item"><span style="color:#888">Lignes scannées:</span> <b id="cntRows">0</b></div>
                             <div class="scan-stat-item"><span style="color:var(--main)">Total Cartes (NFTs):</span> <b id="cntAssets">0</b></div>
@@ -261,66 +242,92 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V133. DEBUG LINKS READY.</div>
+<div class="logs" id="console">> V135. DICTIONARY CORRECTED.</div>
 
 <script>
-    // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
-    const TEMPLATE_NAMES = {
-        "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "C_F1_PRODUCER_FUEL",
-        "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
-        "492379": "R_F1_PRODUCER_FUEL",  "492376": "R_F2_PRODUCER_FUEL", "492386": "R_F3_PRODUCER_FUEL", "492390": "R_F4_PRODUCER_FUEL",
-        "492380": "E_F1_PRODUCER_FUEL",  "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
-        "492368": "L_F1_PRODUCER_FUEL",  "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
-        "544068": "S1_OWNER_FUEL",       "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
+    // --- 1. LE REGISTRE DES TEMPLATES (Source de Vérité - CORRIGÉ V135) ---
+    // Clé = ID, Valeur = { Nom, BaseProdHeure }
+    const TEMPLATE_REGISTRY = {
+        // --- FUEL ---
+        "490122": { n: "C_F1_PRODUCER_FUEL",  b: 5.40 }, 
+        "492383": { n: "C_F1_PRODUCER_FUEL",  b: 5.40 },
+        "492373": { n: "R_F1_PRODUCER_FUEL",  b: 16.20 }, // <--- MODIFICATION DEMANDÉE
+        "492385": { n: "C_F2_PRODUCER_FUEL",  b: 12.15 },
+        "492389": { n: "C_F3_PRODUCER_FUEL",  b: 30.38 },
+        "492397": { n: "C_F4_PRODUCER_FUEL",  b: 83.53 }, 
+        "492379": { n: "R_F1_PRODUCER_FUEL",  b: 16.20 },
+        "492376": { n: "R_F2_PRODUCER_FUEL",  b: 36.45 },
+        "492386": { n: "R_F3_PRODUCER_FUEL",  b: 91.13 },
+        "492390": { n: "R_F4_PRODUCER_FUEL",  b: 250.59 },
+        "492380": { n: "E_F1_PRODUCER_FUEL",  b: 48.60 },
+        "492381": { n: "E_F2_PRODUCER_FUEL",  b: 109.35 },
+        "492387": { n: "E_F3_PRODUCER_FUEL",  b: 273.38 },
+        "492388": { n: "E_F4_PRODUCER_FUEL",  b: 751.78 },
+        "492368": { n: "L_F1_PRODUCER_FUEL",  b: 145.80 },
+        "492370": { n: "L_F2_PRODUCER_FUEL",  b: 328.05 },
+        "492372": { n: "L_F3_PRODUCER_FUEL",  b: 820.13 },
+        "544068": { n: "S1_OWNER_FUEL",       b: 2255.34 },
+        "492391": { n: "SC_F3_PRODUCER_FUEL", b: 121.50 },
 
-        "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
-        "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
-        "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
-        "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
-        "544070": "S1_OWNER_HEALTH",
+        // --- HEALTH ---
+        "492394": { n: "C_F1_PRODUCER_HEALTH", b: 5.40 },
+        "492395": { n: "C_F2_PRODUCER_HEALTH", b: 12.15 },
+        "492396": { n: "C_F3_PRODUCER_HEALTH", b: 30.38 },
+        "492397": { n: "C_F4_PRODUCER_HEALTH", b: 83.53 }, 
+        "492399": { n: "R_F1_PRODUCER_HEALTH", b: 16.20 },
+        "492401": { n: "R_F2_PRODUCER_HEALTH", b: 36.45 },
+        "492535": { n: "R_F3_PRODUCER_HEALTH", b: 91.13 },
+        "492537": { n: "R_F4_PRODUCER_HEALTH", b: 250.59 },
+        "492539": { n: "E_F1_PRODUCER_HEALTH", b: 48.60 },
+        "492543": { n: "E_F2_PRODUCER_HEALTH", b: 109.35 },
+        "492545": { n: "E_F3_PRODUCER_HEALTH", b: 273.38 },
+        "492546": { n: "E_F4_PRODUCER_HEALTH", b: 751.78 },
+        "492550": { n: "L_F1_PRODUCER_HEALTH", b: 145.80 },
+        "492554": { n: "L_F2_PRODUCER_HEALTH", b: 328.05 },
+        "492555": { n: "L_F3_PRODUCER_HEALTH", b: 820.13 },
+        "544070": { n: "S1_OWNER_HEALTH",      b: 2255.34 },
 
-        "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
-        "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
-        "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
-        "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
-        "544071": "S1_OWNER_REPAIR",
+        // --- REPAIR ---
+        "492460": { n: "C_F1_PRODUCER_REPAIR", b: 5.40 },
+        "492461": { n: "C_F2_PRODUCER_REPAIR", b: 12.15 },
+        "492462": { n: "C_F3_PRODUCER_REPAIR", b: 30.38 },
+        "492463": { n: "C_F4_PRODUCER_REPAIR", b: 83.53 },
+        "492464": { n: "R_F1_PRODUCER_REPAIR", b: 16.20 },
+        "492465": { n: "R_F2_PRODUCER_REPAIR", b: 36.45 },
+        "492466": { n: "R_F3_PRODUCER_REPAIR", b: 91.13 },
+        "492467": { n: "R_F4_PRODUCER_REPAIR", b: 250.59 },
+        "492469": { n: "E_F1_PRODUCER_REPAIR", b: 48.60 },
+        "492471": { n: "E_F2_PRODUCER_REPAIR", b: 109.35 },
+        "492472": { n: "E_F3_PRODUCER_REPAIR", b: 273.38 },
+        "492473": { n: "E_F4_PRODUCER_REPAIR", b: 751.78 },
+        "492474": { n: "L_F1_PRODUCER_REPAIR", b: 145.80 },
+        "492475": { n: "L_F2_PRODUCER_REPAIR", b: 328.05 },
+        "492476": { n: "L_F3_PRODUCER_REPAIR", b: 820.13 },
+        "544071": { n: "S1_OWNER_REPAIR",      b: 2255.34 },
 
-        "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
-        "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
-        "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
-        "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
-        "544069": "S1_OWNER_SUPPLY"
+        // --- SUPPLY ---
+        "492507": { n: "C_F1_PRODUCER_SUPPLY", b: 5.40 },
+        "492509": { n: "C_F2_PRODUCER_SUPPLY", b: 12.15 },
+        "492511": { n: "C_F3_PRODUCER_SUPPLY", b: 30.38 },
+        "492513": { n: "C_F4_PRODUCER_SUPPLY", b: 83.53 },
+        "492515": { n: "R_F1_PRODUCER_SUPPLY", b: 16.20 },
+        "492518": { n: "R_F2_PRODUCER_SUPPLY", b: 36.45 },
+        "492521": { n: "R_F3_PRODUCER_SUPPLY", b: 91.13 },
+        "492523": { n: "R_F4_PRODUCER_SUPPLY", b: 250.59 },
+        "492526": { n: "E_F1_PRODUCER_SUPPLY", b: 48.60 },
+        "492528": { n: "E_F2_PRODUCER_SUPPLY", b: 109.35 },
+        "492529": { n: "E_F3_PRODUCER_SUPPLY", b: 273.38 },
+        "492530": { n: "E_F4_PRODUCER_SUPPLY", b: 751.78 },
+        "492532": { n: "L_F1_PRODUCER_SUPPLY", b: 145.80 },
+        "492533": { n: "L_F2_PRODUCER_SUPPLY", b: 328.05 },
+        "492534": { n: "L_F3_PRODUCER_SUPPLY", b: 820.13 },
+        "544069": { n: "S1_OWNER_SUPPLY",      b: 2255.34 }
     };
 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    
-    // --- DB COMPLETE V70 (POUR SCAN ZONE) ---
-    const ZONE_DB = {
-        1:  { name: "Beach 1", cost: 1160, costX: 0, reward: 400.00 }, 
-        2:  { name: "Beach 2", cost: 6968, costX: 0, reward: 2405.00 },
-        3:  { name: "Beach 3", cost: 8800, costX: 0, reward: 3037.00 },
-        4:  { name: "Bunker",  cost: 11120, costX: 0, reward: 3838.00 },
-        5:  { name: "Forest 1", cost: 14024, costX: 0, reward: 4839.00 },
-        6:  { name: "Forest 2", cost: 17704, costX: 0, reward: 6092.00 },
-        7:  { name: "Forest 3", cost: 22352, costX: 0, reward: 7659.00 },
-        8:  { name: "Camp",      cost: 28220, costX: 0, reward: 9617.00 },
-        9:  { name: "Hill 1",   cost: 37052, costX: 0, reward: 12557.00 },
-        10: { name: "Hill 2",   cost: 48652, costX: 0, reward: 16418.00 },
-        11: { name: "Hill 3",   cost: 64516, costX: 0, reward: 21703.00 },
-        12: { name: "Radar",    cost: 84712, costX: 0, reward: 28427.00 },
-        13: { name: "Plain 1",  cost: 99384, costX: 0, reward: 34300.00 },
-        14: { name: "Plain 2",  cost: 125708, costX: 0, reward: 42083.00 },
-        15: { name: "Plain 3",  cost: 151164, costX: 0, reward: 50570.00 },
-        16: { name: "HQ",        cost: 188000, costX: 0, reward: 64884.00 },
-        17: { name: "City 1",   cost: 0, costX: 1664, reward: 0 },
-        18: { name: "City 2",   cost: 0, costX: 4448, reward: 0 },
-        19: { name: "City 3",   cost: 0, costX: 13440, reward: 0 },
-        20: { name: "City 4",   cost: 0, costX: 29120, reward: 0 } 
-    };
+    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    
-    const RPCS = ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io"];
     let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
@@ -333,134 +340,129 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    const PROXIES = ["https://corsproxy.io/?", "https://api.allorigins.win/raw?url=", "https://thingproxy.freeboard.io/fetch/", ""];
+    const RPC_MATRIX = [
+        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
+        "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
+        "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
+        "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
+        "https://api.hivebp.io", "https://wax.blacklusion.io"
+    ];
     
+    // --- ATOMIC FETCH (POUR LE MODE HYBRIDE) ---
+    async function fetchUnknownID(tid) {
+        try {
+            const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
+            const res = await fetch(url);
+            const json = await res.json();
+            if(json.success && json.data.immutable_data.name) {
+                TEMPLATE_NAMES[tid] = { n: json.data.immutable_data.name, b: 0 }; // Base 0 car inconnu
+                return json.data.immutable_data.name;
+            }
+        } catch(e) { return null; }
+    }
+
     async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
-        let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
-        while(attempts < 15 && !stopSignal) {
-            const server = RPCS[rpcIndex % RPCS.length]; 
-            let url = server + "/v1/chain/get_table_rows";
-            
-            let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
-            let proxyUrl = PROXIES[0]; if(attempts > 3) proxyUrl = PROXIES[1]; if(attempts > 6) proxyUrl = PROXIES[2];
-            
-            let finalUrl = url;
-            if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
-            else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
+        let attempts = 0;
+        while(attempts < 20 && !stopSignal) {
+            const server = RPC_MATRIX[rpcIndex % RPC_MATRIX.length];
+            rpcIndex++; 
+            const url = server + "/v1/chain/get_table_rows";
             
             try {
-                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"PROXY":"DIRECT")+": "+new URL(server).hostname;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 20000); 
+                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = "RPC: " + new URL(server).hostname;
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
                 
-                const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
+                const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
             } catch(e) { 
-                console.warn("Fetch Fail:", e.message);
-                rpcIndex++; attempts++; 
-                await new Promise(r => setTimeout(r, 1000));
+                attempts++; 
+                await new Promise(r => setTimeout(r, 200)); 
             }
         }
-        throw new Error("Arrêt (Trop d'erreurs).");
+        throw new Error("Arrêt (Reseau Saturé).");
     }
 
-    // --- CŒUR DU SYSTÈME V133 : LECTURE BRUTE SANS CALCUL ---
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
-        let stack = 1;
-        if (b.asset_ids && Array.isArray(b.asset_ids)) { stack = b.asset_ids.length; }
-
+        
+        // 1. LISTE STACK (Priorité Absolue si dispo)
+        let stack = (b.asset_ids && Array.isArray(b.asset_ids)) ? b.asset_ids.length : 0;
+        
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
 
         let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F";
-        else if(rawStr.includes("DOVH")) pType="H";
-        else if(rawStr.includes("DOVR")) pType="R";
-        else if(rawStr.includes("DOVS")) pType="S";
+        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H";
+        else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
 
-        let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
-        let cost24 = hourlyProd * 24 * 0.085; 
+        // 2. DICTIONNAIRE
+        let def = TEMPLATE_NAMES[tid];
+        let name = `INCONNU [${tid}]`;
+        let baseProd = 0;
 
-        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: (stack>0 ? dailyProd/stack : dailyProd) };
-    }
-
-    async function startBuildings() {
-        const user = document.getElementById('targetIn').value.trim().toLowerCase();
-        switchView('buildingView');
-        document.getElementById('globalStatsArea').style.display = 'none';
-        document.getElementById('buildList').style.display = 'grid';
-        document.getElementById('buildDash').innerHTML = ""; 
-        document.getElementById('buildList').innerHTML = "";
-        
-        log(`🔍 Lecture Deck (${user})...`, "#fff");
-        
-        let nextKey = ""; let hasMore = true;
-        try {
-            while(hasMore && !stopSignal) {
-                const data = await robustFetch("dovutilstake", "buildings", nextKey, 200);
-                if(!data.rows) break;
-                const myBatch = data.rows.filter(r => r.owner === user);
-                const now = Date.now()/1000;
-                
-                myBatch.forEach(b => {
-                    let info = conformBuilding(b); 
-                    let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay));
-                    let isReady = now > rdyTime;
-                    let typeColor = "#fff";
-                    if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)";
-                    else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)";
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`;
-
-                    let card = `<div class="b-card">
-                        <div>
-                            <div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div>
-                            <div class="b-sub">#${b.asset_id}</div>
-                        </div>
-                        <div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div>
-                        <div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div>
-                    </div>`;
-                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card);
-                });
-                if(data.more) nextKey = data.next_key; else hasMore = false;
+        if (def) {
+            name = def.n;
+            baseProd = def.b;
+            // SI STACK NON TROUVÉ DANS LISTE (CAS RPC LIGHT), ON LE CALCULE
+            if (stack === 0 && baseProd > 0) {
+                stack = Math.round(hourlyProd / baseProd);
+                if (stack < 1) stack = 1;
             }
-            log(`✅ Deck Joueur affiché.`, "#00e676");
-        } catch(e){ log("Err: "+e.message, "red"); }
+        } else {
+            // Inconnu, on suppose stack 1 si pas de liste
+            if (stack === 0) stack = 1;
+        }
+
+        let cost24 = hourlyProd * 24 * 0.085; 
+        
+        let unitProd = baseProd > 0 ? (baseProd * 24) : (dailyProd / stack);
+
+        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd };
     }
 
-    async function startGlobalScan() {
+    // --- DISPATCHER ---
+    async function dispatchGlobalScan() {
+        const strategy = document.getElementById('scanStrategy').value;
+        const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX ROTATION" : "MODE HYBRIDE (GOD)");
+        
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
-        
-        if(!document.getElementById('cntRows') || !document.getElementById('cntAssets')) {
-             log("❌ ERREUR FATALE UI: Rechargez la page.", "red"); return;
-        }
+        if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
 
-        log("🌍 SCAN GLOBAL V133 (DEBUG LINKS)...", "#fff");
-        
+        if (strategy === 'A') await runSequentialScan(1000, false);
+        else if (strategy === 'B') await runSequentialScan(2000, false); 
+        else if (strategy === 'C') await runSequentialScan(500, true);   
+    }
+
+    async function runSequentialScan(batchSize, useHybrid) {
+        log(`🌍 DÉMARRAGE ${useHybrid ? 'HYBRIDE' : 'MATRIX'}...`, "#fff");
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
-        let scanRows = 0;
-        let scanAssets = 0;
+        let scanRows = 0; let scanAssets = 0;
         let templateAudit = {}; 
 
         try { while (more && !stopSignal) {
-            const data = await robustFetch("dovutilstake", "buildings", next, 1000); 
+            const data = await robustFetch("dovutilstake", "buildings", next, batchSize); 
             if (!data.rows) break;
             
             scanRows += data.rows.length;
 
-            data.rows.forEach(b => {
+            for(let b of data.rows) {
+                if(useHybrid && !TEMPLATE_NAMES[b.template_id]) {
+                    document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
+                    await fetchUnknownID(b.template_id);
+                }
+
                 stats.total++;
                 let info = conformBuilding(b); 
                 scanAssets += info.stack; 
 
-                // Audit Template
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
 
@@ -474,26 +476,27 @@
                     stats.cost += info.cost24;
                     stats.p[info.type] += info.prod24;
                 } else { groups[info.type][k].cr++; }
-            });
-            
-            // UI Updates
-            document.getElementById('cntRows').innerText = scanRows.toLocaleString();
-            document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
-            document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
-            ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-            
-            // Update Debug Grid (WITH LINKS)
-            let dbgHTML = "";
-            for(let tid in templateAudit) {
-                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
-                dbgHTML += `<div class="d-row"><a href="${link}" target="_blank" class="d-id">[${tid}]</a> <span style="font-size:9px; color:#aaa; overflow:hidden; white-space:nowrap; width:80px;">${templateAudit[tid].name}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
             }
-            document.getElementById('debugGrid').innerHTML = dbgHTML;
-
-            renderLists(groups);
+            
+            if(document.getElementById('cntRows')) {
+                document.getElementById('cntRows').innerText = scanRows.toLocaleString();
+                document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
+                document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
+                ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
+                
+                let dbgHTML = "";
+                for(let tid in templateAudit) {
+                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
+                    let n = templateAudit[tid].name;
+                    let color = n.includes("INCONNU") ? "var(--warn)" : "#aaa";
+                    dbgHTML += `<div class="d-row"><a href="${link}" target="_blank" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
+                }
+                document.getElementById('debugGrid').innerHTML = dbgHTML;
+                renderLists(groups);
+            }
             
             if (data.more) next = data.next_key; else more = false;
-        } log("✅ SCAN MASTER TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
+        } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
     function renderLists(groups){
@@ -514,7 +517,7 @@
         }
     }
 
-    // --- AUTRES FONCTIONS (RESTORED) ---
+    async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
     async function startZoneScan() { stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); try { while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } } if (stats.divs % 200 === 0) updateZoneDash(stats); if(data.more) nextKey = data.next_key; else hasMore = false; } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } }
     function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; } }); }
     async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
