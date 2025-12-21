@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V209 (RPC CLUSTER)</title>
+    <title>DoV - COMMAND V210 (ARCHITECT STABLE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (STABLE V199) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -37,7 +37,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- DASHBOARD HEADER --- */
+        /* --- DASHBOARD --- */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -45,7 +45,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* --- CARDS --- */
+        /* --- CARDS & TABLES --- */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -53,14 +53,12 @@
         .kc-val { font-family: var(--font-num); font-size: 22px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* --- TABLES --- */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
-        /* 7 COLS */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -105,22 +103,22 @@
         a.ext { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; font-weight:700; }
         a.ext:hover { border-bottom-color: var(--blue); color: #fff; }
         
-        #scanStatus { color: var(--orange); font-weight: 700; font-family: var(--font-num); }
+        #scanStatus { color: var(--green); font-weight: 700; font-family: var(--font-num); font-size: 10px; margin-top: 5px;}
     </style>
 </head>
 <body>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V209</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V210</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">MONITORING CLUSTER</span>
+            <span class="grp-lbl">MONITORING CLUSTER (20+3 NODES)</span>
             <div class="btn-row">
                 <button class="btn-green" onclick="dispatchGlobalScan()">SCAN CLUSTER</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
             </div>
-            <div style="font-size:10px; color:#555; margin-top:2px;" id="scanStatus">IDLE</div>
+            <div id="scanStatus">READY</div>
             <div class="btn-row" style="margin-top:10px;">
                 <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
                 <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
@@ -150,7 +148,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">CLUSTER SCAN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <div class="page-meta">SCANNING CHAIN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -221,39 +219,24 @@
 </div>
 
 <script>
-    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DATA ---
     const DEFAULT_DATA = {
-        // RPC CLUSTER: STRATEGY 20 + 3
         apiConfig: { 
+            // 23 NODES CLUSTER (20 PUBLIC + 3 PLACEHOLDERS FOR PRIVATE PROXIES)
             rpcNodes: [
-                "https://wax.greymass.com", 
-                "https://wax.eosio.online", 
-                "https://wax.api.eosnation.io", 
-                "https://wax.pink.gg", 
-                "https://api.wax.alohaeos.com",
-                "https://wax.dapplica.io",
-                "https://api.waxsweden.org",
-                "https://wax.eosphere.io",
-                "https://wax.eu.eosamsterdam.net",
-                "https://api.wax.liquidstudios.io",
-                "https://wax.cryptolions.io",
-                "https://api-wax.eosauthority.com",
-                "https://wax.eosdac.io",
-                "https://api.wax.bountyblok.io",
-                "https://wax-bp.wizardsguild.one",
-                "https://wax.blacklusion.io",
-                "https://api.wax.greeneosio.com",
-                "https://waxapi.ledgerwise.io",
-                "https://wax.tmy.io",
-                "https://api.hivebp.io"
-                // Add your 3 Proxy URLs here in the settings
+                "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
+                "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
+                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
+                "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
+                "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
+                "https://wax.tmy.io", "https://api.hivebp.io",
+                "https://proxy1.example.com", "https://proxy2.example.com", "https://proxy3.example.com"
             ]
         },
         resourceDefs: {
@@ -261,86 +244,32 @@
             "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" }
         },
         gameConfig: { 
-            maintenanceCost: 0.085, 
-            cycleHours: 24, 
+            maintenanceCost: 0.085, cycleHours: 24, 
             tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" },
             atomicAsset: "https://wax.atomichub.io/explorer/asset",
-            accountBase: "https://wax.atomichub.io/explorer/account",
-            atomicBase: "https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions"
+            accountBase: "https://wax.atomichub.io/explorer/account"
         },
-        zones: { 
-            1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
-            5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
-            9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},
-            13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
-            17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
-        },
+        zones: { 1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0} },
         templates: {
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
-            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
-            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
-            "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
-            "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
-            "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 },
-            "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 },
-            "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 },
-            "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
-            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
-            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
-            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
-            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
-            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
-            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
-            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
-            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
-            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }, "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
-            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
-            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
-            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
-            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
-            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
-            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
-            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
-            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
-            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
-            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
-            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
-            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
-            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
-            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
-            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
-            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
-            "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
-            "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
-            "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
-            "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
-            "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
-            "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
-            "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
-            "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 },
+            "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
         }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let SCAN_DETAILS = {}; 
+    let CACHE_DB = {}; // Optimized Master Storage
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V209');
+        const local = localStorage.getItem('DOV_DATA_V210');
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
-                // Ensure RPC nodes are present from default if missing in local
                 if(!loaded.apiConfig.rpcNodes) loaded.apiConfig.rpcNodes = DEFAULT_DATA.apiConfig.rpcNodes;
-                
-                DATA = { 
-                    ...DEFAULT_DATA, 
-                    ...loaded, 
-                    gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig },
-                    templates: { ...DEFAULT_DATA.templates, ...loaded.templates } 
-                }; 
+                DATA = { ...DEFAULT_DATA, ...loaded, gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig }, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
             } catch(e){ console.log("Resetting Data"); } 
         }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
@@ -362,39 +291,38 @@
         }
     }
 
-    // --- RESILIENT FETCHER (LOAD BALANCER) ---
-    async function resilientFetch(bodyPayload) {
+    // --- ROBUST FETCH WITH TIMEOUT & FAILOVER ---
+    async function fetchWithFailover(body) {
         let nodes = DATA.apiConfig.rpcNodes;
-        let retries = 5; // Try 5 different nodes before giving up
+        let controller;
         
-        for(let i=0; i<retries; i++) {
-            // Pick Random Node
+        for(let i=0; i<8; i++) { // Retry 8 times
             let node = nodes[Math.floor(Math.random() * nodes.length)];
-            // Handle trailing slash
             if(node.endsWith('/')) node = node.slice(0, -1);
-            
+            controller = new AbortController();
+            let timeoutId = setTimeout(() => controller.abort(), 4000); // 4s strict timeout
+
             try {
-                let response = await fetch(node + "/v1/chain/get_table_rows", {
-                    method: 'POST',
-                    body: bodyPayload
+                let res = await fetch(node + "/v1/chain/get_table_rows", {
+                    method: 'POST', body: body, signal: controller.signal
                 });
-                
-                if(!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+                clearTimeout(timeoutId);
+                if(!res.ok) throw new Error("HTTP " + res.status);
+                return await res.json();
             } catch(e) {
-                console.warn(`Node ${node} failed (${e.message}). Switching...`);
-                // If it fails, loop continues to next random node
+                console.warn(`Node ${node} failed: ${e.name}`);
+                // Continue loop
             }
         }
-        throw new Error("ALL RPC NODES FAILED");
+        throw new Error("Cluster Unreachable");
     }
 
     function processRow(row) {
         let tid = row.template_id.toString();
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
-        let count_total = assetList.length; // THE TRUTH: 4 IDs = 4 Buildings
+        let count_total = assetList.length; // 4 Buildings Logic
         
-        // TIMER LOGIC
+        // Timer Logic
         let now = Date.now() / 1000;
         let finish = parseFloat(row.last_claim) + parseFloat(row.delay);
         let isActive = now < finish;
@@ -411,41 +339,32 @@
         
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
-        
         let owner = row.player || row.username || row.owner || row.scope || "unknown";
 
-        return { 
-            id:tid, name, type, 
-            count_total, count_active, 
-            hourly, daily, costH, costD, nominal, 
-            assets: assetList, owner: owner 
-        };
+        return { id:tid, name, type, count_total, count_active, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
     }
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        getId('scanStatus').innerText = "RUNNING (RPC CLUSTER)...";
+        getId('scanStatus').innerText = "CLUSTERING...";
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
-        SCAN_DETAILS = {}; 
+        CACHE_DB = {}; // Reset Master Cache
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         
         try {
             while(!stopSignal) {
-                // USE RESILIENT FETCH
-                let json = await resilientFetch(JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+                let res = await fetchWithFailover(JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+                if(!res.rows || res.rows.length === 0) break;
                 
-                if(!json.rows || json.rows.length === 0) break;
-                
-                for(let r of json.rows) {
+                for(let r of res.rows) {
                     rowCount++; 
                     let d = processRow(r); 
                     assetCount += d.count_total;
                     
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(existing) { 
-                        existing.act += d.count_active; 
-                        existing.tot += d.count_total;
+                        existing.act += d.count_active; existing.tot += d.count_total;
                         existing.totH += d.hourly; existing.totD += d.daily; 
                         existing.costH += d.costH; existing.costD += d.costD; 
                     } else { 
@@ -453,17 +372,15 @@
                     }
                     stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
 
-                    if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
-                    d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
+                    // STORE IN CACHE
+                    if(!CACHE_DB[d.id]) CACHE_DB[d.id] = [];
+                    d.assets.forEach(assetId => { CACHE_DB[d.id].push({ assetId: assetId, owner: d.owner }); });
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 10)); // Ultra Fast Loop
             }
-            getId('scanStatus').innerText = "COMPLETE";
-        } catch(e) { 
-            console.error("CRITICAL SCAN ERROR:", e); 
-            getId('scanStatus').innerText = "ERROR: " + e.message;
-        }
+            getId('scanStatus').innerText = "IDLE";
+        } catch(e) { console.error(e); getId('scanStatus').innerText = "FAIL"; }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -499,15 +416,15 @@
     function openAssetDetails(tid) {
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : tid;
-        let list = SCAN_DETAILS[tid] || [];
-        getId('detailTitle').innerText = `${name} (ID: ${tid}) - ${list.length} ASSETS FOUND`;
-        let html = `<table class="ins-table"><thead><tr><th>ASSET ID (ATOMIC)</th><th>WALLET OWNER</th><th>STATUS</th></tr></thead><tbody>`;
+        let list = CACHE_DB[tid] || [];
+        getId('detailTitle').innerText = `${name} (${list.length})`;
+        let html = `<table class="ins-table"><thead><tr><th>ASSET</th><th>OWNER</th><th>STATUS</th></tr></thead><tbody>`;
         list.forEach(item => {
             let assetLink = `${DATA.gameConfig.atomicAsset}/${item.assetId}`;
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
             html += `<tr>
                 <td><a href="${assetLink}" target="_blank" class="ext">${item.assetId} ↗</a></td>
-                <td><a href="${walletLink}" target="_blank" class="ext" style="font-weight:700; color:var(--blue)">${item.owner} ↗</a></td>
+                <td><a href="${walletLink}" target="_blank" class="ext" style="color:var(--blue)">${item.owner} ↗</a></td>
                 <td style="color:var(--green)">STAKED</td>
             </tr>`;
         });
@@ -520,7 +437,7 @@
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0); let next = "";
         while(!stopSignal) {
-            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            let res = await fetchWithFailover(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
             if(!res.rows) break;
             for(let r of res.rows) { let id = r.zone_id || r.zoneID; if(counts[id] !== undefined) counts[id]++; }
             let html = "";
@@ -538,7 +455,7 @@
         stopSignal = false; switchView('viewEco'); getId('ecoStatus').innerText = "Scanning...";
         let next = ""; let dTU = 0, activeZ = 0;
         while(!stopSignal) {
-            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            let res = await fetchWithFailover(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
             if(!res.rows) break;
             for(let r of res.rows) { let z = DATA.zones[r.zone_id]; if(z && z.cost > 0) { dTU += z.cost; activeZ++; } }
             getId('valDemandTU').innerText = fmt(dTU); getId('valActiveZones').innerText = fmt(activeZ);
@@ -555,7 +472,7 @@
         let tbody = getId('targetBody');
 
         while(!stopSignal) {
-            let res = await resilientFetch(JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}));
+            let res = await fetchWithFailover(JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}));
             if(!res.rows) break;
             for(let r of res.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
@@ -575,7 +492,7 @@
         let tbody = getId('targetBody');
 
         while(!stopSignal) {
-            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}));
+            let res = await fetchWithFailover(JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}));
             if(!res.rows) break;
             for(let r of res.rows) {
                 let z = DATA.zones[r.zone_id];
@@ -586,8 +503,8 @@
     }
 
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V209', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V209'); location.reload(); } }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V210', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V210'); location.reload(); } }
 
     window.onload = init;
 </script>
