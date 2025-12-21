@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V219 (FINAL STABLE)</title>
+    <title>DoV - COMMAND V220 (INDUSTRIAL)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -118,7 +118,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V219</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V220</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">COLLECTION SCANNER</span>
@@ -166,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (DISCOVERY MODE)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (INDUSTRIAL MODE)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -181,13 +181,12 @@
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
+    // --- CORE CONSTANTS ---
+    const STORAGE_KEY = 'DOV_DATA_V220'; // UNIFIED VERSION KEY
+
     // --- UTILS & SAFE DOM ---
     const getId = (id) => document.getElementById(id);
-    const safeSetText = (id, text) => { 
-        const el = getId(id); 
-        if(el) el.innerText = text; 
-        // Silent failure if DOM missing (Prevent Crash)
-    };
+    const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; };
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
@@ -239,7 +238,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V219'); // FINAL KEY
+        const local = localStorage.getItem(STORAGE_KEY); 
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
@@ -293,7 +292,6 @@
         let next = "";
         try {
             while(true) {
-                // Get scopes (wallets) 1000 at a time
                 let res = await fetchSmartCluster("/v1/chain/get_table_by_scope", JSON.stringify({
                     code: code, table: table, limit: 1000, lower_bound: next
                 }));
@@ -308,8 +306,7 @@
                 sysLog(`FOUND ${res.rows.length} WALLETS...`, "inf");
 
                 if(!res.more) break;
-                next = res.more; // Using 'more' as the cursor for next batch
-                // Safety break to prevent infinite loop if API misbehaves
+                next = res.more; 
                 if(scopes.length > 20000) { sysLog("SCOPE LIMIT REACHED", "warn"); break; }
                 await new Promise(r => setTimeout(r, 50));
             }
@@ -317,14 +314,17 @@
         return scopes;
     }
 
-    // --- PHASE 2: SCAN EACH WALLET ---
+    // --- PHASE 2: SCAN EACH WALLET (FIXED TYPE SAFETY) ---
     function processRow(row, scope) {
         let tid = String(row.template_id);
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
         let count_total = assetList.length;
         
+        // SAFE NUMBER PARSING (FIXED V220)
         let now = Date.now() / 1000;
-        let finish = parseFloat(row.last_claim) + parseFloat(row.delay);
+        let last = Number(row.last_claim || 0);
+        let delay = Number(row.delay || 0);
+        let finish = last + delay;
         let isActive = now < finish;
         let count_active = isActive ? count_total : 0;
 
@@ -356,12 +356,10 @@
         sysLog(`PHASE 2: SCANNING ${wallets.length} WALLETS...`, "ok");
 
         // 2. SCAN BATCHES
-        // To avoid browser hang, process in chunks
         for(let i=0; i<wallets.length; i++) {
             if(stopSignal) break;
             let user = wallets[i];
             
-            // Log every 50 users
             if(i % 50 === 0) sysLog(`Scanning wallet ${i}/${wallets.length}: ${user}`, "inf");
 
             try {
@@ -385,14 +383,14 @@
                         }
                         stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
                         if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
+                        // Optim: Keep scan details light? No, client wants full drill-down.
                         d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: user }); });
                     }
                 }
             } catch(e) { /* ignore single wallet fail */ }
 
-            // UI Refresh every 20 wallets to save resources
             if(i % 20 === 0) updateGlobalUI(wallets.length, totalAssets, stats, groups);
-            await new Promise(r => setTimeout(r, 10)); // tiny throttle
+            await new Promise(r => setTimeout(r, 10)); 
         }
         updateGlobalUI(wallets.length, totalAssets, stats, groups);
         sysLog("FULL COLLECTION SCAN COMPLETE", "ok");
@@ -420,7 +418,7 @@
         let list = SCAN_DETAILS[tid] || [];
         safeSetText('detailTitle', `${name} (${list.length})`);
         let html = `<table class="ins-table"><thead><tr><th>ASSET</th><th>OWNER</th><th>STATUS</th></tr></thead><tbody>`;
-        let limit = list.length > 500 ? 500 : list.length; // Cap display for huge collections
+        let limit = list.length > 500 ? 500 : list.length; // UI Safety Cap
         for(let i=0; i<limit; i++) {
             let item = list[i];
             let assetLink = `${DATA.gameConfig.atomicAsset}/${item.assetId}`;
@@ -433,16 +431,16 @@
         getId('detailModal').style.display = 'flex';
     }
 
-    // --- OTHER SCANS (UNCHANGED) ---
-    async function startZoneScan() { /* ... Same as V217 ... */ }
-    async function startEconomyScan() { /* ... Same as V217 ... */ }
-    async function startTargetBuildings() { /* ... Same as V217 ... */ }
-    async function startTargetDivisions() { /* ... Same as V217 ... */ }
+    // --- OTHER SCANS ---
+    async function startZoneScan() { /* ... Same as before ... */ }
+    async function startEconomyScan() { /* ... Same as before ... */ }
+    async function startTargetBuildings() { /* ... Same as before ... */ }
+    async function startTargetDivisions() { /* ... Same as before ... */ }
 
     // --- SETTINGS ---
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V218', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V218'); location.reload(); } }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
 
     window.onload = init;
 </script>
