@@ -2,19 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V162 (EMERGENCY FIX)</title>
+    <title>DoV - COMMAND V161 (UI FIX)</title>
     <style>
-        /* --- STYLE --- */
-        :root { 
-            --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
-            --gold: #ffd700; --money: #2ecc71;
-            --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f;
-            --bg: #050505; --panel: #111; 
-        }
+        /* --- STYLE IDENTIQUE --- */
+        :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; --gold: #ffd700; --money: #2ecc71; --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f; --bg: #050505; --panel: #111; }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
-        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
@@ -22,24 +16,17 @@
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
         button:hover { opacity: 0.8; }
-        .btn-zone { background: var(--main); color: #000; } 
-        .btn-eco { background: var(--gold); color: #000; } 
-        .btn-stop { background: var(--alert); color: #fff; display: none; } 
-        .btn-target { background: var(--sec); color: #000; } 
-        .btn-build { background: #9b59b6; color: #fff; } 
-        .btn-global { background: #fff; color: #000; }
-        .btn-settings { background: #333; color: var(--sec); border:1px solid var(--sec); margin-bottom:15px; } 
-        .btn-settings:hover { background: #444; }
+        .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
+        .btn-settings { background: #333; color: var(--sec); border:1px solid var(--sec); margin-bottom:15px; } .btn-settings:hover { background: #444; }
         .btn-update { background: #e67e22; color: #fff; font-size: 10px; margin-bottom: 10px; }
-        .btn-reset-hard { background: #b71c1c; color: #fff; border: 1px solid #ff1744; margin-top: 5px; font-size: 10px; }
-        
+        .btn-reset { background: #b71c1c; color: #fff; font-size: 10px; border: 1px solid #ff1744; margin-top:5px;}
         input, select, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
+        .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
         
-        /* UI */
+        /* UI TABLES */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
-        .g-mc-left { display: flex; flex-direction: column; }
-        .g-mc-right { text-align: right; }
+        .g-mc-left { display: flex; flex-direction: column; } .g-mc-right { text-align: right; }
         .scan-stats-row { display: flex; gap: 20px; font-size: 12px; margin-top: 5px; }
         .g-cost-val { color: var(--dovx); font-weight:bold; font-size:20px; }
         .g-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
@@ -54,23 +41,20 @@
         .ml-row:hover { background: #161616; }
         .ml-name a { color: #ccc; text-decoration: none; border-bottom: 1px dotted #555; font-weight:bold; }
         .ml-name a:hover { color: var(--sec); }
-        .ml-link-icon { text-decoration:none; margin-left:5px; font-size:10px; }
         .ml-mult { color: var(--main); font-size:10px; background:#003300; padding:1px 4px; border-radius:3px; margin-left:5px; font-weight:bold; border:1px solid var(--main); }
         .status-badge { font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; display:inline-block; width:60px; text-align:center; }
         .s-prod { background: var(--main); color: #000; animation: pulse 2s infinite; }
         .s-claim { background: var(--warn); color: #000; opacity: 0.8; }
         .c-f { border-left: 4px solid var(--fuel); } .c-h { border-left: 4px solid var(--health); }
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
-        
         .debug-box { margin-top:30px; border:1px solid #444; background:#080808; padding:10px; }
         .debug-title { font-weight:bold; color:var(--warn); margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px; text-transform:uppercase;}
         .debug-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:5px; font-size:10px; max-height:300px; overflow-y:auto; }
         .d-row { background:#111; padding:4px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center; }
         .d-id { color:var(--sec); font-family:monospace; text-decoration:none; border-bottom:1px dotted var(--sec); cursor:pointer; }
-        .d-id:hover { color:#fff; border-color:#fff; }
         .d-cnt { font-weight:bold; color:#fff; }
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; margin-top:20px; }
-
+        
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -93,7 +77,6 @@
         .z-act-mission { background: var(--warn); height: 100%; } .z-act-ready { background: var(--main); height: 100%; }
         .view-section { display: none; } .view-active { display: block; }
         .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
@@ -107,7 +90,6 @@
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
-        
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
@@ -116,38 +98,35 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
 
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--sec); width: 600px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         .modal-head { padding: 10px 15px; background: #222; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-weight: bold; color: var(--sec); text-transform: uppercase; }
-        .modal-close { cursor: pointer; color: #fff; font-weight: bold; }
+        .modal-close { cursor: pointer; color: #fff; font-weight: bold; font-size: 14px; padding: 5px; }
         .modal-body { padding: 15px; overflow-y: auto; color: #ccc; font-size: 11px; }
-        
         .set-group { margin-bottom: 15px; border: 1px solid #333; padding: 10px; }
         .set-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display:block; border-bottom:1px solid #444; padding-bottom:3px; }
         .set-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
         .btn-action { background: var(--main); color: #000; width: auto; display: inline-block; padding: 5px 15px; cursor: pointer; border:none; font-weight:bold; }
-        .btn-action:hover { opacity:0.8; }
         .sybil-cluster { border: 1px solid var(--alert); background: rgba(255, 23, 68, 0.1); margin-bottom: 8px; padding: 5px; border-radius: 3px; }
         .cluster-head { color: var(--alert); font-weight: bold; font-size: 10px; border-bottom: 1px solid #444; margin-bottom: 4px; display: flex; justify-content: space-between; }
         .player-row { padding: 3px 0; display: flex; justify-content: space-between; align-items: center; }
-        .player-row:hover { background: #1a1a1a; }
         .p-name { color: var(--main); font-weight: bold; cursor: pointer; }
         .btn-audit { background: #333; border: 1px solid #555; color: #fff; font-size: 9px; padding: 1px 5px; cursor: pointer; margin-left: 5px; width: auto; display: inline-block; }
-        .btn-audit:hover { background: var(--sec); border-color: var(--sec); }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V162 EMERGENCY FIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V161 UI FIX</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <button class="btn-settings" onclick="openSettings()">⚙️ PARAMÈTRES</button>
-        <button class="btn-reset-hard" onclick="hardReset()">⚠️ RESET USINE</button>
+        <button class="btn-reset" onclick="hardReset()">⚠️ RESET USINE (SI BUG)</button>
         
         <div class="box">
             <div class="box-title">DICTIONNAIRE</div>
@@ -263,7 +242,7 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="zoneModal">
+<div class="modal-overlay" id="zoneModal" onclick="if(event.target===this) closeModal('zoneModal')">
     <div class="modal-box">
         <div class="modal-head">
             <div class="modal-title" id="zmTitle">RADAR MULTI-COMPTES</div>
@@ -275,10 +254,10 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="settingsModal">
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this) closeModal('settingsModal')">
     <div class="modal-box" style="width:700px;">
         <div class="modal-head">
-            <div class="modal-title">⚙️ PARAMÈTRES AVANCÉS (ZERO HARDCODE)</div>
+            <div class="modal-title">⚙️ PARAMÈTRES AVANCÉS</div>
             <div class="modal-close" onclick="closeModal('settingsModal')">X</div>
         </div>
         <div class="modal-body">
@@ -293,17 +272,14 @@
                     <div><label class="inp-label">Start Key (Optionnel)</label><input type="text" id="cfgStart" placeholder="ex: 5000"></div>
                 </div>
             </div>
-
             <div class="set-group">
-                <span class="set-title">CONFIGURATION DES ZONES (JSON)</span>
+                <span class="set-title">CONFIGURATION ZONES (JSON)</span>
                 <textarea id="cfgZones" style="height:100px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
             </div>
-
             <div class="set-group">
                 <span class="set-title">DICTIONNAIRE TEMPLATES (JSON: ID -> {name, prod})</span>
                 <textarea id="cfgTemplates" style="height:150px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
             </div>
-            
             <div class="set-group">
                 <span class="set-title">LOGIQUE DE JEU (CLAIM LEVELS)</span>
                 <textarea id="cfgLevels" style="height:60px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
@@ -312,30 +288,24 @@
                 <span class="set-title">TRI D'AFFICHAGE</span>
                 <textarea id="cfgSort" style="height:40px; font-size:10px;"></textarea>
             </div>
-
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                <div class="set-group">
-                    <span class="set-title">NODES RPC</span>
-                    <textarea id="cfgRpc" style="height:80px; font-size:10px; white-space:pre;"></textarea>
-                </div>
-                <div class="set-group">
-                    <span class="set-title">PROXIES CORS</span>
-                    <textarea id="cfgProxy" style="height:80px; font-size:10px; white-space:pre;"></textarea>
-                </div>
+                <div class="set-group"><span class="set-title">NODES RPC</span><textarea id="cfgRpc" style="height:80px; font-size:10px; white-space:pre;"></textarea></div>
+                <div class="set-group"><span class="set-title">PROXIES CORS</span><textarea id="cfgProxy" style="height:80px; font-size:10px; white-space:pre;"></textarea></div>
             </div>
-
             <div style="text-align:right;">
-                <button class="btn-action" style="background:#444;" onclick="resetConfig()">RÉINITIALISER TOUT</button>
+                <button class="btn-action" style="background:#444;" onclick="hardReset()">RÉINITIALISER TOUT</button>
                 <button class="btn-action" onclick="saveConfig()">SAUVEGARDER CONFIG</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="logs" id="console">> V162. EMERGENCY RESET READY.</div>
+<div class="logs" id="console">> V161. UI FIX READY.</div>
 
 <script>
-    // --- I. DONNÉES PAR DÉFAUT (STRUCTURED) ---
+    // GLOBAL CLOSE MODAL FIX (HOISTED)
+    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+
     const DEFAULT_DATA = {
         zones: { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}},
         templates: {
@@ -363,15 +333,13 @@
             "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
             "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 },
             "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
-            "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 },
-            "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
             "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
         },
         claimLevels: [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }],
         rates: { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 }
     };
     
-    // --- II. CONFIGURATION SYSTÈME (NET & UI) ---
     let SYSTEM_CONFIG = {
         strategy: 'B',
         batchSize: 1000,
@@ -383,16 +351,11 @@
         proxies: ["", "https://corsproxy.io/?", "https://api.allorigins.win/raw?url=", "https://thingproxy.freeboard.io/fetch/"]
     };
 
-    // --- III. VARIABLES D'ÉTAT (RUNTIME) ---
-    let CORE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA)); // Clone
+    let CORE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let SYS_CONFIG = JSON.parse(JSON.stringify(SYSTEM_CONFIG));
-    let ZONE_DETAILS = {}; 
-    let stopSignal = false; 
-    let rpcIndex = 0; 
-    let proxyIndex = 0;
+    let ZONE_DETAILS = {}; let stopSignal = false; let rpcIndex = 0; let proxyIndex = 0;
     let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
-    // --- UTILS ---
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
     function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
@@ -400,88 +363,55 @@
     function isBusy(row) { return (getProp(row, ['end_time', 'end']) > (Date.now()/1000)); }
     function getId(row) { return row.asset_id || row.id || row.division_id || 0; }
     function extractPower(row) { let val = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr); if (typeof val === 'string') val = val.replace(/[^0-9.]/g, ''); return parseFloat(val) || 0; }
-    
-    // --- CALCUL RECOMPENSE (Via Config) ---
-    function computeDovxReward(baseReward, divisionPower) { 
-        if(!CORE_DATA.claimLevels) return 0;
-        for (let lvl of CORE_DATA.claimLevels) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } 
-        return 0; 
-    }
-    
-    // --- UPDATE RATES FROM INPUT ---
-    function updateRates() { 
-        CORE_DATA.rates.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; 
-        CORE_DATA.rates.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; 
-        CORE_DATA.rates.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; 
-        if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); 
-    }
+    function computeDovxReward(baseReward, divisionPower) { if(!CORE_DATA.claimLevels) return 0; for (let lvl of CORE_DATA.claimLevels) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
+    function updateRates() { CORE_DATA.rates.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; CORE_DATA.rates.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; CORE_DATA.rates.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); }
 
-    // --- INITIALISATION BLINDEE (FIX V162) ---
     function initApp() {
-        // Load System config
         const storedSys = localStorage.getItem('DOV_SYS');
         if(storedSys) try { SYS_CONFIG = { ...SYSTEM_CONFIG, ...JSON.parse(storedSys) }; } catch(e) {}
-        
-        // Load Game Data with Deep Merge safety
         const storedData = localStorage.getItem('DOV_DATA');
         if(storedData) {
             try { 
                 let loaded = JSON.parse(storedData);
-                // On s'assure que chaque clé critique est présente, sinon on prend le défaut
                 CORE_DATA.zones = loaded.zones || DEFAULT_DATA.zones;
                 CORE_DATA.templates = loaded.templates || DEFAULT_DATA.templates;
                 CORE_DATA.rates = loaded.rates || DEFAULT_DATA.rates;
-                CORE_DATA.claimLevels = loaded.claimLevels || DEFAULT_DATA.claimLevels; // Critical Fix
-            } catch(e) { 
-                console.warn("Data corrupted, using defaults");
-                CORE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-            }
+                CORE_DATA.claimLevels = loaded.claimLevels || DEFAULT_DATA.claimLevels; 
+            } catch(e) { CORE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
         }
-
-        // Populate UI
         document.getElementById('inpWax').value = CORE_DATA.rates.WAX_USD;
         document.getElementById('inpDovx').value = CORE_DATA.rates.DOVX_WAX;
         document.getElementById('inpTu').value = CORE_DATA.rates.TU_WAX;
         document.getElementById('dictSize').innerText = Object.keys(CORE_DATA.templates).length;
-        
         initGrid();
         log("✅ Système initialisé.", "#00e676");
     }
 
-    // --- HARD RESET ---
     function hardReset() {
-        if(confirm("⚠️ ATTENTION: Ceci va effacer toutes vos configurations personnalisées et recharger la version d'usine. Continuer ?")) {
-            localStorage.removeItem('DOV_SYS');
-            localStorage.removeItem('DOV_DATA');
-            location.reload();
+        if(confirm("⚠️ RESET TOTAL : Ceci va effacer toutes vos configurations. Continuer ?")) {
+            localStorage.removeItem('DOV_SYS'); localStorage.removeItem('DOV_DATA'); location.reload();
         }
     }
 
-    // --- ROBUST FETCH ENGINE ---
     async function robustFetch(code, table, lowerBound, limit=1000, customScope=null, indexPos=1, keyType="") {
         let attempts = 0;
         const effectiveLimit = limit || SYS_CONFIG.batchSize;
         const effectiveDelay = SYS_CONFIG.delay;
         const effectiveScope = customScope ? customScope : code;
-
         while(attempts < 20 && !stopSignal) {
             const server = SYS_CONFIG.rpcs[rpcIndex % SYS_CONFIG.rpcs.length];
             const proxy = SYS_CONFIG.proxies[proxyIndex % SYS_CONFIG.proxies.length];
             rpcIndex++; 
-            
             const url = server + "/v1/chain/get_table_rows";
             let finalUrl = url;
             if(proxy && proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
-
             try {
                 let statusText = `[RPC: ${new URL(server).hostname}]`;
                 if(proxy && proxy.length > 5) statusText += ` + [PXY: ${new URL(proxy).hostname}]`; else statusText += ` + [DIRECT]`;
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = statusText;
-
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 15000); 
                 const payload = { json: true, code: code, scope: effectiveScope, table: table, limit: effectiveLimit, lower_bound: lowerBound };
                 if(indexPos > 1) { payload.index_position = indexPos; payload.key_type = keyType; payload.upper_bound = lowerBound; }
-
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 const contentType = res.headers.get("content-type");
@@ -497,10 +427,9 @@
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- ATOMIC UPDATER ---
     async function updateDictionary() {
         stopSignal = false;
-        if (!SYS_CONFIG.proxies || SYS_CONFIG.proxies.length === 0) { alert("ERREUR: Aucun proxy configuré !"); return; }
+        if (!SYS_CONFIG.proxies || SYS_CONFIG.proxies.length === 0) { alert("ERREUR: Aucun proxy !"); return; }
         log("🔄 MAJ Dictionnaire...", "#fff");
         let page = 1; let totalLoaded = 0; let localProxyIdx = 0; 
         try {
@@ -509,7 +438,6 @@
                 const currentProxy = SYS_CONFIG.proxies[localProxyIdx % SYS_CONFIG.proxies.length];
                 let finalUrl = urlTarget;
                 if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
-                
                 try {
                     const res = await fetch(finalUrl);
                     if (!res.headers.get("content-type")?.includes("application/json")) throw new Error("Not JSON");
@@ -534,7 +462,6 @@
         } catch(e) { log("Erreur Dico: "+e.message, "red"); }
     }
 
-    // --- LOGIC: CONFORM BUILDING & SORT ---
     function getSortScore(name) {
         if(!name) return 999;
         for(let i=0; i<SYS_CONFIG.sortOrder.length; i++) { if(name.startsWith(SYS_CONFIG.sortOrder[i])) return i; }
@@ -548,20 +475,16 @@
         let dailyProd = hourlyProd * 24;
         let pType = "F";
         if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
-        
         let tpl = CORE_DATA.templates[tid];
         let name = tpl ? tpl.name : `INCONNU [${tid}]`;
         let base = tpl ? tpl.prod : 0;
         let cost24 = hourlyProd * 24 * 0.085; 
-        
         let unitProd = base > 0 ? (base * 24) : (stack > 0 ? dailyProd/stack : dailyProd);
         if(base > 0 && hourlyProd > 0) stack = Math.round(hourlyProd / base);
-
         let sortScore = getSortScore(name);
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
 
-    // --- SCAN MASTER ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'block'; document.getElementById('buildList').style.display = 'none'; document.getElementById('btnStop').style.display = 'inline-block';
         let start = SYS_CONFIG.startKey || "0";
@@ -592,7 +515,6 @@
                 document.getElementById('cntRows').innerText = scanRows.toLocaleString(); document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
                 document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
                 ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-                
                 let dbgHTML = "";
                 let auditKeys = Object.keys(templateAudit);
                 auditKeys.sort((a,b) => getSortScore(templateAudit[a].name) - getSortScore(templateAudit[b].name));
@@ -625,7 +547,6 @@
         }
     }
 
-    // --- SCAN JOUEUR ---
     async function startBuildings() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
         switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; 
@@ -645,7 +566,6 @@
         } log(`✅ Scan Joueur terminé.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } 
     }
     
-    // --- SCAN CIBLE ---
     async function startTarget() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche divisions..."; 
         try { 
@@ -661,12 +581,10 @@
         } catch(e){ log("Erreur Target: "+e.message, "red"); } 
     }
 
-    // --- SCAN ZONES ---
     async function startZoneScan() { 
         stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
         ZONE_DETAILS = {}; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; 
         Object.keys(CORE_DATA.zones).forEach(id => { stats.zones[id] = { count: 0, active: 0, idle: 0 }; });
-        
         let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); 
         try { while(hasMore && !stopSignal) { 
             const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; 
@@ -725,17 +643,13 @@
     async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = CORE_DATA.zones[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 1000 === 0) updateEcoDisplay(); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
     function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * CORE_DATA.rates.TU_WAX * CORE_DATA.rates.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * CORE_DATA.rates.TU_WAX * CORE_DATA.rates.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * CORE_DATA.rates.DOVX_WAX * CORE_DATA.rates.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * CORE_DATA.rates.DOVX_WAX * CORE_DATA.rates.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * CORE_DATA.rates.DOVX_WAX * CORE_DATA.rates.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * CORE_DATA.rates.DOVX_WAX * CORE_DATA.rates.WAX_USD)); }
 
-    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; 
-    Object.keys(CORE_DATA.zones).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(id => { 
-        const z = CORE_DATA.zones[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
+    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; Object.keys(CORE_DATA.zones).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(id => { const z = CORE_DATA.zones[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
     
-    // --- SETTINGS UI SAFE ---
     function openSettings() { 
         try {
             document.getElementById('cfgStrategy').value = SYS_CONFIG.strategy; document.getElementById('cfgBatch').value = SYS_CONFIG.batchSize; document.getElementById('cfgDelay').value = SYS_CONFIG.delay; document.getElementById('cfgStart').value = SYS_CONFIG.startKey; 
             document.getElementById('cfgSort').value = SYS_CONFIG.sortOrder.join(', '); document.getElementById('cfgRpc').value = SYS_CONFIG.rpcs.join('\n'); document.getElementById('cfgProxy').value = SYS_CONFIG.proxies.join('\n');
             document.getElementById('cfgZones').value = JSON.stringify(CORE_DATA.zones, null, 4); document.getElementById('cfgTemplates').value = JSON.stringify(CORE_DATA.templates, null, 4); 
-            // FIX V162: Check existence of claimLevels before stringify to avoid crash
             if(CORE_DATA.claimLevels) document.getElementById('cfgLevels').value = JSON.stringify(CORE_DATA.claimLevels, null, 4);
             document.getElementById('settingsModal').style.display = 'flex'; 
         } catch(e) { alert("Erreur ouverture settings (Données corrompues ? Essayez RESET USINE). " + e.message); }
@@ -745,15 +659,11 @@
         let rawSort = document.getElementById('cfgSort').value.trim().split(','); let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0); if(cleanSort.length > 0) SYS_CONFIG.sortOrder = cleanSort;
         let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n'); let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http')); if(cleanRpc.length > 0) SYS_CONFIG.rpcs = cleanRpc;
         let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n'); let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === ""); if(cleanProxy.length > 0) SYS_CONFIG.proxies = cleanProxy;
-        try { 
-            CORE_DATA.zones = JSON.parse(document.getElementById('cfgZones').value); 
-            CORE_DATA.templates = JSON.parse(document.getElementById('cfgTemplates').value); 
-            CORE_DATA.claimLevels = JSON.parse(document.getElementById('cfgLevels').value); 
-        } catch(e) { alert("JSON Invalide: "+e.message); return; }
+        try { CORE_DATA.zones = JSON.parse(document.getElementById('cfgZones').value); CORE_DATA.templates = JSON.parse(document.getElementById('cfgTemplates').value); CORE_DATA.claimLevels = JSON.parse(document.getElementById('cfgLevels').value); } catch(e) { alert("JSON Invalide: "+e.message); return; }
         localStorage.setItem('DOV_SYS', JSON.stringify(SYS_CONFIG)); localStorage.setItem('DOV_DATA', JSON.stringify(CORE_DATA));
-        closeModal('settingsModal'); log("⚙️ Config Sauvegardée.", "#ffd700"); initGrid();
+        window.closeModal('settingsModal'); log("⚙️ Config Sauvegardée.", "#ffd700"); initGrid();
     }
-    
+
     window.onload = function() { initApp(); }
 </script>
 
