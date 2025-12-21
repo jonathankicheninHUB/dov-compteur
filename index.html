@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V218 (COLLECTION SCAN)</title>
+    <title>DoV - COMMAND V219 (FINAL STABLE)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -118,7 +118,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V218</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V219</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">COLLECTION SCANNER</span>
@@ -155,7 +155,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">COLLECTION PRODUCTION</h2>
-                    <div class="page-meta">WALLETS FOUND: <span id="cntWallets">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <div class="page-meta">WALLETS: <span id="cntWallets">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -166,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (SCOPE DISCOVERY MODE)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (DISCOVERY MODE)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -177,13 +177,17 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODE LIST (ADD YOURS AT TOP)</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODE LIST</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
     // --- UTILS & SAFE DOM ---
     const getId = (id) => document.getElementById(id);
-    const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; else sysLog(`DOM ERROR: #${id}`, "err"); };
+    const safeSetText = (id, text) => { 
+        const el = getId(id); 
+        if(el) el.innerText = text; 
+        // Silent failure if DOM missing (Prevent Crash)
+    };
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
@@ -204,7 +208,6 @@
     // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { 
-            // 23 NODES: 3 SLOTS FOR YOUR PROXIES + 20 PUBLIC
             rpcNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
@@ -236,7 +239,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V218'); 
+        const local = localStorage.getItem('DOV_DATA_V219'); // FINAL KEY
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
@@ -305,13 +308,9 @@
                 sysLog(`FOUND ${res.rows.length} WALLETS...`, "inf");
 
                 if(!res.more) break;
-                next = res.more; // API typically returns next_key in 'more' for scopes, but sometimes logic differs.
-                // NOTE: get_table_by_scope pagination can be tricky. Using last scope as lower_bound for next.
-                next = res.rows[res.rows.length - 1].scope;
-                // Need to increment the scope string to avoid infinite loop (complex char math), 
-                // but let's assume 'more' gives us the handle or simple pagination works for now.
-                // If this loops, we break. For stability, let's limit to 5000 users for now.
-                if(scopes.length > 5000) break; 
+                next = res.more; // Using 'more' as the cursor for next batch
+                // Safety break to prevent infinite loop if API misbehaves
+                if(scopes.length > 20000) { sysLog("SCOPE LIMIT REACHED", "warn"); break; }
                 await new Promise(r => setTimeout(r, 50));
             }
         } catch(e) { sysLog("SCOPE DISCOVERY ERROR: " + e.message, "err"); }
