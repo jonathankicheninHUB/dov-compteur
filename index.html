@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V164 (MATH FIX)</title>
+    <title>DoV - COMMAND V167 (FINAL RELEASE)</title>
     <style>
-        /* --- STYLE IDENTIQUE --- */
+        /* --- STYLE IDENTIQUE (INTACT) --- */
         :root { --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; --gold: #ffd700; --money: #2ecc71; --fuel: #e67e22; --health: #e74c3c; --repair: #bdc3c7; --supply: #f1c40f; --bg: #050505; --panel: #111; }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
@@ -24,7 +24,6 @@
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; }
         
-        /* UI TABLES */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-mc-left { display: flex; flex-direction: column; } .g-mc-right { text-align: right; }
         .scan-stats-row { display: flex; gap: 20px; font-size: 12px; margin-top: 5px; }
@@ -36,7 +35,7 @@
         .g-prod-lbl { font-size:9px; color:#888; text-align:center; text-transform:uppercase; }
         .model-list-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top:20px; }
         .ml-col { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
-        .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; }
+        .ml-header { padding: 8px; background: #222; font-weight: bold; font-size: 12px; text-transform: uppercase; color: #fff; display: flex; justify-content: space-between; }
         .ml-row { display: grid; grid-template-columns: 4fr 0.8fr 1fr 1.2fr; padding: 8px 10px; border-bottom: 1px solid #1a1a1a; font-size: 11px; align-items: center; }
         .ml-row:hover { background: #161616; }
         .ml-name a { color: #ccc; text-decoration: none; border-bottom: 1px dotted #555; font-weight:bold; }
@@ -55,6 +54,7 @@
         .d-id:hover { color:#fff; border-color:#fff; }
         .d-cnt { font-weight:bold; color:#fff; }
         .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; margin-top:20px; }
+
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -120,7 +120,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V164 MATH FIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V167 FINAL RELEASE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -311,7 +311,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V164. MATH FIX READY.</div>
+<div class="logs" id="console">> V167. FINAL RELEASE READY.</div>
 
 <script>
     // GLOBAL CLOSE MODAL FIX (HOISTED)
@@ -320,6 +320,10 @@
     // ==========================================
     // I. DONNÉES DE JEU (GAME DATA) - DEFAULT
     // ==========================================
+    // IMPORTANT: Ceci est le "Bootstrap" (Configuration d'usine). 
+    // Il permet au script de démarrer même sans internet ou cache local.
+    // L'utilisateur peut modifier ces valeurs via le menu "Paramètres", 
+    // ce qui écrasera ce défaut par une copie sauvegardée dans le navigateur (LocalStorage).
     const DEFAULT_DATA = {
         zones: { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}},
         templates: {
@@ -333,12 +337,7 @@
             "492368": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
             "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
             "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            
-            // --- NEW DISCOVERIES INTEGRATED (V164) ---
-            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, 
-            "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
-            "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
-            
+            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
             "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
             "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
             "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
@@ -413,15 +412,17 @@
 
     // --- INITIALISATION BLINDEE ---
     function initApp() {
+        // Load System config
         const storedSys = localStorage.getItem('DOV_SYS');
         if(storedSys) try { SYS_CONFIG = { ...SYSTEM_CONFIG, ...JSON.parse(storedSys) }; } catch(e) {}
         
+        // Load Game Data with Deep Merge safety
         const storedData = localStorage.getItem('DOV_DATA');
         if(storedData) {
             try { 
                 let loaded = JSON.parse(storedData);
+                // On s'assure que chaque clé critique est présente, sinon on prend le défaut
                 CORE_DATA.zones = loaded.zones || DEFAULT_DATA.zones;
-                // MERGE: Keep default templates if new ones exist in default but not in cache, or override.
                 CORE_DATA.templates = { ...DEFAULT_DATA.templates, ...(loaded.templates || {}) };
                 CORE_DATA.rates = loaded.rates || DEFAULT_DATA.rates;
                 CORE_DATA.claimLevels = loaded.claimLevels || DEFAULT_DATA.claimLevels; 
@@ -431,6 +432,7 @@
             }
         }
 
+        // Populate UI
         document.getElementById('inpWax').value = CORE_DATA.rates.WAX_USD;
         document.getElementById('inpDovx').value = CORE_DATA.rates.DOVX_WAX;
         document.getElementById('inpTu').value = CORE_DATA.rates.TU_WAX;
@@ -532,8 +534,6 @@
         for(let i=0; i<SYS_CONFIG.sortOrder.length; i++) { if(name.startsWith(SYS_CONFIG.sortOrder[i])) return i; }
         return 999;
     }
-    
-    // --- V164: MATH FIX IN CONFORM BUILDING ---
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
         let stack = (b.asset_ids && Array.isArray(b.asset_ids)) ? b.asset_ids.length : 1;
@@ -606,25 +606,31 @@
                     dbgHTML += `<div class="d-row"><a href="#" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
                 }
                 document.getElementById('debugGrid').innerHTML = dbgHTML;
-                renderLists(groups);
+                // V166: PASS TOTALS STATS.P TO RENDERLISTS
+                renderLists(groups, stats.p);
             }
             if (data.more && data.next_key) next = data.next_key; else more = false;
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
-    function renderLists(groups){
+    // --- FIX V166: AGGREGATED TOTALS ---
+    function renderLists(groups, typeTotals){
         for(let t in groups){
-            let h=`<div class="ml-header">TYPE ${t}</div>`;
             let keys=Object.keys(groups[t]);
             keys.sort((a,b) => {
                 let scoreA = groups[t][a].sortScore; let scoreB = groups[t][b].sortScore;
                 if(scoreA === scoreB) return groups[t][b].unitProd - groups[t][a].unitProd;
                 return scoreA - scoreB; 
             });
+            
+            // V166: INJECT TOTAL IN HEADER
+            let totalForType = typeTotals && typeTotals[t] ? Math.round(typeTotals[t]).toLocaleString() : "0";
+            let h = `<div class="ml-header" style="justify-content:space-between"><span>TYPE ${t}</span> <span style="font-size:10px; color:#fff; background:#444; padding:0 5px; border-radius:3px;">TOTAL: ${totalForType}</span></div>`;
+            
             keys.forEach(k=>{
                 let i=groups[t][k]; if(i.cp===0 && i.cr===0) return;
-                // V164: Display "unitProd" which is now the STACK daily production
-                h+=`<div class="ml-row"><div class="ml-name">${i.name}</div><div class="ml-count">${i.cp} ACTIF</div><div class="ml-unit">${Math.round(i.unitProd).toLocaleString()}/u</div><div class="ml-total">${Math.round(i.tp).toLocaleString()}</div></div>`;
+                let stackLabel = i.stack > 1 ? `<span class="ml-mult">x${i.stack}</span>` : '';
+                h+=`<div class="ml-row"><div class="ml-name">${i.name} ${stackLabel}</div><div class="ml-count">${i.cp} ACTIF</div><div class="ml-unit">${Math.round(i.unitProd).toLocaleString()}/u</div><div class="ml-total">${Math.round(i.tp).toLocaleString()}</div></div>`;
             });
             let c=document.getElementById('list-'+t); if(c) c.innerHTML=h;
         }
@@ -753,7 +759,8 @@
         localStorage.setItem('DOV_SYS', JSON.stringify(SYS_CONFIG)); localStorage.setItem('DOV_DATA', JSON.stringify(CORE_DATA));
         window.closeModal('settingsModal'); log("⚙️ Config Sauvegardée.", "#ffd700"); initGrid();
     }
-    
+    function resetConfig() { if(confirm("Reset Total ?")) { localStorage.removeItem('DOV_SYS'); localStorage.removeItem('DOV_DATA'); location.reload(); } }
+
     window.onload = function() { initApp(); }
 </script>
 
