@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V139 (SAFE MATRIX)</title>
+    <title>DoV - COMMAND V140 (ZONE FIX)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -75,9 +75,9 @@
         .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         
-        /* ZONE MODIF V138 */
+        /* ZONE INTERACTIVE (V140) */
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 80px; cursor: pointer; transition: 0.2s; position: relative; }
-        .zone:hover { border-color: var(--sec); background: #111; }
+        .zone:hover { border-color: var(--sec); background: #111; box-shadow: 0 0 10px rgba(41, 182, 246, 0.1); }
         .zone.active { border-color: #444; background: #0e0e0e; }
         
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
@@ -111,7 +111,7 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
 
-        /* MODAL INSPECTOR */
+        /* MODAL INSPECTOR (V140) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--sec); width: 400px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         .modal-head { padding: 10px 15px; background: #222; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
@@ -126,7 +126,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V139 SAFE MATRIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V140 ZONE FIX</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -153,16 +153,13 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            
             <label class="inp-label" style="color:var(--sec)">STRATÉGIE DE SCAN</label>
             <select id="scanStrategy" style="margin-bottom:10px;">
                 <option value="B">B. RPC ROTATION (Recommandé)</option>
                 <option value="C">C. HYBRIDE (God Mode)</option>
                 <option value="A">A. Séquentiel (Safe)</option>
             </select>
-
             <button class="btn-global" onclick="dispatchGlobalScan()">SCAN MASTER (ALL)</button>
-            
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -266,13 +263,13 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V139. SAFE MATRIX (1000).</div>
+<div class="logs" id="console">> V140. ZONES CLICKABLE & MATRIX.</div>
 
 <script>
-    // --- MEMOIRE ZONE ---
+    // --- MEMOIRE ZONE V140 ---
     let ZONE_DETAILS = {};
 
-    // --- DICTATURE DU NOMMAGE ---
+    // --- DICTATURE DU NOMMAGE (SANS CALCUL) ---
     const TEMPLATE_NAMES = {
         "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
         "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
@@ -337,7 +334,6 @@
         } catch(e) { return null; }
     }
 
-    // --- ROBUST FETCH (MULTI-LINK) ---
     async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
         while(attempts < 20 && !stopSignal) {
@@ -393,7 +389,7 @@
     // --- DISPATCHER ---
     async function dispatchGlobalScan() {
         const strategy = document.getElementById('scanStrategy').value;
-        const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX (1000)" : "MODE HYBRIDE (GOD)");
+        const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX (SAFE 1000)" : "MODE HYBRIDE (GOD)");
         
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
@@ -484,7 +480,9 @@
         }
     }
 
-    // --- ZONE MODIFIEE V138 ---
+    async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
+    
+    // --- ZONE FIX V140 ---
     async function startZoneScan() { 
         stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
         ZONE_DETAILS = {}; 
@@ -495,7 +493,8 @@
                 stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); 
                 if(busy) {
                     if(!ZONE_DETAILS[zID]) ZONE_DETAILS[zID] = [];
-                    const ownerName = row.owner || row.user || row.account;
+                    // V140 FIX: ROBUST NAME FINDER
+                    const ownerName = row.owner || row.user || row.account || row.player || "Inconnu";
                     if(ownerName) ZONE_DETAILS[zID].push(ownerName);
                 }
                 if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } 
@@ -532,7 +531,7 @@
     function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
     async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
 
-    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
+    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
     window.onload = function() { initGrid(); }
 </script>
 
