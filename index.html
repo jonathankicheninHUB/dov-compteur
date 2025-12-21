@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V153 (SORTING ARCHITECT)</title>
+    <title>DoV - COMMAND V154 (TARGET FIX)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 (INTACT) --- */
+        /* --- STYLE ORIGINAL (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -153,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V153 SORTING ARCHITECT</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V154 TARGET FIX</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -347,7 +347,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V153. SORTING ARCHITECT READY.</div>
+<div class="logs" id="console">> V154. TARGET FIX READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
@@ -358,7 +358,6 @@
         delay: 200,
         startKey: '',
         // NOUVEAU : ORDRE DE TRI CONFIGURABLE
-        // Ordre logique : C1 -> C4, puis R1 -> R4, etc.
         sortOrder: [
             "C_F1", "C_F2", "C_F3", "C_F4", 
             "R_F1", "R_F2", "R_F3", "R_F4",
@@ -435,7 +434,6 @@
     // --- INIT & BOOTSTRAP (V152) ---
     function initApp() {
         initGrid();
-        
         // CHARGEMENT SILENCIEUX DES DONNEES
         const stored = localStorage.getItem('DOV_DICT');
         if(stored) {
@@ -453,74 +451,50 @@
     // --- ROBUST DICTIONARY LOADER (FAILOVER + SAFE JSON) ---
     async function updateDictionary() {
         stopSignal = false;
-        // Check simple : si liste vide
         if (!CONFIG.proxies || CONFIG.proxies.length === 0) {
             alert("ERREUR: Aucun proxy configuré !");
             return;
         }
-
         log("🔄 Démarrage Téléchargement Dictionnaire...", "#fff");
-        
-        let page = 1;
-        let totalLoaded = 0;
-        let localProxyIdx = 0; 
-
+        let page = 1; let totalLoaded = 0; let localProxyIdx = 0; 
         try {
             while(!stopSignal) {
                 const urlTarget = `${CONFIG.atomicApi}&page=${page}`;
-                
-                // Sélection
                 const currentProxy = CONFIG.proxies[localProxyIdx % CONFIG.proxies.length];
                 let finalUrl = urlTarget;
                 if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
-                
                 let proxyName = (currentProxy.length < 5) ? "DIRECT" : new URL(currentProxy).hostname;
                 document.getElementById('rpcStatus').innerText = `DICT P${page} via ${proxyName}`;
-
                 try {
                     const res = await fetch(finalUrl);
-                    
-                    // V152: Check Content-Type + Safe Parse
                     const contentType = res.headers.get("content-type");
-                    if (!contentType || !contentType.includes("application/json")) {
-                        throw new Error("Réponse HTML/Erreur (Pas de JSON)");
-                    }
-
+                    if (!contentType || !contentType.includes("application/json")) { throw new Error("Réponse HTML/Erreur (Pas de JSON)"); }
                     const json = await res.json();
-                    
                     if(json.success && json.data.length > 0) {
-                        json.data.forEach(t => {
-                            TEMPLATE_NAMES[t.template_id] = t.immutable_data.name;
-                        });
+                        json.data.forEach(t => { TEMPLATE_NAMES[t.template_id] = t.immutable_data.name; });
                         totalLoaded += json.data.length;
                         document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
-                        
                         if(json.data.length < 500) break; // Fin pagination
-                        page++;
-                        await new Promise(r => setTimeout(r, 250));
+                        page++; await new Promise(r => setTimeout(r, 250));
                     } else {
                         if(!json.success) throw new Error(json.message || "API Error");
                         break; 
                     }
-
                 } catch (fetchError) {
                     console.warn(`Proxy ${proxyName} fail: ${fetchError.message}`);
                     log(`⚠️ Echec ${proxyName}. Basculement...`, "orange");
                     localProxyIdx++; 
                     if(localProxyIdx > CONFIG.proxies.length * 3) {
                         log("⚠️ Mode Hors-Ligne forcé (Bootstrap utilisé).", "red");
-                        stopSignal = true; // On arrête l'acharnement
+                        stopSignal = true; 
                     }
                     await new Promise(r => setTimeout(r, 1000)); 
                 }
             }
-            // SAUVEGARDE PERSISTANTE
             localStorage.setItem('DOV_DICT', JSON.stringify(TEMPLATE_NAMES));
             if(totalLoaded > 0) log(`✅ Mise à jour terminée (+${totalLoaded} templates).`, "#00e676");
             document.getElementById('rpcStatus').innerText = "PRÊT";
-        } catch(e) {
-            log("❌ ECHEC DICO: " + e.message, "red");
-        }
+        } catch(e) { log("❌ ECHEC DICO: " + e.message, "red"); }
     }
 
     // --- ATOMIC SINGLE CHECK (Fallback) ---
@@ -532,7 +506,6 @@
                 const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
                 let finalUrl = url;
                 if(proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
-
                 const res = await fetch(finalUrl);
                 const json = await res.json();
                 if(json.success && json.data.immutable_data.name) {
@@ -545,20 +518,20 @@
         return null;
     }
 
-    // --- ROBUST FETCH (ENGINE) ---
-    async function robustFetch(code, table, lowerBound, limit=1000) {
+    // --- ROBUST FETCH (V154 ENGINE - MULTI ARGS) ---
+    async function robustFetch(code, table, lowerBound, limit=1000, customScope=null, indexPos=1, keyType="") {
         let attempts = 0;
         const effectiveLimit = CONFIG.batchSize;
         const effectiveDelay = CONFIG.delay;
         
+        // Scope logic: if customScope provided use it, else default to contract code
+        const effectiveScope = customScope ? customScope : code;
+
         while(attempts < 20 && !stopSignal) {
             const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
-            // PROXY ROTATION
             const proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
             rpcIndex++; 
-            
             const url = server + "/v1/chain/get_table_rows";
-            
             let finalUrl = url;
             if(proxy && proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
 
@@ -566,21 +539,33 @@
                 let statusText = `[RPC: ${new URL(server).hostname}]`;
                 if(proxy && proxy.length > 5) statusText += ` + [PXY: ${new URL(proxy).hostname}]`;
                 else statusText += ` + [DIRECT]`;
-                
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = statusText;
 
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 15000); 
-                const payload = { json: true, code: code, scope: code, table: table, limit: effectiveLimit, lower_bound: lowerBound };
                 
+                // CONSTRUCT PAYLOAD (SUPPORTING INDEXES)
+                const payload = { 
+                    json: true, 
+                    code: code, 
+                    scope: effectiveScope, // V154 Fix
+                    table: table, 
+                    limit: effectiveLimit, 
+                    lower_bound: lowerBound 
+                };
+
+                // V154: Add Index support if needed
+                if(indexPos > 1) {
+                    payload.index_position = indexPos;
+                    payload.key_type = keyType;
+                    // For finding specific user, upper_bound often needed to be same as lower
+                    payload.upper_bound = lowerBound; 
+                }
+
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
-                
                 if(!res.ok) throw new Error("HTTP " + res.status);
-                
                 const contentType = res.headers.get("content-type");
                 if (contentType && !contentType.includes("application/json")) throw new Error("Not JSON");
-
                 if(effectiveDelay > 0) await new Promise(r => setTimeout(r, effectiveDelay));
-                
                 return await res.json();
             } catch(e) { 
                 attempts++;
@@ -591,14 +576,13 @@
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- LOGIC: GET SCORE (V153 NEW) ---
+    // --- LOGIC: GET SCORE ---
     function getSortScore(name) {
         if(!name) return 999;
-        // Trouve l'index dans la liste de config
         for(let i=0; i<CONFIG.sortOrder.length; i++) {
             if(name.startsWith(CONFIG.sortOrder[i])) return i;
         }
-        return 999; // Si pas trouvé, on met à la fin
+        return 999; 
     }
 
     function conformBuilding(b) {
@@ -612,11 +596,11 @@
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
-        // V153: Ajout score de tri
         let sortScore = getSortScore(name);
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
 
+    // --- DISPATCHER ---
     async function dispatchGlobalScan() {
         const title = CONFIG.strategy === 'A' ? "MODE SÉQUENTIEL" : (CONFIG.strategy === 'B' ? "MODE MATRIX" : "MODE HYBRIDE");
         stopSignal = false; switchView('buildingView');
@@ -624,7 +608,6 @@
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
-
         let start = CONFIG.startKey || "0";
         await runSequentialScan(start, CONFIG.strategy === 'C');   
     }
@@ -635,13 +618,10 @@
         const now = Date.now()/1000;
         let scanRows = 0; let scanAssets = 0;
         let templateAudit = {}; 
-
         try { while (more && !stopSignal) {
             const data = await robustFetch("dovutilstake", "buildings", next); 
             if (!data.rows) break;
-            
             scanRows += data.rows.length;
-
             for(let b of data.rows) {
                 if(useHybrid && !TEMPLATE_NAMES[b.template_id]) {
                     document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
@@ -653,7 +633,6 @@
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
-                // Stockage du sortScore pour le rendu
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd, sortScore: info.sortScore };
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
                 if (active) {
@@ -662,13 +641,11 @@
                     stats.p[info.type] += info.prod24;
                 } else { groups[info.type][k].cr++; }
             }
-            
             if(document.getElementById('cntRows')) {
                 document.getElementById('cntRows').innerText = scanRows.toLocaleString();
                 document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
                 document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
                 ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-                
                 let dbgHTML = "";
                 for(let tid in templateAudit) {
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
@@ -679,31 +656,20 @@
                 document.getElementById('debugGrid').innerHTML = dbgHTML;
                 renderLists(groups);
             }
-            
-            if (data.more && data.next_key) {
-                // log(`Page chargée. Suivante: ${data.next_key}`, "#444");
-                next = data.next_key;
-            } else {
-                more = false;
-            }
+            if (data.more && data.next_key) { next = data.next_key; } else { more = false; }
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
-    // --- RENDER LISTS (V153 SORTING) ---
     function renderLists(groups){
         for(let t in groups){
             let h=`<div class="ml-header">TYPE ${t}</div>`;
             let keys=Object.keys(groups[t]);
-            
-            // V153: TRI PAR SCORE (CONFIG)
             keys.sort((a,b) => {
                 let scoreA = groups[t][a].sortScore;
                 let scoreB = groups[t][b].sortScore;
-                // Si scores égaux, on trie par Prod unitaire (pour départager les grades identiques)
                 if(scoreA === scoreB) return groups[t][b].unitProd - groups[t][a].unitProd;
-                return scoreA - scoreB; // Tri ascendant (le premier dans la liste Config sort en premier)
+                return scoreA - scoreB; 
             });
-
             keys.forEach(k=>{
                 let i=groups[t][k];
                 if(i.cp===0 && i.cr===0) return;
@@ -718,112 +684,80 @@
         }
     }
 
-    async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
-    
-    async function startZoneScan() { 
-        stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
-        ZONE_DETAILS = {}; 
-        let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); 
-        try { while(hasMore && !stopSignal) { 
-            const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; 
-            for(let row of data.rows) { 
-                stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); 
-                if(busy) {
-                    if(!ZONE_DETAILS[zID]) ZONE_DETAILS[zID] = [];
-                    const ownerName = row.owner || row.user || row.account || row.player || row.username;
-                    const endTime = row.end_time || row.end || row.finish || 0;
-                    if(ownerName) ZONE_DETAILS[zID].push({ name: ownerName, time: endTime });
-                }
-                if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } 
-            } if (stats.divs % 1000 === 0) updateZoneDash(stats); 
-            if(data.more && data.next_key) nextKey = data.next_key; 
-            else hasMore = false; 
-        } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } 
-    }
-    
-    function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; } }); }
-    
-    function openZoneDetail(id) {
-        const title = ZONE_DB[id] ? ZONE_DB[id].name : "ZONE " + id;
-        document.getElementById('zmTitle').innerText = title + " (RADAR)";
-        const rawList = ZONE_DETAILS[id] || [];
-        if(rawList.length === 0) { document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur détecté.<br><br>1. Lancez un 'SCAN ZONES'.<br>2. Attendez la fin du scan.</div>"; document.getElementById('zoneModal').style.display = 'flex'; return; }
-        let clusters = {}; let singles = []; rawList.sort((a,b) => a.time - b.time); let processed = new Set();
-        for(let i=0; i<rawList.length; i++) {
-            if(processed.has(i)) continue;
-            let group = [rawList[i]]; processed.add(i);
-            if(!rawList[i].time) continue; 
-            for(let j=i+1; j<rawList.length; j++) {
-                if(processed.has(j)) continue;
-                if(rawList[j].time && Math.abs(rawList[i].time - rawList[j].time) <= 2) { group.push(rawList[j]); processed.add(j); }
-            }
-            if(group.length >= 3) { clusters["TIME_"+rawList[i].time] = group; } else { singles.push(...group); }
-        }
-        for(let i=0; i<rawList.length; i++) { if(!processed.has(i)) singles.push(rawList[i]); }
-        let h = "";
-        for(let k in clusters) {
-            let grp = clusters[k]; let uniqueNames = [...new Set(grp.map(x=>x.name))];
-            if(uniqueNames.length < 2) continue; 
-            h += `<div class="sybil-cluster"><div class="cluster-head"><span>⚠️ SUSPICION (${uniqueNames.length} comptes)</span></div>`;
-            uniqueNames.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`; });
-            h += `</div>`;
-        }
-        let uniqueSingles = [...new Set(singles.map(x=>x.name))];
-        uniqueSingles.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`; });
-        document.getElementById('zmBody').innerHTML = h; document.getElementById('zoneModal').style.display = 'flex';
-    }
-
-    function checkFunding(account) { window.open(`https://wax.bloks.io/account/${account}`, '_blank'); }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function setTarget(name) { closeModal('zoneModal'); document.getElementById('targetIn').value = name; switchView('targetView'); }
-
-    // --- UI HELPERS ---
-    function openSettings() {
-        document.getElementById('cfgStrategy').value = CONFIG.strategy;
-        document.getElementById('cfgBatch').value = CONFIG.batchSize;
-        document.getElementById('cfgDelay').value = CONFIG.delay;
-        document.getElementById('cfgStart').value = CONFIG.startKey;
-        // V153: LOAD SORT ORDER
-        document.getElementById('cfgSort').value = CONFIG.sortOrder.join(', ');
-        document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n');
-        document.getElementById('cfgProxy').value = CONFIG.proxies.join('\n');
-        document.getElementById('settingsModal').style.display = 'flex';
-    }
-
-    function saveConfig() {
-        CONFIG.strategy = document.getElementById('cfgStrategy').value;
-        CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value) || 1000;
-        CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200;
-        CONFIG.startKey = document.getElementById('cfgStart').value.trim();
+    // --- V154: FIX START BUILDINGS (USER SCAN) ---
+    async function startBuildings() { 
+        const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
+        switchView('buildingView'); 
+        document.getElementById('globalStatsArea').style.display = 'none'; 
+        document.getElementById('buildList').style.display = 'grid'; 
+        document.getElementById('buildDash').innerHTML = ""; 
+        document.getElementById('buildList').innerHTML = ""; 
+        log(`🔍 Lecture Deck (${user})...`, "#fff"); 
         
-        // V153: SAVE SORT ORDER
-        let rawSort = document.getElementById('cfgSort').value.trim().split(',');
-        let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0);
-        if(cleanSort.length > 0) CONFIG.sortOrder = cleanSort;
-
-        let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n');
-        let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http'));
-        if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc;
-        let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n');
-        let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === "");
-        if(cleanProxy.length > 0) CONFIG.proxies = cleanProxy;
-        closeModal('settingsModal');
-        log("⚙️ Configuration sauvegardée.", "#ffd700");
+        let nextKey = ""; 
+        let hasMore = true; 
+        
+        try { 
+            while(hasMore && !stopSignal) { 
+                // V154 FIX: Pass 'user' as SCOPE to query specifically their buildings
+                const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000, user); 
+                
+                if(!data.rows || data.rows.length === 0) {
+                    if(nextKey === "") log("⚠️ Aucun bâtiment trouvé pour ce joueur.", "orange");
+                    break; 
+                }
+                
+                const now = Date.now()/1000; 
+                
+                data.rows.forEach(b => { 
+                    let info = conformBuilding(b); 
+                    let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); 
+                    let isReady = now > rdyTime; 
+                    let typeColor = "#fff"; 
+                    if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; 
+                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; 
+                    let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; 
+                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card); 
+                }); 
+                
+                if(data.more && data.next_key) nextKey = data.next_key; 
+                else hasMore = false; 
+            } 
+            log(`✅ Deck Joueur affiché.`, "#00e676"); 
+        } catch(e){ log("Err: "+e.message, "red"); } 
     }
-
-    function resetConfig() {
-        document.getElementById('cfgStrategy').value = 'B';
-        document.getElementById('cfgBatch').value = '1000';
-        document.getElementById('cfgDelay').value = '200';
-        document.getElementById('cfgStart').value = '';
-        alert("Configuration remise à zéro (veuillez Sauvegarder).");
+    
+    // --- V154: FIX START TARGET (DIVISIONS SCAN) ---
+    async function startTarget() { 
+        const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
+        switchView('targetView'); 
+        const view = document.getElementById('targetView'); 
+        view.innerHTML="Recherche des divisions pour " + user + "..."; 
+        
+        try { 
+            // V154 FIX: Use Secondary Index (2) to find by Owner Name (i64)
+            const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, null, 2, "i64"); 
+            
+            const rows = data.rows ? data.rows : []; 
+            let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; 
+            
+            rows.forEach(r => { 
+                const zID = getProp(r, ['zoneID', 'zone_id']); 
+                const busy = isBusy(r); 
+                const dID = getId(r); 
+                htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; 
+            }); 
+            view.innerHTML = htmlBuffer; 
+        } catch(e){ log("Erreur Target: "+e.message, "red"); } 
     }
-
-    async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 1000 === 0) updateEcoDisplay(); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
-    function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
-    async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
 
     function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
+    
+    // --- SETTINGS UI ---
+    function openSettings() { document.getElementById('cfgStrategy').value = CONFIG.strategy; document.getElementById('cfgBatch').value = CONFIG.batchSize; document.getElementById('cfgDelay').value = CONFIG.delay; document.getElementById('cfgStart').value = CONFIG.startKey; document.getElementById('cfgSort').value = CONFIG.sortOrder.join(', '); document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n'); document.getElementById('cfgProxy').value = CONFIG.proxies.join('\n'); document.getElementById('settingsModal').style.display = 'flex'; }
+    function saveConfig() { CONFIG.strategy = document.getElementById('cfgStrategy').value; CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value) || 1000; CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200; CONFIG.startKey = document.getElementById('cfgStart').value.trim(); let rawSort = document.getElementById('cfgSort').value.trim().split(','); let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0); if(cleanSort.length > 0) CONFIG.sortOrder = cleanSort; let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n'); let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http')); if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc; let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n'); let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === ""); if(cleanProxy.length > 0) CONFIG.proxies = cleanProxy; closeModal('settingsModal'); log("⚙️ Configuration sauvegardée.", "#ffd700"); }
+    function resetConfig() { document.getElementById('cfgStrategy').value = 'B'; document.getElementById('cfgBatch').value = '1000'; document.getElementById('cfgDelay').value = '200'; document.getElementById('cfgStart').value = ''; alert("Configuration remise à zéro (veuillez Sauvegarder)."); }
+
     window.onload = function() { initApp(); }
 </script>
 
