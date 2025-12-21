@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V151 (PERSISTENCE)</title>
+    <title>DoV - COMMAND V152 (STABLE ARCHITECT)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 (INTACT) --- */
+        /* --- STYLE IDENTIQUE V146 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -148,7 +148,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V151 PERSISTENCE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V152 STABLE ARCHITECT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -159,7 +159,7 @@
         <div class="box">
             <div class="box-title">DICTIONNAIRE</div>
             <div style="font-size:10px; margin-bottom:5px; color:#888;">Templates connus : <b id="dictSize" style="color:#fff">0</b></div>
-            <button class="btn-update" onclick="updateDictionary()">📥 TÉLÉCHARGER TOUT</button>
+            <button class="btn-update" onclick="updateDictionary()">📥 TÉLÉCHARGER (OPTIONNEL)</button>
         </div>
 
         <div class="box" style="border-color: var(--gold)">
@@ -336,7 +336,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V151. PERSISTENCE READY.</div>
+<div class="logs" id="console">> V152. STABLE ARCHITECT READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
@@ -375,8 +375,8 @@
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
-    // --- LE BOOTSTRAP (Sécurité Architecture) ---
-    // Cette liste sert de roue de secours si le réseau/proxies tombent.
+    // --- LE BOOTSTRAP (Sécurité Architecture V152) ---
+    // Données par défaut pour que l'outil fonctionne même si l'API Atomic est bloquée.
     const DEFAULT_TEMPLATES = {
         "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
         "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
@@ -412,26 +412,27 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    // --- STORAGE MANAGER (V151) ---
-    function loadStoredDict() {
+    // --- INIT & BOOTSTRAP (V152) ---
+    function initApp() {
+        initGrid();
+        
+        // CHARGEMENT SILENCIEUX DES DONNEES
+        // 1. Tente de charger le cache local
+        // 2. Si vide, utilise le Bootstrap (DEFAULT_TEMPLATES)
         const stored = localStorage.getItem('DOV_DICT');
         if(stored) {
             try {
-                const parsed = JSON.parse(stored);
-                // Merge Bootstrap + Stored (Stored wins)
-                TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES, ...parsed };
-                log(`💾 Dictionnaire chargé depuis Cache (${Object.keys(TEMPLATE_NAMES).length} entrées).`, "#aaa");
-                document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
-            } catch(e) { 
-                TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES }; 
-            }
+                TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES, ...JSON.parse(stored) };
+                log("💾 Dictionnaire chargé (Cache).", "#aaa");
+            } catch(e) { TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES }; }
         } else {
             TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES };
-            log("⚠️ Cache vide. Utilisation du Bootstrap.", "#aaa");
+            log("🔧 Dictionnaire initialisé (Bootstrap).", "#aaa");
         }
+        document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
     }
 
-    // --- ROBUST DICTIONARY LOADER (V150 - DIRECT FIRST) ---
+    // --- ROBUST DICTIONARY LOADER (FAILOVER + SAFE JSON) ---
     async function updateDictionary() {
         stopSignal = false;
         // Check simple : si liste vide
@@ -461,13 +462,13 @@
                 try {
                     const res = await fetch(finalUrl);
                     
-                    // VALIDATION
+                    // V152: Check Content-Type + Safe Parse
                     const contentType = res.headers.get("content-type");
                     if (!contentType || !contentType.includes("application/json")) {
                         throw new Error("Réponse HTML/Erreur (Pas de JSON)");
                     }
 
-                    const json = await res.json();
+                    const json = await res.json(); // Peut encore failer si JSON malformé
                     
                     if(json.success && json.data.length > 0) {
                         json.data.forEach(t => {
@@ -488,13 +489,16 @@
                     console.warn(`Proxy ${proxyName} fail: ${fetchError.message}`);
                     log(`⚠️ Echec ${proxyName}. Basculement...`, "orange");
                     localProxyIdx++; 
-                    if(localProxyIdx > CONFIG.proxies.length * 3) throw new Error("Tous les accès ont échoué.");
+                    if(localProxyIdx > CONFIG.proxies.length * 3) {
+                        log("⚠️ Mode Hors-Ligne forcé (Bootstrap utilisé).", "red");
+                        stopSignal = true; // On arrête l'acharnement
+                    }
                     await new Promise(r => setTimeout(r, 1000)); 
                 }
             }
             // SAUVEGARDE PERSISTANTE
             localStorage.setItem('DOV_DICT', JSON.stringify(TEMPLATE_NAMES));
-            log(`✅ Dictionnaire chargé & Sauvegardé (${Object.keys(TEMPLATE_NAMES).length}).`, "#00e676");
+            if(totalLoaded > 0) log(`✅ Mise à jour terminée (+${totalLoaded} templates).`, "#00e676");
             document.getElementById('rpcStatus').innerText = "PRÊT";
         } catch(e) {
             log("❌ ECHEC DICO: " + e.message, "red");
@@ -771,7 +775,7 @@
     async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
 
     function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
-    window.onload = function() { initGrid(); loadStoredDict(); }
+    window.onload = function() { initApp(); }
 </script>
 
 </body>
