@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V233 (V199 + GRAPHS)</title>
+    <title>DoV - COMMAND V234 (FULL ACTIVE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 BASE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (V233) --- */
         :root {
             --bg-app: #0b0c10; 
             --bg-panel: #13141b; 
@@ -16,7 +16,7 @@
             --blue: #2979ff; 
             --orange: #ff9100;
             --purple: #d500f9;
-            --yellow: #ffea00; /* Added for Supply */
+            --yellow: #ffea00;
             --text-main: #e0e0e0;
             --text-muted: #858595;
 
@@ -86,12 +86,12 @@
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* NEW: GAUGE CHART */
+        /* GAUGE CHART */
         .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
         .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
         .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
         
-        /* NEW: BIG 24H INDICATOR */
+        /* BIG 24H INDICATOR */
         .big-24h { 
             margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); 
         }
@@ -148,7 +148,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V233</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V234</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -207,6 +207,7 @@
 
 <script>
     // --- UTILS ---
+    const STORAGE_KEY = 'DOV_DATA_V234';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -292,7 +293,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V233');
+        const local = localStorage.getItem(STORAGE_KEY);
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
@@ -436,14 +437,79 @@
         }
     }
 
-    async function startZoneScan() { /* Same V199 */ }
-    async function startEconomyScan() { /* Same V199 */ }
-    async function startTargetBuildings() { /* Same V199 */ }
-    async function startTargetDivisions() { /* Same V199 */ }
+    async function startZoneScan() {
+        stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
+        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0); let next = "";
+        while(!stopSignal) {
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) { let id = r.zone_id || r.zoneID; if(counts[id] !== undefined) counts[id]++; }
+            let html = "";
+            Object.keys(counts).forEach(id => {
+                let z = DATA.zones[id]; let active = counts[id] > 0 ? "active" : "";
+                html += `<div class="zone-card ${active}"><div class="zc-top"><span>${z.name}</span><span>${counts[id]}</span></div><div class="zc-bot"><span style="color:#666">ENTRY COST</span><span style="color:var(--red)">${z.cost} TU</span></div></div>`;
+            });
+            getId('areaZones').innerHTML = html;
+            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+        }
+        getId('zoneStatus').innerText = "Complete.";
+    }
+
+    async function startEconomyScan() {
+        stopSignal = false; switchView('viewEco'); getId('ecoStatus').innerText = "Scanning...";
+        let next = ""; let dTU = 0, activeZ = 0;
+        while(!stopSignal) {
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) { let z = DATA.zones[r.zone_id]; if(z && z.cost > 0) { dTU += z.cost; activeZ++; } }
+            getId('valDemandTU').innerText = fmt(dTU); getId('valActiveZones').innerText = fmt(activeZ);
+            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+        }
+        getId('ecoStatus').innerText = "Complete.";
+    }
+
+    async function startTargetBuildings() {
+        stopSignal = false; switchView('viewTarget');
+        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `<a href="https://wax.atomichub.io/explorer/account/${user}" target="_blank" class="wallet">${user}</a> SCANNING...`;
+        let next = ""; let html = "";
+        
+        let container = getId('areaTarget');
+        container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">BUILDINGS PORTFOLIO</span></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">QTY</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="targetBody"></div></div>`;
+        let tbody = getId('targetBody');
+
+        while(!stopSignal) {
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) {
+                let d = processRow(r); let rd = DATA.resourceDefs[d.type]; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
+                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
+            }
+            if(!json.more) break; next = json.next_key;
+        }
+    }
+
+    async function startTargetDivisions() {
+        stopSignal = false; switchView('viewTarget');
+        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `<a href="https://wax.atomichub.io/explorer/account/${user}" target="_blank" class="wallet">${user}</a> SCANNING...`;
+        let next = "";
+        let container = getId('areaTarget');
+        container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">ACTIVE DIVISIONS</span></div><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr;"><div class="cell">ZONE NAME</div><div class="cell c-right">STATUS</div></div><div id="targetBody"></div></div>`;
+        let tbody = getId('targetBody');
+
+        while(!stopSignal) {
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) {
+                let z = DATA.zones[r.zone_id];
+                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr;"><div class="cell" style="font-weight:700; color:#fff;">${z ? z.name : 'Zone '+r.zone_id}</div><div class="cell c-right" style="color:var(--green)">ENGAGED</div></div>`);
+            }
+            if(!json.more) break; next = json.next_key;
+        }
+    }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V233', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V233'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
 
     window.onload = init;
 </script>
