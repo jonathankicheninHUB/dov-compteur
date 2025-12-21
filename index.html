@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V237 (SETTINGS FIXED)</title>
+    <title>DoV - COMMAND V238 (ZONE WEIGHT & COST)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -47,7 +47,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* DASHBOARD */
+        /* HEADER */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -91,9 +91,12 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* ZONES MAP (TACTICAL) */
+        /* ZONES MAP (WEIGHT & COST) */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; }
+        .zone-card { 
+            background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px;
+            display: flex; flex-direction: column; justify-content: space-between; height: 160px; 
+        }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
         .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
         .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -115,7 +118,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V237</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V238</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -166,7 +169,7 @@
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
                 <div>
-                    <h2 class="page-h1">ZONE TACTICAL MAP</h2>
+                    <h2 class="page-h1">ZONE OPERATIONS</h2>
                     <div class="page-meta" id="zoneStatus">Ready.</div>
                 </div>
                 <div class="total-cost">
@@ -181,9 +184,9 @@
             </div>
             
             <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
-                <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div><div class="kc-sub">STAKED IN ZONES</div></div>
-                <div class="kpi-card"><div class="kc-title">ACTIVE IN COMBAT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING (> NOW)</div></div>
-                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">FROM ACTIVE COMBAT</div></div>
+                <div class="kpi-card"><div class="kc-title">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight">0</div><div class="kc-sub">COMBAT POWER</div></div>
+                <div class="kpi-card"><div class="kc-title">ACTIVE DIVISIONS</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING</div></div>
+                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">ESTIMATED REWARD</div></div>
             </div>
 
             <div class="zones-map" id="areaZones"></div>
@@ -198,10 +201,10 @@
     <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
         <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
-        <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
-        <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
+        <div><span class="grp-lbl">RULES & RATIOS</span><textarea id="cfgGameRules"></textarea></div>
+        <div><span class="grp-lbl">ZONES (COST/24H)</span><textarea id="cfgZones"></textarea></div>
         <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
-        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS MATRIX (COST F/H/R/S)</span><textarea id="cfgDivisions"></textarea></div>
+        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS (WEIGHT ONLY)</span><textarea id="cfgDivisions"></textarea></div>
     </div>
     <div style="text-align:right; margin-top:15px;">
         <button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button>
@@ -210,7 +213,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V237';
+    const STORAGE_KEY = 'DOV_DATA_V238';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -223,7 +226,13 @@
             "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" },
             "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" }
         },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+        gameConfig: { 
+            maintenanceCost: 0.085, 
+            cycleHours: 24, 
+            rewardRatio: 0.1, // NEW: Ratio of Zone Cost returned as DOVX
+            tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } 
+        },
+        // ZONES: Cost is per 24H for EACH resource
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
             5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
@@ -231,10 +240,12 @@
             13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
             17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
         },
+        // NEW: DIVISIONS WEIGHTS ONLY
         divisions: {
-            "default": { name: "Infantry", c: {F:10, H:2, R:0, S:1}, p: 5 },
-            "298539": { name: "Soldier", c: {F:15, H:5, R:0, S:2}, p: 2 }, 
-            "298540": { name: "Tank", c: {F:50, H:0, R:20, S:5}, p: 10 }
+            "default": { name: "Infantry", w: 10 },
+            "298539": { name: "Soldier", w: 10 }, 
+            "298540": { name: "Tank", w: 50 },
+            "298541": { name: "Helo", w: 100 }
         },
         templates: {
             "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
@@ -389,13 +400,17 @@
         }
     }
 
-    // --- ZONE SCANNER TACTICAL V236 ---
+    // --- ZONE SCANNER TACTICAL V238 ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
-        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0,
+                      burnF:0, burnH:0, burnR:0, burnS:0 };
+        
         let zonesData = {}; 
-        Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, bf:0, bh:0, br:0, bs:0 }; });
+        Object.keys(DATA.zones).forEach(id => { 
+            zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; 
+        });
 
         let next = "";
         while(!stopSignal) {
@@ -410,20 +425,40 @@
                     zonesData[zid].count++;
                     stats.totalDivs++;
 
+                    // Calculate Division Weight
+                    let tid = r.template_id || "default";
+                    let d = DATA.divisions[tid] || DATA.divisions["default"];
+                    let weight = d.w || 0;
+                    
+                    zonesData[zid].weight += weight;
+                    stats.totalWeight += weight;
+
+                    // Active Check (unlock_time > now)
                     let isAction = parseFloat(r.unlock_time) > now;
 
                     if(isAction) {
                         zonesData[zid].active++;
                         stats.activeDivs++;
                         
-                        let tid = r.template_id || "default";
-                        let d = DATA.divisions[tid] || DATA.divisions["default"];
+                        // CONSUMPTION IS ZONE BASED (Not division based)
+                        // Every active division consumes the Zone's Cost per day (for each resource)
+                        let zCost = DATA.zones[zid].cost;
                         
-                        zonesData[zid].bf += d.c.F; zonesData[zid].bh += d.c.H; zonesData[zid].br += d.c.R; zonesData[zid].bs += d.c.S;
-                        zonesData[zid].prod += d.p;
+                        // PRODUCTION IS RATIO BASED
+                        // Reward = Zone Cost * Reward Ratio
+                        let zReward = zCost * DATA.gameConfig.rewardRatio;
+
+                        zonesData[zid].bf += zCost;
+                        zonesData[zid].bh += zCost;
+                        zonesData[zid].br += zCost;
+                        zonesData[zid].bs += zCost;
+                        zonesData[zid].prod += zReward;
                         
-                        stats.burnF += d.c.F; stats.burnH += d.c.H; stats.burnR += d.c.R; stats.burnS += d.c.S;
-                        stats.totalProd += d.p;
+                        stats.burnF += zCost;
+                        stats.burnH += zCost;
+                        stats.burnR += zCost;
+                        stats.burnS += zCost;
+                        stats.totalProd += zReward;
                     }
                 }
             }
@@ -436,12 +471,13 @@
     function updateZoneUI(zonesData, stats) {
         getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalProd').innerText = fmt(stats.totalProd * 24);
+        getId('zTotalProd').innerText = fmt(stats.totalProd); // Already 24h based
+        getId('zTotalWeight').innerText = fmt(stats.totalWeight);
         
-        getId('gBurnF').innerText = fmt(stats.burnF * 24);
-        getId('gBurnH').innerText = fmt(stats.burnH * 24);
-        getId('gBurnR').innerText = fmt(stats.burnR * 24);
-        getId('gBurnS').innerText = fmt(stats.burnS * 24);
+        getId('gBurnF').innerText = fmt(stats.burnF);
+        getId('gBurnH').innerText = fmt(stats.burnH);
+        getId('gBurnR').innerText = fmt(stats.burnR);
+        getId('gBurnS').innerText = fmt(stats.burnS);
 
         let html = "";
         Object.keys(zonesData).forEach(id => {
@@ -452,14 +488,17 @@
             html += `
             <div class="zone-card ${activeClass}">
                 <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active}/${d.count}</span></div>
+                
                 <div class="zc-mid">
-                    <div class="zs-item"><span>PROD 24H</span> <span style="color:var(--purple)">${fmt(d.prod * 24)}</span></div>
+                    <div class="zs-item"><span>PROD 24H</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div>
                     <div style="height:1px; background:#333; margin:2px 0;"></div>
-                    <div class="zs-item"><span>FUEL</span> <span class="tc-f">${fmt(d.bf * 24)}</span></div>
-                    <div class="zs-item"><span>HEALTH</span> <span class="tc-h">${fmt(d.bh * 24)}</span></div>
-                    <div class="zs-item"><span>REPAIR</span> <span class="tc-r">${fmt(d.br * 24)}</span></div>
-                    <div class="zs-item"><span>SUPPLY</span> <span class="tc-s">${fmt(d.bs * 24)}</span></div>
+                    <div class="zs-item"><span>FUEL</span> <span class="tc-f">${fmt(d.bf)}</span></div>
+                    <div class="zs-item"><span>HEALTH</span> <span class="tc-h">${fmt(d.bh)}</span></div>
+                    <div class="zs-item"><span>REPAIR</span> <span class="tc-r">${fmt(d.br)}</span></div>
+                    <div class="zs-item"><span>SUPPLY</span> <span class="tc-s">${fmt(d.bs)}</span></div>
                 </div>
+                
                 <div class="zc-bot"><span style="color:#666">ENTRY</span><span style="color:var(--red)">${z.cost} TU</span></div>
             </div>`;
         });
