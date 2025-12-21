@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V146 (ARCHITECT)</title>
+    <title>DoV - COMMAND V147 (DYNAMIC DICT)</title>
     <style>
-        /* --- STYLE V70 (INTACT) --- */
+        /* --- STYLE IDENTIQUE V146 --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -24,6 +24,10 @@
         button:hover { opacity: 0.8; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
         .btn-settings { background: #333; color: var(--sec); border:1px solid var(--sec); margin-bottom:15px; } .btn-settings:hover { background: #444; }
+        
+        /* Bouton Update Dico V147 */
+        .btn-update { background: #e67e22; color: #fff; font-size: 10px; margin-bottom: 10px; }
+        
         input, select, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
@@ -79,6 +83,7 @@
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 80px; cursor: pointer; transition: 0.2s; position: relative; }
         .zone:hover { border-color: var(--sec); background: #111; box-shadow: 0 0 10px rgba(41, 182, 246, 0.1); }
         .zone.active { border-color: #444; background: #0e0e0e; }
+        
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
@@ -137,7 +142,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V146 ARCHITECT</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V147 DYNAMIC DICT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -145,6 +150,12 @@
     <aside class="sidebar">
         <button class="btn-settings" onclick="openSettings()">⚙️ PARAMÈTRES AVANCÉS</button>
         
+        <div class="box">
+            <div class="box-title">Dictionnaire Global</div>
+            <div style="font-size:10px; margin-bottom:5px; color:#888;">Templates connus : <b id="dictSize" style="color:#fff">0</b></div>
+            <button class="btn-update" onclick="updateDictionary()">📥 TÉLÉCHARGER TOUT</button>
+        </div>
+
         <div class="box" style="border-color: var(--gold)">
             <div class="box-title" style="color:var(--gold)">CONFIGURATION RAPIDE</div>
             <label class="inp-label">Prix WAX ($)</label>
@@ -319,10 +330,10 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V146. ARCHITECT READY.</div>
+<div class="logs" id="console">> V147. DYNAMIC DICTIONARY LOADER.</div>
 
 <script>
-    // --- CONFIGURATION CENTRALE (V146) ---
+    // --- CONFIGURATION CENTRALE ---
     let CONFIG = {
         strategy: 'B',
         batchSize: 1000,
@@ -341,6 +352,53 @@
             "https://thingproxy.freeboard.io/fetch/"
         ]
     };
+
+    // --- DICTATURE DU NOMMAGE : VIDE AU DEPART (DYNAMIC) ---
+    // On garde juste une base minime de secours
+    let TEMPLATE_NAMES = {}; 
+
+    // --- NOUVEAU MODULE : SCHEMA LOADER (V147) ---
+    async function updateDictionary() {
+        stopSignal = false;
+        log("🔄 Démarrage du téléchargement DICTIONNAIRE...", "#fff");
+        const schemaApi = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&limit=500";
+        
+        let page = 1;
+        let totalLoaded = 0;
+        
+        try {
+            while(!stopSignal) {
+                // Utilise le proxy configuré pour éviter CORS
+                let proxy = CONFIG.proxies[0]; 
+                let url = `${schemaApi}&page=${page}`;
+                let finalUrl = proxy + encodeURIComponent(url);
+                
+                document.getElementById('rpcStatus').innerText = `DICT PAGE ${page}...`;
+                
+                const res = await fetch(finalUrl);
+                const json = await res.json();
+                
+                if(json.success && json.data.length > 0) {
+                    json.data.forEach(t => {
+                        // STOCKAGE DU NOM OFFICIEL
+                        TEMPLATE_NAMES[t.template_id] = t.immutable_data.name;
+                    });
+                    totalLoaded += json.data.length;
+                    document.getElementById('dictSize').innerText = totalLoaded;
+                    
+                    if(json.data.length < 500) break; // Fin de liste
+                    page++;
+                    await new Promise(r => setTimeout(r, 200)); // Pause anti-spam
+                } else {
+                    break;
+                }
+            }
+            log(`✅ Dictionnaire complet : ${totalLoaded} templates chargés.`, "#00e676");
+            document.getElementById('rpcStatus').innerText = "PRÊT";
+        } catch(e) {
+            log("❌ Erreur Dico: " + e.message, "red");
+        }
+    }
 
     // --- LOGIQUE SETTINGS ---
     function openSettings() {
@@ -381,36 +439,12 @@
 
     // --- VARIABLES GLOBALES ---
     let ZONE_DETAILS = {}; 
-    let stopSignal = false; let rpcIndex = 0; let proxyIndex = 0; // Rotation Proxy ajoutée
+    let stopSignal = false; let rpcIndex = 0; let proxyIndex = 0; 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
     const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
-
-    const TEMPLATE_NAMES = {
-        "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
-        "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
-        "492379": "R_F1_PRODUCER_FUEL",  "492376": "R_F2_PRODUCER_FUEL", "492386": "R_F3_PRODUCER_FUEL", "492390": "R_F4_PRODUCER_FUEL",
-        "492380": "E_F1_PRODUCER_FUEL",  "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
-        "492368": "L_F1_PRODUCER_FUEL",  "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
-        "544068": "S1_OWNER_FUEL",       "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
-        "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
-        "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
-        "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
-        "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
-        "544070": "S1_OWNER_HEALTH",
-        "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
-        "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
-        "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
-        "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
-        "544071": "S1_OWNER_REPAIR",
-        "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
-        "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
-        "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
-        "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
-        "544069": "S1_OWNER_SUPPLY"
-    };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
@@ -422,7 +456,7 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    // --- ATOMIC ---
+    // --- ATOMIC SINGLE (Fallback) ---
     async function fetchUnknownID(tid) {
         try {
             const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
@@ -444,15 +478,12 @@
         
         while(attempts < 20 && !stopSignal) {
             const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
-            
-            // PROXY ROTATION V146
+            // PROXY ROTATION
             const proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
-            
             rpcIndex++; 
             const url = server + "/v1/chain/get_table_rows";
             
             let finalUrl = proxy + encodeURIComponent(url);
-            // Fallback direct mode if proxy list empty
             if(CONFIG.proxies.length === 0) finalUrl = url;
 
             try {
@@ -466,13 +497,12 @@
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 
-                // DELAY (Throttle)
                 if(effectiveDelay > 0) await new Promise(r => setTimeout(r, effectiveDelay));
                 
                 return await res.json();
             } catch(e) { 
                 attempts++;
-                proxyIndex++; // Rotate proxy on error
+                proxyIndex++; 
                 await new Promise(r => setTimeout(r, 200));
             }
         }
