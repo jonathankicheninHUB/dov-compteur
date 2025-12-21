@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V201 (LINKS FIXED)</title>
+    <title>DoV - COMMAND V202 (LINKS PATCHED)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 APPROVED) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -25,13 +25,10 @@
         /* --- COMPONENTS --- */
         .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-        
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        input:focus { border-color: var(--blue); outline: none; }
-        
         button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
         
@@ -40,7 +37,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- HEADER --- */
+        /* --- DASHBOARD --- */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -56,14 +53,13 @@
         .kc-val { font-family: var(--font-num); font-size: 22px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* --- TABLES (GRID SYSTEM) --- */
+        /* --- TABLES --- */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
-        /* 7 COLUMNS: Template | Act | Unit | ProdH | Prod24 | CostH | Cost24 */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -74,20 +70,16 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* LINKS */
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; cursor: pointer; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
-        
-        a.wallet-link { color: var(--blue); font-weight: 700; text-decoration: none; border-bottom: 1px solid transparent; cursor: pointer; }
-        a.wallet-link:hover { border-bottom: 1px solid var(--blue); }
+        a.wallet { color: var(--blue); font-weight: 700; text-decoration: none; border-bottom: 1px solid transparent; cursor: pointer; }
+        a.wallet:hover { border-bottom: 1px solid var(--blue); }
 
-        /* COLORS */
         .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); }
         .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); }
         .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); }
         .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); }
 
-        /* ZONES */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
@@ -96,7 +88,6 @@
 
         .view-section { display: none; } .active-view { display: block; }
         
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
@@ -106,7 +97,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V201</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V202</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -188,10 +179,10 @@
 
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
-        <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
+        <h3 style="margin-top:0; color:var(--text-main); font-size:14px; border-bottom:1px solid var(--border); padding-bottom:10px;">SYSTEM CONFIG</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
             <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
-            <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
+            <div><span class="grp-lbl">RULES / LINKS</span><textarea id="cfgGameRules"></textarea></div>
             <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
             <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
         </div>
@@ -203,7 +194,6 @@
 </div>
 
 <script>
-    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -221,7 +211,7 @@
             maintenanceCost: 0.085, 
             cycleHours: 24, 
             tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" },
-            // CORRECT ATOMIC LINK
+            // URLS ATOMIC HUB CORRECTES
             atomicBase: "https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions",
             accountBase: "https://wax.atomichub.io/explorer/account"
         },
@@ -283,9 +273,21 @@
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false;
 
+    // --- CRITICAL FIX FOR LINKS: FORCE V2 STORAGE ---
     function init() {
-        const local = localStorage.getItem('DOV_DATA');
-        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
+        const local = localStorage.getItem('DOV_DATA_V2');
+        if(local) { 
+            try { 
+                let loaded = JSON.parse(local);
+                // Deep merge gameConfig to ensure URL variables are present
+                DATA = { 
+                    ...DEFAULT_DATA, 
+                    ...loaded, 
+                    gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig },
+                    templates: { ...DEFAULT_DATA.templates, ...loaded.templates } 
+                }; 
+            } catch(e){ console.log("Resetting Data"); } 
+        }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
@@ -312,7 +314,6 @@
 
     function processRow(row) {
         let tid = row.template_id.toString();
-        // LOGIC 4 BUILDINGS: Count assets in the array. 
         let count = row.asset_ids ? row.asset_ids.length : 1; 
         
         let tpl = DATA.templates[tid];
@@ -364,6 +365,7 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
+                // LINK GENERATION FIX
                 let link = `${DATA.gameConfig.atomicBase}/${i.id}`;
                 html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${i.act}</div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costD)}</div></div>`;
             });
@@ -404,7 +406,11 @@
 
     async function startTargetBuildings() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `SCANNING: <a href="${DATA.gameConfig.accountBase}/${user}" target="_blank" class="wallet-link">${user}</a>`;
+        let user = getId('targetIn').value.trim();
+        // LINK FOR TARGET WALLET
+        let walletLink = `${DATA.gameConfig.accountBase}/${user}`;
+        getId('targetMeta').innerHTML = `SCANNING: <a href="${walletLink}" target="_blank" class="wallet-link">${user}</a>`;
+        
         let next = ""; let container = getId('areaTarget');
         container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">BUILDINGS PORTFOLIO</span></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">QTY</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="targetBody"></div></div>`;
         let tbody = getId('targetBody');
@@ -423,7 +429,11 @@
 
     async function startTargetDivisions() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `SCANNING: <a href="${DATA.gameConfig.accountBase}/${user}" target="_blank" class="wallet-link">${user}</a>`;
+        let user = getId('targetIn').value.trim();
+        // LINK FOR TARGET WALLET
+        let walletLink = `${DATA.gameConfig.accountBase}/${user}`;
+        getId('targetMeta').innerHTML = `SCANNING: <a href="${walletLink}" target="_blank" class="wallet-link">${user}</a>`;
+        
         let next = "";
         let container = getId('areaTarget');
         container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">ACTIVE DIVISIONS</span></div><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr;"><div class="cell">ZONE NAME</div><div class="cell c-right">STATUS</div></div><div id="targetBody"></div></div>`;
@@ -441,8 +451,8 @@
     }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V2', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V2'); location.reload(); } }
 
     window.onload = init;
 </script>
