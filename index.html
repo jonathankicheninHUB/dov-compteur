@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V156 (STABLE MERGE)</title>
+    <title>DoV - COMMAND V157 (PROD STABLE)</title>
     <style>
         /* --- STYLE ORIGINAL (INTACT) --- */
         :root { 
@@ -153,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V156 STABLE MERGE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V157 PROD STABLE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -347,7 +347,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V156. FINAL MERGE READY.</div>
+<div class="logs" id="console">> V157. PROD STABLE READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
@@ -543,10 +543,12 @@
         return null;
     }
 
-    // --- ROBUST FETCH (V156 ENGINE - REPAIRED) ---
+    // --- ROBUST FETCH (V157 ENGINE - MULTI ARGS & STRICT LIMIT) ---
     async function robustFetch(code, table, lowerBound, limit=1000, customScope=null, indexPos=1, keyType="") {
         let attempts = 0;
-        const effectiveLimit = CONFIG.batchSize;
+        
+        // V157 FIX: Priority to function arguments over config for Target Scan
+        const effectiveLimit = limit || CONFIG.batchSize;
         const effectiveDelay = CONFIG.delay;
         
         // Scope logic: if customScope provided use it, else default to contract code
@@ -572,13 +574,13 @@
                 const payload = { 
                     json: true, 
                     code: code, 
-                    scope: effectiveScope, // V154/V156 Fix
+                    scope: effectiveScope, // V157 Fix
                     table: table, 
                     limit: effectiveLimit, 
                     lower_bound: lowerBound 
                 };
 
-                // V156: Index support re-added
+                // V157: Index support restored
                 if(indexPos > 1) {
                     payload.index_position = indexPos;
                     payload.key_type = keyType;
@@ -601,9 +603,10 @@
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- LOGIC: GET SCORE (V153) ---
+    // --- LOGIC: GET SCORE (V153 NEW) ---
     function getSortScore(name) {
         if(!name) return 999;
+        // Trouve l'index dans la liste de config
         for(let i=0; i<CONFIG.sortOrder.length; i++) {
             if(name.startsWith(CONFIG.sortOrder[i])) return i;
         }
@@ -724,7 +727,7 @@
         }
     }
 
-    // --- V156 FIX: START BUILDINGS (USER SCAN) ---
+    // --- V157 FIX: START BUILDINGS (USER SCAN) ---
     async function startBuildings() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
         switchView('buildingView'); 
@@ -739,7 +742,7 @@
         
         try { 
             while(hasMore && !stopSignal) { 
-                // V156: Pass 'user' as SCOPE to query specifically their buildings
+                // V157 FIX: Pass 'user' as SCOPE to query specifically their buildings
                 const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000, user); 
                 
                 if(!data.rows || data.rows.length === 0) {
@@ -767,7 +770,7 @@
         } catch(e){ log("Err: "+e.message, "red"); } 
     }
     
-    // --- V156 FIX: START TARGET (DIVISIONS SCAN) ---
+    // --- V157 FIX: START TARGET (DIVISIONS SCAN) ---
     async function startTarget() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
         switchView('targetView'); 
@@ -775,7 +778,7 @@
         view.innerHTML="Recherche des divisions pour " + user + "..."; 
         
         try { 
-            // V156: Use Secondary Index (2) to find by Owner Name (i64)
+            // V157 FIX: Use Secondary Index (2) to find by Owner Name (i64)
             const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, null, 2, "i64"); 
             
             const rows = data.rows ? data.rows : []; 
