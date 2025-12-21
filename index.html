@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V141 (SYBIL RADAR)</title>
+    <title>DoV - COMMAND V142 (ROBUST SYBIL)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -75,6 +75,7 @@
         .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         
+        /* ZONE INTERACTIVE */
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 80px; cursor: pointer; transition: 0.2s; position: relative; }
         .zone:hover { border-color: var(--sec); background: #111; box-shadow: 0 0 10px rgba(41, 182, 246, 0.1); }
         .zone.active { border-color: #444; background: #0e0e0e; }
@@ -110,7 +111,7 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
 
-        /* MODAL INSPECTOR (V141 SYBIL) */
+        /* MODAL INSPECTOR (V142) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--sec); width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         .modal-head { padding: 10px 15px; background: #222; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
@@ -118,13 +119,11 @@
         .modal-close { cursor: pointer; color: #fff; font-weight: bold; }
         .modal-body { padding: 10px; overflow-y: auto; color: #ccc; font-size: 11px; }
         
-        /* SYBIL STYLES */
         .sybil-cluster { border: 1px solid var(--alert); background: rgba(255, 23, 68, 0.1); margin-bottom: 8px; padding: 5px; border-radius: 3px; }
         .cluster-head { color: var(--alert); font-weight: bold; font-size: 10px; border-bottom: 1px solid #444; margin-bottom: 4px; display: flex; justify-content: space-between; }
         .player-row { padding: 3px 0; display: flex; justify-content: space-between; align-items: center; }
         .player-row:hover { background: #1a1a1a; }
         .p-name { color: var(--main); font-weight: bold; cursor: pointer; }
-        .p-meta { color: #666; font-size: 9px; }
         .btn-audit { background: #333; border: 1px solid #555; color: #fff; font-size: 9px; padding: 1px 5px; cursor: pointer; margin-left: 5px; width: auto; display: inline-block; }
         .btn-audit:hover { background: var(--sec); border-color: var(--sec); }
     </style>
@@ -132,7 +131,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V141 SYBIL RADAR</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V142 ROBUST SYBIL</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -265,15 +264,15 @@
             <div class="modal-close" onclick="closeModal()">X</div>
         </div>
         <div class="modal-body" id="zmBody">
-            <div style="text-align:center; padding:10px;">Analyse en cours...</div>
+            <div style="text-align:center; padding:10px;">En attente de scan...</div>
         </div>
     </div>
 </div>
 
-<div class="logs" id="console">> V141. SYBIL RADAR ACTIVATED.</div>
+<div class="logs" id="console">> V142. ROBUST FIX.</div>
 
 <script>
-    // --- MEMOIRE V141 (AVEC TIMESTAMP) ---
+    // --- MEMOIRE ---
     let ZONE_DETAILS = {}; 
 
     // --- DICTATURE DU NOMMAGE ---
@@ -328,6 +327,7 @@
         "https://api.hivebp.io", "https://wax.blacklusion.io"
     ];
     
+    // --- ATOMIC FETCH ---
     async function fetchUnknownID(tid) {
         try {
             const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
@@ -342,27 +342,36 @@
 
     async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
-        while(attempts < 15 && !stopSignal) {
-            const server = RPCS[rpcIndex % RPCS.length]; 
-            let url = server + "/v1/chain/get_table_rows";
+        while(attempts < 20 && !stopSignal) {
+            const server = RPC_MATRIX[rpcIndex % RPC_MATRIX.length];
+            rpcIndex++; 
+            const url = server + "/v1/chain/get_table_rows";
             let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
+            
             let proxyUrl = "https://corsproxy.io/?"; 
             if(attempts > 3) proxyUrl = "https://api.allorigins.win/raw?url=";
             if(attempts > 6) proxyUrl = "https://thingproxy.freeboard.io/fetch/";
+            
             let finalUrl = url;
             if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
             else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
+            
             try {
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"PROXY":"DIRECT")+": "+new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 20000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
                 if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
+                
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
-            } catch(e) { console.warn("Fetch Fail:", e.message); attempts++; await new Promise(r => setTimeout(r, 200)); }
+            } catch(e) { 
+                console.warn("Fetch Fail:", e.message);
+                attempts++; 
+                await new Promise(r => setTimeout(r, 200));
+            }
         }
-        throw new Error("Arrêt (Trop d'erreurs).");
+        throw new Error("Arrêt (Reseau Saturé).");
     }
 
     function conformBuilding(b) {
@@ -371,22 +380,28 @@
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
+
         let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
+        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H";
+        else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
+
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
+
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd };
     }
 
     async function dispatchGlobalScan() {
         const strategy = document.getElementById('scanStrategy').value;
         const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX (1000)" : "MODE HYBRIDE (GOD)");
+        
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
+
         if (strategy === 'A') await runSequentialScan(1000, false);
         else if (strategy === 'B') await runSequentialScan(1000, false); 
         else if (strategy === 'C') await runSequentialScan(500, true);   
@@ -398,22 +413,30 @@
         const now = Date.now()/1000;
         let scanRows = 0; let scanAssets = 0;
         let templateAudit = {}; 
+
         try { while (more && !stopSignal) {
             const data = await robustFetch("dovutilstake", "buildings", next, batchSize); 
             if (!data.rows) break;
+            
             scanRows += data.rows.length;
+
             for(let b of data.rows) {
                 if(useHybrid && !TEMPLATE_NAMES[b.template_id]) {
                     document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
                     await fetchUnknownID(b.template_id);
                 }
+
                 stats.total++;
                 let info = conformBuilding(b); 
                 scanAssets += info.stack; 
+
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
+
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
+                
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd };
+                
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
                 if (active) {
                     groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24;
@@ -421,11 +444,13 @@
                     stats.p[info.type] += info.prod24;
                 } else { groups[info.type][k].cr++; }
             }
+            
             if(document.getElementById('cntRows')) {
                 document.getElementById('cntRows').innerText = scanRows.toLocaleString();
                 document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
                 document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
                 ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
+                
                 let dbgHTML = "";
                 for(let tid in templateAudit) {
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
@@ -436,6 +461,7 @@
                 document.getElementById('debugGrid').innerHTML = dbgHTML;
                 renderLists(groups);
             }
+            
             if (data.more) next = data.next_key; else more = false;
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
@@ -460,23 +486,28 @@
 
     async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey, 200); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
     
-    // --- ZONE MODIFIEE V141 ---
+    // --- ZONE FIX V142 (ROBUST EXTRACTION) ---
     async function startZoneScan() { 
         stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
-        ZONE_DETAILS = {}; // Reset Cache
+        ZONE_DETAILS = {}; // Reset
         let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); 
         try { while(hasMore && !stopSignal) { 
             const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; 
             for(let row of data.rows) { 
                 stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); 
-                // V141: Capture DATA pour SYBIL (Nom + Time)
+                // V142 FIX: FORCE EXTRACTION
                 if(busy) {
                     if(!ZONE_DETAILS[zID]) ZONE_DETAILS[zID] = [];
-                    const ownerName = row.owner || row.user || row.account || row.player || "Inconnu";
-                    if(ownerName !== "Inconnu") {
-                        ZONE_DETAILS[zID].push({ name: ownerName, time: row.end_time || 0 });
+                    // Cherche partout pour trouver le nom
+                    const ownerName = row.owner || row.user || row.account || row.player || row.username;
+                    // Cherche partout pour le temps (Sybil)
+                    const endTime = row.end_time || row.end || row.finish || 0;
+                    
+                    if(ownerName) {
+                        ZONE_DETAILS[zID].push({ name: ownerName, time: endTime });
                     }
                 }
+                
                 if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } 
             } if (stats.divs % 200 === 0) updateZoneDash(stats); if(data.more) nextKey = data.next_key; else hasMore = false; 
         } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } 
@@ -484,88 +515,81 @@
     
     function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; } }); }
     
-    // --- GESTION MODALE INTELLIGENTE V141 ---
+    // --- GESTION MODALE SAFE V142 ---
     function openZoneDetail(id) {
         const title = ZONE_DB[id] ? ZONE_DB[id].name : "ZONE " + id;
         document.getElementById('zmTitle').innerText = title + " (RADAR)";
         const rawList = ZONE_DETAILS[id] || [];
         
         if(rawList.length === 0) {
-            document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur actif détecté ici.</div>";
+            document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur détecté.<br><br>1. Lancez un 'SCAN ZONES'.<br>2. Attendez la fin du scan.</div>";
             document.getElementById('zoneModal').style.display = 'flex';
             return;
         }
 
-        // ALGO DE DETECTION
-        let clusters = {}; // Key: "time_xxxx" ou "name_xxxx"
+        // ALGO SYBIL SAFE (V142: gere les 0)
+        let clusters = {}; 
         let singles = [];
         
-        // 1. Tri par temps
+        // 1. Tri
         rawList.sort((a,b) => a.time - b.time);
         
-        // 2. Clustering Temporel (2 secondes delta)
+        // 2. Clustering
         let processed = new Set();
         for(let i=0; i<rawList.length; i++) {
             if(processed.has(i)) continue;
             let group = [rawList[i]];
             processed.add(i);
             
+            // Si pas de temps valide, on skip le clustering temporel
+            if(!rawList[i].time) continue; 
+
             for(let j=i+1; j<rawList.length; j++) {
                 if(processed.has(j)) continue;
-                if(Math.abs(rawList[i].time - rawList[j].time) <= 2) { // 2 sec diff max
+                if(rawList[j].time && Math.abs(rawList[i].time - rawList[j].time) <= 2) { 
                     group.push(rawList[j]);
                     processed.add(j);
                 }
             }
             
-            if(group.length >= 3) { // Cluster significatif
+            if(group.length >= 3) { 
                 clusters["TIME_"+rawList[i].time] = group;
             } else {
                 singles.push(...group);
             }
         }
-
-        // GENERATION HTML
-        let h = "";
         
-        // AFFICHE CLUSTERS
+        // Ajout des non-traités (sans temps)
+        for(let i=0; i<rawList.length; i++) {
+            if(!processed.has(i)) singles.push(rawList[i]);
+        }
+
+        // HTML GEN
+        let h = "";
         for(let k in clusters) {
             let grp = clusters[k];
-            // Dedoublonnage dans le groupe
             let uniqueNames = [...new Set(grp.map(x=>x.name))];
-            if(uniqueNames.length < 2) continue; // Pas un sybil si c'est le même joueur
+            if(uniqueNames.length < 2) continue; 
 
-            h += `<div class="sybil-cluster">
-                <div class="cluster-head"><span>⚠️ SUSPICION BOT (${uniqueNames.length} comptes)</span> <span>Sync: ${grp[0].time}</span></div>`;
+            h += `<div class="sybil-cluster"><div class="cluster-head"><span>⚠️ SUSPICION (${uniqueNames.length} comptes)</span></div>`;
             uniqueNames.forEach(n => {
-                h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span> 
-                      <button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`;
+                h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`;
             });
             h += `</div>`;
         }
 
-        // AFFICHE LE RESTE
         let uniqueSingles = [...new Set(singles.map(x=>x.name))];
         uniqueSingles.forEach(n => {
-             h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span> 
-                   <button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`;
+             h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`;
         });
 
         document.getElementById('zmBody').innerHTML = h;
         document.getElementById('zoneModal').style.display = 'flex';
     }
 
-    function checkFunding(account) {
-        // Ouvre un explorateur externe pour vérifier le créateur (Solution la plus fiable sans CORS complexe)
-        window.open(`https://wax.bloks.io/account/${account}`, '_blank');
-    }
-
+    function checkFunding(account) { window.open(`https://wax.bloks.io/account/${account}`, '_blank'); }
     function closeModal() { document.getElementById('zoneModal').style.display = 'none'; }
-    function setTarget(name) {
-        closeModal();
-        document.getElementById('targetIn').value = name;
-        switchView('targetView'); 
-    }
+    function setTarget(name) { closeModal(); document.getElementById('targetIn').value = name; switchView('targetView'); }
 
     async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
     function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
