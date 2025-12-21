@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V208 (REALTIME STATUS)</title>
+    <title>DoV - COMMAND V209 (RPC CLUSTER)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (STABLE V199) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -37,7 +37,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- HEADER & METRICS --- */
+        /* --- DASHBOARD HEADER --- */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -45,6 +45,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
+        /* --- CARDS --- */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -59,7 +60,8 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
-        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 60px 70px 90px 90px 70px 70px; }
+        /* 7 COLS */
+        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
@@ -102,21 +104,24 @@
         
         a.ext { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; font-weight:700; }
         a.ext:hover { border-bottom-color: var(--blue); color: #fff; }
+        
+        #scanStatus { color: var(--orange); font-weight: 700; font-family: var(--font-num); }
     </style>
 </head>
 <body>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V208</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V209</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">MONITORING</span>
+            <span class="grp-lbl">MONITORING CLUSTER</span>
             <div class="btn-row">
-                <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
+                <button class="btn-green" onclick="dispatchGlobalScan()">SCAN CLUSTER</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
             </div>
-            <div class="btn-row">
+            <div style="font-size:10px; color:#555; margin-top:2px;" id="scanStatus">IDLE</div>
+            <div class="btn-row" style="margin-top:10px;">
                 <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
                 <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
             </div>
@@ -141,12 +146,11 @@
     </aside>
 
     <main class="main-content">
-        
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">SCANNING CHAIN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <div class="page-meta">CLUSTER SCAN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -184,7 +188,6 @@
             </div>
             <div id="areaTarget" class="tables-grid" style="grid-template-columns: 1fr;"></div>
         </div>
-
     </main>
 </div>
 
@@ -193,6 +196,7 @@
         <div class="modal-header"><span class="modal-title">SYSTEM CONFIGURATION</span></div>
         <div class="modal-body" style="padding:20px;">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC CLUSTER (FAILOVER NODES)</span><textarea id="cfgApi"></textarea></div>
                 <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
                 <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
                 <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
@@ -224,8 +228,34 @@
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
+    // --- DATA ---
     const DEFAULT_DATA = {
-        apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
+        // RPC CLUSTER: STRATEGY 20 + 3
+        apiConfig: { 
+            rpcNodes: [
+                "https://wax.greymass.com", 
+                "https://wax.eosio.online", 
+                "https://wax.api.eosnation.io", 
+                "https://wax.pink.gg", 
+                "https://api.wax.alohaeos.com",
+                "https://wax.dapplica.io",
+                "https://api.waxsweden.org",
+                "https://wax.eosphere.io",
+                "https://wax.eu.eosamsterdam.net",
+                "https://api.wax.liquidstudios.io",
+                "https://wax.cryptolions.io",
+                "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io",
+                "https://api.wax.bountyblok.io",
+                "https://wax-bp.wizardsguild.one",
+                "https://wax.blacklusion.io",
+                "https://api.wax.greeneosio.com",
+                "https://waxapi.ledgerwise.io",
+                "https://wax.tmy.io",
+                "https://api.hivebp.io"
+                // Add your 3 Proxy URLs here in the settings
+            ]
+        },
         resourceDefs: {
             "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" },
             "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" }
@@ -235,7 +265,8 @@
             cycleHours: 24, 
             tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" },
             atomicAsset: "https://wax.atomichub.io/explorer/asset",
-            accountBase: "https://wax.atomichub.io/explorer/account"
+            accountBase: "https://wax.atomichub.io/explorer/account",
+            atomicBase: "https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions"
         },
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
@@ -297,11 +328,19 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V208');
+        const local = localStorage.getItem('DOV_DATA_V209');
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
-                DATA = { ...DEFAULT_DATA, ...loaded, gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig }, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
+                // Ensure RPC nodes are present from default if missing in local
+                if(!loaded.apiConfig.rpcNodes) loaded.apiConfig.rpcNodes = DEFAULT_DATA.apiConfig.rpcNodes;
+                
+                DATA = { 
+                    ...DEFAULT_DATA, 
+                    ...loaded, 
+                    gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig },
+                    templates: { ...DEFAULT_DATA.templates, ...loaded.templates } 
+                }; 
             } catch(e){ console.log("Resetting Data"); } 
         }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
@@ -323,24 +362,48 @@
         }
     }
 
-    // --- CORE LOGIC V208: TIMER CHECK ---
+    // --- RESILIENT FETCHER (LOAD BALANCER) ---
+    async function resilientFetch(bodyPayload) {
+        let nodes = DATA.apiConfig.rpcNodes;
+        let retries = 5; // Try 5 different nodes before giving up
+        
+        for(let i=0; i<retries; i++) {
+            // Pick Random Node
+            let node = nodes[Math.floor(Math.random() * nodes.length)];
+            // Handle trailing slash
+            if(node.endsWith('/')) node = node.slice(0, -1);
+            
+            try {
+                let response = await fetch(node + "/v1/chain/get_table_rows", {
+                    method: 'POST',
+                    body: bodyPayload
+                });
+                
+                if(!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch(e) {
+                console.warn(`Node ${node} failed (${e.message}). Switching...`);
+                // If it fails, loop continues to next random node
+            }
+        }
+        throw new Error("ALL RPC NODES FAILED");
+    }
+
     function processRow(row) {
         let tid = row.template_id.toString();
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
-        let count_total = assetList.length; // STAKED COUNT
+        let count_total = assetList.length; // THE TRUTH: 4 IDs = 4 Buildings
         
-        // TIMER LOGIC: Is it actively producing?
+        // TIMER LOGIC
         let now = Date.now() / 1000;
         let finish = parseFloat(row.last_claim) + parseFloat(row.delay);
-        let isActive = now < finish; // TRUE if currently mining
-        
-        let count_active = isActive ? count_total : 0; // Only count for production if active
+        let isActive = now < finish;
+        let count_active = isActive ? count_total : 0;
 
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
         
-        // Calculations based on ACTIVE count only
         let hourly = count_active * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let costD = daily * DATA.gameConfig.maintenanceCost;
@@ -361,6 +424,7 @@
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        getId('scanStatus').innerText = "RUNNING (RPC CLUSTER)...";
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         SCAN_DETAILS = {}; 
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
@@ -368,15 +432,16 @@
         
         try {
             while(!stopSignal) {
-                let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
-                let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
+                // USE RESILIENT FETCH
+                let json = await resilientFetch(JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+                
+                if(!json.rows || json.rows.length === 0) break;
                 
                 for(let r of json.rows) {
                     rowCount++; 
                     let d = processRow(r); 
                     assetCount += d.count_total;
-                    console.log(`Scan: ${d.name} (${d.id}) -> Active: ${d.count_active}/${d.count_total}`);
-
+                    
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(existing) { 
                         existing.act += d.count_active; 
@@ -394,7 +459,11 @@
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
-        } catch(e) { console.error("SCAN ERROR:", e); }
+            getId('scanStatus').innerText = "COMPLETE";
+        } catch(e) { 
+            console.error("CRITICAL SCAN ERROR:", e); 
+            getId('scanStatus').innerText = "ERROR: " + e.message;
+        }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -405,7 +474,6 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                // UI: Active / Total
                 let actClass = i.act > 0 ? "color:var(--green)" : "color:#666";
                 html += `
                 <div class="dt-grid dt-row">
@@ -452,16 +520,16 @@
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0); let next = "";
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
-            let json = await res.json(); if(!json.rows) break;
-            for(let r of json.rows) { let id = r.zone_id || r.zoneID; if(counts[id] !== undefined) counts[id]++; }
+            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            for(let r of res.rows) { let id = r.zone_id || r.zoneID; if(counts[id] !== undefined) counts[id]++; }
             let html = "";
             Object.keys(counts).forEach(id => {
                 let z = DATA.zones[id]; let active = counts[id] > 0 ? "active" : "";
                 html += `<div class="zone-card ${active}"><div class="zc-top"><span>${z.name}</span><span>${counts[id]}</span></div><div class="zc-bot"><span style="color:#666">ENTRY COST</span><span style="color:var(--red)">${z.cost} TU</span></div></div>`;
             });
             getId('areaZones').innerHTML = html;
-            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+            if(!res.more) break; next = res.next_key; await new Promise(r => setTimeout(r, 50));
         }
         getId('zoneStatus').innerText = "Complete.";
     }
@@ -470,11 +538,11 @@
         stopSignal = false; switchView('viewEco'); getId('ecoStatus').innerText = "Scanning...";
         let next = ""; let dTU = 0, activeZ = 0;
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
-            let json = await res.json(); if(!json.rows) break;
-            for(let r of json.rows) { let z = DATA.zones[r.zone_id]; if(z && z.cost > 0) { dTU += z.cost; activeZ++; } }
+            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            for(let r of res.rows) { let z = DATA.zones[r.zone_id]; if(z && z.cost > 0) { dTU += z.cost; activeZ++; } }
             getId('valDemandTU').innerText = fmt(dTU); getId('valActiveZones').innerText = fmt(activeZ);
-            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+            if(!res.more) break; next = res.next_key; await new Promise(r => setTimeout(r, 50));
         }
         getId('ecoStatus').innerText = "Complete.";
     }
@@ -487,15 +555,14 @@
         let tbody = getId('targetBody');
 
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}) });
-            let json = await res.json(); if(!json.rows) break;
-            for(let r of json.rows) {
+            let res = await resilientFetch(JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            for(let r of res.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
-                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
-                // TARGET DOES NOT CHECK TIMER (ASSETS ARE OWNED)
+                let link = `${DATA.gameConfig.atomicBase}/${d.id}`;
                 tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="ext">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count_total}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
-            if(!json.more) break; next = json.next_key;
+            if(!res.more) break; next = res.next_key;
         }
     }
 
@@ -508,19 +575,19 @@
         let tbody = getId('targetBody');
 
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}) });
-            let json = await res.json(); if(!json.rows) break;
-            for(let r of json.rows) {
+            let res = await resilientFetch(JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            for(let r of res.rows) {
                 let z = DATA.zones[r.zone_id];
                 tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr;"><div class="cell" style="font-weight:700; color:#fff;">${z ? z.name : 'Zone '+r.zone_id}</div><div class="cell c-right" style="color:var(--green)">ENGAGED</div></div>`);
             }
-            if(!json.more) break; next = json.next_key;
+            if(!res.more) break; next = res.next_key;
         }
     }
 
-    function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V208', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V208'); location.reload(); } }
+    function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V209', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V209'); location.reload(); } }
 
     window.onload = init;
 </script>
