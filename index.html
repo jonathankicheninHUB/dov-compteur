@@ -2,203 +2,104 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V196 (PRO TRADING UI)</title>
+    <title>DoV - COMMAND V197 (ATOMIC LINKS)</title>
     <style>
-        /* --- DESIGN SYSTEM : WALL STREET DARK --- */
+        /* --- DESIGN SYSTEM : WALL STREET DARK (V196 BASE) --- */
         :root {
-            /* Backgrounds */
-            --bg-app: #0b0c10;
-            --bg-panel: #111217; 
-            --bg-header: #1a1b20;
-            --bg-row-even: #14151a;
-            --bg-row-hover: #1e1f26;
-            
-            /* Borders */
-            --border-subtle: #23242a;
-            --border-accent: #3a3b45;
-
-            /* Functional Colors */
-            --action-green: #00f298; /* Trading Green */
-            --action-red: #ff3b30;   /* Trading Red */
-            --brand-blue: #2979ff;   /* Professional Blue */
-            --text-primary: #e0e0e0;
-            --text-secondary: #858595;
-            --text-dim: #4a4b55;
-
-            /* Resources */
-            --fuel: #ff9100;
-            --health: #ff1744;
-            --repair: #00b0ff;
-            --supply: #ffea00;
-            --dovx: #d500f9;
-
-            /* Typography */
+            --bg-app: #0b0c10; --bg-panel: #111217; --bg-header: #1a1b20;
+            --bg-row-even: #14151a; --bg-row-hover: #1e1f26;
+            --border-subtle: #23242a; --border-accent: #3a3b45;
+            --action-green: #00f298; --action-red: #ff3b30; --brand-blue: #2979ff;
+            --text-primary: #e0e0e0; --text-secondary: #858595; --text-dim: #4a4b55;
+            --fuel: #ff9100; --health: #ff1744; --repair: #00b0ff; --supply: #ffea00; --dovx: #d500f9;
             --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-num: 'JetBrains Mono', 'Consolas', 'Courier New', monospace; 
         }
 
-        /* --- RESET & BASE --- */
-        body { 
-            background-color: var(--bg-app); color: var(--text-secondary); 
-            font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; 
-            overflow: hidden; font-size: 11px; letter-spacing: 0.02em;
-        }
+        body { background-color: var(--bg-app); color: var(--text-secondary); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; letter-spacing: 0.02em; }
         * { box-sizing: border-box; }
-        
-        /* Custom Scrollbar (Thin & Stealth) */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-app); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* --- HEADER --- */
-        header { 
-            height: 48px; background: var(--bg-header); border-bottom: 1px solid var(--border-accent); 
-            display: flex; align-items: center; padding: 0 16px; justify-content: space-between; z-index: 100;
-        }
+        header { height: 48px; background: var(--bg-header); border-bottom: 1px solid var(--border-accent); display: flex; align-items: center; padding: 0 16px; justify-content: space-between; z-index: 100; }
         .brand { display: flex; align-items: center; gap: 8px; }
         .status-dot { width: 6px; height: 6px; background: var(--action-green); border-radius: 50%; box-shadow: 0 0 8px var(--action-green); }
         h1 { color: var(--text-primary); font-size: 13px; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
         .sys-status { font-family: var(--font-num); font-size: 9px; color: var(--action-green); border: 1px solid #1b3a2b; padding: 2px 6px; border-radius: 2px; background: #0a1f15; }
 
-        /* --- LAYOUT --- */
         .layout { display: flex; flex: 1; width: 100%; overflow: hidden; }
-        
-        /* SIDEBAR (Controls) */
-        .sidebar { 
-            width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border-subtle); 
-            padding: 16px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0;
-        }
-        
+        .sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border-subtle); padding: 16px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0; }
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .group-title { font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Inputs & Buttons - Professional Look */
-        input[type="text"] {
-            background: #08080a; border: 1px solid var(--border-accent); color: var(--text-primary);
-            padding: 8px 10px; font-family: var(--font-num); font-size: 11px; border-radius: 3px; width: 100%;
-            transition: border-color 0.2s;
-        }
+        input[type="text"] { background: #08080a; border: 1px solid var(--border-accent); color: var(--text-primary); padding: 8px 10px; font-family: var(--font-num); font-size: 11px; border-radius: 3px; width: 100%; }
         input:focus { border-color: var(--brand-blue); outline: none; }
 
-        button {
-            width: 100%; padding: 8px 12px; cursor: pointer; border: none; font-weight: 600; 
-            font-size: 10px; text-transform: uppercase; border-radius: 3px; transition: all 0.2s;
-            display: flex; justify-content: center; align-items: center; letter-spacing: 0.5px;
-        }
+        button { width: 100%; padding: 8px 12px; cursor: pointer; border: none; font-weight: 600; font-size: 10px; text-transform: uppercase; border-radius: 3px; transition: all 0.2s; display: flex; justify-content: center; align-items: center; letter-spacing: 0.5px; }
         button:hover { transform: translateY(-1px); }
-        button:active { transform: translateY(0); }
-
         .btn-primary { background: var(--brand-blue); color: #fff; box-shadow: 0 2px 5px rgba(41, 121, 255, 0.2); }
         .btn-success { background: var(--action-green); color: #000; font-weight: 700; }
         .btn-danger { background: rgba(255, 59, 48, 0.1); color: var(--action-red); border: 1px solid rgba(255, 59, 48, 0.3); }
         .btn-danger:hover { background: rgba(255, 59, 48, 0.2); }
-        .btn-subtle { background: var(--border-subtle); color: var(--text-primary); }
-        .btn-subtle:hover { background: var(--border-accent); }
-        
+        .btn-subtle { background: var(--border-subtle); color: var(--text-primary); } .btn-subtle:hover { background: var(--border-accent); }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- MAIN VIEWPORT --- */
-        .main-view { 
-            flex: 1; padding: 24px 32px; overflow-y: auto; overflow-x: hidden;
-            background: linear-gradient(180deg, var(--bg-app) 0%, #0e0f14 100%);
-        }
+        .main-view { flex: 1; padding: 24px 32px; overflow-y: auto; overflow-x: hidden; background: linear-gradient(180deg, var(--bg-app) 0%, #0e0f14 100%); }
 
-        /* DASHBOARD METRICS HEADER */
-        .metrics-bar {
-            display: flex; justify-content: space-between; align-items: flex-end; 
-            padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 24px;
-        }
+        .metrics-bar { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 24px; }
         .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 4px 0; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: var(--text-secondary); }
-        
         .global-cost { text-align: right; }
         .gc-label { display: block; font-size: 9px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2px; }
         .gc-value { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--text-primary); }
         .gc-unit { color: var(--dovx); font-size: 11px; }
 
-        /* RESOURCE CARDS (Compact & Dense) */
-        .cards-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; 
-        }
-        .kpi-card {
-            background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px;
-            padding: 16px; position: relative; overflow: hidden;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 16px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
         .kpi-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; }
         .kpi-value { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
         .kpi-sub { font-size: 9px; color: var(--text-dim); margin-top: 4px; }
 
-        /* DATA TABLES (THE PRO PART) */
-        .tables-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; /* 2 Columns Layout */
-        }
-        
-        .data-panel {
-            background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px;
-            display: flex; flex-direction: column; height: fit-content;
-        }
-        
-        .panel-header {
-            padding: 12px 16px; border-bottom: 1px solid var(--border-subtle);
-            display: flex; justify-content: space-between; align-items: center; background: #16171d;
-        }
+        .tables-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .data-panel { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; flex-direction: column; height: fit-content; }
+        .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: #16171d; }
         .ph-title { font-weight: 700; font-size: 11px; color: var(--text-primary); }
         .ph-meta { font-family: var(--font-num); font-size: 9px; color: var(--text-dim); }
 
-        /* GRID TABLE HEADER */
-        .dt-header {
-            display: grid; 
-            /* Grid definition: Name (Flex), Active (Fixed), Unit (Fixed), Hourly (Fixed), Daily (Fixed) */
-            grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px;
-            padding: 8px 16px; background: var(--bg-header); border-bottom: 1px solid var(--border-subtle);
-            font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;
-        }
-        .dt-h-cell { display: flex; align-items: center; }
-        .dt-right { justify-content: flex-end; text-align: right; }
-        .dt-center { justify-content: center; text-align: center; }
-
-        /* GRID TABLE ROW */
-        .dt-row {
-            display: grid; 
-            grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px;
-            padding: 6px 16px; /* Tight padding */
-            font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.02);
-            transition: background 0.1s;
-        }
+        .dt-header { display: grid; grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px; padding: 8px 16px; background: var(--bg-header); border-bottom: 1px solid var(--border-subtle); font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .dt-row { display: grid; grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px; padding: 6px 16px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.1s; }
         .dt-row:nth-child(even) { background-color: var(--bg-row-even); }
         .dt-row:hover { background-color: var(--bg-row-hover); }
-
-        /* Cell Styling */
+        
         .dt-cell { display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .dt-right { justify-content: flex-end; text-align: right; }
+        .dt-center { justify-content: center; text-align: center; }
+        
         .cell-name { font-weight: 500; color: var(--text-primary); }
+        
+        /* ATOMIC LINK STYLE */
+        a.atomic-link { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; }
+        a.atomic-link:hover { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
+
         .cell-act { font-family: var(--font-num); font-weight: 700; color: var(--text-primary); justify-content: center; }
         .cell-unit { font-family: var(--font-num); color: var(--text-dim); justify-content: flex-end; }
         .cell-hourly { font-family: var(--font-num); font-weight: 700; color: var(--text-primary); justify-content: flex-end; }
         .cell-daily { font-family: var(--font-num); color: var(--text-secondary); justify-content: flex-end; }
 
-        /* Color Modifiers */
         .c-fuel .kpi-card::before { background: var(--fuel); } .c-fuel .cell-hourly { color: var(--fuel); }
         .c-health .kpi-card::before { background: var(--health); } .c-health .cell-hourly { color: var(--health); }
         .c-repair .kpi-card::before { background: var(--repair); } .c-repair .cell-hourly { color: var(--repair); }
         .c-supply .kpi-card::before { background: var(--supply); } .c-supply .cell-hourly { color: var(--supply); }
 
-        /* ZONES & ECO */
         .zones-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-        .zone-box { 
-            background: var(--bg-panel); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 3px;
-            display: flex; flex-direction: column; justify-content: space-between; height: 80px; position: relative;
-        }
+        .zone-box { background: var(--bg-panel); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 3px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; position: relative; }
         .zone-box.active { border-color: var(--brand-blue); background: rgba(41, 121, 255, 0.05); }
         .zb-name { font-size: 10px; font-weight: 700; color: var(--text-primary); }
         .zb-stat { display: flex; justify-content: space-between; align-items: flex-end; }
         .zb-count { font-family: var(--font-num); font-size: 14px; font-weight: 700; color: #fff; }
         .zb-cost { font-family: var(--font-num); font-size: 9px; color: var(--action-red); }
 
-        /* UTILS */
-        .view-section { display: none; }
-        .active-view { display: block; }
+        .view-section { display: none; } .active-view { display: block; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
         .modal-win { width: 600px; background: var(--bg-panel); border: 1px solid var(--border-accent); padding: 24px; border-radius: 4px; box-shadow: 0 20px 50px #000; }
         textarea { width: 100%; height: 120px; background: #08080a; color: #ccc; border: 1px solid var(--border-subtle); font-family: var(--font-num); padding: 10px; font-size: 10px; resize: vertical; }
@@ -209,7 +110,7 @@
 <header>
     <div class="brand">
         <div class="status-dot"></div>
-        <h1>DoV COMMAND <span style="opacity:0.5; font-weight:400;">PRO TRADER V196</span></h1>
+        <h1>DoV COMMAND <span style="opacity:0.5; font-weight:400;">ATOMIC LINK V197</span></h1>
     </div>
     <div class="sys-status" id="statusBadge">CONNECTED</div>
 </header>
@@ -249,7 +150,6 @@
     </aside>
 
     <main class="main-view">
-        
         <div id="viewGlobal" class="view-section active-view">
             <div class="metrics-bar">
                 <div>
@@ -261,23 +161,17 @@
                     <span class="gc-value" id="gTotalCost">0</span> <span class="gc-unit">DOVX</span>
                 </div>
             </div>
-
             <div class="cards-grid" id="areaCards"></div>
-
             <div class="tables-container" id="areaLists"></div>
         </div>
 
         <div id="viewZones" class="view-section">
-            <div class="metrics-bar">
-                <div><h2 class="page-title">TACTICAL MAP</h2><div class="page-meta" id="zoneStatus">Ready.</div></div>
-            </div>
+            <div class="metrics-bar"><div><h2 class="page-title">TACTICAL MAP</h2><div class="page-meta" id="zoneStatus">Ready.</div></div></div>
             <div class="zones-grid" id="areaZones"></div>
         </div>
 
         <div id="viewEco" class="view-section">
-            <div class="metrics-bar">
-                <div><h2 class="page-title">MACRO ECONOMY</h2><div class="page-meta" id="ecoStatus">Ready.</div></div>
-            </div>
+            <div class="metrics-bar"><div><h2 class="page-title">MACRO ECONOMY</h2><div class="page-meta" id="ecoStatus">Ready.</div></div></div>
             <div class="cards-grid">
                 <div class="kpi-card"><div class="kpi-label">GLOBAL DEMAND</div><div class="kpi-value" id="valDemandTU">0</div><div class="kpi-sub">TU BURN / DAY</div></div>
                 <div class="kpi-card"><div class="kpi-label">ACTIVE ZONES</div><div class="kpi-value" id="valActiveZones">0</div></div>
@@ -286,38 +180,21 @@
         </div>
 
         <div id="viewTarget" class="view-section">
-            <div class="metrics-bar">
-                <div><h2 class="page-title">TARGET INSPECTOR</h2><div class="page-meta" id="targetStatus">Ready.</div></div>
-            </div>
+            <div class="metrics-bar"><div><h2 class="page-title">TARGET INSPECTOR</h2><div class="page-meta" id="targetStatus">Ready.</div></div></div>
             <div id="areaTarget" class="tables-container"></div>
         </div>
-
     </main>
 </div>
 
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-win">
         <h3 style="margin-top:0; color:var(--text-primary); font-size:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">SYSTEM CONFIGURATION</h3>
-        
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
-            <div>
-                <span class="group-title">RESOURCES DEF</span>
-                <textarea id="cfgResources"></textarea>
-            </div>
-            <div>
-                <span class="group-title">GAME RULES</span>
-                <textarea id="cfgGameRules"></textarea>
-            </div>
-            <div>
-                <span class="group-title">ZONES DEF</span>
-                <textarea id="cfgZones"></textarea>
-            </div>
-            <div>
-                <span class="group-title">TEMPLATES DB</span>
-                <textarea id="cfgTemplates"></textarea>
-            </div>
+            <div><span class="group-title">RESOURCES DEF</span><textarea id="cfgResources"></textarea></div>
+            <div><span class="group-title">GAME RULES</span><textarea id="cfgGameRules"></textarea></div>
+            <div><span class="group-title">ZONES DEF</span><textarea id="cfgZones"></textarea></div>
+            <div><span class="group-title">TEMPLATES DB</span><textarea id="cfgTemplates"></textarea></div>
         </div>
-        
         <div style="text-align:right; margin-top:20px;">
             <button class="btn-success" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & REBOOT</button>
             <button class="btn-subtle" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button>
@@ -326,129 +203,45 @@
 </div>
 
 <script>
-    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
-    const switchView = (id) => {
-        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view'));
-        getId(id).classList.add('active-view');
-    };
-    // French Format: 10 000,00
+    const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DEFAULT DATA ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
-        resourceDefs: {
-            "F": { label: "FUEL", class: "c-fuel" },
-            "H": { label: "HEALTH", class: "c-health" },
-            "R": { label: "REPAIR", class: "c-repair" },
-            "S": { label: "SUPPLY", class: "c-supply" }
-        },
+        resourceDefs: { "F": { label: "FUEL", class: "c-fuel" }, "H": { label: "HEALTH", class: "c-health" }, "R": { label: "REPAIR", class: "c-repair" }, "S": { label: "SUPPLY", class: "c-supply" } },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
-        zones: { 
-            1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
-            5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
-            9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},
-            13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
-            17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
-        },
+        zones: { 1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0} },
         templates: {
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
-            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
-            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
-            "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
-            "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
-            "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 },
-            "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 },
-            "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 },
-            "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
-            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
-            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
-            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
-            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
-            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
-            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
-            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
-            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
-            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }, "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
-            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
-            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
-            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
-            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
-            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
-            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
-            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
-            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
-            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
-            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
-            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
-            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
-            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
-            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
-            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
-            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
-            "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
-            "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
-            "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
-            "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
-            "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
-            "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
-            "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
-            "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
         }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let stopSignal = false; 
+    let stopSignal = false;
 
     function init() {
         const local = localStorage.getItem('DOV_DATA');
-        if(local) { 
-            try { 
-                let loaded = JSON.parse(local);
-                if(!loaded.templates || Object.keys(loaded.templates).length < 50) { DATA = { ...DEFAULT_DATA }; } 
-                else { DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; }
-            } catch(e) { localStorage.setItem('DOV_DATA', JSON.stringify(DEFAULT_DATA)); DATA = JSON.parse(JSON.stringify(DEFAULT_DATA)); } 
-        }
+        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
 
     function buildUI() {
-        const areaC = getId('areaCards');
-        const areaL = getId('areaLists');
+        const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
-
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            // 1. KPI CARD
-            areaC.innerHTML += `
-            <div class="kpi-card ${rd.class}">
-                <div class="kpi-label"><span>${rd.label}</span> <span>LIVE</span></div>
-                <div class="kpi-value" id="val-${k}">0</div>
-                <div class="kpi-sub">PROD / HOUR</div>
-            </div>`;
-            
-            // 2. DATA TABLE
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div class="kpi-label"><span>${rd.label}</span><span>LIVE</span></div><div class="kpi-value" id="val-${k}">0</div><div class="kpi-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
-            <div class="data-panel">
-                <div class="panel-header">
-                    <span class="ph-title">${rd.label} BREAKDOWN</span>
-                    <span class="ph-meta">MAINTENANCE: <span id="bcost-${k}">0</span> DOVX</span>
-                </div>
-                <div class="dt-header">
-                    <div class="dt-h-cell">TEMPLATE</div>
-                    <div class="dt-h-cell dt-center">ACT</div>
-                    <div class="dt-h-cell dt-right">UNIT</div>
-                    <div class="dt-h-cell dt-right">TOTAL/H</div>
-                    <div class="dt-h-cell dt-right">24H</div>
-                </div>
-                <div id="tbl-${k}"></div>
-            </div>`;
+            <div class="data-panel"><div class="panel-header"><span class="ph-title">${rd.label} BREAKDOWN</span><span class="ph-meta">MAINTENANCE: <span id="bcost-${k}">0</span> DOVX</span></div>
+            <div class="dt-header"><div class="dt-h-cell">TEMPLATE</div><div class="dt-h-cell dt-center">ACT</div><div class="dt-h-cell dt-right">UNIT</div><div class="dt-h-cell dt-right">TOTAL/H</div><div class="dt-h-cell dt-right">24H</div></div>
+            <div id="tbl-${k}"></div></div>`;
         }
     }
 
@@ -462,52 +255,31 @@
         let daily = hourly * DATA.gameConfig.cycleHours;
         let cost = daily * DATA.gameConfig.maintenanceCost;
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
-        let type = "F";
-        for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
-        return { name, type, count, hourly, daily, cost, nominal };
+        let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
+        return { id: tid, name, type, count, hourly, daily, cost, nominal };
     }
 
     async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal');
-        getId('cntRows').innerText = "...";
-        let next = "";
-        let stats = { totalCost:0, types:{} };
-        let groups = {};
+        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
-
         try {
             while(!stopSignal) {
-                let res = await fetch(DATA.apiConfig.endpoint, {
-                    method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})
-                });
-                let json = await res.json();
-                if(!json.rows || json.rows.length === 0) break;
-
+                let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
+                let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
                 const now = Date.now()/1000;
                 for(let r of json.rows) {
-                    rowCount++;
-                    let d = processRow(r);
-                    assetCount += d.count;
-                    let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(active) {
+                    rowCount++; let d = processRow(r); assetCount += d.count;
+                    if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
                         let existing = groups[d.type].find(x => x.name === d.name);
-                        if(existing) {
-                            existing.act += d.count;
-                            existing.totH += d.hourly;
-                            existing.totD += d.daily;
-                            existing.totC += d.cost;
-                        } else {
-                            groups[d.type].push({ name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, totC:d.cost });
-                        }
-                        stats.types[d.type].p += d.hourly;
-                        stats.types[d.type].c += d.cost;
-                        stats.totalCost += d.cost;
+                        if(existing) { existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.totC += d.cost; }
+                        else { groups[d.type].push({ id:d.id, name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, totC:d.cost }); }
+                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.cost; stats.totalCost += d.cost;
                     }
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(json.more) next = json.next_key; else break;
-                await new Promise(r => setTimeout(r, 50));
+                if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
         } catch(e) { console.error(e); }
     }
@@ -520,24 +292,16 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                html += `
-                <div class="dt-row ${rd.class}">
-                    <div class="dt-cell cell-name">${i.name}</div>
-                    <div class="dt-cell cell-act">${i.act}</div>
-                    <div class="dt-cell cell-unit">${fmtDec(i.unit)}</div>
-                    <div class="dt-cell cell-hourly">${fmtDec(i.totH)}</div>
-                    <div class="dt-cell cell-daily">${fmtDec(i.totD)}</div>
-                </div>`;
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                html += `<div class="dt-row ${rd.class}"><div class="dt-cell cell-name"><a href="${link}" target="_blank" class="atomic-link">${i.name}</a></div><div class="dt-cell cell-act">${i.act}</div><div class="dt-cell cell-unit">${fmtDec(i.unit)}</div><div class="dt-cell cell-hourly">${fmtDec(i.totH)}</div><div class="dt-cell cell-daily">${fmtDec(i.totD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
     }
 
     async function startZoneScan() {
-        stopSignal = false; switchView('viewZones');
-        getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
-        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0);
-        let next = "";
+        stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
+        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0); let next = "";
         while(!stopSignal) {
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
@@ -554,8 +318,7 @@
     }
 
     async function startEconomyScan() {
-        stopSignal = false; switchView('viewEco');
-        getId('ecoStatus').innerText = "Scanning...";
+        stopSignal = false; switchView('viewEco'); getId('ecoStatus').innerText = "Scanning...";
         let next = ""; let dTU = 0, activeZ = 0;
         while(!stopSignal) {
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
@@ -569,15 +332,14 @@
 
     async function startTargetBuildings() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user;
-        getId('areaTarget').innerHTML = "Loading...";
+        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user; getId('areaTarget').innerHTML = "Loading...";
         let next = ""; let html = "";
         while(!stopSignal) {
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r);
-                html += `<div class="dt-row"><div class="dt-cell cell-name">${d.name}</div><div class="dt-cell cell-act">${d.count}</div><div class="dt-cell cell-hourly">${fmtDec(d.hourly)}</div></div>`;
+                html += `<div class="dt-row"><div class="dt-cell cell-name">${d.name}</div><div class="dt-cell cell-act">${d.count}</div><div class="dt-cell cell-unit">-</div><div class="dt-cell cell-hourly">${fmtDec(d.hourly)}</div><div class="dt-cell cell-daily">-</div></div>`;
             }
             getId('areaTarget').innerHTML = `<div class="data-panel"><div class="panel-header"><span class="ph-title">USER BUILDINGS</span></div>${html}</div>`;
             if(!json.more) break; next = json.next_key;
@@ -586,23 +348,22 @@
 
     async function startTargetDivisions() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user;
-        getId('areaTarget').innerHTML = "Loading...";
+        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user; getId('areaTarget').innerHTML = "Loading...";
         let next = ""; let html = "";
         while(!stopSignal) {
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let z = DATA.zones[r.zone_id];
-                html += `<div class="dt-row"><div class="dt-cell cell-name">${z ? z.name : 'Zone '+r.zone_id}</div><div class="dt-cell cell-act" style="color:var(--action-green)">ACTIVE</div></div>`;
+                html += `<div class="dt-row"><div class="dt-cell cell-name">${z ? z.name : 'Zone '+r.zone_id}</div><div class="dt-cell cell-act" style="color:var(--action-green)">ACTIVE</div><div class="dt-cell cell-unit">-</div><div class="dt-cell cell-hourly">-</div><div class="dt-cell cell-daily">-</div></div>`;
             }
             getId('areaTarget').innerHTML = `<div class="data-panel"><div class="panel-header"><span class="ph-title">USER DIVISIONS</span></div>${html}</div>`;
             if(!json.more) break; next = json.next_key;
         }
     }
 
-    function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
 
     window.onload = init;
