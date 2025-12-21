@@ -1,10 +1,29 @@
+C'est entendu. En tant qu'Architecte Logiciel Senior, j'ai audité le code précédent.
+
+**Cause de la panne ("Ça ne fonctionne plus") :**
+L'erreur vient probablement de la gestion de la mémoire (`SCAN_DETAILS`) lors du rechargement ou d'un conflit de variable dans la boucle de rendu HTML (les guillemets dans les noms des templates cassaient le `onclick`). De plus, la récupération du "Wallet" (Propriétaire) était mal mappée pour le scan global.
+
+**Correctifs V204 (Stabilité & Architecture Master-Detail) :**
+
+1. **Sécurisation du `onclick` :** Je passe désormais uniquement l'ID du template à la fonction d'ouverture de la modale. Le script retrouve le nom et les détails en interne. Plus de risque de bug avec les caractères spéciaux.
+2. **Mapping du Propriétaire (Wallet) :** J'ai ajouté une sécurité pour trouver le nom du joueur dans les champs `player`, `owner` ou `username` de la ligne blockchain.
+3. **Architecture "Deep Link" :**
+* **Icône 🔗 :** Ajoutée à côté du nom.
+* **Clic sur le nom :** Ouvre l'inspecteur (Modale).
+* **Dans la Modale :** Liste complète des 4 (ou plus) actifs, avec lien vers l'Asset précis (pas le template) et lien vers le Wallet du joueur.
+
+
+
+Voici la **Version V204**. Elle force un nettoyage des données (`DOV_DATA_V204`) pour garantir un démarrage propre.
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V203 (DEEP INSPECTOR)</title>
+    <title>DoV - COMMAND V204 (STABLE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 CORE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -22,7 +41,7 @@
         .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; }
         .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); }
 
-        /* --- SIDEBAR COMPONENTS --- */
+        /* --- COMPONENTS --- */
         .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
         .control-group { display: flex; flex-direction: column; gap: 8px; }
@@ -31,6 +50,7 @@
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
         button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        
         .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
         .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
@@ -44,7 +64,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* --- KPI CARDS --- */
+        /* --- CARDS --- */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -74,16 +94,14 @@
         .template-trigger:hover { color: var(--blue); }
         .link-icon { font-size: 10px; margin-left: 6px; color: var(--blue); opacity: 0.7; }
         
-        a.ext-link { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; }
-        a.ext-link:hover { border-bottom-color: var(--blue); }
+        a.ext-link { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; }
+        a.ext-link:hover { border-bottom-color: var(--blue); color: #fff; }
 
-        /* COLORS */
         .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); }
         .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); }
         .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); }
         .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); }
 
-        /* ZONES */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
@@ -94,17 +112,17 @@
         
         /* MODALS */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
-        .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:0; border-radius:6px; box-shadow:0 20px 50px #000; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+        .modal-box { width:700px; background:var(--bg-panel); border:1px solid var(--border); padding:0; border-radius:6px; box-shadow:0 20px 50px #000; overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; }
         .modal-header { padding: 15px 20px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 20px; overflow-y: auto; }
-        .modal-title { font-weight: 800; color: #fff; text-transform: uppercase; font-size: 12px; }
+        .modal-body { padding: 0; overflow-y: auto; }
+        .modal-title { font-weight: 800; color: #fff; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
         
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
 
         /* INSPECTOR TABLE INSIDE MODAL */
         .ins-table { width: 100%; border-collapse: collapse; font-family: var(--font-num); font-size: 11px; }
-        .ins-table th { text-align: left; color: #666; border-bottom: 1px solid var(--border); padding: 8px; }
-        .ins-table td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px; color: #ccc; }
+        .ins-table th { text-align: left; color: #666; border-bottom: 1px solid var(--border); padding: 12px 20px; background: rgba(0,0,0,0.2); text-transform: uppercase; font-size: 10px; }
+        .ins-table td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 20px; color: #ccc; }
         .ins-table tr:hover { background: rgba(255,255,255,0.05); }
     </style>
 </head>
@@ -112,7 +130,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V203</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V204</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -197,7 +215,7 @@
         <div class="modal-header">
             <span class="modal-title">SYSTEM CONFIGURATION</span>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="padding:20px;">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
                 <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
@@ -216,7 +234,7 @@
     <div class="modal-box">
         <div class="modal-header">
             <span class="modal-title" id="detailTitle">ASSET LIST</span>
-            <button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">X</button>
+            <button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button>
         </div>
         <div class="modal-body" id="detailBody"></div>
     </div>
@@ -252,19 +270,70 @@
             17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
         },
         templates: {
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
-            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
+            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
+            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
+            "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
+            "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
+            "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 },
+            "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 },
+            "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 },
+            "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
+            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
+            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
+            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
+            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
+            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
+            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
+            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
+            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
+            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
+            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }, "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
+            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
+            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
+            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
+            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
+            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
+            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
+            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
+            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
+            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
+            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
+            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
+            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
+            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
+            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
+            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
+            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
+            "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
+            "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
+            "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
+            "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
+            "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
+            "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
+            "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
+            "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
         }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let SCAN_DETAILS = {}; // STORE INDIVIDUAL ASSETS
+    let SCAN_DETAILS = {}; // MASTER STORAGE FOR DRILL-DOWN
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V2');
-        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
+        const local = localStorage.getItem('DOV_DATA_V204');
+        if(local) { 
+            try { 
+                let loaded = JSON.parse(local);
+                DATA = { 
+                    ...DEFAULT_DATA, 
+                    ...loaded, 
+                    gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig },
+                    templates: { ...DEFAULT_DATA.templates, ...loaded.templates } 
+                }; 
+            } catch(e){ console.log("Resetting Data"); } 
+        }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
@@ -277,17 +346,20 @@
             areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div><div class="kc-val" id="val-${k}">0</div><div class="kc-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
             <div class="data-panel">
-                <div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
-                <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div>
+                <div class="dp-head">
+                    <span class="dp-title">${rd.label} BREAKDOWN</span>
+                    <div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div>
+                </div>
+                <div class="dt-grid dt-header">
+                    <div class="cell">TEMPLATE</div><div class="cell c-center">ACT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div>
+                </div>
                 <div id="tbl-${k}"></div>
             </div>`;
         }
     }
 
-    // --- LOGIC ---
     function processRow(row) {
         let tid = row.template_id.toString();
-        // 4 BUILDINGS LOGIC: Count ids
         let assetList = row.asset_ids || [];
         let count = assetList.length;
         
@@ -298,17 +370,20 @@
         let daily = hourly * DATA.gameConfig.cycleHours;
         let costD = daily * DATA.gameConfig.maintenanceCost;
         let costH = costD / 24;
+        
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         
-        return { id:tid, name, type, count, hourly, daily, costH, costD, nominal, assets: assetList, owner: row.scope };
+        // Find owner properly (fallback strategy)
+        let owner = row.player || row.username || row.owner || "unknown";
+
+        return { id:tid, name, type, count, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
     }
 
-    // --- SCANNER WITH DEEP STORAGE ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
-        SCAN_DETAILS = {}; // Reset details
+        SCAN_DETAILS = {}; // Reset
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         
@@ -320,7 +395,6 @@
                 for(let r of json.rows) {
                     rowCount++; let d = processRow(r); assetCount += d.count;
                     if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
-                        // AGGREGATE STATS
                         let existing = groups[d.type].find(x => x.name === d.name);
                         if(existing) { 
                             existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; 
@@ -330,9 +404,8 @@
                         }
                         stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
 
-                        // STORE DETAILS FOR DRILL-DOWN
+                        // Deep Storage
                         if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
-                        // Store each asset individually
                         d.assets.forEach(assetId => {
                             SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner });
                         });
@@ -352,10 +425,11 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
+                // IMPORTANT: Pass only ID to function to avoid quote issues in Name
                 html += `
                 <div class="dt-grid dt-row">
                     <div class="cell">
-                        <span class="template-trigger" onclick="openAssetDetails('${i.id}', '${i.name}')">
+                        <span class="template-trigger" onclick="openAssetDetails('${i.id}')">
                             ${i.name} <span class="link-icon">🔗</span>
                         </span>
                     </div>
@@ -372,9 +446,13 @@
     }
 
     // --- DETAIL MODAL LOGIC ---
-    function openAssetDetails(tid, name) {
+    function openAssetDetails(tid) {
+        let tpl = DATA.templates[tid];
+        let name = tpl ? tpl.name : tid;
         let list = SCAN_DETAILS[tid] || [];
-        getId('detailTitle').innerText = `${name} (${list.length} ACTIVE)`;
+        
+        getId('detailTitle').innerText = `${name} (TEMPLATE ${tid}) - ${list.length} ASSETS FOUND`;
+        
         let html = `<table class="ins-table"><thead><tr><th>ASSET ID (ATOMIC)</th><th>WALLET (TRACKER)</th><th>STATUS</th></tr></thead><tbody>`;
         
         list.forEach(item => {
@@ -382,7 +460,7 @@
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
             html += `<tr>
                 <td><a href="${assetLink}" target="_blank" class="ext-link">${item.assetId} ↗</a></td>
-                <td><a href="${walletLink}" target="_blank" class="ext-link">${item.owner} ↗</a></td>
+                <td><a href="${walletLink}" target="_blank" class="ext-link" style="color:var(--blue); font-weight:700;">${item.owner} ↗</a></td>
                 <td style="color:var(--green)">STAKED</td>
             </tr>`;
         });
@@ -434,10 +512,8 @@
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
-                let link = `${DATA.gameConfig.atomicAsset}/${d.id}`; // Wait, this links to template. Fixed below.
-                // Correction for Target: we link to Atomic Template
-                let tplLink = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
-                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${tplLink}" target="_blank" class="atomic">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
+                let link = `${DATA.gameConfig.atomicBase}/${d.id}`;
+                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
             if(!json.more) break; next = json.next_key;
         }
@@ -463,10 +539,12 @@
     }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V2', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V2'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V204', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V204'); location.reload(); } }
 
     window.onload = init;
 </script>
 </body>
 </html>
+
+```
