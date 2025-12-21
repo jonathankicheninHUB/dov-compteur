@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V152 (STABLE ARCHITECT)</title>
+    <title>DoV - COMMAND V153 (SORTING ARCHITECT)</title>
     <style>
-        /* --- STYLE IDENTIQUE V146 (INTACT) --- */
+        /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -64,7 +64,7 @@
         .c-f { border-left: 4px solid var(--fuel); } .c-h { border-left: 4px solid var(--health); }
         .c-r { border-left: 4px solid var(--repair); } .c-s { border-left: 4px solid var(--supply); }
 
-        /* DEBUG TABLE */
+        /* DEBUG / LOGS */
         .debug-box { margin-top:30px; border:1px solid #444; background:#080808; padding:10px; }
         .debug-title { font-weight:bold; color:var(--warn); margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px; text-transform:uppercase;}
         .debug-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:5px; font-size:10px; max-height:300px; overflow-y:auto; }
@@ -72,8 +72,9 @@
         .d-id { color:var(--sec); font-family:monospace; text-decoration:none; border-bottom:1px dotted var(--sec); cursor:pointer; }
         .d-id:hover { color:#fff; border-color:#fff; }
         .d-cnt { font-weight:bold; color:#fff; }
+        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; margin-top:20px; }
 
-        /* VUES COMMUNES */
+        /* DASHBOARD ZONES */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -83,12 +84,11 @@
         .res-item { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 8px; background: #1a1a1a; border-radius: 3px; align-items: center; }
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .d-fuel { background: var(--fuel); } .d-health { background: var(--health); } .d-repair { background: var(--repair); } .d-supply { background: var(--supply); }
-        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         
+        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 80px; cursor: pointer; transition: 0.2s; position: relative; }
         .zone:hover { border-color: var(--sec); background: #111; box-shadow: 0 0 10px rgba(41, 182, 246, 0.1); }
         .zone.active { border-color: #444; background: #0e0e0e; }
-        
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
@@ -96,9 +96,12 @@
         .z-act-text { font-size: 9px; display: flex; justify-content: space-between; margin-top: 2px; color: #666; }
         .z-activity { height: 4px; background: #222; display: flex; border-radius: 2px; overflow: hidden; margin-top: auto; }
         .z-act-mission { background: var(--warn); height: 100%; } .z-act-ready { background: var(--main); height: 100%; }
+
+        /* VIEW TOGGLE */
         .view-section { display: none; } .view-active { display: block; }
         .status-bar { color: var(--sec); font-size: 10px; text-align: center; margin-bottom: 10px; border: 1px solid #333; padding: 5px; background: #080808; display:none; }
-        .logs { height: 120px; background: #000; border-top: 1px solid #333; padding: 10px; font-size: 11px; color: #888; overflow-y: auto; font-family: monospace; white-space: pre-wrap; margin-top:20px; }
+
+        /* ECONOMY VIEW */
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .eco-card { background: #111; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
         .eco-head { font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; display:flex; justify-content:space-between; }
@@ -112,6 +115,8 @@
         .balance-header { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .balance-bar { width: 100%; height: 12px; background: #222; display: flex; border-radius: 3px; overflow: hidden; }
         .bal-demand { background: var(--alert); height: 100%; transition: width 0.5s; } .bal-supply { background: var(--main); height: 100%; transition: width 0.5s; }
+
+        /* TARGET VIEW */
         .t-row { display: flex; justify-content: space-between; background: #0a0a0a; padding: 8px; border: 1px solid #222; font-size: 11px; align-items: center; margin-bottom: 5px; }
         .st-mission { color: var(--warn); border: 1px solid var(--warn); padding: 0 4px; border-radius: 3px; font-size: 9px; } .st-ready { color: var(--main); border: 1px solid var(--main); padding: 0 4px; border-radius: 3px; font-size: 9px; }
         .b-card { background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
@@ -148,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V152 STABLE ARCHITECT</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V153 SORTING ARCHITECT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -317,6 +322,12 @@
                 </div>
             </div>
 
+            <div class="set-group">
+                <span class="set-title">TRI & AFFICHAGE (Ordre de priorité)</span>
+                <div class="inp-label" style="margin-bottom:5px;">Séparez les préfixes par une virgule (ex: C_F1, R_F2)</div>
+                <textarea id="cfgSort" style="height:60px; font-size:10px;">C_F1, C_F2, C_F3, C_F4, R_F1, R_F2, R_F3, R_F4, E_F1, E_F2, E_F3, E_F4, L_F1, L_F2, L_F3, S1</textarea>
+            </div>
+
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="set-group">
                     <span class="set-title">NODES RPC (1 par ligne)</span>
@@ -336,7 +347,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V152. STABLE ARCHITECT READY.</div>
+<div class="logs" id="console">> V153. SORTING ARCHITECT READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
@@ -346,6 +357,15 @@
         batchSize: 1000,
         delay: 200,
         startKey: '',
+        // NOUVEAU : ORDRE DE TRI CONFIGURABLE
+        // Ordre logique : C1 -> C4, puis R1 -> R4, etc.
+        sortOrder: [
+            "C_F1", "C_F2", "C_F3", "C_F4", 
+            "R_F1", "R_F2", "R_F3", "R_F4",
+            "E_F1", "E_F2", "E_F3", "E_F4",
+            "L_F1", "L_F2", "L_F3", 
+            "S1", "SC_F2", "SC_F3"
+        ],
         atomicApi: "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&limit=500",
         rpcs: [
             "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
@@ -417,8 +437,6 @@
         initGrid();
         
         // CHARGEMENT SILENCIEUX DES DONNEES
-        // 1. Tente de charger le cache local
-        // 2. Si vide, utilise le Bootstrap (DEFAULT_TEMPLATES)
         const stored = localStorage.getItem('DOV_DICT');
         if(stored) {
             try {
@@ -468,7 +486,7 @@
                         throw new Error("Réponse HTML/Erreur (Pas de JSON)");
                     }
 
-                    const json = await res.json(); // Peut encore failer si JSON malformé
+                    const json = await res.json();
                     
                     if(json.success && json.data.length > 0) {
                         json.data.forEach(t => {
@@ -573,7 +591,16 @@
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- LOGIC ---
+    // --- LOGIC: GET SCORE (V153 NEW) ---
+    function getSortScore(name) {
+        if(!name) return 999;
+        // Trouve l'index dans la liste de config
+        for(let i=0; i<CONFIG.sortOrder.length; i++) {
+            if(name.startsWith(CONFIG.sortOrder[i])) return i;
+        }
+        return 999; // Si pas trouvé, on met à la fin
+    }
+
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
         let stack = (b.asset_ids && Array.isArray(b.asset_ids)) ? b.asset_ids.length : 1;
@@ -585,7 +612,9 @@
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
-        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd };
+        // V153: Ajout score de tri
+        let sortScore = getSortScore(name);
+        return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
 
     async function dispatchGlobalScan() {
@@ -624,7 +653,8 @@
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
-                if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd };
+                // Stockage du sortScore pour le rendu
+                if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd, sortScore: info.sortScore };
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
                 if (active) {
                     groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24;
@@ -659,10 +689,21 @@
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
+    // --- RENDER LISTS (V153 SORTING) ---
     function renderLists(groups){
         for(let t in groups){
             let h=`<div class="ml-header">TYPE ${t}</div>`;
-            let keys=Object.keys(groups[t]).sort((a,b)=>groups[t][b].unitProd - groups[t][a].unitProd);
+            let keys=Object.keys(groups[t]);
+            
+            // V153: TRI PAR SCORE (CONFIG)
+            keys.sort((a,b) => {
+                let scoreA = groups[t][a].sortScore;
+                let scoreB = groups[t][b].sortScore;
+                // Si scores égaux, on trie par Prod unitaire (pour départager les grades identiques)
+                if(scoreA === scoreB) return groups[t][b].unitProd - groups[t][a].unitProd;
+                return scoreA - scoreB; // Tri ascendant (le premier dans la liste Config sort en premier)
+            });
+
             keys.forEach(k=>{
                 let i=groups[t][k];
                 if(i.cp===0 && i.cr===0) return;
@@ -742,6 +783,8 @@
         document.getElementById('cfgBatch').value = CONFIG.batchSize;
         document.getElementById('cfgDelay').value = CONFIG.delay;
         document.getElementById('cfgStart').value = CONFIG.startKey;
+        // V153: LOAD SORT ORDER
+        document.getElementById('cfgSort').value = CONFIG.sortOrder.join(', ');
         document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n');
         document.getElementById('cfgProxy').value = CONFIG.proxies.join('\n');
         document.getElementById('settingsModal').style.display = 'flex';
@@ -752,6 +795,12 @@
         CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value) || 1000;
         CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200;
         CONFIG.startKey = document.getElementById('cfgStart').value.trim();
+        
+        // V153: SAVE SORT ORDER
+        let rawSort = document.getElementById('cfgSort').value.trim().split(',');
+        let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0);
+        if(cleanSort.length > 0) CONFIG.sortOrder = cleanSort;
+
         let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n');
         let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http'));
         if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc;
