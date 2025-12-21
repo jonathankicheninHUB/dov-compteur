@@ -2,251 +2,310 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V185 (FULL SUITE)</title>
+    <title>DoV - COMMAND V187 (PURE UI)</title>
     <style>
-        /* --- DESIGN SYSTEM WEB3 --- */
+        /* --- DESIGN SYSTEM DARK & SHARP --- */
         :root {
-            --bg-body: #0b0c15; --bg-panel: #12131f; --bg-card: #151621; --border: #2b2d42;
-            --primary: #3498db; --accent: #00e676; --dovx: #e056fd; --gold: #f1c40f;
-            --fuel: #e67e22; --health: #e74c3c; --repair: #3498db; --supply: #feca57;
-            --text-main: #f1f2f6; --text-muted: #8d99ae;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-mono: 'Consolas', monospace;
+            --bg-body: #0b0c15; 
+            --bg-panel: #12131f; 
+            --bg-card: #161722; 
+            --border: #2b2d42;
+            
+            --cyan: #00e676; 
+            --purple: #9b59b6;
+            --blue: #3498db;
+            --orange: #e67e22;
+            --red: #e74c3c;
+            --yellow: #f1c40f;
+            --dovx: #e056fd;
+
+            --text-main: #ffffff;
+            --text-muted: #8d99ae;
+            
+            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-code: 'Consolas', 'Monaco', monospace;
         }
 
-        body { background-color: var(--bg-body); color: var(--text-gray); font-family: var(--font-main); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
+        /* --- LAYOUT RESET --- */
+        body { background-color: var(--bg-body); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-body); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0c15; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
 
-        /* --- HEADER & LAYOUT --- */
-        header { height: 50px; background: rgba(18, 19, 31, 0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 10; }
-        .logo-dot { width:10px; height:10px; background:var(--accent); border-radius:50%; box-shadow:0 0 10px var(--accent); margin-right:10px; }
-        h1 { color: #fff; margin: 0; font-size: 14px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+        /* --- HEADER --- */
+        header { 
+            height: 50px; background: rgba(18,19,31,0.95); border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
+        h1 { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
+        .sys-badge { font-size: 10px; background: #222; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; color: var(--cyan); }
 
+        /* --- SIDEBAR --- */
         .layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .main-view { flex: 1; padding: 30px; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, rgba(20,20,30,1) 0%, rgba(5,5,8,1) 100%); }
+        .sidebar { 
+            width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); 
+            padding: 15px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; 
+        }
 
-        /* --- COMPONENTS --- */
-        .box-framed { border: 1px solid var(--border); padding: 15px; border-radius: 6px; background: rgba(255,255,255,0.02); }
-        .group-label { font-size: 10px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 5px; }
+        .panel-box { border: 1px solid var(--border); background: rgba(255,255,255,0.02); border-radius: 6px; padding: 10px; }
+        .panel-title { font-size: 10px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 8px; display: block; }
 
-        button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: 700; font-size: 10px; text-transform: uppercase; border-radius: 4px; transition: 0.2s; color:#fff; margin-bottom:5px; }
-        button:hover { opacity: 0.9; }
-        .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); color:#000; }
-        .btn-orange { background: linear-gradient(135deg, #f39c12, #e67e22); color:#000; }
-        .btn-blue { background: linear-gradient(135deg, #2980b9, #3498db); }
-        .btn-red { background: #c0392b; }
-        .btn-row { display:flex; gap:10px; }
-        .btn-ghost { background:transparent; border:1px solid #444; color:#888; } .btn-ghost:hover { border-color:#fff; color:#fff; }
+        /* INPUTS */
+        input { 
+            width: 100%; padding: 8px; background: #050508; border: 1px solid #444; 
+            color: #fff; border-radius: 4px; font-family: var(--font-code); margin-bottom: 5px; 
+        }
+        input:focus { border-color: var(--blue); outline: none; }
+
+        /* BUTTONS */
+        button { 
+            width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: 700; 
+            font-size: 10px; text-transform: uppercase; border-radius: 4px; transition: 0.2s; margin-bottom: 5px; 
+        }
+        button:hover { filter: brightness(1.1); }
         
-        input { width: 100%; padding: 8px; background: #050508; border: 1px solid #333; color: #fff; border-radius: 4px; font-family: var(--font-mono); margin-bottom: 8px; }
+        .btn-cyan { background: var(--cyan); color: #000; }
+        .btn-orange { background: var(--orange); color: #fff; }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-dark { background: #2c3e50; color: #fff; border: 1px solid #34495e; }
+        .btn-ghost { background: transparent; border: 1px solid #444; color: #888; }
+        .btn-row { display: flex; gap: 5px; }
 
-        /* --- GLOBAL DASHBOARD --- */
-        .g-main-count { background: linear-gradient(90deg, #151621 0%, #1a1b26 100%); border: 1px solid var(--border); padding: 20px; border-radius: 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; border-left: 4px solid var(--accent); }
-        .g-title { font-size:18px; font-weight:800; color:#fff; }
-        .g-sub { font-size:11px; color:#666; font-family:var(--font-mono); }
-        .g-cost-val { font-size:24px; font-weight:800; color:#fff; }
-        
-        .cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-        .res-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; position: relative; }
-        .rc-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 10px; }
-        .rc-val { font-size: 22px; font-weight: 800; color: #fff; }
-        .rc-sub { font-size: 9px; color: #444; margin-top: 5px; text-transform: uppercase; }
+        /* --- MAIN CONTENT --- */
+        .main-view { flex: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0b0c15 100%); }
 
+        /* DASHBOARD HEADER */
+        .dash-header { 
+            background: linear-gradient(90deg, #151621 0%, #1a1b26 100%);
+            border: 1px solid var(--border); border-left: 4px solid var(--cyan);
+            padding: 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .dh-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 5px; }
+        .dh-sub { font-size: 11px; color: #666; font-family: var(--font-code); }
+        .dh-cost { text-align: right; }
+        .dh-cost-val { font-size: 28px; font-weight: 800; color: #fff; }
+        .dh-cost-unit { font-size: 14px; color: var(--dovx); font-weight: 700; }
+
+        /* CARDS GRID */
+        .top-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { 
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; 
+            padding: 15px; text-align: center; position: relative; overflow: hidden;
+        }
+        .sc-lbl { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+        .sc-val { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+        .sc-sub { font-size: 9px; color: #444; margin-top: 5px; text-transform: uppercase; }
+
+        /* LISTS GRID */
         .lists-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .list-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; min-height: 200px; }
-        .lp-header { background: #1a1c29; padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .lp-title { font-weight: 700; color: #ccc; font-size: 11px; text-transform: uppercase; }
-        .badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; background: #252838; border: 1px solid #333; color: #fff; font-family: var(--font-mono); }
-        .badge-cost { border-color: rgba(224, 86, 253, 0.3); color: var(--dovx); background: rgba(224, 86, 253, 0.05); }
-
-        .t-header { display: grid; grid-template-columns: 3fr 0.5fr 1.5fr 1.5fr; padding: 8px 15px; font-size: 9px; color: #555; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #222; background: rgba(0,0,0,0.2); }
-        .t-row { display: grid; grid-template-columns: 3fr 0.5fr 1.5fr 1.5fr; padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 11px; align-items: center; color: #eee; }
-        .t-row:hover { background: rgba(255,255,255,0.03); }
-        .t-act { color: var(--accent); font-weight: bold; text-align: center; }
-        .t-val { text-align: right; font-family: var(--font-mono); color: #fff; }
-        .t-val-dim { text-align: right; font-family: var(--font-mono); color: #777; }
-
-        /* --- ZONES & ECO --- */
-        .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .zone { background: #1e202e; border: 1px solid var(--border); padding: 15px; border-radius: 8px; transition:0.2s; position:relative; overflow:hidden; }
-        .zone:hover { border-color: var(--accent); } .zone.active { border-color: var(--primary); background: #151621; }
-        .z-head { display:flex; justify-content:space-between; font-weight:bold; color:#fff; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px; }
-        .z-metric { display:flex; justify-content:space-between; font-size:10px; margin-bottom:3px; }
-        .z-val { color: var(--text-main); font-family: var(--font-mono); }
-
-        .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .eco-card { background: #1e202e; border: 1px solid var(--border); padding: 20px; border-radius: 12px; }
-        .eco-title { color:#666; font-size:10px; text-transform:uppercase; margin-bottom:10px; font-weight:700; }
-        .eco-val { color:#fff; font-size:24px; font-weight:800; }
+        .list-box { 
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; 
+            display: flex; flex-direction: column; min-height: 250px; overflow: hidden;
+        }
         
-        /* --- TARGET LISTS --- */
-        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
-        .b-card { background: #1e202e; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size:11px; }
+        .lb-header { 
+            background: #1e202e; padding: 10px 15px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .lb-title { font-weight: 800; font-size: 12px; color: #fff; text-transform: uppercase; }
+        
+        .badges-row { display: flex; gap: 5px; }
+        .badge-info { 
+            background: #252838; border: 1px solid #333; color: #ccc; 
+            padding: 2px 6px; font-size: 10px; border-radius: 3px; font-family: var(--font-code); 
+        }
+        .badge-dovx { border-color: var(--dovx); color: var(--dovx); background: rgba(224, 86, 253, 0.1); }
 
+        /* DATA TABLE STYLE */
+        .tbl-header { 
+            display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; 
+            padding: 8px 12px; font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; 
+            background: rgba(0,0,0,0.2); border-bottom: 1px solid #222;
+        }
+        .tbl-row { 
+            display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; 
+            padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); 
+            font-size: 11px; align-items: center; color: #eee; 
+        }
+        .tbl-row:hover { background: rgba(255,255,255,0.05); }
+        
+        .col-name { font-weight: 600; color: #dcdde1; }
+        .col-act { color: var(--text-muted); font-size: 10px; text-align: right; }
+        .col-act b { color: #fff; }
+        .col-val { text-align: right; font-family: var(--font-code); font-weight: 700; }
+        .col-tot { text-align: right; font-family: var(--font-code); color: #ccc; }
+
+        /* COLORS */
+        .c-fuel { color: var(--fuel); } .b-fuel { border-top: 3px solid var(--fuel); }
+        .c-health { color: var(--health); } .b-health { border-top: 3px solid var(--health); }
+        .c-repair { color: var(--repair); } .b-repair { border-top: 3px solid var(--repair); }
+        .c-supply { color: var(--supply); } .b-supply { border-top: 3px solid var(--supply); }
+
+        /* ZONES & ECO SPECIFIC */
+        .zones-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .zone-card { 
+            background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; 
+            transition: 0.2s; position: relative;
+        }
+        .zone-card:hover { border-color: var(--cyan); background: #1a1b29; }
+        .zone-card.active { border-color: var(--blue); background: rgba(52, 152, 219, 0.1); }
+        
+        .zc-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 11px; color: #fff; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
+        .zc-row { display: flex; justify-content: space-between; font-size: 10px; margin-top: 2px; font-family: var(--font-code); }
+        .zc-cost { color: var(--red); } .zc-tups { color: var(--text-muted); }
+
+        .eco-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .eco-box { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 6px; }
+        .eco-lbl { font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; }
+        .eco-num { font-size: 20px; font-weight: 800; color: #fff; margin-top: 5px; }
+
+        /* TARGET */
+        .build-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .bld-card { background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-size: 11px; }
+        
         /* UTILS */
-        .border-fuel::before { background: var(--fuel); } .txt-fuel { color: var(--fuel); }
-        .border-health::before { background: var(--health); } .txt-health { color: var(--health); }
-        .border-repair::before { background: var(--repair); } .txt-repair { color: var(--repair); }
-        .border-supply::before { background: var(--supply); } .txt-supply { color: var(--supply); }
         .view-section { display: none; }
-        #systemBadge { position: absolute; top: 15px; right: 20px; font-size: 10px; color: #555; }
-        
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--panel-border); width: 700px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .modal-head { padding: 15px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .modal-close { cursor: pointer; color: var(--text-muted); font-size: 20px; transition: 0.2s; }
-        .modal-close:hover { color: #fff; }
-        .modal-body { padding: 15px; overflow-y: auto; color: #ccc; font-size: 11px; }
-        .set-group { margin-bottom: 15px; border: 1px solid #333; padding: 10px; }
-        .set-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display:block; border-bottom:1px solid #444; padding-bottom:3px; }
+        .active-view { display: block; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
+        .modal-win { width: 600px; background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
         textarea { width: 100%; height: 100px; background: #0b0c15; color: #ccc; border: 1px solid #333; font-family: monospace; padding: 10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="brand">
+    <div class="logo-area">
         <div class="logo-dot"></div>
-        <h1>DoV COMMAND <span class="version">V185</span></h1>
+        <h1>DoV COMMAND V187</h1>
     </div>
-    <div id="systemBadge">SYSTEM READY</div>
+    <div class="sys-badge" id="statusBadge">SYSTEM READY</div>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="panel-group">
-            <span class="group-label">OPERATIONS</span>
-            <div class="box-framed">
-                <div class="btn-row">
-                    <button class="btn-green" onclick="dispatchGlobalScan()">GLOBAL SCAN</button>
-                    <button class="btn-red" onclick="stopSignal=true">STOP</button>
-                </div>
-                <div class="btn-row">
-                    <button class="btn-teal" onclick="startZoneScan()">ZONES</button>
-                    <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
-                </div>
+        <div class="panel-box">
+            <span class="panel-title">GLOBAL OPERATIONS</span>
+            <div class="btn-row">
+                <button class="btn-cyan" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
+                <button class="btn-red" onclick="stopSignal=true">STOP</button>
+            </div>
+            <div class="btn-row">
+                <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
+                <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
             </div>
         </div>
 
-        <div class="panel-group">
-            <span class="group-label">TARGET ACCOUNT</span>
-            <div class="box-framed">
-                <input type="text" id="targetIn" value="u2d2k.c.wam">
-                <div class="btn-row">
-                    <button class="btn-blue" onclick="startTargetDivisions()">DIVISIONS</button>
-                    <button class="btn-blue" onclick="startTargetBuildings()">BUILDINGS</button>
-                </div>
+        <div class="panel-box">
+            <span class="panel-title">TARGET ACCOUNT</span>
+            <input type="text" id="targetIn" value="u2d2k.c.wam">
+            <div class="btn-row">
+                <button class="btn-dark" onclick="startTargetDivisions()">DIVISIONS</button>
+                <button class="btn-dark" onclick="startTargetBuildings()">BUILDINGS</button>
             </div>
         </div>
 
-        <div class="panel-group" style="margin-top:auto">
-            <span class="group-label">SYSTEM</span>
-            <div class="box-framed">
-                <div style="font-size:10px; margin-bottom:5px;">TEMPLATES: <b id="dictSize" style="color:#fff">0</b></div>
-                <button class="btn-ghost" onclick="openSettings()">SETTINGS</button>
-                <button class="btn-ghost" onclick="hardReset()" style="color:var(--alert)">FACTORY RESET</button>
-            </div>
+        <div class="panel-box">
+            <span class="panel-title">CONFIGURATION</span>
+            <div style="font-size:10px; margin-bottom:5px;">Templates: <b id="dictSize" style="color:#fff">0</b></div>
+            <button class="btn-ghost" onclick="openSettings()">EDIT SETTINGS</button>
+            <button class="btn-ghost" onclick="hardReset()" style="color:var(--red)">FACTORY RESET</button>
         </div>
     </aside>
 
     <main class="main-view">
         
-        <div id="globalView" class="view-section" style="display:block;">
-            <div class="g-main-count">
+        <div id="viewGlobal" class="view-section active-view">
+            <div class="dash-header">
                 <div>
-                    <div class="g-title">GLOBAL SCAN LIVE</div>
-                    <div class="g-sub">Rows: <b id="cntRows">0</b> &nbsp;|&nbsp; Assets: <b id="cntAssets">0</b></div>
+                    <div class="dh-title">GLOBAL SCAN LIVE</div>
+                    <div class="dh-sub">Rows: <span id="cntRows">0</span> &bull; Assets: <span id="cntAssets">0</span></div>
                 </div>
-                <div class="g-cost-box">
-                    <div class="g-cost-lbl">TOTAL MAINTENANCE</div>
-                    <div><span class="g-cost-val" id="gTotalCost">0</span> <span class="g-cost-curr">DOVX</span></div>
+                <div class="dh-cost">
+                    <div class="sc-lbl">TOTAL MAINTENANCE</div>
+                    <div><span class="dh-cost-val" id="gTotalCost">0</span> <span class="dh-cost-unit">DOVX</span></div>
                 </div>
             </div>
-            <div class="cards-container" id="dynamicCardsArea"></div>
-            <div class="lists-grid" id="dynamicListsArea"></div>
+
+            <div class="top-grid" id="areaCards"></div>
+
+            <div class="lists-grid" id="areaLists"></div>
         </div>
 
-        <div id="zoneView" class="view-section">
-            <div class="g-main-count" style="border-left-color: var(--accent);">
-                <div class="g-title">ZONE ACTIVITY MAP</div>
-                <div class="g-sub" id="zoneStatus">Waiting for scan...</div>
+        <div id="viewZones" class="view-section">
+            <div class="dash-header" style="border-left-color: var(--blue)">
+                <div class="dh-title">ZONE ACTIVITY MAP</div>
+                <div class="dh-sub" id="zoneStatus">Ready to scan.</div>
             </div>
-            <div class="zones-grid" id="zonesArea"></div>
+            <div class="zones-container" id="areaZones"></div>
         </div>
 
-        <div id="ecoView" class="view-section">
-             <div class="g-main-count" style="border-left-color: var(--gold);">
-                <div class="g-title">ECONOMY WATCH</div>
-                <div class="g-sub" id="ecoStatus">Waiting for scan...</div>
+        <div id="viewEco" class="view-section">
+            <div class="dash-header" style="border-left-color: var(--orange)">
+                <div class="dh-title">ECONOMY METRICS</div>
+                <div class="dh-sub" id="ecoStatus">Ready to scan.</div>
             </div>
-            <div class="eco-grid">
-                <div class="eco-card"><div class="eco-title">GLOBAL DEMAND</div><div class="eco-val" id="valDemandTU">0</div></div>
-                <div class="eco-card"><div class="eco-title">ACTIVE ZONES</div><div class="eco-val" id="valActiveZones">0</div></div>
-                <div class="eco-card"><div class="eco-title">DOVX BURN</div><div class="eco-val" id="valEcoBurn">0</div></div>
+            <div class="eco-stats">
+                <div class="eco-box"><div class="eco-lbl">DEMAND (TU/DAY)</div><div class="eco-num" id="valDemandTU">0</div></div>
+                <div class="eco-box"><div class="eco-lbl">ACTIVE ZONES</div><div class="eco-num" id="valActiveZones">0</div></div>
+                <div class="eco-box"><div class="eco-lbl">DOVX BURN ESTIMATE</div><div class="eco-num" id="valDovxBurn">0</div></div>
             </div>
         </div>
 
-        <div id="targetBuildView" class="view-section">
-            <div class="g-main-count" style="border-left-color: #3498db;">
-                <div class="g-title">PLAYER BUILDINGS</div>
-                <div class="g-sub" id="buildStatus">Ready to scan...</div>
+        <div id="viewTarget" class="view-section">
+            <div class="dash-header" style="border-left-color: var(--purple)">
+                <div class="dh-title">TARGET INSPECTOR</div>
+                <div class="dh-sub" id="targetStatus">Ready.</div>
             </div>
-            <div id="buildList" class="build-grid"></div>
-        </div>
-
-        <div id="targetDivView" class="view-section">
-            <div class="g-main-count" style="border-left-color: #3498db;">
-                <div class="g-title">PLAYER DIVISIONS</div>
-                <div class="g-sub" id="divStatus">Ready to scan...</div>
-            </div>
-            <div id="divList" class="build-grid"></div>
+            <div id="areaTarget" class="build-list"></div>
         </div>
 
     </main>
 </div>
 
 <div class="modal-overlay" id="settingsModal">
-    <div class="modal-box">
-        <div class="modal-head">
-            <div class="modal-title">CONFIGURATION</div>
-            <div class="modal-close" onclick="closeModal('settingsModal')">×</div>
-        </div>
-        <div class="modal-body">
-            <div class="set-group"><span class="set-title">INTERFACE</span><textarea id="cfgResources"></textarea></div>
-            <div class="set-group"><span class="set-title">RÈGLES</span><textarea id="cfgGameRules"></textarea></div>
-            <div class="set-group"><span class="set-title">ZONES</span><textarea id="cfgZones"></textarea></div>
-            <div class="set-group"><span class="set-title">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
-            <button class="btn-green" onclick="saveConfig()">SAVE</button>
+    <div class="modal-win">
+        <h3 style="margin-top:0; color:#fff">CONFIGURATION</h3>
+        <span class="panel-title">RESOURCES UI</span>
+        <textarea id="cfgResources"></textarea>
+        <span class="panel-title">GAME RULES</span>
+        <textarea id="cfgGameRules"></textarea>
+        <span class="panel-title">ZONES</span>
+        <textarea id="cfgZones"></textarea>
+        <span class="panel-title">TEMPLATES</span>
+        <textarea id="cfgTemplates"></textarea>
+        <div style="text-align:right; margin-top:10px;">
+            <button class="btn-cyan" style="width:auto" onclick="saveConfig()">SAVE & RELOAD</button>
+            <button class="btn-ghost" style="width:auto" onclick="closeModal('settingsModal')">CANCEL</button>
         </div>
     </div>
 </div>
 
 <script>
     // --- UTILS ---
-    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
-    function switchView(id) {
-        document.querySelectorAll('.view-section').forEach(e => e.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-    }
-    function setTextSafe(id, val) { let e=document.getElementById(id); if(e) e.innerText=val; }
+    const getId = (id) => document.getElementById(id);
+    const closeModal = (id) => getId(id).style.display = 'none';
+    const switchView = (id) => {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view'));
+        getId(id).classList.add('active-view');
+    };
+    const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+    const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DEFAULT DATA ---
+    // --- DEFAULT DATA (STRICT) ---
     const DEFAULT_DATA = {
         resourceDefs: {
-            "F": { label: "FUEL", color: "#e67e22", css: "border-fuel", txt: "txt-fuel" },
-            "H": { label: "HEALTH", color: "#e74c3c", css: "border-health", txt: "txt-health" },
-            "R": { label: "REPAIR", color: "#3498db", css: "border-repair", txt: "txt-repair" },
-            "S": { label: "SUPPLY", color: "#feca57", css: "border-supply", txt: "txt-supply" }
+            "F": { label: "FUEL", color: "#e67e22", css: "b-fuel", txt: "c-fuel" },
+            "H": { label: "HEALTH", color: "#e74c3c", css: "b-health", txt: "c-health" },
+            "R": { label: "REPAIR", color: "#3498db", css: "b-repair", txt: "c-repair" },
+            "S": { label: "SUPPLY", color: "#feca57", css: "b-supply", txt: "c-supply" }
         },
-        gameConfig: {
-            maintenanceCost: 0.085,
-            cycleHours: 24,
-            tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" }
-        },
+        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
             5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
@@ -294,219 +353,283 @@
         }
     };
 
-    let CORE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false; 
 
-    function initApp() {
-        const stored = localStorage.getItem('DOV_DATA');
-        if(stored) { try { let loaded = JSON.parse(stored); CORE_DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...(loaded.templates||{}) } }; } catch(e){} }
-        document.getElementById('dictSize').innerText = Object.keys(CORE_DATA.templates).length;
-        initUI();
+    // --- APP START ---
+    function init() {
+        const local = localStorage.getItem('DOV_DATA');
+        if(local) { try { DATA = { ...DEFAULT_DATA, ...JSON.parse(local) }; } catch(e){} }
+        getId('dictSize').innerText = Object.keys(DATA.templates).length;
+        buildUI();
     }
-    
-    function initUI() {
-        const c = document.getElementById('dynamicCardsArea'); 
-        const l = document.getElementById('dynamicListsArea');
-        c.innerHTML = ""; l.innerHTML = "";
-        
-        for(let k in CORE_DATA.resourceDefs) {
-            let r = CORE_DATA.resourceDefs[k];
-            c.innerHTML += `<div class="res-card ${r.css}"><div class="rc-label">${r.label}</div><div class="rc-val" style="color:${r.color}" id="pwr-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
-            l.innerHTML += `
+
+    function buildUI() {
+        const areaC = getId('areaCards');
+        const areaL = getId('areaLists');
+        areaC.innerHTML = ''; areaL.innerHTML = '';
+
+        for(let k in DATA.resourceDefs) {
+            let rd = DATA.resourceDefs[k];
+            areaC.innerHTML += `<div class="res-card ${rd.css}"><div class="rc-label">${rd.label}</div><div class="rc-val" style="color:${rd.color}" id="val-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
+            areaL.innerHTML += `
             <div class="list-panel">
-                <div class="lp-header">
-                    <div class="lp-title">${r.label} BREAKDOWN</div>
-                    <div class="lp-badges"><span class="badge">PROD: <span id="tot-p-${k}">0</span></span><span class="badge badge-cost">COST: <span id="tot-c-${k}">0</span></span></div>
+                <div class="lb-header">
+                    <div class="lb-title">${rd.label} DETAILS</div>
+                    <div class="badges-row"><span class="badge-info">PROD: <span id="btot-${k}">0</span></span><span class="badge-info badge-dovx">COST: <span id="bcost-${k}">0</span></span></div>
                 </div>
-                <div class="t-header"><span>TEMPLATE</span><span>ACT</span><span style="text-align:right">TOT/H</span><span style="text-align:right">TOT/24H</span></div>
-                <div class="t-body" id="list-${k}"></div>
+                <div class="tbl-header"><span>TEMPLATE</span><span>ACTIVE</span><span style="text-align:right">UNIT</span><span style="text-align:right">TOTAL/H</span></div>
+                <div id="tbl-${k}"></div>
             </div>`;
         }
     }
 
-    function hardReset() { if(confirm("FACTORY RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
-    
-    // --- API ---
-    async function fetchRows(code, table, scope, limit, lower) {
-        try {
-            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
-                method: 'POST',
-                body: JSON.stringify({ json:true, code:code, scope:scope, table:table, limit:limit, lower_bound:lower })
-            });
-            return await res.json();
-        } catch(e) { return { rows: [] }; }
-    }
-
-    // --- CORE LOGIC (NOMINAL) ---
-    function conformData(row) {
+    // --- LOGIC (NO VISUAL STACK) ---
+    function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1;
-        let tpl = CORE_DATA.templates[tid];
-        let name = tpl ? tpl.name : `UNKNOWN [${tid}]`;
+        
+        let tpl = DATA.templates[tid];
+        let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
-        let totalHourly = count * nominal;
-        let totalDaily = totalHourly * CORE_DATA.gameConfig.cycleHours;
-        let cost = totalDaily * CORE_DATA.gameConfig.maintenanceCost;
-        let rawStr = (Array.isArray(row.power)?row.power[0]:row.power) || "";
-        let type = "F"; 
-        for(let t in CORE_DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = CORE_DATA.gameConfig.tokenMap[t]; break; }
-        return { name, type, count, totalHourly, totalDaily, cost };
+
+        // Strict Math: count * nominal from config
+        let hourly = count * nominal;
+        let daily = hourly * DATA.gameConfig.cycleHours;
+        let cost = daily * DATA.gameConfig.maintenanceCost;
+
+        // Type
+        let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
+        let type = "F";
+        for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
+
+        return { name, type, count, hourly, daily, cost, nominal };
     }
 
     // --- 1. GLOBAL SCAN ---
     async function dispatchGlobalScan() {
-        stopSignal = false; switchView('globalView');
-        let next = ""; let stats = { F:{p:0, c:0}, H:{p:0, c:0}, R:{p:0, c:0}, S:{p:0, c:0}, totalCost:0 };
-        let groups = { F:[], H:[], R:[], S:[] }; let rows=0, assets=0;
+        stopSignal = false; switchView('viewGlobal');
+        getId('cntRows').innerText = "...";
         
-        while(!stopSignal) {
-            let data = await fetchRows("dovutilstake", "buildings", "dovutilstake", 1000, next);
-            if(!data.rows || data.rows.length === 0) break;
-            const now = Date.now()/1000;
-            
-            for(let row of data.rows) {
-                rows++; let info = conformData(row); assets += info.count;
-                let active = now < (parseFloat(row.last_claim) + parseFloat(row.delay));
-                if(active) {
-                    let existing = groups[info.type].find(x => x.name === info.name);
-                    if(existing) { existing.act += info.count; existing.totH += info.totalHourly; existing.totD += info.totalDaily; }
-                    else { groups[info.type].push({ name:info.name, act:info.count, totH:info.totalHourly, totD:info.totalDaily }); }
-                    stats[info.type].p += info.totalHourly; stats[info.type].c += info.cost; stats.totalCost += info.cost;
+        let next = "";
+        let stats = { totalCost:0, types:{} };
+        let groups = {};
+        for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
+        let rowCount = 0; let assetCount = 0;
+
+        try {
+            while(!stopSignal) {
+                let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                    method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})
+                });
+                let json = await res.json();
+                if(!json.rows || json.rows.length === 0) break;
+
+                const now = Date.now()/1000;
+                for(let r of json.rows) {
+                    rowCount++;
+                    let d = processRow(r);
+                    assetCount += d.count;
+                    
+                    let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
+                    if(active) {
+                        let existing = groups[d.type].find(x => x.name === d.name);
+                        if(existing) {
+                            existing.act += d.count;
+                            existing.totH += d.hourly;
+                            existing.totC += d.cost;
+                        } else {
+                            // NO STACK SAVED HERE
+                            groups[d.type].push({ name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totC:d.cost });
+                        }
+                        
+                        stats.types[d.type].p += d.hourly;
+                        stats.types[d.type].c += d.cost;
+                        stats.totalCost += d.cost;
+                    }
                 }
+                
+                updateGlobalUI(rowCount, assetCount, stats, groups);
+                if(json.more) next = json.next_key; else break;
+                await new Promise(r => setTimeout(r, 50));
             }
-            updateGlobalUI(rows, assets, stats, groups);
-            if(data.more) next = data.next_key; else break;
-            await new Promise(r => setTimeout(r, 50));
-        }
+        } catch(e) { console.error(e); }
     }
 
-    function updateGlobalUI(r, a, s, g) {
-        document.getElementById('cntRows').innerText = r; document.getElementById('cntAssets').innerText = a;
-        document.getElementById('gTotalCost').innerText = Math.floor(s.totalCost).toLocaleString();
-        for(let k in CORE_DATA.resourceDefs) {
-            document.getElementById(`pwr-${k}`).innerText = s[k].p.toLocaleString(undefined, {maximumFractionDigits:2});
-            document.getElementById(`tot-p-${k}`).innerText = s[k].p.toLocaleString(undefined, {maximumFractionDigits:2});
-            document.getElementById(`tot-c-${k}`).innerText = Math.floor(s[k].c).toLocaleString();
+    function updateGlobalUI(rows, assets, stats, groups) {
+        getId('cntRows').innerText = fmt(rows);
+        getId('cntAssets').innerText = fmt(assets);
+        getId('gTotalCost').innerText = fmt(stats.totalCost);
+
+        for(let k in DATA.resourceDefs) {
+            let rd = DATA.resourceDefs[k];
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p);
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p);
+            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+
             let html = "";
-            g[k].sort((a,b)=>b.totH-a.totH).forEach(i => {
-                html += `<div class="t-row"><div class="t-name">${i.name}</div><div class="t-act">${i.act}</div><div class="t-val ${CORE_DATA.resourceDefs[k].txt}">${i.totH.toLocaleString(undefined,{maximumFractionDigits:2})}</div><div class="t-val-dim">${i.totD.toLocaleString(undefined,{maximumFractionDigits:2})}</div></div>`;
+            let list = groups[k].sort((a,b) => b.totH - a.totH);
+            
+            list.forEach(i => {
+                // NO BADGE HERE. JUST PLAIN NAME.
+                html += `
+                <div class="tbl-row">
+                    <div class="col-name">${i.name}</div>
+                    <div class="col-act"><b>${i.act}</b> ACTIF</div>
+                    <div class="col-val" style="color:#888">${fmtDec(i.unit)}/h</div>
+                    <div class="col-tot" style="color:${rd.color}">${fmtDec(i.totH)}</div>
+                </div>`;
             });
-            document.getElementById(`list-${k}`).innerHTML = html;
+            getId(`tbl-${k}`).innerHTML = html;
         }
     }
 
     // --- 2. ZONES SCAN ---
     async function startZoneScan() {
-        stopSignal = false; switchView('zoneView');
-        document.getElementById('zoneStatus').innerText = "Scanning...";
-        const grid = document.getElementById('zonesArea'); grid.innerHTML = "";
-        let counts = {}; Object.keys(CORE_DATA.zones).forEach(k => counts[k] = 0);
+        stopSignal = false; switchView('viewZones');
+        getId('zoneStatus').innerText = "Scanning...";
+        getId('areaZones').innerHTML = "";
+        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0);
         let next = "";
-        
+
         while(!stopSignal) {
-            let data = await fetchRows("dovpvecontrl", "sdivisions", "dovpvecontrl", 1000, next);
-            if(!data.rows) break;
-            for(let row of data.rows) { let id = row.zone_id || row.zoneID; if(counts[id] !== undefined) counts[id]++; }
+            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
+            });
+            let json = await res.json();
+            if(!json.rows) break;
+            for(let r of json.rows) {
+                let id = r.zone_id || r.zoneID;
+                if(counts[id] !== undefined) counts[id]++;
+            }
             
             let html = "";
             Object.keys(counts).forEach(id => {
-                let z = CORE_DATA.zones[id];
-                let css = counts[id] > 0 ? "active" : "";
-                html += `<div class="zone ${css}"><div class="z-head"><span>${z.name}</span><span>${counts[id]}</span></div><div class="z-metric"><span>COST</span><span class="z-val">${z.cost} TU</span></div></div>`;
+                let z = DATA.zones[id];
+                let activeClass = counts[id] > 0 ? "active" : "";
+                html += `
+                <div class="zone-card ${activeClass}">
+                    <div class="zc-header"><span>${z.name}</span><span>${counts[id]}</span></div>
+                    <div class="zc-row"><span class="zc-tups">COST:</span><span class="zc-cost">${z.cost} TU</span></div>
+                </div>`;
             });
-            grid.innerHTML = html;
-            if(data.more) next = data.next_key; else break;
+            getId('areaZones').innerHTML = html;
+            if(!json.more) break; next = json.next_key;
             await new Promise(r => setTimeout(r, 50));
         }
-        document.getElementById('zoneStatus').innerText = "Scan Complete";
+        getId('zoneStatus').innerText = "Scan Complete";
     }
 
     // --- 3. ECONOMY SCAN ---
     async function startEconomyScan() {
-        stopSignal = false; switchView('ecoView');
-        document.getElementById('ecoStatus').innerText = "Scanning...";
-        let dTU = 0, activeZones = 0, next = "";
+        stopSignal = false; switchView('viewEco');
+        getId('ecoStatus').innerText = "Scanning...";
+        let next = "";
+        let dTU = 0, activeZ = 0;
+
         while(!stopSignal) {
-            let data = await fetchRows("dovpvecontrl", "sdivisions", "dovpvecontrl", 1000, next);
-            if(!data.rows) break;
-            for(let r of data.rows) {
-                let id = r.zone_id; let z = CORE_DATA.zones[id];
-                if(z && z.cost > 0) { dTU += z.cost; activeZones++; }
+            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
+            });
+            let json = await res.json();
+            if(!json.rows) break;
+            
+            for(let r of json.rows) {
+                let z = DATA.zones[r.zone_id];
+                if(z && z.cost > 0) { dTU += z.cost; activeZ++; }
             }
-            document.getElementById('valDemandTU').innerText = dTU.toLocaleString();
-            document.getElementById('valActiveZones').innerText = activeZones.toLocaleString();
-            if(data.more) next = data.next_key; else break;
+            
+            getId('valDemandTU').innerText = fmt(dTU);
+            getId('valActiveZones').innerText = fmt(activeZ);
+            
+            if(!json.more) break; next = json.next_key;
             await new Promise(r => setTimeout(r, 50));
         }
-        document.getElementById('ecoStatus').innerText = "Scan Complete";
+        getId('ecoStatus').innerText = "Scan Complete";
     }
 
-    // --- 4. TARGET BUILDINGS ---
+    // --- 4. TARGET SCANS ---
     async function startTargetBuildings() {
-        stopSignal = false; switchView('targetBuildView');
-        let user = document.getElementById('targetIn').value;
-        document.getElementById('buildStatus').innerText = "Scanning " + user + "...";
-        let el = document.getElementById('buildList'); el.innerHTML = "";
-        let next = ""; let html = "";
+        stopSignal = false; switchView('viewTarget');
+        let user = getId('targetIn').value.trim();
+        getId('targetStatus').innerText = "Buildings of " + user;
+        getId('areaTarget').innerHTML = "Scanning...";
         
+        let next = ""; let html = "";
         while(!stopSignal) {
-            let data = await fetchRows("dovutilstake", "buildings", user, 1000, next);
-            if(!data.rows) break;
-            for(let row of data.rows) {
-                let info = conformData(row);
-                let color = DEFAULT_DATA.resourceDefs[info.type].color;
-                html += `<div class="b-card" style="border-left:3px solid ${color}"><div class="b-head" style="color:${color}">${info.name}</div><div class="b-sub">ACTIVE: ${info.count}</div><div class="b-stat">${info.totalHourly.toLocaleString()} /h</div></div>`;
+            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next})
+            });
+            let json = await res.json();
+            if(!json.rows) break;
+            
+            for(let r of json.rows) {
+                let d = processRow(r);
+                let col = DATA.resourceDefs[d.type].color;
+                html += `
+                <div class="bld-card" style="border-left:3px solid ${col}">
+                    <div style="font-weight:bold; color:${col}">${d.name}</div>
+                    <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                        <span>QTY: ${d.count}</span>
+                        <span style="color:#fff; font-weight:700">${fmtDec(d.hourly)} /h</span>
+                    </div>
+                </div>`;
             }
-            el.innerHTML = html;
-            if(data.more) next = data.next_key; else break;
+            getId('areaTarget').innerHTML = html || "No buildings found.";
+            if(!json.more) break; next = json.next_key;
         }
-        document.getElementById('buildStatus').innerText = "Scan Complete";
     }
 
-    // --- 5. TARGET DIVISIONS ---
     async function startTargetDivisions() {
-        stopSignal = false; switchView('targetDivView');
-        let user = document.getElementById('targetIn').value;
-        document.getElementById('divStatus').innerText = "Scanning " + user + "...";
-        let el = document.getElementById('divList'); el.innerHTML = "";
-        let next = ""; let html = "";
+        stopSignal = false; switchView('viewTarget');
+        let user = getId('targetIn').value.trim();
+        getId('targetStatus').innerText = "Divisions of " + user;
+        getId('areaTarget').innerHTML = "Scanning...";
         
+        let next = ""; let html = "";
         while(!stopSignal) {
-            let data = await fetchRows("dovpvecontrl", "sdivisions", user, 1000, next);
-            if(!data.rows) break;
-            for(let row of data.rows) {
-                let id = row.zone_id; let z = CORE_DATA.zones[id];
-                html += `<div class="b-card"><div class="b-head">${z ? z.name : 'Zone '+id}</div><div class="b-sub">#${row.division_id}</div><div class="b-stat" style="color:var(--accent)">READY</div></div>`;
+            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next})
+            });
+            let json = await res.json();
+            if(!json.rows) break;
+            
+            for(let r of json.rows) {
+                let z = DATA.zones[r.zone_id];
+                html += `
+                <div class="bld-card" style="border-left:3px solid var(--accent)">
+                    <div style="font-weight:bold; color:#fff">${z ? z.name : 'Zone '+r.zone_id}</div>
+                    <div style="color:var(--accent); text-align:right; font-weight:bold;">READY / ENGAGED</div>
+                </div>`;
             }
-            el.innerHTML = html;
-            if(data.more) next = data.next_key; else break;
+            getId('areaTarget').innerHTML = html || "No divisions found.";
+            if(!json.more) break; next = json.next_key;
         }
-        document.getElementById('divStatus').innerText = "Scan Complete";
     }
 
     // --- SETTINGS ---
     function openSettings() {
-        document.getElementById('cfgGameRules').value = JSON.stringify(CORE_DATA.gameConfig, null, 4);
-        document.getElementById('cfgTemplates').value = JSON.stringify(CORE_DATA.templates, null, 4);
-        document.getElementById('cfgResources').value = JSON.stringify(CORE_DATA.resourceDefs, null, 4);
-        document.getElementById('cfgZones').value = JSON.stringify(CORE_DATA.zones, null, 4);
-        document.getElementById('settingsModal').style.display = 'flex';
+        getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4);
+        getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4);
+        getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4);
+        getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4);
+        getId('settingsModal').style.display = 'flex';
     }
     function saveConfig() {
         try {
-            CORE_DATA.gameConfig = JSON.parse(document.getElementById('cfgGameRules').value);
-            CORE_DATA.templates = JSON.parse(document.getElementById('cfgTemplates').value);
-            CORE_DATA.resourceDefs = JSON.parse(document.getElementById('cfgResources').value);
-            CORE_DATA.zones = JSON.parse(document.getElementById('cfgZones').value);
-            localStorage.setItem('DOV_DATA', JSON.stringify(CORE_DATA));
+            DATA.resourceDefs = JSON.parse(getId('cfgResources').value);
+            DATA.gameConfig = JSON.parse(getId('cfgGameRules').value);
+            DATA.zones = JSON.parse(getId('cfgZones').value);
+            DATA.templates = JSON.parse(getId('cfgTemplates').value);
+            localStorage.setItem('DOV_DATA', JSON.stringify(DATA));
             closeModal('settingsModal');
-            initUI();
-        } catch(e) { alert("JSON Error"); }
+            init();
+        } catch(e) { alert("JSON ERROR"); }
     }
-    function resetConfig() { localStorage.removeItem('DOV_DATA'); location.reload(); }
-    function updateDictionary() { alert("Simulated Update"); }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
+    function updateDictionary() { alert("Use Settings to paste new dictionary."); }
 
-    window.onload = initApp;
+    window.onload = init;
 </script>
 </body>
 </html>
