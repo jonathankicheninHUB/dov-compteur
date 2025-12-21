@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V206 (INSPECTOR STABLE)</title>
+    <title>DoV - COMMAND V207 (STABLE & LOGS)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 CORE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -37,7 +37,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- HEADER & CARDS --- */
+        /* --- HEADER & METRICS --- */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -59,6 +59,7 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
+        /* 7 COLS */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -69,9 +70,9 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        .name-link { cursor: pointer; color: var(--text-main); font-weight: 600; display: flex; align-items: center; transition: 0.2s; }
-        .name-link:hover { color: var(--blue); }
-        .ico-inspect { margin-left: 5px; font-size: 10px; opacity: 0.5; }
+        .template-link { cursor: pointer; color: var(--text-main); font-weight: 600; display: flex; align-items: center; transition: 0.2s; }
+        .template-link:hover { color: var(--blue); }
+        .ico-link { margin-left: 5px; opacity: 0.6; font-size: 10px; }
 
         .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); }
         .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); }
@@ -100,7 +101,7 @@
         .ins-table td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 20px; color: #ccc; }
         .ins-table tr:hover { background: rgba(255,255,255,0.05); }
         
-        a.ext { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; }
+        a.ext { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; font-weight:700; }
         a.ext:hover { border-bottom-color: var(--blue); color: #fff; }
     </style>
 </head>
@@ -108,7 +109,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V206</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V207</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -141,6 +142,7 @@
     </aside>
 
     <main class="main-content">
+        
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
                 <div>
@@ -183,6 +185,7 @@
             </div>
             <div id="areaTarget" class="tables-grid" style="grid-template-columns: 1fr;"></div>
         </div>
+
     </main>
 </div>
 
@@ -207,7 +210,7 @@
 <div class="modal-overlay" id="detailModal">
     <div class="modal-box">
         <div class="modal-header">
-            <span class="modal-title" id="detailTitle">TEMPLATE INSPECTOR</span>
+            <span class="modal-title" id="detailTitle">INSPECTOR</span>
             <button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button>
         </div>
         <div class="modal-body" id="detailBody"></div>
@@ -215,7 +218,6 @@
 </div>
 
 <script>
-    // --- CORE & UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -291,12 +293,11 @@
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let SCAN_DETAILS = {}; // MASTER STORAGE FOR DRILL-DOWN
+    let SCAN_DETAILS = {}; 
     let stopSignal = false;
 
     function init() {
-        // FORCE REFRESH TO AVOID CACHE ISSUES
-        const local = localStorage.getItem('DOV_DATA_V206');
+        const local = localStorage.getItem('DOV_DATA_V207');
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
@@ -322,10 +323,12 @@
         }
     }
 
+    // --- STRICT LOGIC: 4 BUILDINGS ---
     function processRow(row) {
         let tid = row.template_id.toString();
-        let assetList = row.asset_ids || [];
-        let count = assetList.length; // STABILITY: 4 Assets = 4 Items in Array
+        // SAFE ARRAY CHECK
+        let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
+        let count = assetList.length; // THE TRUTH: 4 IDs = 4 Buildings
         
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
@@ -338,8 +341,8 @@
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         
-        // Find owner properly 
-        let owner = row.player || row.username || row.owner || "unknown";
+        // Owner Fallback
+        let owner = row.player || row.username || row.owner || row.scope || "unknown";
 
         return { id:tid, name, type, count, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
     }
@@ -347,7 +350,7 @@
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
-        SCAN_DETAILS = {}; // Reset storage
+        SCAN_DETAILS = {}; // Reset details for this scan
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         
@@ -357,8 +360,13 @@
                 let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
                 
                 for(let r of json.rows) {
-                    rowCount++; let d = processRow(r); assetCount += d.count;
-                    // AGGREGATE
+                    rowCount++; 
+                    let d = processRow(r); 
+                    assetCount += d.count;
+                    
+                    // DEBUG LOG TO SEE WHAT HAPPENS
+                    console.log(`Scan: ${d.name} (${d.id}) -> Count: ${d.count}`);
+
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(existing) { 
                         existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; 
@@ -368,7 +376,7 @@
                     }
                     stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
 
-                    // DEEP STORAGE (One entry per row -> Multiple Assets)
+                    // STORE DETAILS BY ID
                     if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
                     d.assets.forEach(assetId => {
                         SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner });
@@ -377,7 +385,7 @@
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("SCAN ERROR:", e); }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -388,12 +396,12 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                // BUTTON CALLS FUNCTION WITH ID ONLY
+                // CLICK EVENT USES ID ONLY
                 html += `
                 <div class="dt-grid dt-row">
                     <div class="cell">
-                        <span class="name-link" onclick="openAssetDetails('${i.id}')">
-                            ${i.name} <span class="ico-inspect">🔍</span>
+                        <span class="template-link" onclick="openAssetDetails('${i.id}')">
+                            ${i.name} <span class="ico-link">🔗</span>
                         </span>
                     </div>
                     <div class="cell c-center" style="color:var(--green); font-weight:700;">${i.act}</div>
@@ -408,21 +416,23 @@
         }
     }
 
-    // --- MODAL LOGIC ---
+    // --- MODAL INSPECTOR ---
     function openAssetDetails(tid) {
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : tid;
         let list = SCAN_DETAILS[tid] || [];
         
-        getId('detailTitle').innerText = `${name} (ID: ${tid}) - ${list.length} ASSETS`;
+        getId('detailTitle').innerText = `${name} (ID: ${tid}) - ${list.length} ASSETS FOUND`;
         
-        let html = `<table class="ins-table"><thead><tr><th>ASSET ID (ATOMIC)</th><th>OWNER (WALLET)</th><th>STATUS</th></tr></thead><tbody>`;
+        let html = `<table class="ins-table"><thead><tr><th>ASSET ID (ATOMIC)</th><th>WALLET OWNER</th><th>STATUS</th></tr></thead><tbody>`;
+        if(list.length === 0) html += `<tr><td colspan="3" style="text-align:center; padding:20px;">NO DATA LOADED YET</td></tr>`;
+        
         list.forEach(item => {
             let assetLink = `${DATA.gameConfig.atomicAsset}/${item.assetId}`;
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
             html += `<tr>
                 <td><a href="${assetLink}" target="_blank" class="ext">${item.assetId} ↗</a></td>
-                <td><a href="${walletLink}" target="_blank" class="ext" style="font-weight:700; color:var(--blue)">${item.owner} ↗</a></td>
+                <td><a href="${walletLink}" target="_blank" class="ext" style="color:var(--blue); font-weight:700;">${item.owner} ↗</a></td>
                 <td style="color:var(--green)">STAKED</td>
             </tr>`;
         });
@@ -474,7 +484,6 @@
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
-                // Link to template on Atomic
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
                 tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="ext">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
@@ -502,8 +511,8 @@
     }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V206', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V206'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V207', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V207'); location.reload(); } }
 
     window.onload = init;
 </script>
