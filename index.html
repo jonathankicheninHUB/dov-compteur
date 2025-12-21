@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V225 (SUPPLY UPDATE)</title>
+    <title>DoV - COMMAND V227 (24H INDICATOR)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -16,6 +16,7 @@
             --blue: #2979ff; 
             --orange: #ff9100;
             --purple: #d500f9;
+            --yellow: #ffea00;
             --text-main: #e0e0e0;
             --text-muted: #858595;
 
@@ -89,7 +90,10 @@
         }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
         .kc-val { font-family: var(--font-num); font-size: 22px; font-weight: 700; color: #fff; margin-top: 5px; }
+        .kc-val-24 { font-family: var(--font-num); font-size: 28px; font-weight: 800; margin-top: 5px; line-height: 1.1; }
+        
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
         /* TABLES GRID (2 COLS) */
@@ -163,12 +167,12 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V225</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V227</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
             <div class="btn-row">
-                <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
+                <button class="btn-green" onclick="dispatchGlobalScan()">SCAN TARGET</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
             </div>
             <div class="btn-row">
@@ -201,7 +205,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">SCANNING CHAIN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <div class="page-meta">SCANNING <span id="scanTargetDisp">...</span> &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -342,7 +346,7 @@
             "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
             "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
 
-            // --- SUPPLY (NEW & UPDATED) ---
+            // --- SUPPLY (NEW) ---
             "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
             "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
             "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
@@ -367,18 +371,9 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V225');
-        if(local) { 
-            try { 
-                let loaded = JSON.parse(local); 
-                // Merge strategies to keep new hardcoded templates if user has old cache
-                DATA = { 
-                    ...DEFAULT_DATA, 
-                    ...loaded, 
-                    templates: { ...DEFAULT_DATA.templates, ...loaded.templates } // Priority to local but structure from default
-                }; 
-            } catch(e){} 
-        }
+        // V227 STORAGE KEY
+        const local = localStorage.getItem('DOV_DATA_V227');
+        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
@@ -393,6 +388,10 @@
                 <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
                 <div class="kc-val" id="val-${k}">0</div>
                 <div class="kc-sub">PROD / HOUR</div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;">
+                    <div class="kc-val val" id="val24-${k}" style="font-size:24px; font-weight:800;">0</div>
+                    <div class="kc-sub" style="color:#aaa">PROD / 24H</div>
+                </div>
             </div>`;
             areaL.innerHTML += `
             <div class="data-panel">
@@ -410,6 +409,7 @@
 
     function processRow(row) {
         let tid = row.template_id.toString();
+        // RULE OF 4 (ARRAY LENGTH)
         let count = row.asset_ids ? row.asset_ids.length : 1;
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
@@ -421,7 +421,7 @@
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; 
         
-        // Improved type detection
+        // AUTO TYPE DETECTION BY NAME (MORE ROBUST)
         if(name.includes("FUEL")) type = "F";
         else if(name.includes("HEALTH")) type = "H";
         else if(name.includes("REPAIR")) type = "R";
@@ -429,22 +429,29 @@
         else {
             for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         }
-
+        
         return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
     }
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        let target = getId('targetIn').value.trim();
+        getId('scanTargetDisp').innerText = target;
+        
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
-                let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
+                // TARGET SCAN ONLY
+                let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:target, table:"buildings", limit:1000, lower_bound:next}) });
                 let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
+                
                 const now = Date.now()/1000;
                 for(let r of json.rows) {
                     rowCount++; let d = processRow(r); assetCount += d.count;
+                    
+                    // REAL TIME ONLY
                     if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
                         let existing = groups[d.type].find(x => x.name === d.name);
                         if(existing) { existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD; }
@@ -462,7 +469,11 @@
         getId('cntRows').innerText = fmt(rows); getId('cntAssets').innerText = fmt(assets); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
+            // NEW 24H INDICATOR UPDATE
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); 
+            
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
@@ -544,8 +555,8 @@
     }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V225', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V225'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V227', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V227'); location.reload(); } }
 
     window.onload = init;
 </script>
