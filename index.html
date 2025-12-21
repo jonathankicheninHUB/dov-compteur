@@ -2,79 +2,117 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V192 (PURE SUMS)</title>
+    <title>DoV - COMMAND V193 (DATA FIX)</title>
     <style>
-        /* --- DESIGN SYSTEM DARK & SHARP --- */
+        /* --- DESIGN SYSTEM DARK WEB3 --- */
         :root {
-            --bg-body: #0b0c15; --bg-panel: #12131f; --bg-card: #161722; --border: #2b2d42;
-            --cyan: #00e676; --purple: #9b59b6; --blue: #3498db; --orange: #e67e22; --red: #e74c3c; --yellow: #f1c40f; --dovx: #e056fd;
-            --text-main: #ffffff; --text-muted: #8d99ae;
-            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; --font-code: 'Consolas', 'Monaco', monospace;
-            /* Resources */
-            --fuel: #e67e22; --health: #e74c3c; --repair: #3498db; --supply: #feca57;
+            --bg-body: #0b0c15; 
+            --bg-panel: #12131f; 
+            --bg-card: #161722; 
+            --border: #2b2d42;
+            
+            --cyan: #00e676; 
+            --purple: #9b59b6;
+            --blue: #3498db;
+            --orange: #e67e22;
+            --red: #e74c3c;
+            --yellow: #f1c40f;
+            --dovx: #e056fd;
+
+            --text-main: #ffffff;
+            --text-muted: #8d99ae;
+            
+            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-code: 'Consolas', 'Monaco', monospace;
         }
 
         /* --- LAYOUT --- */
         body { background-color: var(--bg-body); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0b0c15; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0c15; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 
         /* --- HEADER --- */
-        header { height: 50px; background: rgba(18,19,31,0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100; }
-        .logo-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); margin-right: 10px; }
+        header { 
+            height: 50px; background: rgba(18,19,31,0.95); border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
         h1 { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
         .sys-badge { font-size: 10px; background: #222; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; color: var(--cyan); }
 
         /* --- SIDEBAR --- */
         .layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .sidebar { 
+            width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); 
+            padding: 15px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; 
+        }
+
         .panel-box { border: 1px solid var(--border); background: rgba(255,255,255,0.02); border-radius: 6px; padding: 10px; }
         .panel-title { font-size: 10px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 8px; display: block; }
 
         input { width: 100%; padding: 8px; background: #050508; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: var(--font-code); margin-bottom: 5px; }
+        input:focus { border-color: var(--blue); outline: none; }
+
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: 700; font-size: 10px; text-transform: uppercase; border-radius: 4px; transition: 0.2s; margin-bottom: 5px; }
         button:hover { filter: brightness(1.1); }
-        .btn-cyan { background: var(--cyan); color: #000; } .btn-orange { background: var(--orange); color: #fff; }
-        .btn-blue { background: var(--blue); color: #fff; } .btn-red { background: var(--red); color: #fff; }
-        .btn-dark { background: #2c3e50; color: #fff; border: 1px solid #34495e; } .btn-ghost { background: transparent; border: 1px solid #444; color: #888; }
+        .btn-cyan { background: var(--cyan); color: #000; }
+        .btn-orange { background: var(--orange); color: #fff; }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-dark { background: #2c3e50; color: #fff; border: 1px solid #34495e; }
+        .btn-ghost { background: transparent; border: 1px solid #444; color: #888; }
         .btn-row { display: flex; gap: 5px; }
 
-        /* --- MAIN --- */
+        /* --- MAIN VIEW --- */
         .main-view { flex: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0b0c15 100%); }
 
-        /* DASHBOARD */
-        .dash-header { background: linear-gradient(90deg, #151621 0%, #1a1b26 100%); border: 1px solid var(--border); border-left: 4px solid var(--cyan); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .dash-header { 
+            background: linear-gradient(90deg, #151621 0%, #1a1b26 100%);
+            border: 1px solid var(--border); border-left: 4px solid var(--cyan);
+            padding: 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
         .dh-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 5px; }
         .dh-sub { font-size: 11px; color: #666; font-family: var(--font-code); }
         .dh-cost-val { font-size: 28px; font-weight: 800; color: #fff; }
         .dh-cost-unit { font-size: 14px; color: var(--dovx); font-weight: 700; }
 
+        /* GLOBAL CARDS */
         .top-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 15px; text-align: center; position: relative; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 15px; text-align: center; position: relative; overflow: hidden; }
         .sc-lbl { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; }
         .sc-val { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
         .sc-sub { font-size: 9px; color: #444; margin-top: 5px; text-transform: uppercase; }
 
+        /* LISTS */
         .lists-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .list-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; min-height: 250px; overflow: hidden; }
         .lb-header { background: #1e202e; padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .lb-title { font-weight: 800; font-size: 12px; color: #fff; text-transform: uppercase; }
+        
         .badges-row { display: flex; gap: 5px; }
         .badge-info { background: #252838; border: 1px solid #333; color: #ccc; padding: 2px 6px; font-size: 10px; border-radius: 3px; font-family: var(--font-code); }
         .badge-dovx { border-color: var(--dovx); color: var(--dovx); background: rgba(224, 86, 253, 0.1); }
 
-        /* TABLES */
+        /* TABLE */
         .tbl-header { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; padding: 8px 12px; font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; background: rgba(0,0,0,0.2); border-bottom: 1px solid #222; }
         .tbl-row { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #eee; }
         .tbl-row:hover { background: rgba(255,255,255,0.05); }
-        .col-name { font-weight: 600; color: #dcdde1; }
+        
+        .col-name { font-weight: 600; color: #dcdde1; display: flex; align-items: center; gap: 6px; }
+        .stack-badge { background: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid #00e676; font-size: 9px; padding: 0 4px; border-radius: 3px; font-weight: 800; font-family: var(--font-code); }
+        
         .col-act { color: var(--text-muted); font-size: 10px; text-align: right; }
         .col-val { text-align: right; font-family: var(--font-code); font-weight: 700; }
         .col-tot { text-align: right; font-family: var(--font-code); color: #ccc; }
 
         /* ZONES & ECO */
         .zones-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .zone-card { background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; transition: 0.2s; }
+        .zone-card { background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; transition: 0.2s; position: relative; }
+        .zone-card:hover { border-color: var(--cyan); background: #1a1b29; }
         .zone-card.active { border-color: var(--blue); background: rgba(52, 152, 219, 0.1); }
         .zc-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 11px; color: #fff; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
         .zc-row { display: flex; justify-content: space-between; font-size: 10px; margin-top: 2px; font-family: var(--font-code); }
@@ -96,7 +134,6 @@
         .c-supply { color: var(--supply); } .b-supply { border-top: 3px solid var(--supply); }
         .view-section { display: none; } .active-view { display: block; }
         
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
         .modal-win { width: 600px; background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
         textarea { width: 100%; height: 100px; background: #0b0c15; color: #ccc; border: 1px solid #333; font-family: monospace; padding: 10px; }
@@ -105,9 +142,9 @@
 <body>
 
 <header>
-    <div style="display:flex; align-items:center;">
+    <div class="logo-area">
         <div class="logo-dot"></div>
-        <h1>DoV COMMAND V192</h1>
+        <h1>DoV COMMAND V193</h1>
     </div>
     <div class="sys-badge" id="statusBadge">SYSTEM READY</div>
 </header>
@@ -115,7 +152,7 @@
 <div class="layout">
     <aside class="sidebar">
         <div class="panel-box">
-            <span class="panel-title">OPERATIONS</span>
+            <span class="panel-title">GLOBAL OPERATIONS</span>
             <div class="btn-row">
                 <button class="btn-cyan" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
@@ -138,7 +175,7 @@
         <div class="panel-box">
             <span class="panel-title">CONFIGURATION</span>
             <div style="font-size:10px; margin-bottom:5px;">Templates: <b id="dictSize" style="color:#fff">0</b></div>
-            <button class="btn-ghost" onclick="openSettings()">SETTINGS</button>
+            <button class="btn-ghost" onclick="openSettings()">EDIT SETTINGS</button>
             <button class="btn-ghost" onclick="hardReset()" style="color:var(--red)">FACTORY RESET</button>
         </div>
     </aside>
@@ -162,7 +199,7 @@
 
         <div id="viewZones" class="view-section">
             <div class="dash-header" style="border-left-color: var(--blue)">
-                <div class="dh-title">ZONE ACTIVITY</div>
+                <div class="dh-title">ZONE ACTIVITY MAP</div>
                 <div class="dh-sub" id="zoneStatus">Ready.</div>
             </div>
             <div class="zones-container" id="areaZones"></div>
@@ -170,7 +207,7 @@
 
         <div id="viewEco" class="view-section">
             <div class="dash-header" style="border-left-color: var(--orange)">
-                <div class="dh-title">ECONOMY</div>
+                <div class="dh-title">ECONOMY METRICS</div>
                 <div class="dh-sub" id="ecoStatus">Ready.</div>
             </div>
             <div class="eco-stats">
@@ -232,9 +269,14 @@
             17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
         },
         templates: {
+            // FIXED 492368 -> C_F4
+            "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, 
+            // FIXED 492389 -> L_F1
+            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, 
+
             "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
             "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
-            "492389": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
+            "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
             "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
             "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 },
             "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 },
@@ -268,6 +310,7 @@
             "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
             "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
             "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 },
+            // REPAIR
             "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 },
             "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
             "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 },
@@ -283,14 +326,20 @@
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false; 
 
-    // --- INIT ---
     function init() {
         const local = localStorage.getItem('DOV_DATA');
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
-                if(!loaded.templates || Object.keys(loaded.templates).length < 50) { DATA = { ...DEFAULT_DATA }; } 
-                else { DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; }
+                // PATCH: If we detect the old wrong mapping for 492389, we force update
+                if(loaded.templates && loaded.templates["492389"] && loaded.templates["492389"].name.startsWith("C_F3")) {
+                    console.log("Patching template 492389...");
+                    DATA = { ...DEFAULT_DATA };
+                } else if(!loaded.templates || Object.keys(loaded.templates).length < 50) {
+                    DATA = { ...DEFAULT_DATA };
+                } else {
+                    DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } };
+                }
             } catch(e) { localStorage.setItem('DOV_DATA', JSON.stringify(DEFAULT_DATA)); DATA = JSON.parse(JSON.stringify(DEFAULT_DATA)); } 
         }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
@@ -307,14 +356,16 @@
             areaC.innerHTML += `<div class="res-card ${rd.css}"><div class="rc-label">${rd.label}</div><div class="rc-val" style="color:${rd.color}" id="val-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
             <div class="list-box">
-                <div class="lb-header"><div class="lb-title">${rd.label} DETAILS</div><div class="badges-row"><span class="badge-info">PROD: <span id="btot-${k}">0</span></span><span class="badge-info badge-dovx">COST: <span id="bcost-${k}">0</span></span></div></div>
+                <div class="lb-header">
+                    <div class="lb-title">${rd.label} DETAILS</div>
+                    <div class="badges-row"><span class="badge-info">PROD: <span id="btot-${k}">0</span></span><span class="badge-info badge-dovx">COST: <span id="bcost-${k}">0</span></span></div>
+                </div>
                 <div class="tbl-header"><span>TEMPLATE</span><span>ACTIVE</span><span style="text-align:right">UNIT</span><span style="text-align:right">TOTAL/H</span></div>
                 <div id="tbl-${k}"></div>
             </div>`;
         }
     }
 
-    // --- LOGIC ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1;
@@ -322,18 +373,20 @@
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
 
+        let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
+        let rawVal = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
+        let stackVis = (nominal > 0 && rawVal > 0) ? Math.round(rawVal / nominal) : 1;
+
         let hourly = count * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let cost = daily * DATA.gameConfig.maintenanceCost;
 
-        let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F";
         for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
 
-        return { name, type, count, hourly, daily, cost, nominal };
+        return { name, type, count, hourly, daily, cost, nominal, stackVis };
     }
 
-    // --- SCANNER ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal');
         getId('cntRows').innerText = "...";
@@ -359,9 +412,16 @@
                     let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
                     if(active) {
                         let existing = groups[d.type].find(x => x.name === d.name);
-                        if(existing) { existing.act += d.count; existing.totH += d.hourly; existing.totC += d.cost; } 
-                        else { groups[d.type].push({ name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totC:d.cost }); }
-                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.cost; stats.totalCost += d.cost;
+                        if(existing) {
+                            existing.act += d.count;
+                            existing.totH += d.hourly;
+                            existing.totC += d.cost;
+                        } else {
+                            groups[d.type].push({ name:d.name, stack:d.stackVis, act:d.count, unit:d.nominal, totH:d.hourly, totC:d.cost });
+                        }
+                        stats.types[d.type].p += d.hourly;
+                        stats.types[d.type].c += d.cost;
+                        stats.totalCost += d.cost;
                     }
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
@@ -376,16 +436,16 @@
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
             getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            let html = "";
             let list = groups[k].sort((a,b) => b.totH - a.totH);
+            let html = "";
             list.forEach(i => {
-                html += `<div class="tbl-row"><div class="col-name">${i.name}</div><div class="col-act"><b>${i.act}</b> ACTIF</div><div class="col-val" style="color:#888">${fmtDec(i.unit)}/h</div><div class="col-tot" style="color:${rd.color}">${fmtDec(i.totH)}</div></div>`;
+                let badge = i.stack > 1 ? `<span class="stack-badge">x${i.stack}</span>` : '';
+                html += `<div class="tbl-row"><div class="col-name">${i.name} ${badge}</div><div class="col-act"><b>${i.act}</b> ACTIF</div><div class="col-val" style="color:#888">${fmtDec(i.unit)}/h</div><div class="col-tot" style="color:${rd.color}">${fmtDec(i.totH)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
     }
 
-    // --- OTHER SCANS ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones');
         getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
