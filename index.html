@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V187 (PURE UI)</title>
+    <title>DoV - COMMAND V188 (PRODUCTION)</title>
     <style>
-        /* --- DESIGN SYSTEM DARK & SHARP --- */
+        /* --- 1. DESIGN SYSTEM WEB3 (FINAL) --- */
         :root {
             --bg-body: #0b0c15; 
             --bg-panel: #12131f; 
@@ -26,7 +26,7 @@
             --font-code: 'Consolas', 'Monaco', monospace;
         }
 
-        /* --- LAYOUT RESET --- */
+        /* --- 2. LAYOUT & RESET --- */
         body { background-color: var(--bg-body); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 8px; }
@@ -34,7 +34,7 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
 
-        /* --- HEADER --- */
+        /* --- 3. HEADER --- */
         header { 
             height: 50px; background: rgba(18,19,31,0.95); border-bottom: 1px solid var(--border); 
             display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100;
@@ -44,7 +44,7 @@
         h1 { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
         .sys-badge { font-size: 10px; background: #222; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; color: var(--cyan); }
 
-        /* --- SIDEBAR --- */
+        /* --- 4. SIDEBAR --- */
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { 
             width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); 
@@ -76,7 +76,7 @@
         .btn-ghost { background: transparent; border: 1px solid #444; color: #888; }
         .btn-row { display: flex; gap: 5px; }
 
-        /* --- MAIN CONTENT --- */
+        /* --- 5. MAIN CONTENT --- */
         .main-view { flex: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0b0c15 100%); }
 
         /* DASHBOARD HEADER */
@@ -182,7 +182,7 @@
 <header>
     <div class="logo-area">
         <div class="logo-dot"></div>
-        <h1>DoV COMMAND V187</h1>
+        <h1>DoV COMMAND V188</h1>
     </div>
     <div class="sys-badge" id="statusBadge">SYSTEM READY</div>
 </header>
@@ -271,6 +271,8 @@
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-win">
         <h3 style="margin-top:0; color:#fff">CONFIGURATION</h3>
+        <span class="panel-title">API & ENDPOINTS</span>
+        <textarea id="cfgApi"></textarea>
         <span class="panel-title">RESOURCES UI</span>
         <textarea id="cfgResources"></textarea>
         <span class="panel-title">GAME RULES</span>
@@ -297,8 +299,11 @@
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DEFAULT DATA (STRICT) ---
+    // --- DEFAULT DATA (STRICT & COMPLETE) ---
     const DEFAULT_DATA = {
+        apiConfig: {
+            endpoint: "https://wax.greymass.com/v1/chain/get_table_rows"
+        },
         resourceDefs: {
             "F": { label: "FUEL", color: "#e67e22", css: "b-fuel", txt: "c-fuel" },
             "H": { label: "HEALTH", color: "#e74c3c", css: "b-health", txt: "c-health" },
@@ -356,10 +361,24 @@
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false; 
 
-    // --- APP START ---
+    // --- APP START (AUTO-REPAIR) ---
     function init() {
         const local = localStorage.getItem('DOV_DATA');
-        if(local) { try { DATA = { ...DEFAULT_DATA, ...JSON.parse(local) }; } catch(e){} }
+        if(local) { 
+            try { 
+                let loaded = JSON.parse(local); 
+                // SAFETY: If old version without resourceDefs, force reset
+                if(!loaded.resourceDefs || !loaded.apiConfig) {
+                    console.warn("Detected old config. Upgrading...");
+                    throw new Error("Old Config");
+                }
+                DATA = { ...DEFAULT_DATA, ...loaded }; 
+            } catch(e){ 
+                console.log("Config Reset"); 
+                localStorage.setItem('DOV_DATA', JSON.stringify(DEFAULT_DATA));
+                DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            } 
+        }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
@@ -373,7 +392,7 @@
             let rd = DATA.resourceDefs[k];
             areaC.innerHTML += `<div class="res-card ${rd.css}"><div class="rc-label">${rd.label}</div><div class="rc-val" style="color:${rd.color}" id="val-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
-            <div class="list-panel">
+            <div class="list-box">
                 <div class="lb-header">
                     <div class="lb-title">${rd.label} DETAILS</div>
                     <div class="badges-row"><span class="badge-info">PROD: <span id="btot-${k}">0</span></span><span class="badge-info badge-dovx">COST: <span id="bcost-${k}">0</span></span></div>
@@ -384,7 +403,7 @@
         }
     }
 
-    // --- LOGIC (NO VISUAL STACK) ---
+    // --- LOGIC: CONFORM DATA (STRICT + NO VISUAL STACK) ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1;
@@ -393,12 +412,10 @@
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
 
-        // Strict Math: count * nominal from config
         let hourly = count * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let cost = daily * DATA.gameConfig.maintenanceCost;
 
-        // Type
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F";
         for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
@@ -419,7 +436,7 @@
 
         try {
             while(!stopSignal) {
-                let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+                let res = await fetch(DATA.apiConfig.endpoint, {
                     method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})
                 });
                 let json = await res.json();
@@ -439,10 +456,8 @@
                             existing.totH += d.hourly;
                             existing.totC += d.cost;
                         } else {
-                            // NO STACK SAVED HERE
                             groups[d.type].push({ name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totC:d.cost });
                         }
-                        
                         stats.types[d.type].p += d.hourly;
                         stats.types[d.type].c += d.cost;
                         stats.totalCost += d.cost;
@@ -471,7 +486,6 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             
             list.forEach(i => {
-                // NO BADGE HERE. JUST PLAIN NAME.
                 html += `
                 <div class="tbl-row">
                     <div class="col-name">${i.name}</div>
@@ -493,7 +507,7 @@
         let next = "";
 
         while(!stopSignal) {
-            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+            let res = await fetch(DATA.apiConfig.endpoint, {
                 method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
             });
             let json = await res.json();
@@ -502,7 +516,6 @@
                 let id = r.zone_id || r.zoneID;
                 if(counts[id] !== undefined) counts[id]++;
             }
-            
             let html = "";
             Object.keys(counts).forEach(id => {
                 let z = DATA.zones[id];
@@ -528,20 +541,17 @@
         let dTU = 0, activeZ = 0;
 
         while(!stopSignal) {
-            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+            let res = await fetch(DATA.apiConfig.endpoint, {
                 method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
             });
             let json = await res.json();
             if(!json.rows) break;
-            
             for(let r of json.rows) {
                 let z = DATA.zones[r.zone_id];
                 if(z && z.cost > 0) { dTU += z.cost; activeZ++; }
             }
-            
             getId('valDemandTU').innerText = fmt(dTU);
             getId('valActiveZones').innerText = fmt(activeZ);
-            
             if(!json.more) break; next = json.next_key;
             await new Promise(r => setTimeout(r, 50));
         }
@@ -554,15 +564,13 @@
         let user = getId('targetIn').value.trim();
         getId('targetStatus').innerText = "Buildings of " + user;
         getId('areaTarget').innerHTML = "Scanning...";
-        
         let next = ""; let html = "";
         while(!stopSignal) {
-            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+            let res = await fetch(DATA.apiConfig.endpoint, {
                 method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next})
             });
             let json = await res.json();
             if(!json.rows) break;
-            
             for(let r of json.rows) {
                 let d = processRow(r);
                 let col = DATA.resourceDefs[d.type].color;
@@ -585,15 +593,13 @@
         let user = getId('targetIn').value.trim();
         getId('targetStatus').innerText = "Divisions of " + user;
         getId('areaTarget').innerHTML = "Scanning...";
-        
         let next = ""; let html = "";
         while(!stopSignal) {
-            let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+            let res = await fetch(DATA.apiConfig.endpoint, {
                 method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next})
             });
             let json = await res.json();
             if(!json.rows) break;
-            
             for(let r of json.rows) {
                 let z = DATA.zones[r.zone_id];
                 html += `
@@ -609,6 +615,7 @@
 
     // --- SETTINGS ---
     function openSettings() {
+        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4);
         getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4);
         getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4);
         getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4);
@@ -617,6 +624,7 @@
     }
     function saveConfig() {
         try {
+            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
             DATA.resourceDefs = JSON.parse(getId('cfgResources').value);
             DATA.gameConfig = JSON.parse(getId('cfgGameRules').value);
             DATA.zones = JSON.parse(getId('cfgZones').value);
