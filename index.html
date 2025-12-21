@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V248 (SMART TIMER)</title>
+    <title>DoV - COMMAND V249 (INSTANT ZONES)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -103,7 +103,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V248</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V249</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">ROBUST MONITORING</span>
@@ -206,7 +206,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V248';
+    const STORAGE_KEY = 'DOV_DATA_V249';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -365,33 +365,29 @@
         }
     }
 
-    // --- HELPER FOR TIMER DETECTION (V248 SMART) ---
     function getEndTime(row) {
-        // Try known keys in order
         let keys = ['unlock_time', 'end_time', 'finish_time', 'lock_until', 'free_at', 'return_time'];
-        for (let k of keys) {
-            if (row[k] !== undefined && row[k] !== null) return parseFloat(row[k]);
-        }
+        for (let k of keys) { if (row[k] !== undefined && row[k] !== null) return parseFloat(row[k]); }
         return 0;
     }
 
-    // --- ZONE SCANNER (V248 SMART TIMER) ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
         let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
 
+        // IMPORTANT FIX: Initial render so UI is never blank
+        updateZoneUI(zonesData, stats);
+
         let next = "";
         let countDisplay = getId('zTotalDivsHeader');
 
         try {
             while(!stopSignal) {
-                // FIXED SCOPE: dovpvecontrl (Global)
                 let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
                 if(!json.rows) break;
                 
-                // Get current time in SECONDS
                 const nowSec = Date.now()/1000;
                 
                 for(let r of json.rows) {
@@ -405,30 +401,19 @@
                         zonesData[zid].weight += weight;
                         stats.totalWeight += weight;
 
-                        // SMART TIMER CHECK
                         let endTime = getEndTime(r);
                         let isFighting = false;
-
-                        // Auto-detect if time is seconds or ms
-                        if (endTime > 1000000000000) { 
-                            // Probably MS, so compare to Date.now()
-                            isFighting = endTime > Date.now();
-                        } else {
-                            // Probably SEC, so compare to nowSec
-                            isFighting = endTime > nowSec;
-                        }
+                        if (endTime > 1000000000000) isFighting = endTime > Date.now();
+                        else isFighting = endTime > nowSec;
 
                         if(isFighting) {
                             zonesData[zid].active++;
                             stats.activeDivs++;
-                            
                             let zInfo = DATA.zones[zid];
                             let zCost = zInfo.cost;
                             let zReward = zInfo.win;
-
                             zonesData[zid].bf += zCost; zonesData[zid].bh += zCost; zonesData[zid].br += zCost; zonesData[zid].bs += zCost;
                             zonesData[zid].prod += zReward;
-                            
                             stats.burnF += zCost; stats.burnH += zCost; stats.burnR += zCost; stats.burnS += zCost;
                             stats.totalProd += zReward;
                         }
@@ -446,7 +431,6 @@
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
         getId('zTotalProd').innerText = fmt(stats.totalProd);
         getId('zTotalWeight').innerText = fmt(stats.totalWeight);
-        // ... update others as needed
 
         let html = "";
         Object.keys(zonesData).forEach(id => {
