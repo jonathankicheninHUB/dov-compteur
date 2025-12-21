@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V232 (PERFORMANCE CHART)</title>
+    <title>DoV - COMMAND V233 (V199 + GRAPHS)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 BASE) --- */
         :root {
             --bg-app: #0b0c10; 
             --bg-panel: #13141b; 
@@ -16,6 +16,7 @@
             --blue: #2979ff; 
             --orange: #ff9100;
             --purple: #d500f9;
+            --yellow: #ffea00; /* Added for Supply */
             --text-main: #e0e0e0;
             --text-muted: #858595;
 
@@ -23,14 +24,12 @@
             --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
 
-        /* --- RESET --- */
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 6px; } 
         ::-webkit-scrollbar-track { background: var(--bg-app); } 
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* --- STRUCTURE --- */
         .layout { display: flex; width: 100%; height: 100%; }
         
         .sidebar { 
@@ -44,7 +43,10 @@
         .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
+        button { 
+            padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; 
+            text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%;
+        }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
         
         .btn-green { background: var(--green); color: #000; }
@@ -65,51 +67,50 @@
         }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
+        
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* KPI CARDS */
+        /* KPI CARDS (UPDATED FOR GRAPH) */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { 
             background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; 
             padding: 15px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         
-        .kc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .kc-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
-        .kc-val { font-family: var(--font-num); font-size: 22px; font-weight: 700; color: #fff; margin-top: 5px; }
+        .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* GAUGE CHART (PURE CSS) */
-        .chart-box { 
-            margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; gap: 15px;
+        /* NEW: GAUGE CHART */
+        .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
+        .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
+        
+        /* NEW: BIG 24H INDICATOR */
+        .big-24h { 
+            margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); 
         }
-        .gauge {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: conic-gradient(var(--g-color) 0%, #222 0%);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; flex-shrink: 0;
-        }
-        .gauge::before {
-            content: ''; position: absolute;
-            width: 35px; height: 35px; background: var(--bg-panel); border-radius: 50%;
-        }
-        .gauge-val { position: relative; font-family: var(--font-num); font-size: 10px; font-weight: 700; color: #fff; }
-        .chart-meta { display: flex; flex-direction: column; }
-        .cm-label { font-size: 9px; color: #666; font-weight: 700; }
-        .cm-val { font-family: var(--font-num); color: #ccc; font-size: 11px; }
+        .b24-val { font-family: var(--font-num); font-size: 26px; font-weight: 800; line-height: 1; }
+        .b24-lbl { font-size: 9px; color: #666; font-weight: 700; margin-top: 4px; display:flex; justify-content:space-between;}
 
-        /* COLORS */
-        .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); } .fuel .gauge { --g-color: var(--orange); }
-        .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); } .health .gauge { --g-color: var(--red); }
-        .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); } .repair .gauge { --g-color: var(--blue); }
-        .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); } .supply .gauge { --g-color: var(--yellow); }
+        /* COLORS & GRADIENTS */
+        .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); } 
+        .fuel .gauge-wrapper { background: conic-gradient(var(--orange) var(--pct), #333 0deg); }
+        
+        .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); }
+        .health .gauge-wrapper { background: conic-gradient(var(--red) var(--pct), #333 0deg); }
+        
+        .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); }
+        .repair .gauge-wrapper { background: conic-gradient(var(--blue) var(--pct), #333 0deg); }
+        
+        .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); }
+        .supply .gauge-wrapper { background: conic-gradient(var(--yellow) var(--pct), #333 0deg); }
 
-        /* TABLES */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -119,14 +120,25 @@
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
+        .dt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
         .dt-row:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
         .cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
+        a.wallet { color: var(--blue); font-weight: 700; text-decoration: none; }
 
+        .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
+        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
+        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 4px;}
+        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); }
+
+        .view-section { display: none; } .active-view { display: block; }
+        
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
@@ -136,13 +148,17 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V232</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V233</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">COLLECTION SCANNER</span>
+            <span class="grp-lbl">MONITORING</span>
             <div class="btn-row">
                 <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
+            </div>
+            <div class="btn-row">
+                <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
+                <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
             </div>
         </div>
 
@@ -169,7 +185,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL COLLECTION</h2>
-                    <div class="page-meta">MONOLITH SCAN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <div class="page-meta">SCANNING CHAIN &bull; ROWS: <span id="cntRows">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -180,27 +196,24 @@
             <div class="kpi-grid" id="areaCards"></div>
             <div class="tables-grid" id="areaLists"></div>
         </div>
-        
-        <div id="viewTarget" class="view-section">
-            <div class="dashboard-header">
-                <h2 class="page-h1">TARGET INSPECTOR</h2>
-                <div class="page-meta" id="targetMeta">Ready.</div>
-            </div>
-            <div id="areaTarget" class="tables-grid" style="grid-template-columns: 1fr;"></div>
-        </div>
+
+        <div id="viewZones" class="view-section"><div class="dashboard-header" style="border-left: 4px solid var(--blue)"><h2 class="page-h1">ZONE TACTICAL MAP</h2><div class="page-meta" id="zoneStatus">Ready.</div></div><div class="zones-map" id="areaZones"></div></div>
+        <div id="viewEco" class="view-section"><div class="dashboard-header" style="border-left: 4px solid var(--orange)"><h2 class="page-h1">MACRO ECONOMICS</h2><div class="page-meta" id="ecoStatus">Ready.</div></div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);"><div class="kpi-card"><div class="kc-title">GLOBAL DEMAND</div><div class="kc-val" id="valDemandTU">0</div><div class="kc-sub">TU BURN / DAY</div></div><div class="kpi-card"><div class="kc-title">ACTIVE ZONES</div><div class="kc-val" id="valActiveZones">0</div></div><div class="kpi-card"><div class="kc-title">DOVX BURN</div><div class="kc-val" style="color:var(--purple)" id="valDovxBurn">0</div><div class="kc-sub">ESTIMATED / DAY</div></div></div></div>
+        <div id="viewTarget" class="view-section"><div class="dashboard-header"><h2 class="page-h1">TARGET INSPECTOR</h2><div class="page-meta" id="targetMeta">Ready.</div></div><div id="areaTarget" class="tables-grid" style="grid-template-columns: 1fr;"></div></div>
     </main>
 </div>
 
 <div class="modal-overlay" id="settingsModal"><div class="modal-box"><h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;"><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V232'; 
+    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
+    // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
         resourceDefs: {
@@ -208,16 +221,70 @@
             "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" }
         },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
-        zones: { 1:{name:"Beach 1",cost:1160} }, // Simplified for brevity, user has full list
+        zones: { 
+            1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
+            5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
+            9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},
+            13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
+            17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
+        },
         templates: {
             // FUEL
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 },
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
+            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
+            "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, 
+            "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, 
+            "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, 
+            "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, 
+            "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, 
+            "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, 
+            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
+            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
+            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 },
             // HEALTH
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
+            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
+            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
+            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
+            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
+            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
+            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
+            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
             // REPAIR
-            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
+            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
+            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 },
+            "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
+            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
+            "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
+            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 },
+            "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
+            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
+            "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
+            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 },
+            "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
+            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
+            "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
+            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 },
+            "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
+            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
             // SUPPLY
-            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
+            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
+            "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
+            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
+            "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
+            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 },
+            "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
+            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
+            "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
+            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 },
+            "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
+            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
+            "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
+            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 },
+            "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
+            "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
         }
     };
 
@@ -225,7 +292,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem(STORAGE_KEY);
+        const local = localStorage.getItem('DOV_DATA_V233');
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
@@ -238,27 +305,22 @@
         
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
-            // ADDED GAUGE CHART
+            // ADDED GRAPH & 24H BIG TEXT
             areaC.innerHTML += `
             <div class="kpi-card ${rd.class}">
-                <div class="kc-top">
+                <div class="kc-header">
                     <div>
-                        <div class="kc-title"><span>${rd.label}</span></div>
+                        <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
                         <div class="kc-val" id="val-${k}">0</div>
                         <div class="kc-sub">PROD / HOUR</div>
                     </div>
-                    <div class="gauge" id="gauge-${k}" style="--g-color: #333;"><div class="gauge-val" id="pct-${k}">0%</div></div>
+                    <div class="gauge-wrapper" id="gauge-${k}" style="--pct:0deg;">
+                        <div class="gauge-core"><div class="gauge-txt" id="pct-${k}">0%</div></div>
+                    </div>
                 </div>
-                
-                <div class="chart-box">
-                    <div class="chart-meta">
-                        <span class="cm-label">ACTIVE</span>
-                        <span class="cm-val" id="act-${k}">0</span>
-                    </div>
-                    <div class="chart-meta">
-                        <span class="cm-label">TOTAL</span>
-                        <span class="cm-val" id="tot-${k}">0</span>
-                    </div>
+                <div class="big-24h">
+                    <div class="b24-val val" id="val24-${k}">0</div>
+                    <div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div>
                 </div>
             </div>`;
             
@@ -301,28 +363,25 @@
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; 
-        // Track Active (a) and Total (t) counts per resource
         let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
         let groups = {};
         for(let k in DATA.resourceDefs) { groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
-                // CONTRACT SCAN (MONOLITH)
+                // FIXED: BACK TO V199 LOGIC -> SCAN CONTRACT SCOPE
                 let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
                 let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
-                
                 const now = Date.now()/1000;
                 for(let r of json.rows) {
                     rowCount++; let d = processRow(r); assetCount += d.count;
                     
-                    // Increment Total Count for this resource type
+                    // Count Total
                     stats.types[d.type].t += d.count;
 
+                    // Active Check
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    
-                    // Increment Active Count if active
-                    if (isActive) stats.types[d.type].a += d.count;
+                    if(isActive) stats.types[d.type].a += d.count;
 
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(!existing) {
@@ -330,10 +389,8 @@
                         groups[d.type].push(existing);
                     }
                     
-                    // Always add to group Total
                     existing.tot += d.count;
 
-                    // If active, add to group Active & Prod metrics
                     if(isActive) {
                         existing.act += d.count; 
                         existing.totH += d.hourly; existing.totD += d.daily; 
@@ -350,29 +407,24 @@
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
-        getId('cntRows').innerText = fmt(rows); getId('cntAssets').innerText = fmt(assets); getId('gTotalCost').innerText = fmt(stats.totalCost);
-        
+        getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            // UPDATE KPI VALUES
+            // UPDATE KPI
             getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
             getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
             getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
             
-            // UPDATE CHART VALUES
-            getId(`act-${k}`).innerText = fmt(stats.types[k].a);
-            getId(`tot-${k}`).innerText = fmt(stats.types[k].t);
-            
-            // UPDATE CHART VISUAL
+            // UPDATE 24H BIG TEXT
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24);
+            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+
+            // UPDATE GAUGE
             let pct = stats.types[k].t > 0 ? Math.round((stats.types[k].a / stats.types[k].t) * 100) : 0;
             getId(`pct-${k}`).innerText = pct + "%";
-            
-            // CSS CONIC GRADIENT FOR GAUGE
-            let color = getComputedStyle(document.documentElement).getPropertyValue(`--${rd.label.toLowerCase() === 'fuel' ? 'orange' : rd.label.toLowerCase() === 'health' ? 'red' : rd.label.toLowerCase() === 'repair' ? 'blue' : 'yellow'}`).trim();
-            // Fallback colors if var fails
-            if(k==='F') color='#ff9100'; if(k==='H') color='#ff3b30'; if(k==='R') color='#2979ff'; if(k==='S') color='#ffea00';
-            
-            getId(`gauge-${k}`).style.background = `conic-gradient(${color} ${pct}%, #222 ${pct}%)`;
+            // Set css var --pct using degrees (0% = 0deg, 100% = 360deg)
+            let deg = Math.round(pct * 3.6);
+            getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
 
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
@@ -384,14 +436,14 @@
         }
     }
 
-    async function startZoneScan() { /* ... Same V199 ... */ }
-    async function startEconomyScan() { /* ... Same V199 ... */ }
-    async function startTargetBuildings() { /* ... Same V199 ... */ }
-    async function startTargetDivisions() { /* ... Same V199 ... */ }
+    async function startZoneScan() { /* Same V199 */ }
+    async function startEconomyScan() { /* Same V199 */ }
+    async function startTargetBuildings() { /* Same V199 */ }
+    async function startTargetDivisions() { /* Same V199 */ }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V233', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V233'); location.reload(); } }
 
     window.onload = init;
 </script>
