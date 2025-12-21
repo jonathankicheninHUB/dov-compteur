@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V225 (DATA UPDATE)</title>
+    <title>DoV - COMMAND V226 (MONOLITH + SUPPLY DATA)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
@@ -118,27 +118,26 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V225</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V226</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">TARGET SCANNER</span>
-            <input type="text" id="targetIn" value="u2d2k.c.wam">
+            <span class="grp-lbl">MONOLITH SCANNER</span>
             <div class="btn-row">
-                <button class="btn-green" onclick="dispatchScan()">SCAN TARGET</button>
+                <button class="btn-green" onclick="dispatchMonolithScan()">SCAN ALL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
             </div>
-            
-            <div class="btn-row" style="margin-top:15px;">
+            <div class="btn-row">
                 <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
                 <button class="btn-orange" onclick="startEconomyScan()">ECON</button>
             </div>
         </div>
 
         <div class="control-group">
-            <span class="grp-lbl">DIVISIONS & BUILDINGS</span>
+            <span class="grp-lbl">TARGET INTELLIGENCE</span>
+            <input type="text" id="targetIn" value="u2d2k.c.wam">
             <div class="btn-row">
                 <button class="btn-ghost" style="color:#fff" onclick="startTargetDivisions()">DIVISIONS</button>
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetBuildings()">INVENTORY</button>
+                <button class="btn-ghost" style="color:#fff" onclick="startTargetBuildings()">BUILDINGS</button>
             </div>
         </div>
 
@@ -155,8 +154,8 @@
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
                 <div>
-                    <h2 class="page-h1">PRODUCTION DASHBOARD</h2>
-                    <div class="page-meta">TARGET: <span id="scanTargetDisp">...</span> &bull; ROWS: <span id="cntRows">0</span></div>
+                    <h2 class="page-h1">COLLECTION PRODUCTION</h2>
+                    <div class="page-meta">CONTRACT SCAN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -167,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (STABLE MODE)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (AUTO-DETECT)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -182,7 +181,7 @@
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V225'; // UPDATED KEY FOR NEW DATA
+    const STORAGE_KEY = 'DOV_DATA_V226'; 
     const getId = (id) => document.getElementById(id);
     const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; };
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -210,7 +209,8 @@
                 "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
                 "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
                 "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
-                "https://wax.tmy.io", "https://api.hivebp.io"
+                "https://wax.tmy.io", "https://api.hivebp.io",
+                "https://proxy1.example.com", "https://proxy2.example.com", "https://proxy3.example.com"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
@@ -392,17 +392,22 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // --- PHASE 2: SCAN EACH WALLET (FIXED TYPE SAFETY) ---
-    function processRow(row, scope) {
+    // --- PROCESS ROW WITH FLEXIBLE ASSET DETECTION ---
+    function processRow(row) {
         let tid = String(row.template_id);
         
+        // --- SMART DETECTOR ---
         let assetList = [];
         if(row.asset_ids && Array.isArray(row.asset_ids)) assetList = row.asset_ids;
         else if(row.assets && Array.isArray(row.assets)) assetList = row.assets;
+        else if(row.ids && Array.isArray(row.ids)) assetList = row.ids;
+        
+        // Fallback: Si pas d'array trouvé mais que la ligne existe, on suppose 1 entité ?
+        // Non, on respecte la consigne "4 bâtiments".
         
         let count_total = assetList.length;
         
-        // SAFE NUMBER PARSING (FIXED V220)
+        // --- TIMER LOGIC ---
         let now = Date.now() / 1000;
         let last = Number(row.last_claim || 0);
         let delay = Number(row.delay || 0);
@@ -423,39 +428,40 @@
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         
-        // Override type detection for Supply if needed based on name (safer)
-        if(name.includes("SUPPLY")) type = "S";
-        else if(name.includes("FUEL")) type = "F";
-        else if(name.includes("HEALTH")) type = "H";
-        else if(name.includes("REPAIR")) type = "R";
-
-        return { id:tid, name, type, count_total, count_active, hourly, daily, costH, costD, nominal, assets: assetList, owner: scope };
+        // --- OWNER DETECTION ---
+        let owner = row.player || row.username || row.owner || row.user || "unknown";
+        
+        return { id:tid, name, type, count_total, count_active, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
     }
 
-    async function dispatchScan() {
-        stopSignal = false; switchView('viewGlobal'); 
+    async function dispatchMonolithScan() {
+        stopSignal = false; switchView('viewGlobal'); safeSetText('cntRows', "...");
         
-        let target = getId('targetIn').value.trim();
-        safeSetText('scanTargetDisp', target);
-        sysLog(`SCANNING ${target}`, "ok");
+        sysLog(`SCANNING MONOLITH SCOPE: dovutilstake`, "ok");
         
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         SCAN_DETAILS = {}; 
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
-        let assetCount = 0;
-        let rowCount = 0;
+        let rowCount = 0; let assetCount = 0;
         
         try {
             while(!stopSignal) {
+                // HERE IS THE MAGIC: WE SCAN THE CONTRACT SCOPE DIRECTLY
                 let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                    json:true, code:"dovutilstake", scope:target, table:"buildings", limit:1000, lower_bound:next
+                    json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next
                 }));
                 
-                if(!res.rows || res.rows.length === 0) break;
+                if(!res.rows || res.rows.length === 0) { sysLog("NO DATA IN MONOLITH", "warn"); break; }
                 
+                // INSPECTOR: PRINT KEYS OF FIRST ROW TO DEBUG
+                if(rowCount === 0) {
+                    let keys = Object.keys(res.rows[0]).join(", ");
+                    sysLog(`DATA STRUCTURE FOUND: ${keys}`, "inf");
+                }
+
                 for(let r of res.rows) {
                     rowCount++; 
-                    let d = processRow(r, target); 
+                    let d = processRow(r); 
                     if(!d) continue;
 
                     assetCount += d.count_total;
@@ -469,13 +475,14 @@
                     }
                     stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
                     if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
+                    // STORE OWNER info found in the row
                     d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 20));
             }
             sysLog("SCAN COMPLETE", "ok");
-        } catch(e) { sysLog("ERROR: " + e.message, "err"); }
+        } catch(e) { sysLog("FATAL: " + e.message, "err"); }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -483,13 +490,7 @@
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
             safeSetText(`val-${k}`, fmtDec(stats.types[k].p)); safeSetText(`btot-${k}`, fmtDec(stats.types[k].p)); safeSetText(`bcost-${k}`, fmt(stats.types[k].c));
-            
-            // SORTING LOGIC: Sort by Nominal Production (UNIT) desc, then Name asc
-            let list = groups[k].sort((a,b) => {
-                if (b.unit !== a.unit) return b.unit - a.unit;
-                return a.name.localeCompare(b.name);
-            });
-
+            let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
                 let actClass = i.act > 0 ? "color:var(--green)" : "color:#666";
@@ -520,10 +521,10 @@
     }
 
     // --- OTHER SCANS ---
-    async function startZoneScan() { /* ... Same as V224 ... */ }
-    async function startEconomyScan() { /* ... Same as V224 ... */ }
-    async function startTargetBuildings() { /* ... Same as V224 ... */ }
-    async function startTargetDivisions() { /* ... Same as V224 ... */ }
+    async function startZoneScan() { /* ... */ }
+    async function startEconomyScan() { /* ... */ }
+    async function startTargetBuildings() { /* ... */ }
+    async function startTargetDivisions() { /* ... */ }
 
     // --- SETTINGS ---
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
