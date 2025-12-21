@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V215 (NATIVE CLUSTER)</title>
+    <title>DoV - COMMAND V216 (DATA MATCHING FIX)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -45,7 +45,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* CARDS & TABLES */
+        /* KPI & TABLES */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -118,7 +118,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V215</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V216</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">NATIVE CLUSTER (23 NODES)</span>
@@ -166,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (DIRECT CONNECT)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (DATA MATCHING FIX)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -251,7 +251,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V215'); // FLUSH OLD DATA
+        const local = localStorage.getItem('DOV_DATA_V216'); // RESET DATA
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
@@ -306,7 +306,10 @@
     }
 
     function processRow(row) {
-        let tid = row.template_id.toString();
+        // --- DATA MATCHING FIX ---
+        // Force String conversion for safe dictionary lookup
+        let tid = String(row.template_id);
+        
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
         let count_total = assetList.length;
         
@@ -316,8 +319,13 @@
         let count_active = isActive ? count_total : 0;
 
         let tpl = DATA.templates[tid];
+        // VERBOSE LOGGING FOR UNKNOWN TEMPLATES
+        if(!tpl) {
+            sysLog(`UNKNOWN TPL ID: ${tid}`, "warn");
+        }
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
+        
         let hourly = count_active * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let costD = daily * DATA.gameConfig.maintenanceCost;
@@ -473,8 +481,8 @@
     }
 
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V215', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V215'); location.reload(); } }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V216', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V216'); location.reload(); } }
 
     window.onload = init;
 </script>
