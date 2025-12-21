@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V236 (TACTICAL PRECISION)</title>
+    <title>DoV - COMMAND V237 (SETTINGS FIXED)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; 
             --bg-panel: #13141b; 
@@ -47,7 +47,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* HEADER */
+        /* DASHBOARD */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
@@ -63,12 +63,11 @@
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* GRAPH & INDICATORS */
+        /* GRAPHS */
         .kc-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .big-24h { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
         .b24-val { font-family: var(--font-num); font-size: 26px; font-weight: 800; line-height: 1; }
         .b24-lbl { font-size: 9px; color: #666; font-weight: 700; margin-top: 4px; display:flex; justify-content:space-between;}
-        
         .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
         .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
         .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
@@ -78,13 +77,12 @@
         .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); } .repair .gauge-wrapper { background: conic-gradient(var(--blue) var(--pct), #333 0deg); }
         .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); } .supply .gauge-wrapper { background: conic-gradient(var(--yellow) var(--pct), #333 0deg); }
 
-        /* TABLES & LISTS */
+        /* TABLES */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
-        
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -93,21 +91,14 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* ZONES TACTICAL MAP */
+        /* ZONES MAP (TACTICAL) */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px;
-            display: flex; flex-direction: column; justify-content: space-between; height: 160px; /* Taller for details */
-        }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
         .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
-        
-        /* MINI STATS GRID */
         .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
-        
         .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
-
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
 
         .view-section { display: none; } .active-view { display: block; }
@@ -124,7 +115,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V236</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V237</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -203,10 +194,23 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box"><h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;"><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">DIVISIONS (COST F/H/R/S)</span><textarea id="cfgDivisions"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-box">
+    <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
+        <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
+        <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
+        <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
+        <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
+        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS MATRIX (COST F/H/R/S)</span><textarea id="cfgDivisions"></textarea></div>
+    </div>
+    <div style="text-align:right; margin-top:15px;">
+        <button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button>
+        <button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button>
+    </div>
+</div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V236';
+    const STORAGE_KEY = 'DOV_DATA_V237';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -227,8 +231,6 @@
             13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
             17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
         },
-        // NEW: DIVISIONS MATRIX (Cost F/H/R/S + Prod DOVX)
-        // NOTE: USER MUST UPDATE THESE VALUES IN SETTINGS
         divisions: {
             "default": { name: "Infantry", c: {F:10, H:2, R:0, S:1}, p: 5 },
             "298539": { name: "Soldier", c: {F:15, H:5, R:0, S:2}, p: 2 }, 
@@ -315,13 +317,13 @@
                 </div>
                 <div class="big-24h"><div class="b24-val val" id="val24-${k}">0</div><div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div></div>
             </div>`;
-            
             areaL.innerHTML += `
             <div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
             <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
     }
 
+    // --- GLOBAL MONOLITH SCAN ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1; 
@@ -334,23 +336,15 @@
         let costH = costD / 24;
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; 
-        
-        if(name.includes("FUEL")) type = "F";
-        else if(name.includes("HEALTH")) type = "H";
-        else if(name.includes("REPAIR")) type = "R";
-        else if(name.includes("SUPPLY")) type = "S";
+        if(name.includes("FUEL")) type = "F"; else if(name.includes("HEALTH")) type = "H"; else if(name.includes("REPAIR")) type = "R"; else if(name.includes("SUPPLY")) type = "S";
         else { for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; } }
-        
         return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
     }
 
-    // --- GLOBAL MONOLITH SCAN ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        let next = ""; 
-        let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
-        let groups = {};
-        for(let k in DATA.resourceDefs) { groups[k] = []; }
+        let next = ""; let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
+        let groups = {}; for(let k in DATA.resourceDefs) { groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
@@ -363,18 +357,11 @@
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
                     if(isActive) stats.types[d.type].a += d.count;
                     let existing = groups[d.type].find(x => x.name === d.name);
-                    if(!existing) {
-                        existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 };
-                        groups[d.type].push(existing);
-                    }
+                    if(!existing) { existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 }; groups[d.type].push(existing); }
                     existing.tot += d.count;
                     if(isActive) {
-                        existing.act += d.count; 
-                        existing.totH += d.hourly; existing.totD += d.daily; 
-                        existing.costH += d.costH; existing.costD += d.costD;
-                        stats.types[d.type].p += d.hourly; 
-                        stats.types[d.type].c += d.costD; 
-                        stats.totalCost += d.costD;
+                        existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD;
+                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
                     }
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
@@ -387,15 +374,11 @@
         getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24);
-            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
             let pct = stats.types[k].t > 0 ? Math.round((stats.types[k].a / stats.types[k].t) * 100) : 0;
             getId(`pct-${k}`).innerText = pct + "%";
-            let deg = Math.round(pct * 3.6);
-            getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
+            let deg = Math.round(pct * 3.6); getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
@@ -406,21 +389,16 @@
         }
     }
 
-    // --- ZONE SCANNER TACTICAL UPGRADE V236 ---
+    // --- ZONE SCANNER TACTICAL V236 ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
-        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, 
-                      burnF:0, burnH:0, burnR:0, burnS:0 };
-        
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
         let zonesData = {}; 
-        Object.keys(DATA.zones).forEach(id => { 
-            zonesData[id] = { count: 0, active: 0, prod: 0, bf:0, bh:0, br:0, bs:0 }; 
-        });
+        Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, bf:0, bh:0, br:0, bs:0 }; });
 
         let next = "";
         while(!stopSignal) {
-            // FIXED SCOPE: dovpvecontrl (All Divisions)
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
             
@@ -432,7 +410,6 @@
                     zonesData[zid].count++;
                     stats.totalDivs++;
 
-                    // STRICT TIMER CHECK: unlock_time > now means IN ACTION
                     let isAction = parseFloat(r.unlock_time) > now;
 
                     if(isAction) {
@@ -442,23 +419,14 @@
                         let tid = r.template_id || "default";
                         let d = DATA.divisions[tid] || DATA.divisions["default"];
                         
-                        // Per Zone Stats
-                        zonesData[zid].bf += d.c.F;
-                        zonesData[zid].bh += d.c.H;
-                        zonesData[zid].br += d.c.R;
-                        zonesData[zid].bs += d.c.S;
+                        zonesData[zid].bf += d.c.F; zonesData[zid].bh += d.c.H; zonesData[zid].br += d.c.R; zonesData[zid].bs += d.c.S;
                         zonesData[zid].prod += d.p;
                         
-                        // Global Stats
-                        stats.burnF += d.c.F;
-                        stats.burnH += d.c.H;
-                        stats.burnR += d.c.R;
-                        stats.burnS += d.c.S;
+                        stats.burnF += d.c.F; stats.burnH += d.c.H; stats.burnR += d.c.R; stats.burnS += d.c.S;
                         stats.totalProd += d.p;
                     }
                 }
             }
-
             updateZoneUI(zonesData, stats);
             if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
         }
@@ -466,18 +434,15 @@
     }
 
     function updateZoneUI(zonesData, stats) {
-        // Global Header Stats
         getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
         getId('zTotalProd').innerText = fmt(stats.totalProd * 24);
         
-        // 24H Global Burn Breakdown
         getId('gBurnF').innerText = fmt(stats.burnF * 24);
         getId('gBurnH').innerText = fmt(stats.burnH * 24);
         getId('gBurnR').innerText = fmt(stats.burnR * 24);
         getId('gBurnS').innerText = fmt(stats.burnS * 24);
 
-        // Cards
         let html = "";
         Object.keys(zonesData).forEach(id => {
             let z = DATA.zones[id];
@@ -487,7 +452,6 @@
             html += `
             <div class="zone-card ${activeClass}">
                 <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active}/${d.count}</span></div>
-                
                 <div class="zc-mid">
                     <div class="zs-item"><span>PROD 24H</span> <span style="color:var(--purple)">${fmt(d.prod * 24)}</span></div>
                     <div style="height:1px; background:#333; margin:2px 0;"></div>
@@ -496,7 +460,6 @@
                     <div class="zs-item"><span>REPAIR</span> <span class="tc-r">${fmt(d.br * 24)}</span></div>
                     <div class="zs-item"><span>SUPPLY</span> <span class="tc-s">${fmt(d.bs * 24)}</span></div>
                 </div>
-                
                 <div class="zc-bot"><span style="color:#666">ENTRY</span><span style="color:var(--red)">${z.cost} TU</span></div>
             </div>`;
         });
