@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V159 (ZERO HARDCODE)</title>
+    <title>DoV - COMMAND V160 (NOMINAL PROD)</title>
     <style>
-        /* --- STYLE IDENTIQUE (INTACT) --- */
+        /* --- STYLE ORIGINAL (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -153,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V159 ZERO HARDCODE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V160 NOMINAL PROD</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -328,8 +328,8 @@
             </div>
 
             <div class="set-group">
-                <span class="set-title">DICTIONNAIRE TEMPLATES (JSON)</span>
-                <textarea id="cfgTemplates" style="height:150px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
+                <span class="set-title">DICTIONNAIRE TEMPLATES (JSON: ID -> {name, prod})</span>
+                <textarea id="cfgTemplates" style="height:200px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
             </div>
 
             <div class="set-group">
@@ -356,34 +356,84 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V159. ZERO HARDCODE.</div>
+<div class="logs" id="console">> V160. NOMINAL PROD READY.</div>
 
 <script>
-    // --- I. DONNÉES PAR DÉFAUT (INJECTÉES SI CACHE VIDE) ---
+    // --- I. DONNÉES PAR DÉFAUT (STRUCTURED) ---
     const DEFAULT_DATA = {
         zones: { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}},
         templates: {
-            "490122": "C_F1_PRODUCER_FUEL", "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
-            "492385": "C_F2_PRODUCER_FUEL", "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
-            "492379": "R_F1_PRODUCER_FUEL", "492376": "R_F2_PRODUCER_FUEL", "492386": "R_F3_PRODUCER_FUEL", "492390": "R_F4_PRODUCER_FUEL",
-            "492380": "E_F1_PRODUCER_FUEL", "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
-            "492368": "L_F1_PRODUCER_FUEL", "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
-            "544068": "S1_OWNER_FUEL", "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
-            "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
-            "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
-            "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
-            "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
-            "544070": "S1_OWNER_HEALTH",
-            "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
-            "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
-            "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
-            "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
-            "544071": "S1_OWNER_REPAIR",
-            "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
-            "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
-            "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
-            "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
-            "544069": "S1_OWNER_SUPPLY"
+            // STRUCTURE V160: ID -> { name, prod }
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
+            "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
+            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 },
+            "492389": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 },
+            "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
+            "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
+            "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
+            "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 },
+            "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 },
+            "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 },
+            "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 },
+            "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 },
+            "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 },
+            "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 },
+            "492368": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 },
+            "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
+            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 },
+            "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
+            "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
+            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 },
+            "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
+            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 },
+            "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
+            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 },
+            "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
+            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 },
+            "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
+            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 },
+            "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
+            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 },
+            "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
+            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 },
+            "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
+            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+
+            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
+            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 },
+            "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
+            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
+            "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
+            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 },
+            "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
+            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
+            "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
+            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 },
+            "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
+            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
+            "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
+            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 },
+            "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
+            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
+            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
+            "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
+            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
+            "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
+            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 },
+            "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
+            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
+            "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
+            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 },
+            "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
+            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
+            "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
+            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 },
+            "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
+            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
         },
         rates: { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 }
     };
@@ -504,9 +554,17 @@
         let dailyProd = hourlyProd * 24;
         let pType = "F";
         if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
-        let name = APP_DATA.templates[tid] || `INCONNU [${tid}]`;
+        
+        let tpl = APP_DATA.templates[tid];
+        let name = tpl ? tpl.name : `INCONNU [${tid}]`;
+        let base = tpl ? tpl.prod : 0;
+        
         let cost24 = hourlyProd * 24 * 0.085; 
-        let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
+        
+        // V160: Precise stack calculation
+        let unitProd = base > 0 ? (base * 24) : (stack > 0 ? dailyProd/stack : dailyProd);
+        if(base > 0 && hourlyProd > 0) stack = Math.round(hourlyProd / base);
+
         let sortScore = getSortScore(name);
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
@@ -528,7 +586,14 @@
                     if (!res.headers.get("content-type")?.includes("application/json")) throw new Error("Not JSON");
                     const json = await res.json();
                     if(json.success && json.data.length > 0) {
-                        json.data.forEach(t => { APP_DATA.templates[t.template_id] = t.immutable_data.name; });
+                        json.data.forEach(t => { 
+                            // Preserve existing PROD value if present
+                            let old = APP_DATA.templates[t.template_id];
+                            APP_DATA.templates[t.template_id] = { 
+                                name: t.immutable_data.name, 
+                                prod: old ? old.prod : 0 
+                            }; 
+                        });
                         totalLoaded += json.data.length;
                         document.getElementById('dictSize').innerText = Object.keys(APP_DATA.templates).length;
                         if(json.data.length < 500) break;
