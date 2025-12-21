@@ -3,640 +3,369 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V188 (PRODUCTION)</title>
+    <title>DoV - COMMAND V197 (ATOMIC LINKS)</title>
     <style>
-        /* --- 1. DESIGN SYSTEM WEB3 (FINAL) --- */
+        /* --- DESIGN SYSTEM : WALL STREET DARK (V196 BASE) --- */
         :root {
-            --bg-body: #0b0c15; 
-            --bg-panel: #12131f; 
-            --bg-card: #161722; 
-            --border: #2b2d42;
-            
-            --cyan: #00e676; 
-            --purple: #9b59b6;
-            --blue: #3498db;
-            --orange: #e67e22;
-            --red: #e74c3c;
-            --yellow: #f1c40f;
-            --dovx: #e056fd;
-
-            --text-main: #ffffff;
-            --text-muted: #8d99ae;
-            
-            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-code: 'Consolas', 'Monaco', monospace;
+            --bg-app: #0b0c10; --bg-panel: #111217; --bg-header: #1a1b20;
+            --bg-row-even: #14151a; --bg-row-hover: #1e1f26;
+            --border-subtle: #23242a; --border-accent: #3a3b45;
+            --action-green: #00f298; --action-red: #ff3b30; --brand-blue: #2979ff;
+            --text-primary: #e0e0e0; --text-secondary: #858595; --text-dim: #4a4b55;
+            --fuel: #ff9100; --health: #ff1744; --repair: #00b0ff; --supply: #ffea00; --dovx: #d500f9;
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-num: 'JetBrains Mono', 'Consolas', 'Courier New', monospace; 
         }
 
-        /* --- 2. LAYOUT & RESET --- */
-        body { background-color: var(--bg-body); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
+        body { background-color: var(--bg-app); color: var(--text-secondary); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; letter-spacing: 0.02em; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0b0c15; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* --- 3. HEADER --- */
-        header { 
-            height: 50px; background: rgba(18,19,31,0.95); border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100;
-        }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
-        h1 { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
-        .sys-badge { font-size: 10px; background: #222; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; color: var(--cyan); }
+        header { height: 48px; background: var(--bg-header); border-bottom: 1px solid var(--border-accent); display: flex; align-items: center; padding: 0 16px; justify-content: space-between; z-index: 100; }
+        .brand { display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 6px; height: 6px; background: var(--action-green); border-radius: 50%; box-shadow: 0 0 8px var(--action-green); }
+        h1 { color: var(--text-primary); font-size: 13px; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        .sys-status { font-family: var(--font-num); font-size: 9px; color: var(--action-green); border: 1px solid #1b3a2b; padding: 2px 6px; border-radius: 2px; background: #0a1f15; }
 
-        /* --- 4. SIDEBAR --- */
-        .layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { 
-            width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            padding: 15px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; 
-        }
-
-        .panel-box { border: 1px solid var(--border); background: rgba(255,255,255,0.02); border-radius: 6px; padding: 10px; }
-        .panel-title { font-size: 10px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 8px; display: block; }
-
-        /* INPUTS */
-        input { 
-            width: 100%; padding: 8px; background: #050508; border: 1px solid #444; 
-            color: #fff; border-radius: 4px; font-family: var(--font-code); margin-bottom: 5px; 
-        }
-        input:focus { border-color: var(--blue); outline: none; }
-
-        /* BUTTONS */
-        button { 
-            width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: 700; 
-            font-size: 10px; text-transform: uppercase; border-radius: 4px; transition: 0.2s; margin-bottom: 5px; 
-        }
-        button:hover { filter: brightness(1.1); }
+        .layout { display: flex; flex: 1; width: 100%; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border-subtle); padding: 16px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0; }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .group-title { font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
-        .btn-cyan { background: var(--cyan); color: #000; }
-        .btn-orange { background: var(--orange); color: #fff; }
-        .btn-blue { background: var(--blue); color: #fff; }
-        .btn-red { background: var(--red); color: #fff; }
-        .btn-dark { background: #2c3e50; color: #fff; border: 1px solid #34495e; }
-        .btn-ghost { background: transparent; border: 1px solid #444; color: #888; }
-        .btn-row { display: flex; gap: 5px; }
+        input[type="text"] { background: #08080a; border: 1px solid var(--border-accent); color: var(--text-primary); padding: 8px 10px; font-family: var(--font-num); font-size: 11px; border-radius: 3px; width: 100%; }
+        input:focus { border-color: var(--brand-blue); outline: none; }
 
-        /* --- 5. MAIN CONTENT --- */
-        .main-view { flex: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0b0c15 100%); }
+        button { width: 100%; padding: 8px 12px; cursor: pointer; border: none; font-weight: 600; font-size: 10px; text-transform: uppercase; border-radius: 3px; transition: all 0.2s; display: flex; justify-content: center; align-items: center; letter-spacing: 0.5px; }
+        button:hover { transform: translateY(-1px); }
+        .btn-primary { background: var(--brand-blue); color: #fff; box-shadow: 0 2px 5px rgba(41, 121, 255, 0.2); }
+        .btn-success { background: var(--action-green); color: #000; font-weight: 700; }
+        .btn-danger { background: rgba(255, 59, 48, 0.1); color: var(--action-red); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .btn-danger:hover { background: rgba(255, 59, 48, 0.2); }
+        .btn-subtle { background: var(--border-subtle); color: var(--text-primary); } .btn-subtle:hover { background: var(--border-accent); }
+        .btn-row { display: flex; gap: 8px; }
 
-        /* DASHBOARD HEADER */
-        .dash-header { 
-            background: linear-gradient(90deg, #151621 0%, #1a1b26 100%);
-            border: 1px solid var(--border); border-left: 4px solid var(--cyan);
-            padding: 20px; border-radius: 8px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .dh-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 5px; }
-        .dh-sub { font-size: 11px; color: #666; font-family: var(--font-code); }
-        .dh-cost { text-align: right; }
-        .dh-cost-val { font-size: 28px; font-weight: 800; color: #fff; }
-        .dh-cost-unit { font-size: 14px; color: var(--dovx); font-weight: 700; }
+        .main-view { flex: 1; padding: 24px 32px; overflow-y: auto; overflow-x: hidden; background: linear-gradient(180deg, var(--bg-app) 0%, #0e0f14 100%); }
 
-        /* CARDS GRID */
-        .top-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { 
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; 
-            padding: 15px; text-align: center; position: relative; overflow: hidden;
-        }
-        .sc-lbl { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; }
-        .sc-val { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-        .sc-sub { font-size: 9px; color: #444; margin-top: 5px; text-transform: uppercase; }
+        .metrics-bar { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 24px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 4px 0; }
+        .page-meta { font-family: var(--font-num); font-size: 10px; color: var(--text-secondary); }
+        .global-cost { text-align: right; }
+        .gc-label { display: block; font-size: 9px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2px; }
+        .gc-value { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .gc-unit { color: var(--dovx); font-size: 11px; }
 
-        /* LISTS GRID */
-        .lists-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .list-box { 
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; 
-            display: flex; flex-direction: column; min-height: 250px; overflow: hidden;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 16px; position: relative; overflow: hidden; }
+        .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+        .kpi-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .kpi-value { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+        .kpi-sub { font-size: 9px; color: var(--text-dim); margin-top: 4px; }
+
+        .tables-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .data-panel { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; flex-direction: column; height: fit-content; }
+        .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: #16171d; }
+        .ph-title { font-weight: 700; font-size: 11px; color: var(--text-primary); }
+        .ph-meta { font-family: var(--font-num); font-size: 9px; color: var(--text-dim); }
+
+        .dt-header { display: grid; grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px; padding: 8px 16px; background: var(--bg-header); border-bottom: 1px solid var(--border-subtle); font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .dt-row { display: grid; grid-template-columns: minmax(120px, 2fr) 60px 80px 100px 100px; padding: 6px 16px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.1s; }
+        .dt-row:nth-child(even) { background-color: var(--bg-row-even); }
+        .dt-row:hover { background-color: var(--bg-row-hover); }
         
-        .lb-header { 
-            background: #1e202e; padding: 10px 15px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .lb-title { font-weight: 800; font-size: 12px; color: #fff; text-transform: uppercase; }
+        .dt-cell { display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .dt-right { justify-content: flex-end; text-align: right; }
+        .dt-center { justify-content: center; text-align: center; }
         
-        .badges-row { display: flex; gap: 5px; }
-        .badge-info { 
-            background: #252838; border: 1px solid #333; color: #ccc; 
-            padding: 2px 6px; font-size: 10px; border-radius: 3px; font-family: var(--font-code); 
-        }
-        .badge-dovx { border-color: var(--dovx); color: var(--dovx); background: rgba(224, 86, 253, 0.1); }
-
-        /* DATA TABLE STYLE */
-        .tbl-header { 
-            display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; 
-            padding: 8px 12px; font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; 
-            background: rgba(0,0,0,0.2); border-bottom: 1px solid #222;
-        }
-        .tbl-row { 
-            display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; 
-            padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); 
-            font-size: 11px; align-items: center; color: #eee; 
-        }
-        .tbl-row:hover { background: rgba(255,255,255,0.05); }
+        .cell-name { font-weight: 500; color: var(--text-primary); }
         
-        .col-name { font-weight: 600; color: #dcdde1; }
-        .col-act { color: var(--text-muted); font-size: 10px; text-align: right; }
-        .col-act b { color: #fff; }
-        .col-val { text-align: right; font-family: var(--font-code); font-weight: 700; }
-        .col-tot { text-align: right; font-family: var(--font-code); color: #ccc; }
+        /* ATOMIC LINK STYLE */
+        a.atomic-link { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; }
+        a.atomic-link:hover { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* COLORS */
-        .c-fuel { color: var(--fuel); } .b-fuel { border-top: 3px solid var(--fuel); }
-        .c-health { color: var(--health); } .b-health { border-top: 3px solid var(--health); }
-        .c-repair { color: var(--repair); } .b-repair { border-top: 3px solid var(--repair); }
-        .c-supply { color: var(--supply); } .b-supply { border-top: 3px solid var(--supply); }
+        .cell-act { font-family: var(--font-num); font-weight: 700; color: var(--text-primary); justify-content: center; }
+        .cell-unit { font-family: var(--font-num); color: var(--text-dim); justify-content: flex-end; }
+        .cell-hourly { font-family: var(--font-num); font-weight: 700; color: var(--text-primary); justify-content: flex-end; }
+        .cell-daily { font-family: var(--font-num); color: var(--text-secondary); justify-content: flex-end; }
 
-        /* ZONES & ECO SPECIFIC */
-        .zones-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .zone-card { 
-            background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; 
-            transition: 0.2s; position: relative;
-        }
-        .zone-card:hover { border-color: var(--cyan); background: #1a1b29; }
-        .zone-card.active { border-color: var(--blue); background: rgba(52, 152, 219, 0.1); }
-        
-        .zc-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 11px; color: #fff; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
-        .zc-row { display: flex; justify-content: space-between; font-size: 10px; margin-top: 2px; font-family: var(--font-code); }
-        .zc-cost { color: var(--red); } .zc-tups { color: var(--text-muted); }
+        .c-fuel .kpi-card::before { background: var(--fuel); } .c-fuel .cell-hourly { color: var(--fuel); }
+        .c-health .kpi-card::before { background: var(--health); } .c-health .cell-hourly { color: var(--health); }
+        .c-repair .kpi-card::before { background: var(--repair); } .c-repair .cell-hourly { color: var(--repair); }
+        .c-supply .kpi-card::before { background: var(--supply); } .c-supply .cell-hourly { color: var(--supply); }
 
-        .eco-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .eco-box { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 6px; }
-        .eco-lbl { font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; }
-        .eco-num { font-size: 20px; font-weight: 800; color: #fff; margin-top: 5px; }
+        .zones-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .zone-box { background: var(--bg-panel); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 3px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; position: relative; }
+        .zone-box.active { border-color: var(--brand-blue); background: rgba(41, 121, 255, 0.05); }
+        .zb-name { font-size: 10px; font-weight: 700; color: var(--text-primary); }
+        .zb-stat { display: flex; justify-content: space-between; align-items: flex-end; }
+        .zb-count { font-family: var(--font-num); font-size: 14px; font-weight: 700; color: #fff; }
+        .zb-cost { font-family: var(--font-num); font-size: 9px; color: var(--action-red); }
 
-        /* TARGET */
-        .build-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .bld-card { background: #151621; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-size: 11px; }
-        
-        /* UTILS */
-        .view-section { display: none; }
-        .active-view { display: block; }
+        .view-section { display: none; } .active-view { display: block; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
-        .modal-win { width: 600px; background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
-        textarea { width: 100%; height: 100px; background: #0b0c15; color: #ccc; border: 1px solid #333; font-family: monospace; padding: 10px; }
+        .modal-win { width: 600px; background: var(--bg-panel); border: 1px solid var(--border-accent); padding: 24px; border-radius: 4px; box-shadow: 0 20px 50px #000; }
+        textarea { width: 100%; height: 120px; background: #08080a; color: #ccc; border: 1px solid var(--border-subtle); font-family: var(--font-num); padding: 10px; font-size: 10px; resize: vertical; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-area">
-        <div class="logo-dot"></div>
-        <h1>DoV COMMAND V188</h1>
+    <div class="brand">
+        <div class="status-dot"></div>
+        <h1>DoV COMMAND <span style="opacity:0.5; font-weight:400;">ATOMIC LINK V197</span></h1>
     </div>
-    <div class="sys-badge" id="statusBadge">SYSTEM READY</div>
+    <div class="sys-status" id="statusBadge">CONNECTED</div>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="panel-box">
-            <span class="panel-title">GLOBAL OPERATIONS</span>
+        <div class="control-group">
+            <span class="group-title">GLOBAL MONITORING</span>
             <div class="btn-row">
-                <button class="btn-cyan" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
-                <button class="btn-red" onclick="stopSignal=true">STOP</button>
+                <button class="btn-success" onclick="dispatchGlobalScan()">SCAN ALL</button>
+                <button class="btn-danger" onclick="stopSignal=true">STOP</button>
             </div>
             <div class="btn-row">
-                <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
-                <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
+                <button class="btn-primary" onclick="startZoneScan()">ZONES</button>
+                <button class="btn-primary" style="background:var(--fuel)" onclick="startEconomyScan()">ECON</button>
             </div>
         </div>
 
-        <div class="panel-box">
-            <span class="panel-title">TARGET ACCOUNT</span>
+        <div class="control-group">
+            <span class="group-title">TARGET INTELLIGENCE</span>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
             <div class="btn-row">
-                <button class="btn-dark" onclick="startTargetDivisions()">DIVISIONS</button>
-                <button class="btn-dark" onclick="startTargetBuildings()">BUILDINGS</button>
+                <button class="btn-subtle" onclick="startTargetDivisions()">DIVISIONS</button>
+                <button class="btn-subtle" onclick="startTargetBuildings()">BUILDINGS</button>
             </div>
         </div>
 
-        <div class="panel-box">
-            <span class="panel-title">CONFIGURATION</span>
-            <div style="font-size:10px; margin-bottom:5px;">Templates: <b id="dictSize" style="color:#fff">0</b></div>
-            <button class="btn-ghost" onclick="openSettings()">EDIT SETTINGS</button>
-            <button class="btn-ghost" onclick="hardReset()" style="color:var(--red)">FACTORY RESET</button>
+        <div class="control-group" style="margin-top:auto">
+            <span class="group-title">SYSTEM CONFIG</span>
+            <div style="font-size:10px; display:flex; justify-content:space-between; color:var(--text-dim);">
+                <span>DB SIZE:</span>
+                <span style="color:var(--text-primary); font-family:var(--font-num);" id="dictSize">0</span>
+            </div>
+            <button class="btn-subtle" onclick="openSettings()">SETTINGS JSON</button>
+            <button class="btn-subtle" onclick="hardReset()" style="color:var(--action-red)">HARD RESET</button>
         </div>
     </aside>
 
     <main class="main-view">
-        
         <div id="viewGlobal" class="view-section active-view">
-            <div class="dash-header">
+            <div class="metrics-bar">
                 <div>
-                    <div class="dh-title">GLOBAL SCAN LIVE</div>
-                    <div class="dh-sub">Rows: <span id="cntRows">0</span> &bull; Assets: <span id="cntAssets">0</span></div>
+                    <h2 class="page-title">GLOBAL PRODUCTION</h2>
+                    <div class="page-meta">SCANNING CHAIN: <span id="cntRows">0</span> ROWS / <span id="cntAssets">0</span> ASSETS</div>
                 </div>
-                <div class="dh-cost">
-                    <div class="sc-lbl">TOTAL MAINTENANCE</div>
-                    <div><span class="dh-cost-val" id="gTotalCost">0</span> <span class="dh-cost-unit">DOVX</span></div>
+                <div class="global-cost">
+                    <span class="gc-label">TOTAL DAILY MAINTENANCE</span>
+                    <span class="gc-value" id="gTotalCost">0</span> <span class="gc-unit">DOVX</span>
                 </div>
             </div>
-
-            <div class="top-grid" id="areaCards"></div>
-
-            <div class="lists-grid" id="areaLists"></div>
+            <div class="cards-grid" id="areaCards"></div>
+            <div class="tables-container" id="areaLists"></div>
         </div>
 
         <div id="viewZones" class="view-section">
-            <div class="dash-header" style="border-left-color: var(--blue)">
-                <div class="dh-title">ZONE ACTIVITY MAP</div>
-                <div class="dh-sub" id="zoneStatus">Ready to scan.</div>
-            </div>
-            <div class="zones-container" id="areaZones"></div>
+            <div class="metrics-bar"><div><h2 class="page-title">TACTICAL MAP</h2><div class="page-meta" id="zoneStatus">Ready.</div></div></div>
+            <div class="zones-grid" id="areaZones"></div>
         </div>
 
         <div id="viewEco" class="view-section">
-            <div class="dash-header" style="border-left-color: var(--orange)">
-                <div class="dh-title">ECONOMY METRICS</div>
-                <div class="dh-sub" id="ecoStatus">Ready to scan.</div>
-            </div>
-            <div class="eco-stats">
-                <div class="eco-box"><div class="eco-lbl">DEMAND (TU/DAY)</div><div class="eco-num" id="valDemandTU">0</div></div>
-                <div class="eco-box"><div class="eco-lbl">ACTIVE ZONES</div><div class="eco-num" id="valActiveZones">0</div></div>
-                <div class="eco-box"><div class="eco-lbl">DOVX BURN ESTIMATE</div><div class="eco-num" id="valDovxBurn">0</div></div>
+            <div class="metrics-bar"><div><h2 class="page-title">MACRO ECONOMY</h2><div class="page-meta" id="ecoStatus">Ready.</div></div></div>
+            <div class="cards-grid">
+                <div class="kpi-card"><div class="kpi-label">GLOBAL DEMAND</div><div class="kpi-value" id="valDemandTU">0</div><div class="kpi-sub">TU BURN / DAY</div></div>
+                <div class="kpi-card"><div class="kpi-label">ACTIVE ZONES</div><div class="kpi-value" id="valActiveZones">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">DOVX BURN</div><div class="kpi-value" style="color:var(--dovx)" id="valDovxBurn">0</div><div class="kpi-sub">ESTIMATED</div></div>
             </div>
         </div>
 
         <div id="viewTarget" class="view-section">
-            <div class="dash-header" style="border-left-color: var(--purple)">
-                <div class="dh-title">TARGET INSPECTOR</div>
-                <div class="dh-sub" id="targetStatus">Ready.</div>
-            </div>
-            <div id="areaTarget" class="build-list"></div>
+            <div class="metrics-bar"><div><h2 class="page-title">TARGET INSPECTOR</h2><div class="page-meta" id="targetStatus">Ready.</div></div></div>
+            <div id="areaTarget" class="tables-container"></div>
         </div>
-
     </main>
 </div>
 
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-win">
-        <h3 style="margin-top:0; color:#fff">CONFIGURATION</h3>
-        <span class="panel-title">API & ENDPOINTS</span>
-        <textarea id="cfgApi"></textarea>
-        <span class="panel-title">RESOURCES UI</span>
-        <textarea id="cfgResources"></textarea>
-        <span class="panel-title">GAME RULES</span>
-        <textarea id="cfgGameRules"></textarea>
-        <span class="panel-title">ZONES</span>
-        <textarea id="cfgZones"></textarea>
-        <span class="panel-title">TEMPLATES</span>
-        <textarea id="cfgTemplates"></textarea>
-        <div style="text-align:right; margin-top:10px;">
-            <button class="btn-cyan" style="width:auto" onclick="saveConfig()">SAVE & RELOAD</button>
-            <button class="btn-ghost" style="width:auto" onclick="closeModal('settingsModal')">CANCEL</button>
+        <h3 style="margin-top:0; color:var(--text-primary); font-size:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">SYSTEM CONFIGURATION</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
+            <div><span class="group-title">RESOURCES DEF</span><textarea id="cfgResources"></textarea></div>
+            <div><span class="group-title">GAME RULES</span><textarea id="cfgGameRules"></textarea></div>
+            <div><span class="group-title">ZONES DEF</span><textarea id="cfgZones"></textarea></div>
+            <div><span class="group-title">TEMPLATES DB</span><textarea id="cfgTemplates"></textarea></div>
+        </div>
+        <div style="text-align:right; margin-top:20px;">
+            <button class="btn-success" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & REBOOT</button>
+            <button class="btn-subtle" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
-    const switchView = (id) => {
-        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view'));
-        getId(id).classList.add('active-view');
-    };
+    const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DEFAULT DATA (STRICT & COMPLETE) ---
     const DEFAULT_DATA = {
-        apiConfig: {
-            endpoint: "https://wax.greymass.com/v1/chain/get_table_rows"
-        },
-        resourceDefs: {
-            "F": { label: "FUEL", color: "#e67e22", css: "b-fuel", txt: "c-fuel" },
-            "H": { label: "HEALTH", color: "#e74c3c", css: "b-health", txt: "c-health" },
-            "R": { label: "REPAIR", color: "#3498db", css: "b-repair", txt: "c-repair" },
-            "S": { label: "SUPPLY", color: "#feca57", css: "b-supply", txt: "c-supply" }
-        },
+        apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
+        resourceDefs: { "F": { label: "FUEL", class: "c-fuel" }, "H": { label: "HEALTH", class: "c-health" }, "R": { label: "REPAIR", class: "c-repair" }, "S": { label: "SUPPLY", class: "c-supply" } },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
-        zones: { 
-            1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
-            5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
-            9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},
-            13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
-            17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
-        },
+        zones: { 1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},9:{name:"Hill 1",cost:37052},10:{name:"Hill 2",cost:48652},11:{name:"Hill 3",cost:64516},12:{name:"Radar",cost:84712},13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0} },
         templates: {
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
-            "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 },
-            "492389": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 },
-            "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 },
-            "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 },
-            "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 },
-            "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 },
-            "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 },
-            "492368": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
-            "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
-            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
-            "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
-            "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
-            "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 },
-            "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 },
-            "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 },
-            "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 },
-            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }, "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 },
-            "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 },
-            "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 },
-            "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 },
-            "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 },
-            "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 },
-            "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 },
-            "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 },
-            "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
-            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
-            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
-            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
-            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
-            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
-            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
-            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
-            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+            "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }
         }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let stopSignal = false; 
+    let stopSignal = false;
 
-    // --- APP START (AUTO-REPAIR) ---
     function init() {
         const local = localStorage.getItem('DOV_DATA');
-        if(local) { 
-            try { 
-                let loaded = JSON.parse(local); 
-                // SAFETY: If old version without resourceDefs, force reset
-                if(!loaded.resourceDefs || !loaded.apiConfig) {
-                    console.warn("Detected old config. Upgrading...");
-                    throw new Error("Old Config");
-                }
-                DATA = { ...DEFAULT_DATA, ...loaded }; 
-            } catch(e){ 
-                console.log("Config Reset"); 
-                localStorage.setItem('DOV_DATA', JSON.stringify(DEFAULT_DATA));
-                DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-            } 
-        }
+        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
         getId('dictSize').innerText = Object.keys(DATA.templates).length;
         buildUI();
     }
 
     function buildUI() {
-        const areaC = getId('areaCards');
-        const areaL = getId('areaLists');
+        const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
-
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            areaC.innerHTML += `<div class="res-card ${rd.css}"><div class="rc-label">${rd.label}</div><div class="rc-val" style="color:${rd.color}" id="val-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div class="kpi-label"><span>${rd.label}</span><span>LIVE</span></div><div class="kpi-value" id="val-${k}">0</div><div class="kpi-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
-            <div class="list-box">
-                <div class="lb-header">
-                    <div class="lb-title">${rd.label} DETAILS</div>
-                    <div class="badges-row"><span class="badge-info">PROD: <span id="btot-${k}">0</span></span><span class="badge-info badge-dovx">COST: <span id="bcost-${k}">0</span></span></div>
-                </div>
-                <div class="tbl-header"><span>TEMPLATE</span><span>ACTIVE</span><span style="text-align:right">UNIT</span><span style="text-align:right">TOTAL/H</span></div>
-                <div id="tbl-${k}"></div>
-            </div>`;
+            <div class="data-panel"><div class="panel-header"><span class="ph-title">${rd.label} BREAKDOWN</span><span class="ph-meta">MAINTENANCE: <span id="bcost-${k}">0</span> DOVX</span></div>
+            <div class="dt-header"><div class="dt-h-cell">TEMPLATE</div><div class="dt-h-cell dt-center">ACT</div><div class="dt-h-cell dt-right">UNIT</div><div class="dt-h-cell dt-right">TOTAL/H</div><div class="dt-h-cell dt-right">24H</div></div>
+            <div id="tbl-${k}"></div></div>`;
         }
     }
 
-    // --- LOGIC: CONFORM DATA (STRICT + NO VISUAL STACK) ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1;
-        
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
-
         let hourly = count * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let cost = daily * DATA.gameConfig.maintenanceCost;
-
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
-        let type = "F";
-        for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
-
-        return { name, type, count, hourly, daily, cost, nominal };
+        let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
+        return { id: tid, name, type, count, hourly, daily, cost, nominal };
     }
 
-    // --- 1. GLOBAL SCAN ---
     async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal');
-        getId('cntRows').innerText = "...";
-        
-        let next = "";
-        let stats = { totalCost:0, types:{} };
-        let groups = {};
+        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
-
         try {
             while(!stopSignal) {
-                let res = await fetch(DATA.apiConfig.endpoint, {
-                    method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})
-                });
-                let json = await res.json();
-                if(!json.rows || json.rows.length === 0) break;
-
+                let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
+                let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
                 const now = Date.now()/1000;
                 for(let r of json.rows) {
-                    rowCount++;
-                    let d = processRow(r);
-                    assetCount += d.count;
-                    
-                    let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(active) {
+                    rowCount++; let d = processRow(r); assetCount += d.count;
+                    if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
                         let existing = groups[d.type].find(x => x.name === d.name);
-                        if(existing) {
-                            existing.act += d.count;
-                            existing.totH += d.hourly;
-                            existing.totC += d.cost;
-                        } else {
-                            groups[d.type].push({ name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totC:d.cost });
-                        }
-                        stats.types[d.type].p += d.hourly;
-                        stats.types[d.type].c += d.cost;
-                        stats.totalCost += d.cost;
+                        if(existing) { existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.totC += d.cost; }
+                        else { groups[d.type].push({ id:d.id, name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, totC:d.cost }); }
+                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.cost; stats.totalCost += d.cost;
                     }
                 }
-                
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(json.more) next = json.next_key; else break;
-                await new Promise(r => setTimeout(r, 50));
+                if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
         } catch(e) { console.error(e); }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
-        getId('cntRows').innerText = fmt(rows);
-        getId('cntAssets').innerText = fmt(assets);
-        getId('gTotalCost').innerText = fmt(stats.totalCost);
-
+        getId('cntRows').innerText = fmt(rows); getId('cntAssets').innerText = fmt(assets); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p);
-            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p);
-            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-
-            let html = "";
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
             let list = groups[k].sort((a,b) => b.totH - a.totH);
-            
+            let html = "";
             list.forEach(i => {
-                html += `
-                <div class="tbl-row">
-                    <div class="col-name">${i.name}</div>
-                    <div class="col-act"><b>${i.act}</b> ACTIF</div>
-                    <div class="col-val" style="color:#888">${fmtDec(i.unit)}/h</div>
-                    <div class="col-tot" style="color:${rd.color}">${fmtDec(i.totH)}</div>
-                </div>`;
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                html += `<div class="dt-row ${rd.class}"><div class="dt-cell cell-name"><a href="${link}" target="_blank" class="atomic-link">${i.name}</a></div><div class="dt-cell cell-act">${i.act}</div><div class="dt-cell cell-unit">${fmtDec(i.unit)}</div><div class="dt-cell cell-hourly">${fmtDec(i.totH)}</div><div class="dt-cell cell-daily">${fmtDec(i.totD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
     }
 
-    // --- 2. ZONES SCAN ---
     async function startZoneScan() {
-        stopSignal = false; switchView('viewZones');
-        getId('zoneStatus').innerText = "Scanning...";
-        getId('areaZones').innerHTML = "";
-        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0);
-        let next = "";
-
+        stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
+        let counts = {}; Object.keys(DATA.zones).forEach(id => counts[id] = 0); let next = "";
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, {
-                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
-            });
-            let json = await res.json();
-            if(!json.rows) break;
-            for(let r of json.rows) {
-                let id = r.zone_id || r.zoneID;
-                if(counts[id] !== undefined) counts[id]++;
-            }
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) { let id = r.zone_id || r.zoneID; if(counts[id] !== undefined) counts[id]++; }
             let html = "";
             Object.keys(counts).forEach(id => {
-                let z = DATA.zones[id];
-                let activeClass = counts[id] > 0 ? "active" : "";
-                html += `
-                <div class="zone-card ${activeClass}">
-                    <div class="zc-header"><span>${z.name}</span><span>${counts[id]}</span></div>
-                    <div class="zc-row"><span class="zc-tups">COST:</span><span class="zc-cost">${z.cost} TU</span></div>
-                </div>`;
+                let z = DATA.zones[id]; let activeClass = counts[id] > 0 ? "active" : "";
+                html += `<div class="zone-box ${activeClass}"><div class="zb-name">${z.name}</div><div class="zb-stat"><span class="zb-count">${counts[id]}</span><span class="zb-cost">COST: ${z.cost}</span></div></div>`;
             });
             getId('areaZones').innerHTML = html;
-            if(!json.more) break; next = json.next_key;
-            await new Promise(r => setTimeout(r, 50));
+            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
         }
-        getId('zoneStatus').innerText = "Scan Complete";
+        getId('zoneStatus').innerText = "Complete.";
     }
 
-    // --- 3. ECONOMY SCAN ---
     async function startEconomyScan() {
-        stopSignal = false; switchView('viewEco');
-        getId('ecoStatus').innerText = "Scanning...";
-        let next = "";
-        let dTU = 0, activeZ = 0;
-
+        stopSignal = false; switchView('viewEco'); getId('ecoStatus').innerText = "Scanning...";
+        let next = ""; let dTU = 0, activeZ = 0;
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, {
-                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})
-            });
-            let json = await res.json();
-            if(!json.rows) break;
-            for(let r of json.rows) {
-                let z = DATA.zones[r.zone_id];
-                if(z && z.cost > 0) { dTU += z.cost; activeZ++; }
-            }
-            getId('valDemandTU').innerText = fmt(dTU);
-            getId('valActiveZones').innerText = fmt(activeZ);
-            if(!json.more) break; next = json.next_key;
-            await new Promise(r => setTimeout(r, 50));
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
+            for(let r of json.rows) { let z = DATA.zones[r.zone_id]; if(z && z.cost > 0) { dTU += z.cost; activeZ++; } }
+            getId('valDemandTU').innerText = fmt(dTU); getId('valActiveZones').innerText = fmt(activeZ);
+            if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
         }
-        getId('ecoStatus').innerText = "Scan Complete";
+        getId('ecoStatus').innerText = "Complete.";
     }
 
-    // --- 4. TARGET SCANS ---
     async function startTargetBuildings() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim();
-        getId('targetStatus').innerText = "Buildings of " + user;
-        getId('areaTarget').innerHTML = "Scanning...";
+        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user; getId('areaTarget').innerHTML = "Loading...";
         let next = ""; let html = "";
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, {
-                method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next})
-            });
-            let json = await res.json();
-            if(!json.rows) break;
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r);
-                let col = DATA.resourceDefs[d.type].color;
-                html += `
-                <div class="bld-card" style="border-left:3px solid ${col}">
-                    <div style="font-weight:bold; color:${col}">${d.name}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:5px;">
-                        <span>QTY: ${d.count}</span>
-                        <span style="color:#fff; font-weight:700">${fmtDec(d.hourly)} /h</span>
-                    </div>
-                </div>`;
+                html += `<div class="dt-row"><div class="dt-cell cell-name">${d.name}</div><div class="dt-cell cell-act">${d.count}</div><div class="dt-cell cell-unit">-</div><div class="dt-cell cell-hourly">${fmtDec(d.hourly)}</div><div class="dt-cell cell-daily">-</div></div>`;
             }
-            getId('areaTarget').innerHTML = html || "No buildings found.";
+            getId('areaTarget').innerHTML = `<div class="data-panel"><div class="panel-header"><span class="ph-title">USER BUILDINGS</span></div>${html}</div>`;
             if(!json.more) break; next = json.next_key;
         }
     }
 
     async function startTargetDivisions() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim();
-        getId('targetStatus').innerText = "Divisions of " + user;
-        getId('areaTarget').innerHTML = "Scanning...";
+        let user = getId('targetIn').value.trim(); getId('targetStatus').innerText = "Scanning " + user; getId('areaTarget').innerHTML = "Loading...";
         let next = ""; let html = "";
         while(!stopSignal) {
-            let res = await fetch(DATA.apiConfig.endpoint, {
-                method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next})
-            });
-            let json = await res.json();
-            if(!json.rows) break;
+            let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:user, table:"sdivisions", limit:1000, lower_bound:next}) });
+            let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let z = DATA.zones[r.zone_id];
-                html += `
-                <div class="bld-card" style="border-left:3px solid var(--accent)">
-                    <div style="font-weight:bold; color:#fff">${z ? z.name : 'Zone '+r.zone_id}</div>
-                    <div style="color:var(--accent); text-align:right; font-weight:bold;">READY / ENGAGED</div>
-                </div>`;
+                html += `<div class="dt-row"><div class="dt-cell cell-name">${z ? z.name : 'Zone '+r.zone_id}</div><div class="dt-cell cell-act" style="color:var(--action-green)">ACTIVE</div><div class="dt-cell cell-unit">-</div><div class="dt-cell cell-hourly">-</div><div class="dt-cell cell-daily">-</div></div>`;
             }
-            getId('areaTarget').innerHTML = html || "No divisions found.";
+            getId('areaTarget').innerHTML = `<div class="data-panel"><div class="panel-header"><span class="ph-title">USER DIVISIONS</span></div>${html}</div>`;
             if(!json.more) break; next = json.next_key;
         }
     }
 
-    // --- SETTINGS ---
-    function openSettings() {
-        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4);
-        getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4);
-        getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4);
-        getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4);
-        getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4);
-        getId('settingsModal').style.display = 'flex';
-    }
-    function saveConfig() {
-        try {
-            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
-            DATA.resourceDefs = JSON.parse(getId('cfgResources').value);
-            DATA.gameConfig = JSON.parse(getId('cfgGameRules').value);
-            DATA.zones = JSON.parse(getId('cfgZones').value);
-            DATA.templates = JSON.parse(getId('cfgTemplates').value);
-            localStorage.setItem('DOV_DATA', JSON.stringify(DATA));
-            closeModal('settingsModal');
-            init();
-        } catch(e) { alert("JSON ERROR"); }
-    }
+    function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
-    function updateDictionary() { alert("Use Settings to paste new dictionary."); }
 
     window.onload = init;
 </script>
