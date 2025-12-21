@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V207 (STABLE & LOGS)</title>
+    <title>DoV - COMMAND V208 (REALTIME STATUS)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V199 CORE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -59,8 +59,7 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
-        /* 7 COLS */
-        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
+        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 60px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
@@ -109,7 +108,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V207</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V208</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -225,7 +224,6 @@
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
         resourceDefs: {
@@ -299,7 +297,7 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V207');
+        const local = localStorage.getItem('DOV_DATA_V208');
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
@@ -319,21 +317,31 @@
             areaL.innerHTML += `
             <div class="data-panel">
                 <div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
-                <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div>
+                <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div>
                 <div id="tbl-${k}"></div>
             </div>`;
         }
     }
 
+    // --- CORE LOGIC V208: TIMER CHECK ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
-        let count = assetList.length; // THE TRUTH: 4 IDs = 4 Buildings
+        let count_total = assetList.length; // STAKED COUNT
         
+        // TIMER LOGIC: Is it actively producing?
+        let now = Date.now() / 1000;
+        let finish = parseFloat(row.last_claim) + parseFloat(row.delay);
+        let isActive = now < finish; // TRUE if currently mining
+        
+        let count_active = isActive ? count_total : 0; // Only count for production if active
+
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
-        let hourly = count * nominal;
+        
+        // Calculations based on ACTIVE count only
+        let hourly = count_active * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
         let costD = daily * DATA.gameConfig.maintenanceCost;
         let costH = costD / 24;
@@ -341,16 +349,20 @@
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         
-        // Owner Fallback
         let owner = row.player || row.username || row.owner || row.scope || "unknown";
 
-        return { id:tid, name, type, count, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
+        return { 
+            id:tid, name, type, 
+            count_total, count_active, 
+            hourly, daily, costH, costD, nominal, 
+            assets: assetList, owner: owner 
+        };
     }
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
-        SCAN_DETAILS = {}; // Reset details for this scan
+        SCAN_DETAILS = {}; 
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         
@@ -362,26 +374,22 @@
                 for(let r of json.rows) {
                     rowCount++; 
                     let d = processRow(r); 
-                    assetCount += d.count;
-                    
-                    // LOGS FOR DEBUGGING
-                    console.log(`Scan: ${d.name} (${d.id}) -> Count: ${d.count}`);
+                    assetCount += d.count_total;
+                    console.log(`Scan: ${d.name} (${d.id}) -> Active: ${d.count_active}/${d.count_total}`);
 
-                    // AGGREGATE
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(existing) { 
-                        existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; 
+                        existing.act += d.count_active; 
+                        existing.tot += d.count_total;
+                        existing.totH += d.hourly; existing.totD += d.daily; 
                         existing.costH += d.costH; existing.costD += d.costD; 
                     } else { 
-                        groups[d.type].push({ id:d.id, name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); 
+                        groups[d.type].push({ id:d.id, name:d.name, act:d.count_active, tot:d.count_total, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); 
                     }
                     stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
 
-                    // STORE DETAILS BY ID
                     if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
-                    d.assets.forEach(assetId => {
-                        SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner });
-                    });
+                    d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
@@ -397,7 +405,8 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                // BUTTON CALLS FUNCTION WITH ID ONLY
+                // UI: Active / Total
+                let actClass = i.act > 0 ? "color:var(--green)" : "color:#666";
                 html += `
                 <div class="dt-grid dt-row">
                     <div class="cell">
@@ -405,7 +414,9 @@
                             ${i.name} <span class="ico-link">🔗</span>
                         </span>
                     </div>
-                    <div class="cell c-center" style="color:var(--green); font-weight:700;">${i.act}</div>
+                    <div class="cell c-center" style="font-weight:700;">
+                        <span style="${actClass}">${i.act}</span> <span style="color:#444">/</span> <span style="color:#aaa">${i.tot}</span>
+                    </div>
                     <div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div>
                     <div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div>
                     <div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div>
@@ -417,17 +428,12 @@
         }
     }
 
-    // --- MODAL INSPECTOR ---
     function openAssetDetails(tid) {
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : tid;
         let list = SCAN_DETAILS[tid] || [];
-        
         getId('detailTitle').innerText = `${name} (ID: ${tid}) - ${list.length} ASSETS FOUND`;
-        
         let html = `<table class="ins-table"><thead><tr><th>ASSET ID (ATOMIC)</th><th>WALLET OWNER</th><th>STATUS</th></tr></thead><tbody>`;
-        if(list.length === 0) html += `<tr><td colspan="3" style="text-align:center; padding:20px;">NO DATA LOADED YET</td></tr>`;
-        
         list.forEach(item => {
             let assetLink = `${DATA.gameConfig.atomicAsset}/${item.assetId}`;
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
@@ -485,9 +491,9 @@
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
-                // Link to template on Atomic
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
-                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="ext">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
+                // TARGET DOES NOT CHECK TIMER (ASSETS ARE OWNED)
+                tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="ext">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count_total}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
             if(!json.more) break; next = json.next_key;
         }
@@ -513,8 +519,8 @@
     }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V207', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V207'); location.reload(); } }
+    function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V208', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V208'); location.reload(); } }
 
     window.onload = init;
 </script>
