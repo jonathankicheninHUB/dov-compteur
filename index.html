@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V214 (AUTO-PROXY)</title>
+    <title>DoV - COMMAND V215 (NATIVE CLUSTER)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -45,7 +45,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* KPI & TABLES */
+        /* CARDS & TABLES */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -118,10 +118,10 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V214</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V215</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">AUTO-PROXY SYSTEM</span>
+            <span class="grp-lbl">NATIVE CLUSTER (23 NODES)</span>
             <div class="btn-row">
                 <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
@@ -155,7 +155,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">PROXY MODE &bull; ROWS: <span id="cntRows">0</span></div>
+                    <div class="page-meta">ROBUST SCAN &bull; ROWS: <span id="cntRows">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -166,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (AUTO-FAILOVER)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (DIRECT CONNECT)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -177,11 +177,11 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">PROXY CLUSTER (PRE-FILLED)</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODE LIST (ADD YOURS AT TOP)</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
-    // --- UTILS ---
+    // --- UTILS & SAFE DOM ---
     const getId = (id) => document.getElementById(id);
     const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; else sysLog(`DOM ERROR: #${id}`, "err"); };
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -204,21 +204,31 @@
     // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { 
-            // PRE-FILLED WORKING PROXIES (GATEWAYS)
-            proxies: [
-                "https://corsproxy.io/?", 
-                "https://api.allorigins.win/raw?url=", 
-                "" // DIRECT ACCESS (No Proxy)
-            ],
-            // ROBUST PUBLIC NODES
-            publicNodes: [
-                "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
-                "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
-                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
-                "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
-                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
-                "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
-                "https://wax.tmy.io", "https://api.hivebp.io"
+            // 23 NODES: 3 SLOTS FOR YOUR PROXIES + 20 PUBLIC
+            rpcNodes: [
+                "https://your-private-proxy-1.com", 
+                "https://your-private-proxy-2.com", 
+                "https://your-private-proxy-3.com",
+                "https://wax.greymass.com", 
+                "https://wax.eosio.online", 
+                "https://wax.api.eosnation.io", 
+                "https://wax.pink.gg", 
+                "https://api.wax.alohaeos.com", 
+                "https://wax.dapplica.io",
+                "https://api.waxsweden.org", 
+                "https://wax.eosphere.io", 
+                "https://wax.eu.eosamsterdam.net",
+                "https://api.wax.liquidstudios.io", 
+                "https://wax.cryptolions.io", 
+                "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", 
+                "https://api.wax.bountyblok.io", 
+                "https://wax-bp.wizardsguild.one",
+                "https://wax.blacklusion.io", 
+                "https://api.wax.greeneosio.com", 
+                "https://waxapi.ledgerwise.io",
+                "https://wax.tmy.io", 
+                "https://api.hivebp.io"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
@@ -241,11 +251,11 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V214'); // FLUSH DATA
+        const local = localStorage.getItem('DOV_DATA_V215'); // FLUSH OLD DATA
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
-                if(!loaded.apiConfig.proxies) loaded.apiConfig = DEFAULT_DATA.apiConfig;
+                if(!loaded.apiConfig.rpcNodes) loaded.apiConfig.rpcNodes = DEFAULT_DATA.apiConfig.rpcNodes;
                 DATA = { ...DEFAULT_DATA, ...loaded, gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig }, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
             } catch(e){ sysLog("RESET DATA", "warn"); } 
         }
@@ -268,33 +278,31 @@
         }
     }
 
-    // --- AUTO-PROXY FETCH ---
+    // --- NATIVE CLUSTER FETCH (NO PROXY GATEWAYS) ---
     async function fetchSmartCluster(body) {
-        // STRATEGY: Try PROXIES first (CORS GATEWAYS), then PUBLIC NODES
-        const proxies = DATA.apiConfig.proxies;
-        const publicNodes = DATA.apiConfig.publicNodes;
+        let nodes = DATA.apiConfig.rpcNodes;
+        // Shuffle nodes to distribute load
+        let shuffled = [...nodes].sort(() => 0.5 - Math.random());
         
-        let targetList = [...publicNodes]; 
-        // Shuffle targets
-        targetList.sort(() => 0.5 - Math.random());
+        for(let i=0; i<8; i++) { // Try 8 different nodes
+            let node = shuffled[i % shuffled.length];
+            if(node.endsWith('/')) node = node.slice(0, -1);
+            if(node.includes("your-private-proxy")) continue; // Skip placeholders
 
-        for(let i=0; i<8; i++) { // Try 8 times
-            let rpc = targetList[i % targetList.length];
-            if(rpc.endsWith('/')) rpc = rpc.slice(0, -1);
-            
-            // Randomly wrap in a Proxy from the list
-            let proxy = proxies[Math.floor(Math.random() * proxies.length)];
-            let finalUrl = proxy + rpc + "/v1/chain/get_table_rows";
-            
             try {
                 let controller = new AbortController();
-                setTimeout(() => controller.abort(), 6000); // 6s timeout
+                setTimeout(() => controller.abort(), 5000); // 5s Timeout
+                let res = await fetch(node + "/v1/chain/get_table_rows", { method: 'POST', body: body, signal: controller.signal });
                 
-                let res = await fetch(finalUrl, { method: 'POST', body: body, signal: controller.signal });
-                if(res.ok) return await res.json();
-            } catch(e) { /* silent fail, try next */ }
+                if(res.ok) {
+                    // sysLog(`OK: ${node}`, "ok"); // Verbose
+                    return await res.json();
+                } else {
+                    sysLog(`FAIL ${node}: ${res.status}`, "warn");
+                }
+            } catch(e) { /* sysLog(`ERR ${node}`, "err"); */ }
         }
-        throw new Error("CLUSTER UNREACHABLE");
+        throw new Error("CLUSTER UNREACHABLE (ALL 8 NODES FAILED)");
     }
 
     function processRow(row) {
@@ -323,7 +331,7 @@
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); safeSetText('cntRows', "...");
-        sysLog("STARTING SCAN (AUTO-PROXY)...", "ok");
+        sysLog("STARTING NATIVE CLUSTER SCAN...", "ok");
         
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         SCAN_DETAILS = {}; 
@@ -352,7 +360,7 @@
                     d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 20));
             }
             sysLog("SCAN COMPLETE", "ok");
         } catch(e) { sysLog("ERROR: " + e.message, "err"); }
@@ -465,8 +473,8 @@
     }
 
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V214', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V214'); location.reload(); } }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V215', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V215'); location.reload(); } }
 
     window.onload = init;
 </script>
