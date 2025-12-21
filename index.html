@@ -2,127 +2,66 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V199 (PRO LAYOUT)</title>
+    <title>DoV - COMMAND V200 (ATOMIC FIX)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
-            --bg-app: #0b0c10; 
-            --bg-panel: #13141b; 
-            --bg-header: #1c1d26;
-            --border: #2d2e3a;
-            
-            --green: #00f090; 
-            --red: #ff3b30; 
-            --blue: #2979ff; 
-            --orange: #ff9100;
-            --purple: #d500f9;
-            --text-main: #e0e0e0;
-            --text-muted: #858595;
-
-            --font-ui: 'Inter', system-ui, sans-serif;
-            --font-num: 'JetBrains Mono', 'Consolas', monospace; 
+            --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
+            --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
+            --text-main: #e0e0e0; --text-muted: #858595;
+            --fuel: #ff9100; --health: #ff1744; --repair: #00b0ff; --supply: #ffea00;
+            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
 
-        /* --- RESET --- */
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; } 
-        ::-webkit-scrollbar-track { background: var(--bg-app); } 
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* --- STRUCTURE --- */
+        /* --- LAYOUT --- */
         .layout { display: flex; width: 100%; height: 100%; }
-        
-        /* SIDEBAR */
-        .sidebar { 
-            width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; 
-        }
-        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; margin-bottom: 5px; display:flex; align-items:center; gap:8px; }
+        .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; }
+        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); }
+
+        /* --- COMPONENTS --- */
+        .app-title { color: #fff; weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-        
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* INPUTS & BUTTONS */
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        input:focus { border-color: var(--blue); outline: none; }
-        
-        button { 
-            padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; 
-            text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%;
-        }
+        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
         
-        .btn-green { background: var(--green); color: #000; }
-        .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
-        .btn-blue { background: var(--blue); color: #fff; }
-        .btn-orange { background: var(--orange); color: #000; }
+        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* --- MAIN VIEWPORT --- */
-        .main-content { 
-            flex: 1; overflow-y: auto; padding: 25px; 
-            background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%);
-        }
-
-        /* HEADER METRICS */
-        .dashboard-header { 
-            display: flex; justify-content: space-between; align-items: flex-end; 
-            padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px;
-        }
+        /* --- HEADER METRICS --- */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
-        
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* KPI CARDS (4 COLS) */
-        .kpi-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; 
-        }
-        .kpi-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; 
-            padding: 15px; position: relative; overflow: hidden;
-        }
+        /* --- GRIDS & TABLES --- */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; display: flex; justify-content: space-between; }
         .kc-val { font-family: var(--font-num); font-size: 22px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* TABLES GRID (2 COLS) - THE FIX */
-        .tables-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; 
-            align-items: start; /* Prevents stretching height */
-        }
-        
-        /* DATA TABLE COMPONENT */
-        .data-panel { 
-            background: var(--bg-panel); border: 1px solid var(--border); 
-            border-radius: 6px; display: flex; flex-direction: column; 
-        }
-        
-        .dp-head { 
-            padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+        .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
+        .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
-        .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
         
-        /* TABLE GRID LAYOUT - 7 COLUMNS PERFECTLY ALIGNED */
+        /* GRID 7 COLS : Name | Act | Unit | ProdH | Prod24 | CostH | Cost24 */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
-        
-        .dt-header { 
-            padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; 
-            border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2);
-        }
-        
-        .dt-row { 
-            padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); 
-            font-size: 11px; align-items: center; color: #ccc; transition: 0.1s;
-        }
+        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
         .dt-row:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
@@ -130,23 +69,26 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* SPECIFIC COLORS */
+        .cell-name { font-weight: 500; color: var(--text-main); }
+        .cell-act { font-family: var(--font-num); font-weight: 700; color: var(--green); }
+        .cell-unit { font-family: var(--font-num); color: var(--text-muted); }
+        .cell-prod { font-family: var(--font-num); font-weight: 700; color: #fff; }
+        
+        /* LINKS */
+        a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; cursor: pointer; }
+        a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
+        a.wallet { color: var(--blue); font-weight: 700; text-decoration: none; border-bottom: 1px solid transparent; }
+        a.wallet:hover { border-bottom-color: var(--blue); }
+
+        /* COLORS */
         .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); }
         .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); }
         .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); }
         .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); }
 
-        /* LINKS */
-        a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
-        a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
-        a.wallet { color: var(--blue); font-weight: 700; text-decoration: none; }
-
-        /* ZONES & ECO */
+        /* ZONES */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px;
-            display: flex; flex-direction: column; justify-content: space-between; height: 80px;
-        }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 80px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
         .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 4px;}
         .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); }
@@ -163,7 +105,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V199</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V200</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -208,9 +150,7 @@
                     <div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div>
                 </div>
             </div>
-
             <div class="kpi-grid" id="areaCards"></div>
-
             <div class="tables-grid" id="areaLists"></div>
         </div>
 
@@ -247,10 +187,10 @@
 
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
-        <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
+        <h3 style="margin-top:0; color:var(--text-main); font-size:14px; border-bottom:1px solid var(--border); padding-bottom:10px;">SYSTEM CONFIG</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
             <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
-            <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
+            <div><span class="grp-lbl">RULES / LINKS</span><textarea id="cfgGameRules"></textarea></div>
             <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
             <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
         </div>
@@ -276,7 +216,13 @@
             "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" },
             "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" }
         },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+        gameConfig: { 
+            maintenanceCost: 0.085, 
+            cycleHours: 24, 
+            tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" },
+            atomicBase: "https://atomichub.io/explorer/template/wax-mainnet/dovdivisions",
+            accountBase: "https://atomichub.io/explorer/account"
+        },
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
             5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
@@ -347,12 +293,7 @@
         areaC.innerHTML = ''; areaL.innerHTML = '';
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            areaC.innerHTML += `
-            <div class="kpi-card ${rd.class}">
-                <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
-                <div class="kc-val" id="val-${k}">0</div>
-                <div class="kc-sub">PROD / HOUR</div>
-            </div>`;
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div><div class="kc-val" id="val-${k}">0</div><div class="kc-sub">PROD / HOUR</div></div>`;
             areaL.innerHTML += `
             <div class="data-panel">
                 <div class="dp-head">
@@ -369,7 +310,9 @@
 
     function processRow(row) {
         let tid = row.template_id.toString();
-        let count = row.asset_ids ? row.asset_ids.length : 1;
+        // LOGIC 4 BUILDINGS: Count assets in the array. 
+        let count = row.asset_ids ? row.asset_ids.length : 1; 
+        
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
         let nominal = tpl ? tpl.prod : 0;
@@ -396,8 +339,12 @@
                     rowCount++; let d = processRow(r); assetCount += d.count;
                     if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
                         let existing = groups[d.type].find(x => x.name === d.name);
-                        if(existing) { existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD; }
-                        else { groups[d.type].push({ id:d.id, name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); }
+                        if(existing) { 
+                            existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; 
+                            existing.costH += d.costH; existing.costD += d.costD; 
+                        } else { 
+                            groups[d.type].push({ id:d.id, name:d.name, act:d.count, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); 
+                        }
                         stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
                     }
                 }
@@ -415,7 +362,7 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                let link = `${DATA.gameConfig.atomicBase}/${i.id}`;
                 html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${i.act}</div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
@@ -455,10 +402,8 @@
 
     async function startTargetBuildings() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `<a href="https://wax.atomichub.io/explorer/account/${user}" target="_blank" class="wallet">${user}</a> SCANNING...`;
-        let next = ""; let html = "";
-        
-        let container = getId('areaTarget');
+        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `SCANNING: <a href="${DATA.gameConfig.accountBase}/${user}" target="_blank" class="wallet">${user}</a>`;
+        let next = ""; let container = getId('areaTarget');
         container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">BUILDINGS PORTFOLIO</span></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">QTY</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="targetBody"></div></div>`;
         let tbody = getId('targetBody');
 
@@ -466,7 +411,8 @@
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:user, table:"buildings", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
-                let d = processRow(r); let rd = DATA.resourceDefs[d.type]; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
+                let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
+                let link = `${DATA.gameConfig.atomicBase}/${d.id}`;
                 tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
             if(!json.more) break; next = json.next_key;
@@ -475,7 +421,7 @@
 
     async function startTargetDivisions() {
         stopSignal = false; switchView('viewTarget');
-        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `<a href="https://wax.atomichub.io/explorer/account/${user}" target="_blank" class="wallet">${user}</a> SCANNING...`;
+        let user = getId('targetIn').value.trim(); getId('targetMeta').innerHTML = `SCANNING: <a href="${DATA.gameConfig.accountBase}/${user}" target="_blank" class="wallet">${user}</a>`;
         let next = "";
         let container = getId('areaTarget');
         container.innerHTML = `<div class="data-panel"><div class="dp-head"><span class="dp-title">ACTIVE DIVISIONS</span></div><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr;"><div class="cell">ZONE NAME</div><div class="cell c-right">STATUS</div></div><div id="targetBody"></div></div>`;
