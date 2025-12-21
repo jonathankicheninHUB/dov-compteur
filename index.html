@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V145 (GOD MODE SETTINGS)</title>
+    <title>DoV - COMMAND V146 (ARCHITECT)</title>
     <style>
-        /* --- STYLE ORIGINAL V70 (INTACT) --- */
+        /* --- STYLE V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -23,7 +23,7 @@
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
         button:hover { opacity: 0.8; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
-        .btn-settings { background: #444; color: #fff; border:1px solid #666; margin-bottom:15px; } .btn-settings:hover { background: #666; }
+        .btn-settings { background: #333; color: var(--sec); border:1px solid var(--sec); margin-bottom:15px; } .btn-settings:hover { background: #444; }
         input, select, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
@@ -79,7 +79,6 @@
         .zone { background: #0a0a0a; border: 1px solid #333; padding: 8px; min-height: 80px; cursor: pointer; transition: 0.2s; position: relative; }
         .zone:hover { border-color: var(--sec); background: #111; box-shadow: 0 0 10px rgba(41, 182, 246, 0.1); }
         .zone.active { border-color: #444; background: #0e0e0e; }
-        
         .z-head { display: flex; justify-content: space-between; color: #fff; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 4px; }
         .z-metrics { font-size: 10px; color: #888; margin-bottom: 5px; display: grid; grid-template-columns: 1fr; gap: 3px; }
         .z-row { display: flex; justify-content: space-between; }
@@ -123,7 +122,8 @@
         .set-group { margin-bottom: 15px; border: 1px solid #333; padding: 10px; }
         .set-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display:block; border-bottom:1px solid #444; padding-bottom:3px; }
         .set-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
-        .btn-action { background: var(--main); color: #000; width: auto; display: inline-block; padding: 5px 15px; }
+        .btn-action { background: var(--main); color: #000; width: auto; display: inline-block; padding: 5px 15px; cursor: pointer; border:none; font-weight:bold; }
+        .btn-action:hover { opacity:0.8; }
         
         .sybil-cluster { border: 1px solid var(--alert); background: rgba(255, 23, 68, 0.1); margin-bottom: 8px; padding: 5px; border-radius: 3px; }
         .cluster-head { color: var(--alert); font-weight: bold; font-size: 10px; border-bottom: 1px solid #444; margin-bottom: 4px; display: flex; justify-content: space-between; }
@@ -137,7 +137,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V145 GOD MODE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V146 ARCHITECT</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -300,9 +300,15 @@
                 </div>
             </div>
 
-            <div class="set-group">
-                <span class="set-title">RÉSEAU & RPC (1 URL par ligne)</span>
-                <textarea id="cfgRpc" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="set-group">
+                    <span class="set-title">NODES RPC (1 par ligne)</span>
+                    <textarea id="cfgRpc" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+                </div>
+                <div class="set-group">
+                    <span class="set-title">PROXIES CORS (1 par ligne)</span>
+                    <textarea id="cfgProxy" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+                </div>
             </div>
 
             <div style="text-align:right;">
@@ -313,10 +319,10 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V145. GOD MODE READY.</div>
+<div class="logs" id="console">> V146. ARCHITECT READY.</div>
 
 <script>
-    // --- CONFIGURATION CENTRALE (V145) ---
+    // --- CONFIGURATION CENTRALE (V146) ---
     let CONFIG = {
         strategy: 'B',
         batchSize: 1000,
@@ -328,6 +334,11 @@
             "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
             "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
             "https://api.hivebp.io", "https://wax.blacklusion.io"
+        ],
+        proxies: [
+            "https://corsproxy.io/?",
+            "https://api.allorigins.win/raw?url=",
+            "https://thingproxy.freeboard.io/fetch/"
         ]
     };
 
@@ -338,6 +349,7 @@
         document.getElementById('cfgDelay').value = CONFIG.delay;
         document.getElementById('cfgStart').value = CONFIG.startKey;
         document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n');
+        document.getElementById('cfgProxy').value = CONFIG.proxies.join('\n');
         document.getElementById('settingsModal').style.display = 'flex';
     }
 
@@ -347,17 +359,19 @@
         CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200;
         CONFIG.startKey = document.getElementById('cfgStart').value.trim();
         
-        // Parse RPC List
         let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n');
         let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http'));
         if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc;
 
+        let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n');
+        let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http'));
+        if(cleanProxy.length > 0) CONFIG.proxies = cleanProxy;
+
         closeModal('settingsModal');
-        log("⚙️ Configuration mise à jour.", "#ffd700");
+        log("⚙️ Configuration sauvegardée.", "#ffd700");
     }
 
     function resetConfig() {
-        // Reset to safe defaults
         document.getElementById('cfgStrategy').value = 'B';
         document.getElementById('cfgBatch').value = '1000';
         document.getElementById('cfgDelay').value = '200';
@@ -367,7 +381,7 @@
 
     // --- VARIABLES GLOBALES ---
     let ZONE_DETAILS = {}; 
-    let stopSignal = false; let rpcIndex = 0; 
+    let stopSignal = false; let rpcIndex = 0; let proxyIndex = 0; // Rotation Proxy ajoutée
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
     const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
@@ -421,28 +435,32 @@
         } catch(e) { return null; }
     }
 
-    // --- ROBUST FETCH V145 (DYNAMIC CONFIG) ---
+    // --- ROBUST FETCH V146 (DYNAMIC & CONFIGURABLE) ---
     async function robustFetch(code, table, lowerBound, limit=1000) {
-        let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
-        
-        // OVERRIDE PARAMETERS FROM CONFIG
+        let attempts = 0;
+        // Override with config
         const effectiveLimit = CONFIG.batchSize;
         const effectiveDelay = CONFIG.delay;
         
         while(attempts < 20 && !stopSignal) {
             const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
+            
+            // PROXY ROTATION V146
+            const proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
+            
             rpcIndex++; 
             const url = server + "/v1/chain/get_table_rows";
-            let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
-            let proxyUrl = "https://corsproxy.io/?"; 
-            if(attempts > 3) proxyUrl = "https://api.allorigins.win/raw?url=";
-            let finalUrl = url;
-            if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
-            else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
             
+            let finalUrl = proxy + encodeURIComponent(url);
+            // Fallback direct mode if proxy list empty
+            if(CONFIG.proxies.length === 0) finalUrl = url;
+
             try {
-                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = "RPC: "+new URL(server).hostname;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
+                let statusText = `[RPC: ${new URL(server).hostname}]`;
+                if(CONFIG.proxies.length > 0) statusText += ` + [PROXY: ${new URL(proxy).hostname}]`;
+                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = statusText;
+
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 15000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: effectiveLimit, lower_bound: lowerBound };
                 
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
@@ -453,7 +471,8 @@
                 
                 return await res.json();
             } catch(e) { 
-                attempts++; 
+                attempts++;
+                proxyIndex++; // Rotate proxy on error
                 await new Promise(r => setTimeout(r, 200));
             }
         }
@@ -467,7 +486,7 @@
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
         let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="S"; else if(rawStr.includes("DOVS")) pType="S";
+        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
