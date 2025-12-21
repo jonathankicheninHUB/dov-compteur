@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V240 (FINAL STABLE)</title>
+    <title>DoV - COMMAND V241 (ECO LOOP FIXED)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -79,7 +79,7 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* ZONES MAP (TACTICAL) */
+        /* ZONES MAP (ECONOMY) */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
@@ -103,7 +103,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V240</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V241</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">ROBUST MONITORING</span>
@@ -139,11 +139,11 @@
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
                 <div>
-                    <h2 class="page-h1">GLOBAL COLLECTION</h2>
+                    <h2 class="page-h1">GLOBAL PRODUCTION</h2>
                     <div class="page-meta">CLUSTER SCAN &bull; ROWS: <span id="cntRows">0</span></div>
                 </div>
                 <div class="total-cost">
-                    <div class="grp-lbl">DAILY MAINTENANCE</div>
+                    <div class="grp-lbl">DAILY DOVX CONSUMPTION</div>
                     <div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div>
                 </div>
             </div>
@@ -154,11 +154,11 @@
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
                 <div>
-                    <h2 class="page-h1">ZONE TACTICAL MAP</h2>
+                    <h2 class="page-h1">ZONE ECONOMY MAP</h2>
                     <div class="page-meta" id="zoneStatus">Ready.</div>
                 </div>
                 <div class="total-cost">
-                    <div class="grp-lbl">ACTIVE CONSUMPTION / 24H</div>
+                    <div class="grp-lbl">GLOBAL TU BURN / 24H</div>
                     <div style="font-family:var(--font-num); font-size:10px; margin-top:2px;">
                         <span class="tc-f">F: <span id="gBurnF">0</span></span> &bull; 
                         <span class="tc-h">H: <span id="gBurnH">0</span></span> &bull; 
@@ -169,9 +169,9 @@
             </div>
             
             <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
+                <div class="kpi-card"><div class="kc-title">ACTIVE DIVISIONS</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING (> NOW)</div></div>
                 <div class="kpi-card"><div class="kc-title">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight">0</div><div class="kc-sub">COMBAT POWER</div></div>
-                <div class="kpi-card"><div class="kc-title">ACTIVE DIVISIONS</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING</div></div>
-                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">ESTIMATED REWARD</div></div>
+                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">REWARD ESTIMATE</div></div>
             </div>
 
             <div class="zones-map" id="areaZones"></div>
@@ -187,10 +187,10 @@
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
         <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES (CLUSTER)</span><textarea id="cfgApi"></textarea></div>
         <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
-        <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
+        <div><span class="grp-lbl">RULES (REWARD RATIO)</span><textarea id="cfgGameRules"></textarea></div>
         <div><span class="grp-lbl">ZONES (COST/24H)</span><textarea id="cfgZones"></textarea></div>
         <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
-        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS (WEIGHTS)</span><textarea id="cfgDivisions"></textarea></div>
+        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS (WEIGHT ONLY)</span><textarea id="cfgDivisions"></textarea></div>
     </div>
     <div style="text-align:right; margin-top:15px;">
         <button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button>
@@ -199,7 +199,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V240';
+    const STORAGE_KEY = 'DOV_DATA_V241';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -208,7 +208,6 @@
 
     const DEFAULT_DATA = {
         apiConfig: { 
-            // RESTORED: MULTI-NODE CLUSTER
             rpcNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
@@ -220,7 +219,12 @@
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, rewardRatio: 0.1, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+        gameConfig: { 
+            maintenanceCost: 0.085, 
+            cycleHours: 24, 
+            rewardRatio: 0.1, // REWARD IS RATIO OF ZONE COST
+            tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } 
+        },
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
             5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
@@ -245,8 +249,8 @@
             "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, 
             "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
             "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 },
-            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, 
+            "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 }, // Keeping IDs as is, user can remove SC via settings if desired or I can remove them from default.
             "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
             "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 },
             "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 },
@@ -337,6 +341,7 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
+    // --- GLOBAL SCAN (BUILDINGS) ---
     function processRow(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1; 
@@ -345,7 +350,7 @@
         let nominal = tpl ? tpl.prod : 0;
         let hourly = count * nominal;
         let daily = hourly * DATA.gameConfig.cycleHours;
-        let costD = daily * DATA.gameConfig.maintenanceCost;
+        let costD = daily * DATA.gameConfig.maintenanceCost; // DOVX COST
         let costH = costD / 24;
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; 
@@ -354,7 +359,6 @@
         return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
     }
 
-    // --- GLOBAL MONOLITH SCAN ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
@@ -362,7 +366,6 @@
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
-                // FIXED: CLUSTER FETCH
                 let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
                 if(!json.rows || json.rows.length === 0) break;
                 const now = Date.now()/1000;
@@ -404,7 +407,7 @@
         }
     }
 
-    // --- ZONE SCANNER TACTICAL (RESTORED WITH CLUSTER) ---
+    // --- ZONE SCANNER (FIXED V241) ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
@@ -413,28 +416,37 @@
 
         let next = "";
         while(!stopSignal) {
-            // FIXED: CLUSTER FETCH
             let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
             if(!json.rows) break;
+            
             const now = Date.now()/1000;
+
             for(let r of json.rows) {
                 let zid = r.zone_id || r.zoneID;
                 if(zonesData[zid]) {
                     zonesData[zid].count++;
                     stats.totalDivs++;
+
                     let tid = r.template_id || "default";
                     let d = DATA.divisions[tid] || DATA.divisions["default"];
                     let weight = d.w || 0;
                     zonesData[zid].weight += weight;
                     stats.totalWeight += weight;
+
                     let isAction = parseFloat(r.unlock_time) > now;
+
                     if(isAction) {
                         zonesData[zid].active++;
                         stats.activeDivs++;
+                        
+                        // CONSUMPTION = ZONE COST
                         let zCost = DATA.zones[zid].cost;
+                        // REWARD = ZONE COST * RATIO
                         let zReward = zCost * DATA.gameConfig.rewardRatio;
+
                         zonesData[zid].bf += zCost; zonesData[zid].bh += zCost; zonesData[zid].br += zCost; zonesData[zid].bs += zCost;
                         zonesData[zid].prod += zReward;
+                        
                         stats.burnF += zCost; stats.burnH += zCost; stats.burnR += zCost; stats.burnS += zCost;
                         stats.totalProd += zReward;
                     }
@@ -462,15 +474,15 @@
             <div class="zone-card ${activeClass}">
                 <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active}/${d.count}</span></div>
                 <div class="zc-mid">
-                    <div class="zs-item"><span>PROD 24H</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div class="zs-item"><span>PROD DOVX</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
                     <div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div>
                     <div style="height:1px; background:#333; margin:2px 0;"></div>
-                    <div class="zs-item"><span>FUEL</span> <span class="tc-f">${fmt(d.bf)}</span></div>
-                    <div class="zs-item"><span>HEALTH</span> <span class="tc-h">${fmt(d.bh)}</span></div>
-                    <div class="zs-item"><span>REPAIR</span> <span class="tc-r">${fmt(d.br)}</span></div>
-                    <div class="zs-item"><span>SUPPLY</span> <span class="tc-s">${fmt(d.bs)}</span></div>
+                    <div class="zs-item"><span>INPUT F</span> <span class="tc-f">${fmt(d.bf)}</span></div>
+                    <div class="zs-item"><span>INPUT H</span> <span class="tc-h">${fmt(d.bh)}</span></div>
+                    <div class="zs-item"><span>INPUT R</span> <span class="tc-r">${fmt(d.br)}</span></div>
+                    <div class="zs-item"><span>INPUT S</span> <span class="tc-s">${fmt(d.bs)}</span></div>
                 </div>
-                <div class="zc-bot"><span style="color:#666">ENTRY</span><span style="color:var(--red)">${z.cost} TU</span></div>
+                <div class="zc-bot"><span style="color:#666">ENTRY COST</span><span style="color:var(--red)">${z.cost} TU</span></div>
             </div>`;
         });
         getId('areaZones').innerHTML = html;
@@ -481,7 +493,7 @@
     async function startTargetDivisions() { /* Same V199 */ }
 
     function openSettings() { 
-        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); // ADDED
+        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); 
         getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); 
         getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); 
         getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); 
@@ -492,7 +504,7 @@
     
     function saveConfig() { 
         try { 
-            DATA.apiConfig = JSON.parse(getId('cfgApi').value); // ADDED
+            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
             DATA.resourceDefs = JSON.parse(getId('cfgResources').value); 
             DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); 
             DATA.zones = JSON.parse(getId('cfgZones').value); 
