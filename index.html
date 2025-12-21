@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V235 (ZONE COMMANDER)</title>
+    <title>DoV - COMMAND V236 (TACTICAL PRECISION)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V234 BASE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
             --bg-app: #0b0c10; 
             --bg-panel: #13141b; 
@@ -26,79 +26,59 @@
 
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; } 
-        ::-webkit-scrollbar-track { background: var(--bg-app); } 
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
         .layout { display: flex; width: 100%; height: 100%; }
-        
-        .sidebar { 
-            width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; 
-        }
-        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; margin-bottom: 5px; display:flex; align-items:center; gap:8px; }
+        .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; }
+        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); display:flex; flex-direction:column; }
+
+        /* COMPONENTS */
+        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-        
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        button { 
-            padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; 
-            text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%;
-        }
+        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
         
-        .btn-green { background: var(--green); color: #000; }
-        .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
-        .btn-blue { background: var(--blue); color: #fff; }
-        .btn-orange { background: var(--orange); color: #000; }
+        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        .main-content { 
-            flex: 1; overflow-y: auto; padding: 25px; 
-            background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%);
-        }
-
-        .dashboard-header { 
-            display: flex; justify-content: space-between; align-items: flex-end; 
-            padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px;
-        }
+        /* HEADER */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
         .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
-        
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
         /* KPI CARDS */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; 
-            padding: 15px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* GAUGE CHART */
-        .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
-        .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
+        /* GRAPH & INDICATORS */
         .kc-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .big-24h { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
         .b24-val { font-family: var(--font-num); font-size: 26px; font-weight: 800; line-height: 1; }
         .b24-lbl { font-size: 9px; color: #666; font-weight: 700; margin-top: 4px; display:flex; justify-content:space-between;}
+        
+        .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
+        .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
 
-        /* COLORS */
         .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); } .fuel .gauge-wrapper { background: conic-gradient(var(--orange) var(--pct), #333 0deg); }
         .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); } .health .gauge-wrapper { background: conic-gradient(var(--red) var(--pct), #333 0deg); }
         .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); } .repair .gauge-wrapper { background: conic-gradient(var(--blue) var(--pct), #333 0deg); }
         .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); } .supply .gauge-wrapper { background: conic-gradient(var(--yellow) var(--pct), #333 0deg); }
 
+        /* TABLES & LISTS */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -113,22 +93,28 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* ZONES MAP (ENHANCED) */
+        /* ZONES TACTICAL MAP */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { 
             background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px;
-            display: flex; flex-direction: column; justify-content: space-between; height: 110px; /* Taller for details */
+            display: flex; flex-direction: column; justify-content: space-between; height: 160px; /* Taller for details */
         }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
-        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 4px;}
-        .zc-mid { flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px; font-family:var(--font-num); font-size:10px; color:#aaa; }
-        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top:4px; }
-        .z-metric { display:flex; justify-content:space-between; }
+        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
         
+        /* MINI STATS GRID */
+        .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
+        
+        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
+
+        .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
+
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
 
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
@@ -138,7 +124,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V235</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V236</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">MONITORING</span>
@@ -193,16 +179,23 @@
                     <div class="page-meta" id="zoneStatus">Ready.</div>
                 </div>
                 <div class="total-cost">
-                    <div class="grp-lbl">TOTAL BURN / 24H</div>
-                    <div><span class="tc-val" id="zTotalBurn">0</span> <span class="tc-unit">TU</span></div>
+                    <div class="grp-lbl">ACTIVE CONSUMPTION / 24H</div>
+                    <div style="font-family:var(--font-num); font-size:10px; margin-top:2px;">
+                        <span class="tc-f">F: <span id="gBurnF">0</span></span> &bull; 
+                        <span class="tc-h">H: <span id="gBurnH">0</span></span> &bull; 
+                        <span class="tc-r">R: <span id="gBurnR">0</span></span> &bull; 
+                        <span class="tc-s">S: <span id="gBurnS">0</span></span>
+                    </div>
                 </div>
             </div>
-            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+            
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
                 <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div><div class="kc-sub">STAKED IN ZONES</div></div>
-                <div class="kpi-card"><div class="kc-title">ACTIVE DIVISIONS</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">IN ACTION</div></div>
-                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">ESTIMATED PRODUCTION</div></div>
+                <div class="kpi-card"><div class="kc-title">ACTIVE IN COMBAT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING (> NOW)</div></div>
+                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">FROM ACTIVE COMBAT</div></div>
             </div>
-            <div class="zones-map" id="areaZones" style="margin-top:20px;"></div>
+
+            <div class="zones-map" id="areaZones"></div>
         </div>
 
         <div id="viewEco" class="view-section"><div class="dashboard-header" style="border-left: 4px solid var(--orange)"><h2 class="page-h1">MACRO ECONOMICS</h2><div class="page-meta" id="ecoStatus">Ready.</div></div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);"><div class="kpi-card"><div class="kc-title">GLOBAL DEMAND</div><div class="kc-val" id="valDemandTU">0</div><div class="kc-sub">TU BURN / DAY</div></div><div class="kpi-card"><div class="kc-title">ACTIVE ZONES</div><div class="kc-val" id="valActiveZones">0</div></div><div class="kpi-card"><div class="kc-title">DOVX BURN</div><div class="kc-val" style="color:var(--purple)" id="valDovxBurn">0</div><div class="kc-sub">ESTIMATED / DAY</div></div></div></div>
@@ -210,17 +203,16 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box"><h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;"><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">DIVISIONS (STATS)</span><textarea id="cfgDivisions"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-box"><h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;"><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">DIVISIONS (COST F/H/R/S)</span><textarea id="cfgDivisions"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V235';
+    const STORAGE_KEY = 'DOV_DATA_V236';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DATA WITH DIVISIONS ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
         resourceDefs: {
@@ -235,11 +227,12 @@
             13:{name:"Plain 1",cost:99384},14:{name:"Plain 2",cost:125708},15:{name:"Plain 3",cost:151164},16:{name:"HQ",cost:188000},
             17:{name:"City 1",cost:0},18:{name:"City 2",cost:0},19:{name:"City 3",cost:0},20:{name:"City 4",cost:0}
         },
-        // NEW: DIVISIONS DICTIONARY (Placeholders - User to update in Settings)
+        // NEW: DIVISIONS MATRIX (Cost F/H/R/S + Prod DOVX)
+        // NOTE: USER MUST UPDATE THESE VALUES IN SETTINGS
         divisions: {
-            "default": { name: "Infantry", burn: 10, prod: 5 },
-            "298539": { name: "Soldier", burn: 15, prod: 2 }, 
-            "298540": { name: "Tank", burn: 50, prod: 10 }
+            "default": { name: "Infantry", c: {F:10, H:2, R:0, S:1}, p: 5 },
+            "298539": { name: "Soldier", c: {F:15, H:5, R:0, S:2}, p: 2 }, 
+            "298540": { name: "Tank", c: {F:50, H:0, R:20, S:5}, p: 10 }
         },
         templates: {
             "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 },
@@ -311,6 +304,7 @@
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
         const order = ["F", "H", "R", "S"];
+        
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
             areaC.innerHTML += `
@@ -321,6 +315,7 @@
                 </div>
                 <div class="big-24h"><div class="b24-val val" id="val24-${k}">0</div><div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div></div>
             </div>`;
+            
             areaL.innerHTML += `
             <div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
             <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
@@ -339,15 +334,23 @@
         let costH = costD / 24;
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         let type = "F"; 
-        if(name.includes("FUEL")) type = "F"; else if(name.includes("HEALTH")) type = "H"; else if(name.includes("REPAIR")) type = "R"; else if(name.includes("SUPPLY")) type = "S";
+        
+        if(name.includes("FUEL")) type = "F";
+        else if(name.includes("HEALTH")) type = "H";
+        else if(name.includes("REPAIR")) type = "R";
+        else if(name.includes("SUPPLY")) type = "S";
         else { for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; } }
+        
         return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
     }
 
+    // --- GLOBAL MONOLITH SCAN ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        let next = ""; let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
-        let groups = {}; for(let k in DATA.resourceDefs) { groups[k] = []; }
+        let next = ""; 
+        let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
+        let groups = {};
+        for(let k in DATA.resourceDefs) { groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
@@ -360,11 +363,18 @@
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
                     if(isActive) stats.types[d.type].a += d.count;
                     let existing = groups[d.type].find(x => x.name === d.name);
-                    if(!existing) { existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 }; groups[d.type].push(existing); }
+                    if(!existing) {
+                        existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 };
+                        groups[d.type].push(existing);
+                    }
                     existing.tot += d.count;
                     if(isActive) {
-                        existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD;
-                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
+                        existing.act += d.count; 
+                        existing.totH += d.hourly; existing.totD += d.daily; 
+                        existing.costH += d.costH; existing.costD += d.costD;
+                        stats.types[d.type].p += d.hourly; 
+                        stats.types[d.type].c += d.costD; 
+                        stats.totalCost += d.costD;
                     }
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
@@ -377,11 +387,15 @@
         getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24);
+            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
             let pct = stats.types[k].t > 0 ? Math.round((stats.types[k].a / stats.types[k].t) * 100) : 0;
             getId(`pct-${k}`).innerText = pct + "%";
-            let deg = Math.round(pct * 3.6); getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
+            let deg = Math.round(pct * 3.6);
+            getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
@@ -392,20 +406,21 @@
         }
     }
 
-    // --- ZONE SCANNER UPGRADE ---
+    // --- ZONE SCANNER TACTICAL UPGRADE V236 ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
-        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalBurn: 0 };
-        let zonesData = {}; // Store aggregates per zone
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, 
+                      burnF:0, burnH:0, burnR:0, burnS:0 };
         
-        // Init zonesData
+        let zonesData = {}; 
         Object.keys(DATA.zones).forEach(id => { 
-            zonesData[id] = { count: 0, active: 0, burn: 0, prod: 0 }; 
+            zonesData[id] = { count: 0, active: 0, prod: 0, bf:0, bh:0, br:0, bs:0 }; 
         });
 
         let next = "";
         while(!stopSignal) {
+            // FIXED SCOPE: dovpvecontrl (All Divisions)
             let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}) });
             let json = await res.json(); if(!json.rows) break;
             
@@ -417,53 +432,52 @@
                     zonesData[zid].count++;
                     stats.totalDivs++;
 
-                    // Determine Active Status & Stats
-                    // Note: Logic is simplified as 'active' status flag isn't fully detailed in prompt, 
-                    // assuming presence in sdivisions = staked. 
-                    // 'Active' here implies 'In Action' based on user request.
-                    // We check if there's a return_time or similar. If not, assume all staked are active in zone logic or look for 'finish_time'.
-                    // Standard DoV: 'unlock_time' > now means busy.
-                    
-                    let isAction = true; // Default to active if staked
-                    if (r.unlock_time && parseFloat(r.unlock_time) > now) {
-                        // Busy / Cooldown? Adjust logic if specific field known. 
-                        // For this request: "combien sont en action" -> Staked usually means ready/fighting.
-                    }
+                    // STRICT TIMER CHECK: unlock_time > now means IN ACTION
+                    let isAction = parseFloat(r.unlock_time) > now;
 
                     if(isAction) {
                         zonesData[zid].active++;
                         stats.activeDivs++;
                         
-                        // Calculate Burn & Prod based on Template ID
-                        let tid = r.template_id || (r.asset_id ? "UNKNOWN" : "UNKNOWN"); // Often need asset lookup, but let's check if template_id is in row
-                        // Fallback to default stats if specific template not found
-                        let divStats = DATA.divisions[tid] || DATA.divisions["default"];
+                        let tid = r.template_id || "default";
+                        let d = DATA.divisions[tid] || DATA.divisions["default"];
                         
-                        zonesData[zid].burn += divStats.burn;
-                        zonesData[zid].prod += divStats.prod;
+                        // Per Zone Stats
+                        zonesData[zid].bf += d.c.F;
+                        zonesData[zid].bh += d.c.H;
+                        zonesData[zid].br += d.c.R;
+                        zonesData[zid].bs += d.c.S;
+                        zonesData[zid].prod += d.p;
                         
-                        stats.totalBurn += divStats.burn;
-                        stats.totalProd += divStats.prod;
+                        // Global Stats
+                        stats.burnF += d.c.F;
+                        stats.burnH += d.c.H;
+                        stats.burnR += d.c.R;
+                        stats.burnS += d.c.S;
+                        stats.totalProd += d.p;
                     }
                 }
             }
 
-            // Update UI on the fly
             updateZoneUI(zonesData, stats);
-
             if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
         }
         getId('zoneStatus').innerText = "Complete.";
     }
 
     function updateZoneUI(zonesData, stats) {
-        // Global Stats
+        // Global Header Stats
         getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalBurn').innerText = fmt(stats.totalBurn * 24); // Daily Burn
-        getId('zTotalProd').innerText = fmt(stats.totalProd * 24); // Daily Prod
+        getId('zTotalProd').innerText = fmt(stats.totalProd * 24);
+        
+        // 24H Global Burn Breakdown
+        getId('gBurnF').innerText = fmt(stats.burnF * 24);
+        getId('gBurnH').innerText = fmt(stats.burnH * 24);
+        getId('gBurnR').innerText = fmt(stats.burnR * 24);
+        getId('gBurnS').innerText = fmt(stats.burnS * 24);
 
-        // Zone Cards
+        // Cards
         let html = "";
         Object.keys(zonesData).forEach(id => {
             let z = DATA.zones[id];
@@ -473,10 +487,16 @@
             html += `
             <div class="zone-card ${activeClass}">
                 <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active}/${d.count}</span></div>
+                
                 <div class="zc-mid">
-                    <div class="z-metric"><span>BURN/24H</span> <span style="color:var(--orange)">${fmt(d.burn * 24)}</span></div>
-                    <div class="z-metric"><span>EARN/24H</span> <span style="color:var(--purple)">${fmt(d.prod * 24)}</span></div>
+                    <div class="zs-item"><span>PROD 24H</span> <span style="color:var(--purple)">${fmt(d.prod * 24)}</span></div>
+                    <div style="height:1px; background:#333; margin:2px 0;"></div>
+                    <div class="zs-item"><span>FUEL</span> <span class="tc-f">${fmt(d.bf * 24)}</span></div>
+                    <div class="zs-item"><span>HEALTH</span> <span class="tc-h">${fmt(d.bh * 24)}</span></div>
+                    <div class="zs-item"><span>REPAIR</span> <span class="tc-r">${fmt(d.br * 24)}</span></div>
+                    <div class="zs-item"><span>SUPPLY</span> <span class="tc-s">${fmt(d.bs * 24)}</span></div>
                 </div>
+                
                 <div class="zc-bot"><span style="color:#666">ENTRY</span><span style="color:var(--red)">${z.cost} TU</span></div>
             </div>`;
         });
@@ -492,7 +512,6 @@
         getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); 
         getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); 
         getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); 
-        // Add Divisions config
         getId('cfgDivisions').value = JSON.stringify(DATA.divisions, null, 4);
         getId('settingsModal').style.display = 'flex'; 
     }
@@ -503,7 +522,7 @@
             DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); 
             DATA.zones = JSON.parse(getId('cfgZones').value); 
             DATA.templates = JSON.parse(getId('cfgTemplates').value); 
-            DATA.divisions = JSON.parse(getId('cfgDivisions').value); // Save Divisions
+            DATA.divisions = JSON.parse(getId('cfgDivisions').value); 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); 
             closeModal('settingsModal'); init(); 
         } catch(e) { alert("JSON ERROR"); } 
