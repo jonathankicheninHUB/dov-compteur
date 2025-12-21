@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V184 (STABLE & RESTORED)</title>
+    <title>DoV - COMMAND V185 (FULL SUITE)</title>
     <style>
-        /* --- DESIGN SYSTEM WEB3 (V183) --- */
+        /* --- DESIGN SYSTEM WEB3 --- */
         :root {
             --bg-body: #0b0c15; --bg-panel: #12131f; --bg-card: #151621; --border: #2b2d42;
             --primary: #3498db; --accent: #00e676; --dovx: #e056fd; --gold: #f1c40f;
@@ -14,17 +14,20 @@
             --font-mono: 'Consolas', monospace;
         }
 
-        body { background-color: var(--bg-body); color: var(--text-muted); font-family: var(--font-main); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
+        body { background-color: var(--bg-body); color: var(--text-gray); font-family: var(--font-main); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-body); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
+        /* --- HEADER & LAYOUT --- */
         header { height: 50px; background: rgba(18, 19, 31, 0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 10; }
         .logo-dot { width:10px; height:10px; background:var(--accent); border-radius:50%; box-shadow:0 0 10px var(--accent); margin-right:10px; }
         h1 { color: #fff; margin: 0; font-size: 14px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
 
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        
+        .main-view { flex: 1; padding: 30px; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, rgba(20,20,30,1) 0%, rgba(5,5,8,1) 100%); }
+
+        /* --- COMPONENTS --- */
         .box-framed { border: 1px solid var(--border); padding: 15px; border-radius: 6px; background: rgba(255,255,255,0.02); }
         .group-label { font-size: 10px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 5px; }
 
@@ -39,9 +42,7 @@
         
         input { width: 100%; padding: 8px; background: #050508; border: 1px solid #333; color: #fff; border-radius: 4px; font-family: var(--font-mono); margin-bottom: 8px; }
 
-        .main-view { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
-        
-        /* DASHBOARD GRID */
+        /* --- GLOBAL DASHBOARD --- */
         .g-main-count { background: linear-gradient(90deg, #151621 0%, #1a1b26 100%); border: 1px solid var(--border); padding: 20px; border-radius: 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; border-left: 4px solid var(--accent); }
         .g-title { font-size:18px; font-weight:800; color:#fff; }
         .g-sub { font-size:11px; color:#666; font-family:var(--font-mono); }
@@ -61,12 +62,13 @@
         .badge-cost { border-color: rgba(224, 86, 253, 0.3); color: var(--dovx); background: rgba(224, 86, 253, 0.05); }
 
         .t-header { display: grid; grid-template-columns: 3fr 0.5fr 1.5fr 1.5fr; padding: 8px 15px; font-size: 9px; color: #555; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #222; background: rgba(0,0,0,0.2); }
-        .t-row { display: grid; grid-template-columns: 3fr 0.5fr 1.5fr 1.5fr; padding: 8px 15px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 11px; align-items: center; color: #eee; }
+        .t-row { display: grid; grid-template-columns: 3fr 0.5fr 1.5fr 1.5fr; padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 11px; align-items: center; color: #eee; }
         .t-row:hover { background: rgba(255,255,255,0.03); }
         .t-act { color: var(--accent); font-weight: bold; text-align: center; }
         .t-val { text-align: right; font-family: var(--font-mono); color: #fff; }
-        
-        /* ZONES SPECIFIC */
+        .t-val-dim { text-align: right; font-family: var(--font-mono); color: #777; }
+
+        /* --- ZONES & ECO --- */
         .zones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .zone { background: #1e202e; border: 1px solid var(--border); padding: 15px; border-radius: 8px; transition:0.2s; position:relative; overflow:hidden; }
         .zone:hover { border-color: var(--accent); } .zone.active { border-color: var(--primary); background: #151621; }
@@ -74,12 +76,15 @@
         .z-metric { display:flex; justify-content:space-between; font-size:10px; margin-bottom:3px; }
         .z-val { color: var(--text-main); font-family: var(--font-mono); }
 
-        /* ECO SPECIFIC */
         .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .eco-card { background: #1e202e; border: 1px solid var(--border); padding: 20px; border-radius: 12px; }
         .eco-title { color:#666; font-size:10px; text-transform:uppercase; margin-bottom:10px; font-weight:700; }
         .eco-val { color:#fff; font-size:24px; font-weight:800; }
         
+        /* --- TARGET LISTS --- */
+        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .b-card { background: #1e202e; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size:11px; }
+
         /* UTILS */
         .border-fuel::before { background: var(--fuel); } .txt-fuel { color: var(--fuel); }
         .border-health::before { background: var(--health); } .txt-health { color: var(--health); }
@@ -87,14 +92,26 @@
         .border-supply::before { background: var(--supply); } .txt-supply { color: var(--supply); }
         .view-section { display: none; }
         #systemBadge { position: absolute; top: 15px; right: 20px; font-size: 10px; color: #555; }
+        
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; border: 1px solid var(--panel-border); width: 700px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .modal-head { padding: 15px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-close { cursor: pointer; color: var(--text-muted); font-size: 20px; transition: 0.2s; }
+        .modal-close:hover { color: #fff; }
+        .modal-body { padding: 15px; overflow-y: auto; color: #ccc; font-size: 11px; }
+        .set-group { margin-bottom: 15px; border: 1px solid #333; padding: 10px; }
+        .set-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display:block; border-bottom:1px solid #444; padding-bottom:3px; }
+        textarea { width: 100%; height: 100px; background: #0b0c15; color: #ccc; border: 1px solid #333; font-family: monospace; padding: 10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div class="brand">
         <div class="logo-dot"></div>
-        <h1>DoV COMMAND <span style="font-weight:300; opacity:0.5; margin-left:5px;">V184 STABLE</span></h1>
+        <h1>DoV COMMAND <span class="version">V185</span></h1>
     </div>
     <div id="systemBadge">SYSTEM READY</div>
 </header>
@@ -105,26 +122,33 @@
             <span class="group-label">OPERATIONS</span>
             <div class="box-framed">
                 <div class="btn-row">
-                    <button class="btn-green" onclick="startZoneScan()">SCAN ZONES</button>
-                    <button class="btn-orange" onclick="startEconomyScan()">SCAN ECON</button>
+                    <button class="btn-green" onclick="dispatchGlobalScan()">GLOBAL SCAN</button>
+                    <button class="btn-red" onclick="stopSignal=true">STOP</button>
                 </div>
-                <button class="btn-dark" style="margin-top:10px;" onclick="dispatchGlobalScan()">GLOBAL SCAN (ALL)</button>
-                <button class="btn-red" onclick="stopSignal=true">STOP</button>
+                <div class="btn-row">
+                    <button class="btn-teal" onclick="startZoneScan()">ZONES</button>
+                    <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
+                </div>
             </div>
         </div>
+
         <div class="panel-group">
-            <span class="group-label">TARGET</span>
+            <span class="group-label">TARGET ACCOUNT</span>
             <div class="box-framed">
                 <input type="text" id="targetIn" value="u2d2k.c.wam">
-                <button class="btn-blue" onclick="startTarget()">SCAN DIVISIONS</button>
-                <button class="btn-blue" onclick="startBuildings()">SCAN BUILDINGS</button>
+                <div class="btn-row">
+                    <button class="btn-blue" onclick="startTargetDivisions()">DIVISIONS</button>
+                    <button class="btn-blue" onclick="startTargetBuildings()">BUILDINGS</button>
+                </div>
             </div>
         </div>
+
         <div class="panel-group" style="margin-top:auto">
             <span class="group-label">SYSTEM</span>
             <div class="box-framed">
                 <div style="font-size:10px; margin-bottom:5px;">TEMPLATES: <b id="dictSize" style="color:#fff">0</b></div>
-                <button class="btn-ghost" onclick="resetConfig()">RESET CONFIG</button>
+                <button class="btn-ghost" onclick="openSettings()">SETTINGS</button>
+                <button class="btn-ghost" onclick="hardReset()" style="color:var(--alert)">FACTORY RESET</button>
             </div>
         </div>
     </aside>
@@ -160,21 +184,57 @@
                 <div class="g-sub" id="ecoStatus">Waiting for scan...</div>
             </div>
             <div class="eco-grid">
-                <div class="eco-card"><div class="eco-title">GLOBAL DEMAND</div><div class="eco-val" id="valDemandTU">0</div><div class="rc-sub">TU BURN / DAY</div></div>
-                <div class="eco-card"><div class="eco-title">ACTIVE ZONES</div><div class="eco-val" id="valActiveZones">0</div><div class="rc-sub">COUNT</div></div>
-                <div class="eco-card"><div class="eco-title">DOVX BURN</div><div class="eco-val" id="valDovxBurn">0</div><div class="rc-sub">ESTIMATED / DAY</div></div>
+                <div class="eco-card"><div class="eco-title">GLOBAL DEMAND</div><div class="eco-val" id="valDemandTU">0</div></div>
+                <div class="eco-card"><div class="eco-title">ACTIVE ZONES</div><div class="eco-val" id="valActiveZones">0</div></div>
+                <div class="eco-card"><div class="eco-title">DOVX BURN</div><div class="eco-val" id="valEcoBurn">0</div></div>
             </div>
         </div>
 
-        <div id="targetView" class="view-section">
-            <div id="targetList"></div>
+        <div id="targetBuildView" class="view-section">
+            <div class="g-main-count" style="border-left-color: #3498db;">
+                <div class="g-title">PLAYER BUILDINGS</div>
+                <div class="g-sub" id="buildStatus">Ready to scan...</div>
+            </div>
+            <div id="buildList" class="build-grid"></div>
+        </div>
+
+        <div id="targetDivView" class="view-section">
+            <div class="g-main-count" style="border-left-color: #3498db;">
+                <div class="g-title">PLAYER DIVISIONS</div>
+                <div class="g-sub" id="divStatus">Ready to scan...</div>
+            </div>
+            <div id="divList" class="build-grid"></div>
         </div>
 
     </main>
 </div>
 
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <div class="modal-title">CONFIGURATION</div>
+            <div class="modal-close" onclick="closeModal('settingsModal')">×</div>
+        </div>
+        <div class="modal-body">
+            <div class="set-group"><span class="set-title">INTERFACE</span><textarea id="cfgResources"></textarea></div>
+            <div class="set-group"><span class="set-title">RÈGLES</span><textarea id="cfgGameRules"></textarea></div>
+            <div class="set-group"><span class="set-title">ZONES</span><textarea id="cfgZones"></textarea></div>
+            <div class="set-group"><span class="set-title">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
+            <button class="btn-green" onclick="saveConfig()">SAVE</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // --- CORE DATA & CONFIG ---
+    // --- UTILS ---
+    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+    function switchView(id) {
+        document.querySelectorAll('.view-section').forEach(e => e.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+    function setTextSafe(id, val) { let e=document.getElementById(id); if(e) e.innerText=val; }
+
+    // --- DEFAULT DATA ---
     const DEFAULT_DATA = {
         resourceDefs: {
             "F": { label: "FUEL", color: "#e67e22", css: "border-fuel", txt: "txt-fuel" },
@@ -182,7 +242,11 @@
             "R": { label: "REPAIR", color: "#3498db", css: "border-repair", txt: "txt-repair" },
             "S": { label: "SUPPLY", color: "#feca57", css: "border-supply", txt: "txt-supply" }
         },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+        gameConfig: {
+            maintenanceCost: 0.085,
+            cycleHours: 24,
+            tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" }
+        },
         zones: { 
             1:{name:"Beach 1",cost:1160},2:{name:"Beach 2",cost:6968},3:{name:"Beach 3",cost:8800},4:{name:"Bunker",cost:11120},
             5:{name:"Forest 1",cost:14024},6:{name:"Forest 2",cost:17704},7:{name:"Forest 3",cost:22352},8:{name:"Camp",cost:28220},
@@ -239,23 +303,30 @@
         document.getElementById('dictSize').innerText = Object.keys(CORE_DATA.templates).length;
         initUI();
     }
-
+    
     function initUI() {
-        const c = document.getElementById('dynamicCardsArea'); const l = document.getElementById('dynamicListsArea');
+        const c = document.getElementById('dynamicCardsArea'); 
+        const l = document.getElementById('dynamicListsArea');
         c.innerHTML = ""; l.innerHTML = "";
+        
         for(let k in CORE_DATA.resourceDefs) {
             let r = CORE_DATA.resourceDefs[k];
             c.innerHTML += `<div class="res-card ${r.css}"><div class="rc-label">${r.label}</div><div class="rc-val" style="color:${r.color}" id="pwr-${k}">0</div><div class="rc-sub">PROD / HOUR</div></div>`;
-            l.innerHTML += `<div class="list-panel"><div class="lp-header"><div class="lp-title">${r.label} BREAKDOWN</div><div class="lp-badges"><span class="badge">PROD: <span id="tot-p-${k}">0</span></span><span class="badge badge-cost">COST: <span id="tot-c-${k}">0</span></span></div></div><div class="t-header"><span>TEMPLATE</span><span>ACT</span><span style="text-align:right">TOT/H</span><span style="text-align:right">TOT/24H</span></div><div class="t-body" id="list-${k}"></div></div>`;
+            l.innerHTML += `
+            <div class="list-panel">
+                <div class="lp-header">
+                    <div class="lp-title">${r.label} BREAKDOWN</div>
+                    <div class="lp-badges"><span class="badge">PROD: <span id="tot-p-${k}">0</span></span><span class="badge badge-cost">COST: <span id="tot-c-${k}">0</span></span></div>
+                </div>
+                <div class="t-header"><span>TEMPLATE</span><span>ACT</span><span style="text-align:right">TOT/H</span><span style="text-align:right">TOT/24H</span></div>
+                <div class="t-body" id="list-${k}"></div>
+            </div>`;
         }
     }
 
-    function switchView(id) {
-        document.querySelectorAll('.view-section').forEach(e => e.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-    }
-
-    // --- API & FETCHING ---
+    function hardReset() { if(confirm("FACTORY RESET?")) { localStorage.removeItem('DOV_DATA'); location.reload(); } }
+    
+    // --- API ---
     async function fetchRows(code, table, scope, limit, lower) {
         try {
             let res = await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
@@ -266,7 +337,7 @@
         } catch(e) { return { rows: [] }; }
     }
 
-    // --- GLOBAL SCAN (BUILDINGS) ---
+    // --- CORE LOGIC (NOMINAL) ---
     function conformData(row) {
         let tid = row.template_id.toString();
         let count = row.asset_ids ? row.asset_ids.length : 1;
@@ -282,6 +353,7 @@
         return { name, type, count, totalHourly, totalDaily, cost };
     }
 
+    // --- 1. GLOBAL SCAN ---
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('globalView');
         let next = ""; let stats = { F:{p:0, c:0}, H:{p:0, c:0}, R:{p:0, c:0}, S:{p:0, c:0}, totalCost:0 };
@@ -311,7 +383,6 @@
     function updateGlobalUI(r, a, s, g) {
         document.getElementById('cntRows').innerText = r; document.getElementById('cntAssets').innerText = a;
         document.getElementById('gTotalCost').innerText = Math.floor(s.totalCost).toLocaleString();
-        for(let k in s.types) { /* covered by loop below */ }
         for(let k in CORE_DATA.resourceDefs) {
             document.getElementById(`pwr-${k}`).innerText = s[k].p.toLocaleString(undefined, {maximumFractionDigits:2});
             document.getElementById(`tot-p-${k}`).innerText = s[k].p.toLocaleString(undefined, {maximumFractionDigits:2});
@@ -324,48 +395,42 @@
         }
     }
 
-    // --- ZONES SCAN (RESTORED) ---
+    // --- 2. ZONES SCAN ---
     async function startZoneScan() {
         stopSignal = false; switchView('zoneView');
         document.getElementById('zoneStatus').innerText = "Scanning...";
-        document.getElementById('zonesArea').innerHTML = "";
-        let counts = {}; 
-        Object.keys(CORE_DATA.zones).forEach(k => counts[k] = 0);
+        const grid = document.getElementById('zonesArea'); grid.innerHTML = "";
+        let counts = {}; Object.keys(CORE_DATA.zones).forEach(k => counts[k] = 0);
         let next = "";
         
         while(!stopSignal) {
             let data = await fetchRows("dovpvecontrl", "sdivisions", "dovpvecontrl", 1000, next);
-            if(!data.rows || data.rows.length === 0) break;
-            for(let row of data.rows) {
-                let id = row.zone_id || row.zoneID;
-                if(counts[id] !== undefined) counts[id]++;
-            }
-            // Render Grid
+            if(!data.rows) break;
+            for(let row of data.rows) { let id = row.zone_id || row.zoneID; if(counts[id] !== undefined) counts[id]++; }
+            
             let html = "";
             Object.keys(counts).forEach(id => {
                 let z = CORE_DATA.zones[id];
                 let css = counts[id] > 0 ? "active" : "";
                 html += `<div class="zone ${css}"><div class="z-head"><span>${z.name}</span><span>${counts[id]}</span></div><div class="z-metric"><span>COST</span><span class="z-val">${z.cost} TU</span></div></div>`;
             });
-            document.getElementById('zonesArea').innerHTML = html;
+            grid.innerHTML = html;
             if(data.more) next = data.next_key; else break;
             await new Promise(r => setTimeout(r, 50));
         }
         document.getElementById('zoneStatus').innerText = "Scan Complete";
     }
 
-    // --- ECO SCAN (RESTORED) ---
+    // --- 3. ECONOMY SCAN ---
     async function startEconomyScan() {
         stopSignal = false; switchView('ecoView');
         document.getElementById('ecoStatus').innerText = "Scanning...";
         let dTU = 0, activeZones = 0, next = "";
-        
         while(!stopSignal) {
             let data = await fetchRows("dovpvecontrl", "sdivisions", "dovpvecontrl", 1000, next);
             if(!data.rows) break;
-            for(let row of data.rows) {
-                let id = row.zone_id;
-                let z = CORE_DATA.zones[id];
+            for(let r of data.rows) {
+                let id = r.zone_id; let z = CORE_DATA.zones[id];
                 if(z && z.cost > 0) { dTU += z.cost; activeZones++; }
             }
             document.getElementById('valDemandTU').innerText = dTU.toLocaleString();
@@ -376,53 +441,68 @@
         document.getElementById('ecoStatus').innerText = "Scan Complete";
     }
 
-    // --- TARGET (PLAYER) SCAN ---
-    async function startBuildings() {
-        stopSignal = false; switchView('buildingsView');
+    // --- 4. TARGET BUILDINGS ---
+    async function startTargetBuildings() {
+        stopSignal = false; switchView('targetBuildView');
         let user = document.getElementById('targetIn').value;
         document.getElementById('buildStatus').innerText = "Scanning " + user + "...";
+        let el = document.getElementById('buildList'); el.innerHTML = "";
         let next = ""; let html = "";
+        
         while(!stopSignal) {
             let data = await fetchRows("dovutilstake", "buildings", user, 1000, next);
             if(!data.rows) break;
             for(let row of data.rows) {
-                let info = conformData(row); // Reuse logic
-                // Simple Card Render
+                let info = conformData(row);
                 let color = DEFAULT_DATA.resourceDefs[info.type].color;
-                html += `<div class="box-framed" style="border-left:3px solid ${color}; margin-bottom:0;">
-                    <div style="font-weight:bold; color:#fff">${info.name}</div>
-                    <div style="font-size:10px; color:#666">Count: ${info.count}</div>
-                    <div style="text-align:right; font-weight:bold; font-size:14px; color:${color}">${info.totalHourly.toLocaleString()} /h</div>
-                </div>`;
+                html += `<div class="b-card" style="border-left:3px solid ${color}"><div class="b-head" style="color:${color}">${info.name}</div><div class="b-sub">ACTIVE: ${info.count}</div><div class="b-stat">${info.totalHourly.toLocaleString()} /h</div></div>`;
             }
-            document.getElementById('buildList').innerHTML = html;
+            el.innerHTML = html;
             if(data.more) next = data.next_key; else break;
         }
-        document.getElementById('buildStatus').innerText = "Complete.";
+        document.getElementById('buildStatus').innerText = "Scan Complete";
     }
-    
-    async function startTarget() {
-        stopSignal = false; switchView('divisionsView');
+
+    // --- 5. TARGET DIVISIONS ---
+    async function startTargetDivisions() {
+        stopSignal = false; switchView('targetDivView');
         let user = document.getElementById('targetIn').value;
         document.getElementById('divStatus').innerText = "Scanning " + user + "...";
+        let el = document.getElementById('divList'); el.innerHTML = "";
         let next = ""; let html = "";
+        
         while(!stopSignal) {
             let data = await fetchRows("dovpvecontrl", "sdivisions", user, 1000, next);
             if(!data.rows) break;
             for(let row of data.rows) {
-                let id = row.zone_id;
-                let z = CORE_DATA.zones[id];
-                html += `<div class="box-framed" style="margin-bottom:10px; display:flex; justify-content:space-between;">
-                    <span style="color:#fff; font-weight:bold;">${z ? z.name : 'Zone '+id}</span>
-                    <span style="color:var(--accent); font-family:monospace;">READY</span>
-                </div>`;
+                let id = row.zone_id; let z = CORE_DATA.zones[id];
+                html += `<div class="b-card"><div class="b-head">${z ? z.name : 'Zone '+id}</div><div class="b-sub">#${row.division_id}</div><div class="b-stat" style="color:var(--accent)">READY</div></div>`;
             }
-            document.getElementById('divList').innerHTML = html;
+            el.innerHTML = html;
             if(data.more) next = data.next_key; else break;
         }
-        document.getElementById('divStatus').innerText = "Complete.";
+        document.getElementById('divStatus').innerText = "Scan Complete";
     }
 
+    // --- SETTINGS ---
+    function openSettings() {
+        document.getElementById('cfgGameRules').value = JSON.stringify(CORE_DATA.gameConfig, null, 4);
+        document.getElementById('cfgTemplates').value = JSON.stringify(CORE_DATA.templates, null, 4);
+        document.getElementById('cfgResources').value = JSON.stringify(CORE_DATA.resourceDefs, null, 4);
+        document.getElementById('cfgZones').value = JSON.stringify(CORE_DATA.zones, null, 4);
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+    function saveConfig() {
+        try {
+            CORE_DATA.gameConfig = JSON.parse(document.getElementById('cfgGameRules').value);
+            CORE_DATA.templates = JSON.parse(document.getElementById('cfgTemplates').value);
+            CORE_DATA.resourceDefs = JSON.parse(document.getElementById('cfgResources').value);
+            CORE_DATA.zones = JSON.parse(document.getElementById('cfgZones').value);
+            localStorage.setItem('DOV_DATA', JSON.stringify(CORE_DATA));
+            closeModal('settingsModal');
+            initUI();
+        } catch(e) { alert("JSON Error"); }
+    }
     function resetConfig() { localStorage.removeItem('DOV_DATA'); location.reload(); }
     function updateDictionary() { alert("Simulated Update"); }
 
