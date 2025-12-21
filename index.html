@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V149 (SENIOR ARCHITECT)</title>
+    <title>DoV - COMMAND V150 (HYBRID NETWORK)</title>
     <style>
-        /* --- CHARTE GRAPHIQUE (NOIR & NEON) --- */
+        /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -12,22 +12,14 @@
             --bg: #050505; --panel: #111; 
         }
         body { background-color: var(--bg); color: #ccc; font-family: 'Consolas', monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* HEADER */
         header { height: 40px; background: #000; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
         h1 { color: var(--gold); margin: 0; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
         .rpc-badge { font-size: 10px; background: #222; padding: 2px 6px; border-radius: 4px; border: 1px solid #444; color: #888; transition: color 0.3s; }
-        
-        /* LAYOUT */
         .layout { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--panel); border-right: 1px solid #333; padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .main-view { flex: 1; padding: 20px; overflow-y: auto; position: relative; background: #000; }
-        
-        /* WIDGETS */
         .box { border: 1px solid #444; padding: 10px; background: #080808; margin-bottom: 10px; }
         .box-title { color: #fff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        
-        /* BOUTONS & INPUTS */
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
         button:hover { opacity: 0.8; }
         .btn-zone { background: var(--main); color: #000; } 
@@ -43,7 +35,7 @@
         input, select, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
-        /* STATS SCAN */
+        /* UI BATIMENTS */
         .g-main-count { background: #fff; color: #000; padding: 15px; border-radius: 4px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid var(--gold); margin-bottom: 20px; }
         .g-mc-left { display: flex; flex-direction: column; }
         .g-mc-right { text-align: right; }
@@ -161,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V149 ARCHITECT</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V150 HYBRID NETWORK</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -349,18 +341,17 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V149. ARCHITECT READY.</div>
+<div class="logs" id="console">> V150. ARCHITECT READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
+    // Note: On ajoute "" dans les proxies pour tenter le DIRECT d'abord
     let CONFIG = {
         strategy: 'B',
         batchSize: 1000,
         delay: 200,
         startKey: '',
-        // API ATOMIC POUR L'INDEXATION
         atomicApi: "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&limit=500",
-        // LISTE PAR DÉFAUT (Modifiable via UI)
         rpcs: [
             "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
             "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
@@ -369,6 +360,7 @@
             "https://api.hivebp.io", "https://wax.blacklusion.io"
         ],
         proxies: [
+            "", /* ESSAI DIRECT EN PREMIER */
             "https://corsproxy.io/?",
             "https://api.allorigins.win/raw?url=",
             "https://thingproxy.freeboard.io/fetch/"
@@ -399,16 +391,16 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    // --- ROBUST DICTIONARY LOADER (FAILOVER) ---
+    // --- ROBUST DICTIONARY LOADER (V150 - DIRECT FIRST) ---
     async function updateDictionary() {
         stopSignal = false;
-        // Sécurité débutant : si pas de proxy, alerte
+        // Check simple : si liste vide
         if (!CONFIG.proxies || CONFIG.proxies.length === 0) {
-            alert("ERREUR: Aucun proxy configuré dans les Paramètres !");
+            alert("ERREUR: Aucun proxy configuré !");
             return;
         }
 
-        log("🔄 Démarrage Téléchargement Dictionnaire (Mode Failover)...", "#fff");
+        log("🔄 Démarrage Téléchargement Dictionnaire...", "#fff");
         
         let page = 1;
         let totalLoaded = 0;
@@ -417,17 +409,22 @@
         try {
             while(!stopSignal) {
                 const urlTarget = `${CONFIG.atomicApi}&page=${page}`;
-                const currentProxy = CONFIG.proxies[localProxyIdx % CONFIG.proxies.length];
-                const finalUrl = currentProxy + encodeURIComponent(urlTarget);
                 
-                document.getElementById('rpcStatus').innerText = `DICT P${page} via ${new URL(currentProxy).hostname}`;
+                // Sélection
+                const currentProxy = CONFIG.proxies[localProxyIdx % CONFIG.proxies.length];
+                let finalUrl = urlTarget;
+                if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
+                
+                let proxyName = (currentProxy.length < 5) ? "DIRECT" : new URL(currentProxy).hostname;
+                document.getElementById('rpcStatus').innerText = `DICT P${page} via ${proxyName}`;
 
                 try {
                     const res = await fetch(finalUrl);
-                    // Check Content-Type to avoid "<!DOCTYPE html>" errors
+                    
+                    // VALIDATION
                     const contentType = res.headers.get("content-type");
                     if (!contentType || !contentType.includes("application/json")) {
-                        throw new Error("Réponse non-JSON (HTML/Erreur Proxy)");
+                        throw new Error("Réponse HTML/Erreur (Pas de JSON)");
                     }
 
                     const json = await res.json();
@@ -439,7 +436,7 @@
                         totalLoaded += json.data.length;
                         document.getElementById('dictSize').innerText = totalLoaded;
                         
-                        if(json.data.length < 500) break; 
+                        if(json.data.length < 500) break; // Fin pagination
                         page++;
                         await new Promise(r => setTimeout(r, 250));
                     } else {
@@ -448,19 +445,17 @@
                     }
 
                 } catch (fetchError) {
-                    console.warn(`Proxy ${localProxyIdx} failed: ${fetchError.message}`);
-                    log(`⚠️ Echec Proxy. Basculement...`, "orange");
+                    console.warn(`Proxy ${proxyName} fail: ${fetchError.message}`);
+                    log(`⚠️ Echec ${proxyName}. Basculement...`, "orange");
                     localProxyIdx++; 
-                    if(localProxyIdx > CONFIG.proxies.length * 3) { // 3 tours complets max
-                        throw new Error("Tous les proxies ont échoué.");
-                    }
+                    if(localProxyIdx > CONFIG.proxies.length * 3) throw new Error("Tous les accès ont échoué.");
                     await new Promise(r => setTimeout(r, 1000)); 
                 }
             }
             log(`✅ Dictionnaire chargé : ${totalLoaded} templates.`, "#00e676");
             document.getElementById('rpcStatus').innerText = "PRÊT";
         } catch(e) {
-            log("❌ ECHEC CRITIQUE DICO: " + e.message, "red");
+            log("❌ ECHEC DICO: " + e.message, "red");
         }
     }
 
@@ -471,7 +466,10 @@
             try {
                 const proxy = CONFIG.proxies[localIdx];
                 const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
-                const res = await fetch(proxy + encodeURIComponent(url));
+                let finalUrl = url;
+                if(proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
+
+                const res = await fetch(finalUrl);
                 const json = await res.json();
                 if(json.success && json.data.immutable_data.name) {
                     TEMPLATE_NAMES[tid] = json.data.immutable_data.name;
@@ -491,21 +489,20 @@
         
         while(attempts < 20 && !stopSignal) {
             const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
-            // Rotation Proxy si dispo
-            let proxy = "";
-            if(CONFIG.proxies.length > 0) {
-                proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
-            }
-            
+            // PROXY ROTATION
+            const proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
             rpcIndex++; 
+            
             const url = server + "/v1/chain/get_table_rows";
             
             let finalUrl = url;
-            if(proxy) finalUrl = proxy + encodeURIComponent(url);
+            if(proxy && proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
 
             try {
                 let statusText = `[RPC: ${new URL(server).hostname}]`;
-                if(proxy) statusText += ` + [PXY: ${new URL(proxy).hostname}]`;
+                if(proxy && proxy.length > 5) statusText += ` + [PXY: ${new URL(proxy).hostname}]`;
+                else statusText += ` + [DIRECT]`;
+                
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = statusText;
 
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 15000); 
@@ -523,13 +520,14 @@
                 return await res.json();
             } catch(e) { 
                 attempts++;
-                if(CONFIG.proxies.length > 0) proxyIndex++; 
+                if(CONFIG.proxies.length > 1) proxyIndex++; 
                 await new Promise(r => setTimeout(r, 200));
             }
         }
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
+    // --- LOGIC ---
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
         let stack = (b.asset_ids && Array.isArray(b.asset_ids)) ? b.asset_ids.length : 1;
@@ -607,6 +605,7 @@
             }
             
             if (data.more && data.next_key) {
+                // log(`Page chargée. Suivante: ${data.next_key}`, "#444");
                 next = data.next_key;
             } else {
                 more = false;
@@ -632,10 +631,8 @@
         }
     }
 
-    // --- PLAYER SCAN ---
     async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
     
-    // --- ZONE SCAN ---
     async function startZoneScan() { 
         stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
         ZONE_DETAILS = {}; 
@@ -713,7 +710,7 @@
         let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http'));
         if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc;
         let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n');
-        let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http'));
+        let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === "");
         if(cleanProxy.length > 0) CONFIG.proxies = cleanProxy;
         closeModal('settingsModal');
         log("⚙️ Configuration sauvegardée.", "#ffd700");
@@ -732,7 +729,7 @@
     async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
 
     function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
-    window.onload = function() { initGrid(); }
+    window.onload = function() { initGrid(); openSettings(); }
 </script>
 
 </body>
