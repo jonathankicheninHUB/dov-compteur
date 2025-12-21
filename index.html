@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V213 (SMART PROXY)</title>
+    <title>DoV - COMMAND V214 (AUTO-PROXY)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (STABLE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9;
@@ -45,7 +45,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* CARDS & TABLES */
+        /* KPI & TABLES */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -59,7 +59,7 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
 
-        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
+        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 60px 70px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
@@ -94,8 +94,7 @@
         .log-head { padding: 6px 10px; background: #111; border-bottom: 1px solid #333; font-size: 10px; font-weight: 700; color: #888; display:flex; justify-content: space-between;}
         .log-content { flex: 1; overflow-y: auto; padding: 10px; font-size: 10px; color: #ccc; }
         .log-row { margin-bottom: 3px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom:2px; display:flex; gap:10px; }
-        .l-time { color: #666; width: 60px; }
-        .l-msg { flex:1; }
+        .l-time { color: #666; width: 60px; } .l-msg { flex:1; }
         .l-err { color: var(--red); } .l-ok { color: var(--green); } .l-inf { color: var(--blue); } .l-warn { color: var(--orange); }
 
         /* MODALS */
@@ -119,10 +118,10 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V213</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V214</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">CLUSTER MONITORING</span>
+            <span class="grp-lbl">AUTO-PROXY SYSTEM</span>
             <div class="btn-row">
                 <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
@@ -156,7 +155,7 @@
             <div class="dashboard-header">
                 <div>
                     <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">TIERED SCAN &bull; ROWS: <span id="cntRows">0</span></div>
+                    <div class="page-meta">PROXY MODE &bull; ROWS: <span id="cntRows">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -167,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>SYSTEM LOGS (TIERED ROUTING)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (AUTO-FAILOVER)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -178,11 +177,11 @@
     </main>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">NETWORK CONFIG (SEPARATE LISTS)</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-box"><div class="modal-header"><span class="modal-title">SYSTEM CONFIG</span></div><div class="modal-body" style="padding:20px;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;"><div style="grid-column: 1 / -1;"><span class="grp-lbl">PROXY CLUSTER (PRE-FILLED)</span><textarea id="cfgApi"></textarea></div><div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div><div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div><div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div><div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button><button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button></div></div></div></div>
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
-    // --- SAFE DOM & UTILS ---
+    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; else sysLog(`DOM ERROR: #${id}`, "err"); };
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -205,13 +204,13 @@
     // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { 
-            // TIER 1: PROXIES
+            // PRE-FILLED WORKING PROXIES (GATEWAYS)
             proxies: [
-                "https://proxy1.example.com", 
-                "https://proxy2.example.com", 
-                "https://proxy3.example.com"
+                "https://corsproxy.io/?", 
+                "https://api.allorigins.win/raw?url=", 
+                "" // DIRECT ACCESS (No Proxy)
             ],
-            // TIER 2: PUBLIC NODES (FALLBACK)
+            // ROBUST PUBLIC NODES
             publicNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
@@ -242,11 +241,11 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem('DOV_DATA_V213'); // NEW DATA VERSION
+        const local = localStorage.getItem('DOV_DATA_V214'); // FLUSH DATA
         if(local) { 
             try { 
                 let loaded = JSON.parse(local);
-                if(!loaded.apiConfig.proxies) loaded.apiConfig = DEFAULT_DATA.apiConfig; // Structure update
+                if(!loaded.apiConfig.proxies) loaded.apiConfig = DEFAULT_DATA.apiConfig;
                 DATA = { ...DEFAULT_DATA, ...loaded, gameConfig: { ...DEFAULT_DATA.gameConfig, ...loaded.gameConfig }, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
             } catch(e){ sysLog("RESET DATA", "warn"); } 
         }
@@ -269,39 +268,33 @@
         }
     }
 
-    // --- SMART FETCHER V213 (PRIORITY QUEUE) ---
+    // --- AUTO-PROXY FETCH ---
     async function fetchSmartCluster(body) {
-        // TIER 1: PROXIES
-        const proxies = DATA.apiConfig.proxies.filter(p => !p.includes("example.com")); // Filter placeholders
-        if(proxies.length > 0) {
-            // Shuffle proxies
-            let shuffledProxies = proxies.sort(() => 0.5 - Math.random());
-            for(let node of shuffledProxies) {
-                if(node.endsWith('/')) node = node.slice(0, -1);
-                // sysLog(`[PROXY] Trying ${node}...`, "inf");
-                try {
-                    let controller = new AbortController();
-                    setTimeout(() => controller.abort(), 5000); // 5s timeout for proxy
-                    let res = await fetch(node + "/v1/chain/get_table_rows", { method: 'POST', body: body, signal: controller.signal });
-                    if(res.ok) return await res.json();
-                } catch(e) { sysLog(`[PROXY] ${node} FAIL`, "warn"); }
-            }
-        }
+        // STRATEGY: Try PROXIES first (CORS GATEWAYS), then PUBLIC NODES
+        const proxies = DATA.apiConfig.proxies;
+        const publicNodes = DATA.apiConfig.publicNodes;
+        
+        let targetList = [...publicNodes]; 
+        // Shuffle targets
+        targetList.sort(() => 0.5 - Math.random());
 
-        // TIER 2: PUBLIC NODES (FALLBACK)
-        const publics = DATA.apiConfig.publicNodes;
-        // Try random 5 public nodes max to avoid infinite loop
-        for(let i=0; i<5; i++) {
-            let node = publics[Math.floor(Math.random() * publics.length)];
-            if(node.endsWith('/')) node = node.slice(0, -1);
+        for(let i=0; i<8; i++) { // Try 8 times
+            let rpc = targetList[i % targetList.length];
+            if(rpc.endsWith('/')) rpc = rpc.slice(0, -1);
+            
+            // Randomly wrap in a Proxy from the list
+            let proxy = proxies[Math.floor(Math.random() * proxies.length)];
+            let finalUrl = proxy + rpc + "/v1/chain/get_table_rows";
+            
             try {
                 let controller = new AbortController();
-                setTimeout(() => controller.abort(), 3000); // 3s timeout for public
-                let res = await fetch(node + "/v1/chain/get_table_rows", { method: 'POST', body: body, signal: controller.signal });
+                setTimeout(() => controller.abort(), 6000); // 6s timeout
+                
+                let res = await fetch(finalUrl, { method: 'POST', body: body, signal: controller.signal });
                 if(res.ok) return await res.json();
-            } catch(e) { /* silent fail for public to keep logs clean */ }
+            } catch(e) { /* silent fail, try next */ }
         }
-        throw new Error("ALL CLUSTER NODES FAILED");
+        throw new Error("CLUSTER UNREACHABLE");
     }
 
     function processRow(row) {
@@ -330,7 +323,7 @@
 
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); safeSetText('cntRows', "...");
-        sysLog("STARTING SMART CLUSTER SCAN...", "ok");
+        sysLog("STARTING SCAN (AUTO-PROXY)...", "ok");
         
         let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         SCAN_DETAILS = {}; 
@@ -359,10 +352,10 @@
                     d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 20));
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
             sysLog("SCAN COMPLETE", "ok");
-        } catch(e) { sysLog("FATAL: " + e.message, "err"); }
+        } catch(e) { sysLog("ERROR: " + e.message, "err"); }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -472,8 +465,8 @@
     }
 
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
-    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V213', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V213'); location.reload(); } }
+    function saveConfig() { try { DATA.apiConfig = JSON.parse(getId('cfgApi').value); DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem('DOV_DATA_V214', JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem('DOV_DATA_V214'); location.reload(); } }
 
     window.onload = init;
 </script>
