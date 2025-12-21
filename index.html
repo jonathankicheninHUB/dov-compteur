@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V154 (TARGET FIX)</title>
+    <title>DoV - COMMAND V156 (STABLE MERGE)</title>
     <style>
         /* --- STYLE ORIGINAL (INTACT) --- */
         :root { 
@@ -153,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V154 TARGET FIX</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V156 STABLE MERGE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -347,7 +347,7 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V154. TARGET FIX READY.</div>
+<div class="logs" id="console">> V156. FINAL MERGE READY.</div>
 
 <script>
     // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
@@ -451,50 +451,74 @@
     // --- ROBUST DICTIONARY LOADER (FAILOVER + SAFE JSON) ---
     async function updateDictionary() {
         stopSignal = false;
+        // Check simple : si liste vide
         if (!CONFIG.proxies || CONFIG.proxies.length === 0) {
             alert("ERREUR: Aucun proxy configuré !");
             return;
         }
+
         log("🔄 Démarrage Téléchargement Dictionnaire...", "#fff");
-        let page = 1; let totalLoaded = 0; let localProxyIdx = 0; 
+        
+        let page = 1;
+        let totalLoaded = 0;
+        let localProxyIdx = 0; 
+
         try {
             while(!stopSignal) {
                 const urlTarget = `${CONFIG.atomicApi}&page=${page}`;
+                
+                // Sélection
                 const currentProxy = CONFIG.proxies[localProxyIdx % CONFIG.proxies.length];
                 let finalUrl = urlTarget;
                 if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
+                
                 let proxyName = (currentProxy.length < 5) ? "DIRECT" : new URL(currentProxy).hostname;
                 document.getElementById('rpcStatus').innerText = `DICT P${page} via ${proxyName}`;
+
                 try {
                     const res = await fetch(finalUrl);
+                    
+                    // V152: Check Content-Type + Safe Parse
                     const contentType = res.headers.get("content-type");
-                    if (!contentType || !contentType.includes("application/json")) { throw new Error("Réponse HTML/Erreur (Pas de JSON)"); }
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error("Réponse HTML/Erreur (Pas de JSON)");
+                    }
+
                     const json = await res.json();
+                    
                     if(json.success && json.data.length > 0) {
-                        json.data.forEach(t => { TEMPLATE_NAMES[t.template_id] = t.immutable_data.name; });
+                        json.data.forEach(t => {
+                            TEMPLATE_NAMES[t.template_id] = t.immutable_data.name;
+                        });
                         totalLoaded += json.data.length;
                         document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
+                        
                         if(json.data.length < 500) break; // Fin pagination
-                        page++; await new Promise(r => setTimeout(r, 250));
+                        page++;
+                        await new Promise(r => setTimeout(r, 250));
                     } else {
                         if(!json.success) throw new Error(json.message || "API Error");
                         break; 
                     }
+
                 } catch (fetchError) {
                     console.warn(`Proxy ${proxyName} fail: ${fetchError.message}`);
                     log(`⚠️ Echec ${proxyName}. Basculement...`, "orange");
                     localProxyIdx++; 
                     if(localProxyIdx > CONFIG.proxies.length * 3) {
                         log("⚠️ Mode Hors-Ligne forcé (Bootstrap utilisé).", "red");
-                        stopSignal = true; 
+                        stopSignal = true; // On arrête l'acharnement
                     }
                     await new Promise(r => setTimeout(r, 1000)); 
                 }
             }
+            // SAUVEGARDE PERSISTANTE
             localStorage.setItem('DOV_DICT', JSON.stringify(TEMPLATE_NAMES));
             if(totalLoaded > 0) log(`✅ Mise à jour terminée (+${totalLoaded} templates).`, "#00e676");
             document.getElementById('rpcStatus').innerText = "PRÊT";
-        } catch(e) { log("❌ ECHEC DICO: " + e.message, "red"); }
+        } catch(e) {
+            log("❌ ECHEC DICO: " + e.message, "red");
+        }
     }
 
     // --- ATOMIC SINGLE CHECK (Fallback) ---
@@ -506,6 +530,7 @@
                 const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
                 let finalUrl = url;
                 if(proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
+
                 const res = await fetch(finalUrl);
                 const json = await res.json();
                 if(json.success && json.data.immutable_data.name) {
@@ -518,7 +543,7 @@
         return null;
     }
 
-    // --- ROBUST FETCH (V154 ENGINE - MULTI ARGS) ---
+    // --- ROBUST FETCH (V156 ENGINE - REPAIRED) ---
     async function robustFetch(code, table, lowerBound, limit=1000, customScope=null, indexPos=1, keyType="") {
         let attempts = 0;
         const effectiveLimit = CONFIG.batchSize;
@@ -547,13 +572,13 @@
                 const payload = { 
                     json: true, 
                     code: code, 
-                    scope: effectiveScope, // V154 Fix
+                    scope: effectiveScope, // V154/V156 Fix
                     table: table, 
                     limit: effectiveLimit, 
                     lower_bound: lowerBound 
                 };
 
-                // V154: Add Index support if needed
+                // V156: Index support re-added
                 if(indexPos > 1) {
                     payload.index_position = indexPos;
                     payload.key_type = keyType;
@@ -576,13 +601,13 @@
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- LOGIC: GET SCORE ---
+    // --- LOGIC: GET SCORE (V153) ---
     function getSortScore(name) {
         if(!name) return 999;
         for(let i=0; i<CONFIG.sortOrder.length; i++) {
             if(name.startsWith(CONFIG.sortOrder[i])) return i;
         }
-        return 999; 
+        return 999; // Si pas trouvé, on met à la fin
     }
 
     function conformBuilding(b) {
@@ -596,6 +621,7 @@
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
+        // V153: Ajout score de tri
         let sortScore = getSortScore(name);
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
@@ -633,6 +659,7 @@
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
+                // Stockage du sortScore pour le rendu
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd, sortScore: info.sortScore };
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
                 if (active) {
@@ -646,8 +673,17 @@
                 document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
                 document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
                 ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
+                
+                // V155: GLOBAL SORT ON DEBUG GRID
                 let dbgHTML = "";
-                for(let tid in templateAudit) {
+                let auditKeys = Object.keys(templateAudit);
+                auditKeys.sort((a,b) => {
+                    let nameA = templateAudit[a].name;
+                    let nameB = templateAudit[b].name;
+                    return getSortScore(nameA) - getSortScore(nameB);
+                });
+
+                for(let tid of auditKeys) {
                     let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
                     let n = templateAudit[tid].name;
                     let color = n.includes("INCONNU") ? "var(--warn)" : "#aaa";
@@ -660,16 +696,20 @@
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
+    // --- RENDER LISTS (V153 SORTING) ---
     function renderLists(groups){
         for(let t in groups){
             let h=`<div class="ml-header">TYPE ${t}</div>`;
             let keys=Object.keys(groups[t]);
+            
+            // V153: TRI PAR SCORE (CONFIG)
             keys.sort((a,b) => {
                 let scoreA = groups[t][a].sortScore;
                 let scoreB = groups[t][b].sortScore;
                 if(scoreA === scoreB) return groups[t][b].unitProd - groups[t][a].unitProd;
                 return scoreA - scoreB; 
             });
+
             keys.forEach(k=>{
                 let i=groups[t][k];
                 if(i.cp===0 && i.cr===0) return;
@@ -684,7 +724,7 @@
         }
     }
 
-    // --- V154: FIX START BUILDINGS (USER SCAN) ---
+    // --- V156 FIX: START BUILDINGS (USER SCAN) ---
     async function startBuildings() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
         switchView('buildingView'); 
@@ -699,7 +739,7 @@
         
         try { 
             while(hasMore && !stopSignal) { 
-                // V154 FIX: Pass 'user' as SCOPE to query specifically their buildings
+                // V156: Pass 'user' as SCOPE to query specifically their buildings
                 const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000, user); 
                 
                 if(!data.rows || data.rows.length === 0) {
@@ -727,7 +767,7 @@
         } catch(e){ log("Err: "+e.message, "red"); } 
     }
     
-    // --- V154: FIX START TARGET (DIVISIONS SCAN) ---
+    // --- V156 FIX: START TARGET (DIVISIONS SCAN) ---
     async function startTarget() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
         switchView('targetView'); 
@@ -735,7 +775,7 @@
         view.innerHTML="Recherche des divisions pour " + user + "..."; 
         
         try { 
-            // V154 FIX: Use Secondary Index (2) to find by Owner Name (i64)
+            // V156: Use Secondary Index (2) to find by Owner Name (i64)
             const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, null, 2, "i64"); 
             
             const rows = data.rows ? data.rows : []; 
