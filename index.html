@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V246 (STEP 1: COUNT)</title>
+    <title>DoV - COMMAND V247 (COMBAT TIMER)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (UNCHANGED) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICTEMENT CONSERVÉ) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -51,7 +51,7 @@
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
         .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
 
-        /* GRAPHS */
+        /* GRAPHS & GAUGE */
         .kc-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .big-24h { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
         .b24-val { font-family: var(--font-num); font-size: 26px; font-weight: 800; line-height: 1; }
@@ -79,7 +79,7 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         
-        /* ZONES MAP */
+        /* ZONES MAP (BIBLE DATA LAYOUT) */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; }
         .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
@@ -93,7 +93,7 @@
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
 
-        /* MODALS */
+        /* MODALS (FIXED) */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
@@ -103,7 +103,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V246</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V247</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">ROBUST MONITORING</span>
@@ -159,14 +159,26 @@
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DIVISIONS FOUND</div>
-                    <div><span class="tc-val" id="divCounterDisplay">0</span></div>
+                    <div><span class="tc-val" id="zTotalDivsHeader">0</span></div>
                 </div>
             </div>
             
             <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
-                <div class="kpi-card"><div class="kc-title">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight">0</div><div class="kc-sub">COMBAT POWER</div></div>
-                <div class="kpi-card"><div class="kc-title">ACTIVE DIVISIONS</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER RUNNING</div></div>
-                <div class="kpi-card"><div class="kc-title">DOVX YIELD / 24H</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">ESTIMATED REWARD</div></div>
+                <div class="kpi-card">
+                    <div class="kc-title">TOTAL DIVISIONS</div>
+                    <div class="kc-val" id="zTotalDivs">0</div>
+                    <div class="kc-sub">GLOBAL STACKED</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kc-title">IN FIGHT</div>
+                    <div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div>
+                    <div class="kc-sub">TIMER ACTIVE (> NOW)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kc-title">TOTAL WEIGHT</div>
+                    <div class="kc-val" id="zTotalWeight" style="color:var(--blue)">0</div>
+                    <div class="kc-sub">COMBAT POWER</div>
+                </div>
             </div>
 
             <div class="zones-map" id="areaZones"></div>
@@ -183,7 +195,7 @@
         <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES (CLUSTER)</span><textarea id="cfgApi"></textarea></div>
         <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
         <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
-        <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
+        <div><span class="grp-lbl">ZONES (BIBLE DATA)</span><textarea id="cfgZones"></textarea></div>
         <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
         <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS (WEIGHTS)</span><textarea id="cfgDivisions"></textarea></div>
     </div>
@@ -194,7 +206,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V246';
+    const STORAGE_KEY = 'DOV_DATA_V247';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -216,7 +228,6 @@
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, rewardRatio: 0.1, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
         
-        // ZONES: BIBLE DATA
         zones: { 
             1: {name:"Beach 1", cost:1160, win:400, min_w:0},
             2: {name:"Beach 2", cost:6968, win:2405, min_w:0},
@@ -258,7 +269,6 @@
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
         const order = ["F", "H", "R", "S"];
-        
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
             areaC.innerHTML += `
@@ -275,7 +285,6 @@
         }
     }
 
-    // --- ROBUST RPC CLUSTER FETCH (V199 ENGINE) ---
     async function fetchSmartCluster(endpoint, body) {
         let nodes = DATA.apiConfig.rpcNodes;
         let shuffled = [...nodes].sort(() => 0.5 - Math.random());
@@ -315,7 +324,6 @@
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
-                // FETCH: CONTRACT (dovutilstake) for BUILDINGS
                 let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
                 if(!json.rows || json.rows.length === 0) break;
                 const now = Date.now()/1000;
@@ -357,7 +365,7 @@
         }
     }
 
-    // --- ZONE SCANNER (STEP 1: LISTING & COUNTING) ---
+    // --- ZONE SCANNER (MODIFIED V247: COMBAT TIMER & COUNTS) ---
     async function startZoneScan() {
         stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
         
@@ -365,8 +373,6 @@
         let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
 
         let next = "";
-        let countDisplay = getId('divCounterDisplay'); // Step 1 Counter
-
         try {
             while(!stopSignal) {
                 // FETCH: CONTRACT (dovpvecontrl) for SDIVISIONS (Global List)
@@ -380,20 +386,20 @@
                     if(zonesData[zid]) {
                         zonesData[zid].count++;
                         stats.totalDivs++;
-                        countDisplay.innerText = fmt(stats.totalDivs); // UPDATE LIVE COUNTER
 
                         // WEIGHT
                         let weight = parseFloat(r.weight || 0);
                         zonesData[zid].weight += weight;
                         stats.totalWeight += weight;
 
-                        let isAction = parseFloat(r.unlock_time) > now;
+                        // COMBAT DETECTION: unlock_time > now means the timer is running
+                        let isFighting = r.unlock_time && parseFloat(r.unlock_time) > now;
 
-                        if(isAction) {
+                        if(isFighting) {
                             zonesData[zid].active++;
                             stats.activeDivs++;
                             
-                            // BIBLE LOGIC: CONSUME ZONE COST, EARN ZONE WIN
+                            // CALCULATE BURN & REWARD ONLY FOR FIGHTING UNITS
                             let zInfo = DATA.zones[zid];
                             let zCost = zInfo.cost;
                             let zReward = zInfo.win;
@@ -414,10 +420,12 @@
     }
 
     function updateZoneUI(zonesData, stats) {
-        getId('zTotalWeight').innerText = fmt(stats.totalWeight);
+        // UPDATE KPI CARDS
+        getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalProd').innerText = fmt(stats.totalProd);
-        // ... (Eco update usually goes to header, simplified here)
+        getId('zTotalWeight').innerText = fmt(stats.totalWeight);
+        // Header Total Display
+        getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs);
 
         let html = "";
         Object.keys(zonesData).forEach(id => {
@@ -426,7 +434,7 @@
             let activeClass = d.count > 0 ? "active" : "";
             html += `
             <div class="zone-card ${activeClass}">
-                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active}/${d.count}</span></div>
+                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
                 <div class="zc-mid">
                     <div class="zs-item"><span>WIN (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
                     <div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div>
