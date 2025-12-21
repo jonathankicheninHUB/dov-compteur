@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V222 (DEEP CRAWLER)</title>
+    <title>DoV - COMMAND V223 (MONOLITH READER)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
@@ -86,10 +86,6 @@
 
         .view-section { display: none; } .active-view { display: block; }
         
-        /* PROGRESS BAR */
-        .progress-container { width: 100%; background: #222; height: 4px; border-radius: 2px; margin-top: 5px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
-
         /* TERMINAL */
         .log-terminal { 
             margin-top: 20px; background: #08080a; border: 1px solid var(--border); border-radius: 6px; 
@@ -122,18 +118,15 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V222</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400; margin-left:5px;">V223</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">DEEP CRAWLER (SLOW & STEADY)</span>
+            <span class="grp-lbl">MONOLITH SCANNER</span>
             <div class="btn-row">
-                <button class="btn-green" onclick="dispatchDeepCrawl()">FULL COLLECTION SCAN</button>
+                <button class="btn-green" onclick="dispatchMonolithScan()">SCAN ALL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
             </div>
-            <div class="progress-container"><div class="progress-bar" id="progBar"></div></div>
-            <div style="font-size:9px; color:#666; margin-top:3px; text-align:right;" id="progText">IDLE</div>
-            
-            <div class="btn-row" style="margin-top:15px;">
+            <div class="btn-row">
                 <button class="btn-blue" onclick="startZoneScan()">ZONES</button>
                 <button class="btn-orange" onclick="startEconomyScan()">ECON</button>
             </div>
@@ -161,8 +154,8 @@
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
                 <div>
-                    <h2 class="page-h1">COLLECTION ANALYTICS</h2>
-                    <div class="page-meta">PLAYERS: <span id="cntWallets">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
+                    <h2 class="page-h1">COLLECTION PRODUCTION</h2>
+                    <div class="page-meta">CONTRACT SCAN &bull; ROWS: <span id="cntRows">0</span> &bull; ASSETS: <span id="cntAssets">0</span></div>
                 </div>
                 <div class="total-cost">
                     <div class="grp-lbl">DAILY MAINTENANCE</div>
@@ -173,7 +166,7 @@
             <div class="tables-grid" id="areaLists"></div>
             
             <div class="log-terminal">
-                <div class="log-head"><span>CRAWLER LOGS</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
+                <div class="log-head"><span>SYSTEM LOGS (AUTO-DETECT)</span><button style="width:auto; padding:2px 6px; font-size:9px;" onclick="clearLogs()">CLEAR</button></div>
                 <div class="log-content" id="sysLogs"></div>
             </div>
         </div>
@@ -188,10 +181,7 @@
 <div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-header"><span class="modal-title" id="detailTitle">INSPECTOR</span><button class="btn-ghost" style="width:auto; padding:4px 8px;" onclick="closeModal('detailModal')">CLOSE</button></div><div class="modal-body" id="detailBody"></div></div></div>
 
 <script>
-    // --- CONSTANTS ---
-    const STORAGE_KEY = 'DOV_DATA_V222'; 
-
-    // --- UTILS & SAFE DOM ---
+    const STORAGE_KEY = 'DOV_DATA_V223'; 
     const getId = (id) => document.getElementById(id);
     const safeSetText = (id, text) => { const el = getId(id); if(el) el.innerText = text; };
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -199,7 +189,6 @@
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- LOGGER ---
     function sysLog(msg, type="inf") {
         const d = new Date();
         const time = d.toLocaleTimeString();
@@ -211,7 +200,6 @@
     }
     function clearLogs() { getId('sysLogs').innerHTML = ""; }
 
-    // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { 
             rpcNodes: [
@@ -286,53 +274,28 @@
                 setTimeout(() => controller.abort(), 6000); 
                 let res = await fetch(node + endpoint, { method: 'POST', body: body, signal: controller.signal });
                 if(res.ok) return await res.json();
+                else sysLog(`FAIL ${node}: ${res.status}`, "warn");
             } catch(e) { }
         }
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // --- PHASE 1: DISCOVER ALL WALLETS ---
-    async function fetchAllScopes(code, table) {
-        sysLog(`PHASE 1: DISCOVERING WALLETS...`, "ok");
-        let scopes = [];
-        let next = "";
-        try {
-            while(true) {
-                // IMPORTANT: FetchScopes uses proper pagination
-                let body = { code: code, table: table, limit: 1000 };
-                if (next) body.lower_bound = next;
-
-                let res = await fetchSmartCluster("/v1/chain/get_table_by_scope", JSON.stringify(body));
-                
-                if(!res.rows || res.rows.length === 0) break;
-                
-                for(let r of res.rows) {
-                    scopes.push(r.scope);
-                }
-                
-                safeSetText('cntWallets', fmt(scopes.length));
-                sysLog(`FOUND ${res.rows.length} WALLETS... (Total: ${scopes.length})`, "inf");
-
-                // Pagination Logic for Scopes
-                if(res.more && res.more.length > 0) {
-                    next = res.more;
-                } else {
-                    break;
-                }
-                
-                await new Promise(r => setTimeout(r, 200)); // Pace the discovery
-            }
-        } catch(e) { sysLog("SCOPE DISCOVERY ERROR: " + e.message, "err"); }
-        return scopes;
-    }
-
-    // --- PHASE 2: SCAN EACH WALLET (FIXED TYPE SAFETY) ---
-    function processRow(row, scope) {
+    // --- PROCESS ROW WITH FLEXIBLE ASSET DETECTION ---
+    function processRow(row) {
         let tid = String(row.template_id);
-        let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
+        
+        // --- SMART DETECTOR ---
+        let assetList = [];
+        if(row.asset_ids && Array.isArray(row.asset_ids)) assetList = row.asset_ids;
+        else if(row.assets && Array.isArray(row.assets)) assetList = row.assets;
+        else if(row.ids && Array.isArray(row.ids)) assetList = row.ids;
+        
+        // Fallback: Si pas d'array trouvé mais que la ligne existe, on suppose 1 entité ?
+        // Non, on respecte la consigne "4 bâtiments".
+        
         let count_total = assetList.length;
         
-        // SAFE NUMBER PARSING (FIXED V220)
+        // --- TIMER LOGIC ---
         let now = Date.now() / 1000;
         let last = Number(row.last_claim || 0);
         let delay = Number(row.delay || 0);
@@ -353,75 +316,65 @@
         let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
         for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; }
         
-        return { id:tid, name, type, count_total, count_active, hourly, daily, costH, costD, nominal, assets: assetList, owner: scope };
+        // --- OWNER DETECTION ---
+        let owner = row.player || row.username || row.owner || row.user || "unknown";
+        
+        return { id:tid, name, type, count_total, count_active, hourly, daily, costH, costD, nominal, assets: assetList, owner: owner };
     }
 
-    async function dispatchDeepCrawl() {
-        stopSignal = false; switchView('viewGlobal'); 
+    async function dispatchMonolithScan() {
+        stopSignal = false; switchView('viewGlobal'); safeSetText('cntRows', "...");
+        
+        sysLog(`SCANNING MONOLITH SCOPE: dovutilstake`, "ok");
+        
+        let next = ""; let stats = { totalCost:0, types:{} }; let groups = {};
         SCAN_DETAILS = {}; 
-        let stats = { totalCost:0, types:{} }; let groups = {};
         for(let k in DATA.resourceDefs) { stats.types[k] = {p:0, c:0}; groups[k] = []; }
-        let totalAssets = 0;
-
-        // 1. GET ALL WALLETS
-        let wallets = await fetchAllScopes("dovutilstake", "buildings");
-        sysLog(`PHASE 2: CRAWLING ${wallets.length} WALLETS...`, "ok");
-
-        // 2. SCAN BATCHES (Slow & Steady)
-        for(let i=0; i<wallets.length; i++) {
-            if(stopSignal) { sysLog("STOPPED BY USER", "warn"); break; }
-            let user = wallets[i];
-            
-            // Update UI progress bar
-            let pct = Math.floor((i / wallets.length) * 100);
-            getId('progBar').style.width = pct + "%";
-            safeSetText('progText', `${pct}% (${i}/${wallets.length})`);
-
-            // Fetch Data
-            try {
+        let rowCount = 0; let assetCount = 0;
+        
+        try {
+            while(!stopSignal) {
+                // HERE IS THE MAGIC: WE SCAN THE CONTRACT SCOPE DIRECTLY
                 let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                    json:true, code:"dovutilstake", scope:user, table:"buildings", limit:100
+                    json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next
                 }));
-
-                if(res.rows) {
-                    for(let r of res.rows) {
-                        let d = processRow(r, user);
-                        if(!d) continue;
-                        totalAssets += d.count_total;
-                        safeSetText('cntAssets', fmt(totalAssets));
-
-                        // Aggregation Logic
-                        let existing = groups[d.type].find(x => x.name === d.name);
-                        if(existing) { 
-                            existing.act += d.count_active; existing.tot += d.count_total;
-                            existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD; 
-                        } else { 
-                            groups[d.type].push({ id:d.id, name:d.name, act:d.count_active, tot:d.count_total, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); 
-                        }
-                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
-                        
-                        // Limit details storage to prevent RAM crash (only store first 5000 assets)
-                        if(totalAssets < 5000) {
-                            if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
-                            d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: user }); });
-                        }
-                    }
+                
+                if(!res.rows || res.rows.length === 0) { sysLog("NO DATA IN MONOLITH", "warn"); break; }
+                
+                // INSPECTOR: PRINT KEYS OF FIRST ROW TO DEBUG
+                if(rowCount === 0) {
+                    let keys = Object.keys(res.rows[0]).join(", ");
+                    sysLog(`DATA STRUCTURE FOUND: ${keys}`, "inf");
                 }
-            } catch(e) { /* ignore single wallet fail */ }
 
-            // UI Refresh every 10 wallets to save CPU
-            if(i % 10 === 0) updateGlobalUI(wallets.length, totalAssets, stats, groups);
-            
-            // THE CRAWLER DELAY (200ms) to respect RPCs
-            await new Promise(r => setTimeout(r, 200)); 
-        }
-        updateGlobalUI(wallets.length, totalAssets, stats, groups);
-        sysLog("DEEP CRAWL FINISHED", "ok");
+                for(let r of res.rows) {
+                    rowCount++; 
+                    let d = processRow(r); 
+                    if(!d) continue;
+
+                    assetCount += d.count_total;
+                    
+                    let existing = groups[d.type].find(x => x.name === d.name);
+                    if(existing) { 
+                        existing.act += d.count_active; existing.tot += d.count_total;
+                        existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD; 
+                    } else { 
+                        groups[d.type].push({ id:d.id, name:d.name, act:d.count_active, tot:d.count_total, unit:d.nominal, totH:d.hourly, totD:d.daily, costH:d.costH, costD:d.costD }); 
+                    }
+                    stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
+                    if(!SCAN_DETAILS[d.id]) SCAN_DETAILS[d.id] = [];
+                    // STORE OWNER info found in the row
+                    d.assets.forEach(assetId => { SCAN_DETAILS[d.id].push({ assetId: assetId, owner: d.owner }); });
+                }
+                updateGlobalUI(rowCount, assetCount, stats, groups);
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 20));
+            }
+            sysLog("SCAN COMPLETE", "ok");
+        } catch(e) { sysLog("FATAL: " + e.message, "err"); }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
-        // safeSetText('cntRows', fmt(rows)); 
-        safeSetText('gTotalCost', fmt(stats.totalCost));
+        safeSetText('cntRows', fmt(rows)); safeSetText('cntAssets', fmt(assets)); safeSetText('gTotalCost', fmt(stats.totalCost));
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
             safeSetText(`val-${k}`, fmtDec(stats.types[k].p)); safeSetText(`btot-${k}`, fmtDec(stats.types[k].p)); safeSetText(`bcost-${k}`, fmt(stats.types[k].c));
@@ -449,17 +402,17 @@
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
             html += `<tr><td><a href="${assetLink}" target="_blank" class="ext">${item.assetId} ↗</a></td><td><a href="${walletLink}" target="_blank" class="ext" style="color:var(--blue)">${item.owner} ↗</a></td><td style="color:var(--green)">STAKED</td></tr>`;
         }
-        if(list.length > 500) html += `<tr><td colspan="3">... LIST TRUNCATED FOR PERFORMANCE</td></tr>`;
+        if(list.length > 500) html += `<tr><td colspan="3">... LIST TRUNCATED</td></tr>`;
         html += `</tbody></table>`;
         getId('detailBody').innerHTML = html;
         getId('detailModal').style.display = 'flex';
     }
 
     // --- OTHER SCANS ---
-    async function startZoneScan() { /* ... Same as before ... */ }
-    async function startEconomyScan() { /* ... Same as before ... */ }
-    async function startTargetBuildings() { /* ... Same as before ... */ }
-    async function startTargetDivisions() { /* ... Same as before ... */ }
+    async function startZoneScan() { /* ... */ }
+    async function startEconomyScan() { /* ... */ }
+    async function startTargetBuildings() { /* ... */ }
+    async function startTargetDivisions() { /* ... */ }
 
     // --- SETTINGS ---
     function openSettings() { getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
