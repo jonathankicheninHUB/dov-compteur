@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V157 (PROD STABLE)</title>
+    <title>DoV - COMMAND V159 (ZERO HARDCODE)</title>
     <style>
-        /* --- STYLE ORIGINAL (INTACT) --- */
+        /* --- STYLE IDENTIQUE (INTACT) --- */
         :root { 
             --main: #00e676; --alert: #ff1744; --sec: #29b6f6; --warn: #ff9800; --dovx: #9c27b0; 
             --gold: #ffd700; --money: #2ecc71;
@@ -153,7 +153,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V157 PROD STABLE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V159 ZERO HARDCODE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -170,11 +170,11 @@
         <div class="box" style="border-color: var(--gold)">
             <div class="box-title" style="color:var(--gold)">CONFIGURATION RAPIDE</div>
             <label class="inp-label">Prix WAX ($)</label>
-            <input type="number" id="inpWax" value="0.00786" step="0.00001" class="inp-money" onchange="updateRates()">
+            <input type="number" id="inpWax" step="0.00001" class="inp-money" onchange="updateRates()">
             <label class="inp-label">Parité DOVX</label>
-            <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
+            <input type="number" id="inpDovx" step="0.00000001" onchange="updateRates()">
             <label class="inp-label">Parité TU</label>
-            <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
+            <input type="number" id="inpTu" step="0.00000001" onchange="updateRates()">
         </div>
         <div class="box">
             <div class="box-title">1. Global (Monde)</div>
@@ -290,7 +290,7 @@
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-box" style="width:700px;">
         <div class="modal-head">
-            <div class="modal-title">⚙️ PARAMÈTRES AVANCÉS</div>
+            <div class="modal-title">⚙️ PARAMÈTRES AVANCÉS (ZERO HARDCODE)</div>
             <div class="modal-close" onclick="closeModal('settingsModal')">X</div>
         </div>
         <div class="modal-body">
@@ -323,104 +323,93 @@
             </div>
 
             <div class="set-group">
-                <span class="set-title">TRI & AFFICHAGE (Ordre de priorité)</span>
-                <div class="inp-label" style="margin-bottom:5px;">Séparez les préfixes par une virgule (ex: C_F1, R_F2)</div>
-                <textarea id="cfgSort" style="height:60px; font-size:10px;">C_F1, C_F2, C_F3, C_F4, R_F1, R_F2, R_F3, R_F4, E_F1, E_F2, E_F3, E_F4, L_F1, L_F2, L_F3, S1</textarea>
+                <span class="set-title">CONFIGURATION DES ZONES (JSON)</span>
+                <textarea id="cfgZones" style="height:100px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
+            </div>
+
+            <div class="set-group">
+                <span class="set-title">DICTIONNAIRE TEMPLATES (JSON)</span>
+                <textarea id="cfgTemplates" style="height:150px; font-size:10px; font-family:monospace; color:#ccc; background:#1a1a1a; border:1px solid #333;"></textarea>
+            </div>
+
+            <div class="set-group">
+                <span class="set-title">TRI & AFFICHAGE</span>
+                <textarea id="cfgSort" style="height:40px; font-size:10px;"></textarea>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="set-group">
-                    <span class="set-title">NODES RPC (1 par ligne)</span>
-                    <textarea id="cfgRpc" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+                    <span class="set-title">NODES RPC</span>
+                    <textarea id="cfgRpc" style="height:80px; font-size:10px; white-space:pre;"></textarea>
                 </div>
                 <div class="set-group">
-                    <span class="set-title">PROXIES CORS (1 par ligne)</span>
-                    <textarea id="cfgProxy" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+                    <span class="set-title">PROXIES CORS</span>
+                    <textarea id="cfgProxy" style="height:80px; font-size:10px; white-space:pre;"></textarea>
                 </div>
             </div>
 
             <div style="text-align:right;">
-                <button class="btn-action" style="background:#444;" onclick="resetConfig()">RÉINITIALISER</button>
-                <button class="btn-action" onclick="saveConfig()">SAUVEGARDER</button>
+                <button class="btn-action" style="background:#444;" onclick="resetConfig()">RÉINITIALISER TOUT</button>
+                <button class="btn-action" onclick="saveConfig()">SAUVEGARDER CONFIG</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="logs" id="console">> V157. PROD STABLE READY.</div>
+<div class="logs" id="console">> V159. ZERO HARDCODE.</div>
 
 <script>
-    // --- 1. CONFIGURATION CENTRALE (DYNAMIQUE) ---
-    // Note: On ajoute "" dans les proxies pour tenter le DIRECT d'abord
-    let CONFIG = {
+    // --- I. DONNÉES PAR DÉFAUT (INJECTÉES SI CACHE VIDE) ---
+    const DEFAULT_DATA = {
+        zones: { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}},
+        templates: {
+            "490122": "C_F1_PRODUCER_FUEL", "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
+            "492385": "C_F2_PRODUCER_FUEL", "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
+            "492379": "R_F1_PRODUCER_FUEL", "492376": "R_F2_PRODUCER_FUEL", "492386": "R_F3_PRODUCER_FUEL", "492390": "R_F4_PRODUCER_FUEL",
+            "492380": "E_F1_PRODUCER_FUEL", "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
+            "492368": "L_F1_PRODUCER_FUEL", "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
+            "544068": "S1_OWNER_FUEL", "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
+            "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
+            "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
+            "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
+            "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
+            "544070": "S1_OWNER_HEALTH",
+            "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
+            "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
+            "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
+            "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
+            "544071": "S1_OWNER_REPAIR",
+            "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
+            "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
+            "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
+            "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
+            "544069": "S1_OWNER_SUPPLY"
+        },
+        rates: { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 }
+    };
+    
+    // --- II. CONFIGURATION SYSTÈME (NET & UI) ---
+    let SYSTEM_CONFIG = {
         strategy: 'B',
         batchSize: 1000,
         delay: 200,
         startKey: '',
-        // NOUVEAU : ORDRE DE TRI CONFIGURABLE
-        sortOrder: [
-            "C_F1", "C_F2", "C_F3", "C_F4", 
-            "R_F1", "R_F2", "R_F3", "R_F4",
-            "E_F1", "E_F2", "E_F3", "E_F4",
-            "L_F1", "L_F2", "L_F3", 
-            "S1", "SC_F2", "SC_F3"
-        ],
+        sortOrder: ["C_F1","C_F2","C_F3","C_F4","R_F1","R_F2","R_F3","R_F4","E_F1","E_F2","E_F3","E_F4","L_F1","L_F2","L_F3","S1","SC_F2","SC_F3"],
         atomicApi: "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&limit=500",
-        rpcs: [
-            "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
-            "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
-            "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
-            "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
-            "https://api.hivebp.io", "https://wax.blacklusion.io"
-        ],
-        proxies: [
-            "", /* ESSAI DIRECT EN PREMIER */
-            "https://corsproxy.io/?",
-            "https://api.allorigins.win/raw?url=",
-            "https://thingproxy.freeboard.io/fetch/"
-        ]
+        rpcs: ["https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com"],
+        proxies: ["", "https://corsproxy.io/?", "https://api.allorigins.win/raw?url=", "https://thingproxy.freeboard.io/fetch/"]
     };
 
-    // --- VARIABLES D'ÉTAT ---
-    let TEMPLATE_NAMES = {}; // Base dynamique
+    // --- III. VARIABLES D'ÉTAT (RUNTIME) ---
+    let APP_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA)); // Clone
     let ZONE_DETAILS = {}; 
     let stopSignal = false; 
     let rpcIndex = 0; 
     let proxyIndex = 0;
-    
-    const RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
-    const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
-    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
+    const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
 
-    // --- LE BOOTSTRAP (Sécurité Architecture V152) ---
-    // Données par défaut pour que l'outil fonctionne même si l'API Atomic est bloquée.
-    const DEFAULT_TEMPLATES = {
-        "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
-        "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
-        "492379": "R_F1_PRODUCER_FUEL",  "492376": "R_F2_PRODUCER_FUEL", "492386": "R_F3_PRODUCER_FUEL", "492390": "R_F4_PRODUCER_FUEL",
-        "492380": "E_F1_PRODUCER_FUEL",  "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
-        "492368": "L_F1_PRODUCER_FUEL",  "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
-        "544068": "S1_OWNER_FUEL",       "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
-        "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
-        "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
-        "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
-        "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
-        "544070": "S1_OWNER_HEALTH",
-        "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
-        "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
-        "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
-        "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
-        "544071": "S1_OWNER_REPAIR",
-        "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
-        "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
-        "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
-        "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
-        "544069": "S1_OWNER_SUPPLY"
-    };
-
-    // --- UTILITAIRES ---
+    // --- UTILS ---
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
     function setTextSafe(id, txt) { let el = document.getElementById(id); if(el) el.innerText = txt; }
@@ -429,135 +418,45 @@
     function getId(row) { return row.asset_id || row.id || row.division_id || 0; }
     function extractPower(row) { let val = Array.isArray(row.power) ? row.power[0] : (row.power || row.pwr); if (typeof val === 'string') val = val.replace(/[^0-9.]/g, ''); return parseFloat(val) || 0; }
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
-    function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
+    
+    // --- V159: UPDATE RATES FROM INPUT OR CONFIG ---
+    function updateRates() { 
+        APP_DATA.rates.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; 
+        APP_DATA.rates.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; 
+        APP_DATA.rates.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; 
+        if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); 
+    }
 
-    // --- INIT & BOOTSTRAP (V152) ---
+    // --- V159: INIT APP (LOAD FROM CACHE OR DEFAULT) ---
     function initApp() {
-        initGrid();
-        // CHARGEMENT SILENCIEUX DES DONNEES
-        const stored = localStorage.getItem('DOV_DICT');
-        if(stored) {
-            try {
-                TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES, ...JSON.parse(stored) };
-                log("💾 Dictionnaire chargé (Cache).", "#aaa");
-            } catch(e) { TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES }; }
-        } else {
-            TEMPLATE_NAMES = { ...DEFAULT_TEMPLATES };
-            log("🔧 Dictionnaire initialisé (Bootstrap).", "#aaa");
-        }
-        document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
-    }
-
-    // --- ROBUST DICTIONARY LOADER (FAILOVER + SAFE JSON) ---
-    async function updateDictionary() {
-        stopSignal = false;
-        // Check simple : si liste vide
-        if (!CONFIG.proxies || CONFIG.proxies.length === 0) {
-            alert("ERREUR: Aucun proxy configuré !");
-            return;
-        }
-
-        log("🔄 Démarrage Téléchargement Dictionnaire...", "#fff");
+        const storedSys = localStorage.getItem('DOV_SYS');
+        if(storedSys) try { SYSTEM_CONFIG = { ...SYSTEM_CONFIG, ...JSON.parse(storedSys) }; } catch(e) {}
         
-        let page = 1;
-        let totalLoaded = 0;
-        let localProxyIdx = 0; 
+        const storedData = localStorage.getItem('DOV_DATA');
+        if(storedData) try { APP_DATA = { ...DEFAULT_DATA, ...JSON.parse(storedData) }; } catch(e) {}
 
-        try {
-            while(!stopSignal) {
-                const urlTarget = `${CONFIG.atomicApi}&page=${page}`;
-                
-                // Sélection
-                const currentProxy = CONFIG.proxies[localProxyIdx % CONFIG.proxies.length];
-                let finalUrl = urlTarget;
-                if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
-                
-                let proxyName = (currentProxy.length < 5) ? "DIRECT" : new URL(currentProxy).hostname;
-                document.getElementById('rpcStatus').innerText = `DICT P${page} via ${proxyName}`;
-
-                try {
-                    const res = await fetch(finalUrl);
-                    
-                    // V152: Check Content-Type + Safe Parse
-                    const contentType = res.headers.get("content-type");
-                    if (!contentType || !contentType.includes("application/json")) {
-                        throw new Error("Réponse HTML/Erreur (Pas de JSON)");
-                    }
-
-                    const json = await res.json();
-                    
-                    if(json.success && json.data.length > 0) {
-                        json.data.forEach(t => {
-                            TEMPLATE_NAMES[t.template_id] = t.immutable_data.name;
-                        });
-                        totalLoaded += json.data.length;
-                        document.getElementById('dictSize').innerText = Object.keys(TEMPLATE_NAMES).length;
-                        
-                        if(json.data.length < 500) break; // Fin pagination
-                        page++;
-                        await new Promise(r => setTimeout(r, 250));
-                    } else {
-                        if(!json.success) throw new Error(json.message || "API Error");
-                        break; 
-                    }
-
-                } catch (fetchError) {
-                    console.warn(`Proxy ${proxyName} fail: ${fetchError.message}`);
-                    log(`⚠️ Echec ${proxyName}. Basculement...`, "orange");
-                    localProxyIdx++; 
-                    if(localProxyIdx > CONFIG.proxies.length * 3) {
-                        log("⚠️ Mode Hors-Ligne forcé (Bootstrap utilisé).", "red");
-                        stopSignal = true; // On arrête l'acharnement
-                    }
-                    await new Promise(r => setTimeout(r, 1000)); 
-                }
-            }
-            // SAUVEGARDE PERSISTANTE
-            localStorage.setItem('DOV_DICT', JSON.stringify(TEMPLATE_NAMES));
-            if(totalLoaded > 0) log(`✅ Mise à jour terminée (+${totalLoaded} templates).`, "#00e676");
-            document.getElementById('rpcStatus').innerText = "PRÊT";
-        } catch(e) {
-            log("❌ ECHEC DICO: " + e.message, "red");
-        }
+        // Populate UI with loaded data
+        document.getElementById('inpWax').value = APP_DATA.rates.WAX_USD;
+        document.getElementById('inpDovx').value = APP_DATA.rates.DOVX_WAX;
+        document.getElementById('inpTu').value = APP_DATA.rates.TU_WAX;
+        document.getElementById('dictSize').innerText = Object.keys(APP_DATA.templates).length;
+        
+        initGrid();
+        log("✅ Système initialisé.", "#00e676");
     }
 
-    // --- ATOMIC SINGLE CHECK (Fallback) ---
-    async function fetchUnknownID(tid) {
-        let localIdx = 0;
-        while(localIdx < CONFIG.proxies.length) {
-            try {
-                const proxy = CONFIG.proxies[localIdx];
-                const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
-                let finalUrl = url;
-                if(proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
-
-                const res = await fetch(finalUrl);
-                const json = await res.json();
-                if(json.success && json.data.immutable_data.name) {
-                    TEMPLATE_NAMES[tid] = json.data.immutable_data.name;
-                    return json.data.immutable_data.name;
-                }
-                return null;
-            } catch(e) { localIdx++; }
-        }
-        return null;
-    }
-
-    // --- ROBUST FETCH (V157 ENGINE - MULTI ARGS & STRICT LIMIT) ---
+    // --- V159: NETWORK ENGINE (ROBUST FETCH) ---
     async function robustFetch(code, table, lowerBound, limit=1000, customScope=null, indexPos=1, keyType="") {
         let attempts = 0;
-        
-        // V157 FIX: Priority to function arguments over config for Target Scan
-        const effectiveLimit = limit || CONFIG.batchSize;
-        const effectiveDelay = CONFIG.delay;
-        
-        // Scope logic: if customScope provided use it, else default to contract code
+        const effectiveLimit = limit || SYSTEM_CONFIG.batchSize;
+        const effectiveDelay = SYSTEM_CONFIG.delay;
         const effectiveScope = customScope ? customScope : code;
 
         while(attempts < 20 && !stopSignal) {
-            const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
-            const proxy = CONFIG.proxies[proxyIndex % CONFIG.proxies.length];
+            const server = SYSTEM_CONFIG.rpcs[rpcIndex % SYSTEM_CONFIG.rpcs.length];
+            const proxy = SYSTEM_CONFIG.proxies[proxyIndex % SYSTEM_CONFIG.proxies.length];
             rpcIndex++; 
+            
             const url = server + "/v1/chain/get_table_rows";
             let finalUrl = url;
             if(proxy && proxy.length > 5) finalUrl = proxy + encodeURIComponent(url);
@@ -570,47 +469,31 @@
 
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 15000); 
                 
-                // CONSTRUCT PAYLOAD (SUPPORTING INDEXES)
-                const payload = { 
-                    json: true, 
-                    code: code, 
-                    scope: effectiveScope, // V157 Fix
-                    table: table, 
-                    limit: effectiveLimit, 
-                    lower_bound: lowerBound 
-                };
-
-                // V157: Index support restored
-                if(indexPos > 1) {
-                    payload.index_position = indexPos;
-                    payload.key_type = keyType;
-                    // For finding specific user, upper_bound often needed to be same as lower
-                    payload.upper_bound = lowerBound; 
-                }
+                const payload = { json: true, code: code, scope: effectiveScope, table: table, limit: effectiveLimit, lower_bound: lowerBound };
+                if(indexPos > 1) { payload.index_position = indexPos; payload.key_type = keyType; payload.upper_bound = lowerBound; }
 
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
+                
                 const contentType = res.headers.get("content-type");
                 if (contentType && !contentType.includes("application/json")) throw new Error("Not JSON");
+
                 if(effectiveDelay > 0) await new Promise(r => setTimeout(r, effectiveDelay));
                 return await res.json();
             } catch(e) { 
                 attempts++;
-                if(CONFIG.proxies.length > 1) proxyIndex++; 
+                if(SYSTEM_CONFIG.proxies.length > 1) proxyIndex++; 
                 await new Promise(r => setTimeout(r, 200));
             }
         }
         throw new Error("Arrêt (Trop d'erreurs).");
     }
 
-    // --- LOGIC: GET SCORE (V153 NEW) ---
+    // --- V159: LOGIC MODULES ---
     function getSortScore(name) {
         if(!name) return 999;
-        // Trouve l'index dans la liste de config
-        for(let i=0; i<CONFIG.sortOrder.length; i++) {
-            if(name.startsWith(CONFIG.sortOrder[i])) return i;
-        }
-        return 999; // Si pas trouvé, on met à la fin
+        for(let i=0; i<SYSTEM_CONFIG.sortOrder.length; i++) { if(name.startsWith(SYSTEM_CONFIG.sortOrder[i])) return i; }
+        return 999;
     }
 
     function conformBuilding(b) {
@@ -621,185 +504,227 @@
         let dailyProd = hourlyProd * 24;
         let pType = "F";
         if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
-        let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
+        let name = APP_DATA.templates[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
-        // V153: Ajout score de tri
         let sortScore = getSortScore(name);
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd, sortScore: sortScore };
     }
 
-    // --- DISPATCHER ---
-    async function dispatchGlobalScan() {
-        const title = CONFIG.strategy === 'A' ? "MODE SÉQUENTIEL" : (CONFIG.strategy === 'B' ? "MODE MATRIX" : "MODE HYBRIDE");
-        stopSignal = false; switchView('buildingView');
-        document.getElementById('globalStatsArea').style.display = 'block';
-        document.getElementById('buildList').style.display = 'none';
-        document.getElementById('btnStop').style.display = 'inline-block';
-        if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
-        let start = CONFIG.startKey || "0";
-        await runSequentialScan(start, CONFIG.strategy === 'C');   
+    // --- V159: ATOMIC UPDATER ---
+    async function updateDictionary() {
+        stopSignal = false;
+        log("🔄 MAJ Dictionnaire...", "#fff");
+        let page = 1; let totalLoaded = 0; let localProxyIdx = 0; 
+        try {
+            while(!stopSignal) {
+                const urlTarget = `${SYSTEM_CONFIG.atomicApi}&page=${page}`;
+                const currentProxy = SYSTEM_CONFIG.proxies[localProxyIdx % SYSTEM_CONFIG.proxies.length];
+                let finalUrl = urlTarget;
+                if(currentProxy.length > 5) finalUrl = currentProxy + encodeURIComponent(urlTarget);
+                
+                try {
+                    const res = await fetch(finalUrl);
+                    if (!res.headers.get("content-type")?.includes("application/json")) throw new Error("Not JSON");
+                    const json = await res.json();
+                    if(json.success && json.data.length > 0) {
+                        json.data.forEach(t => { APP_DATA.templates[t.template_id] = t.immutable_data.name; });
+                        totalLoaded += json.data.length;
+                        document.getElementById('dictSize').innerText = Object.keys(APP_DATA.templates).length;
+                        if(json.data.length < 500) break;
+                        page++; await new Promise(r => setTimeout(r, 250));
+                    } else break;
+                } catch (e) {
+                    localProxyIdx++; if(localProxyIdx > SYSTEM_CONFIG.proxies.length*2) break;
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+            localStorage.setItem('DOV_DATA', JSON.stringify(APP_DATA));
+            log("✅ Dictionnaire mis à jour.", "#00e676");
+        } catch(e) { log("Erreur Dico: "+e.message, "red"); }
     }
 
-    async function runSequentialScan(next, useHybrid) {
-        log(`🌍 START SCAN (Batch: ${CONFIG.batchSize})...`, "#fff");
+    // --- SCAN FUNCTIONS ---
+    async function dispatchGlobalScan() {
+        stopSignal = false; switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'block'; document.getElementById('buildList').style.display = 'none'; document.getElementById('btnStop').style.display = 'inline-block';
+        let start = SYSTEM_CONFIG.startKey || "0";
+        await runGlobalScan(start);   
+    }
+
+    async function runGlobalScan(next) {
+        log(`🌍 START GLOBAL SCAN...`, "#fff");
         let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
-        let scanRows = 0; let scanAssets = 0;
-        let templateAudit = {}; 
+        let scanRows = 0; let scanAssets = 0; let templateAudit = {}; 
         try { while (more && !stopSignal) {
             const data = await robustFetch("dovutilstake", "buildings", next); 
             if (!data.rows) break;
             scanRows += data.rows.length;
             for(let b of data.rows) {
-                if(useHybrid && !TEMPLATE_NAMES[b.template_id]) {
-                    document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
-                    await fetchUnknownID(b.template_id);
-                }
                 stats.total++;
                 let info = conformBuilding(b); 
                 scanAssets += info.stack; 
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
-                // Stockage du sortScore pour le rendu
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd, sortScore: info.sortScore };
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
-                if (active) {
-                    groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24;
-                    stats.cost += info.cost24;
-                    stats.p[info.type] += info.prod24;
-                } else { groups[info.type][k].cr++; }
+                if (active) { groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24; stats.cost += info.cost24; stats.p[info.type] += info.prod24; } else { groups[info.type][k].cr++; }
             }
             if(document.getElementById('cntRows')) {
-                document.getElementById('cntRows').innerText = scanRows.toLocaleString();
-                document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
+                document.getElementById('cntRows').innerText = scanRows.toLocaleString(); document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
                 document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
                 ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-                
-                // V155: GLOBAL SORT ON DEBUG GRID
                 let dbgHTML = "";
                 let auditKeys = Object.keys(templateAudit);
-                auditKeys.sort((a,b) => {
-                    let nameA = templateAudit[a].name;
-                    let nameB = templateAudit[b].name;
-                    return getSortScore(nameA) - getSortScore(nameB);
-                });
-
+                auditKeys.sort((a,b) => getSortScore(templateAudit[a].name) - getSortScore(templateAudit[b].name));
                 for(let tid of auditKeys) {
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
                     let n = templateAudit[tid].name;
                     let color = n.includes("INCONNU") ? "var(--warn)" : "#aaa";
-                    dbgHTML += `<div class="d-row"><a href="${link}" target="_blank" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
+                    dbgHTML += `<div class="d-row"><a href="#" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
                 }
                 document.getElementById('debugGrid').innerHTML = dbgHTML;
                 renderLists(groups);
             }
-            if (data.more && data.next_key) { next = data.next_key; } else { more = false; }
+            if (data.more && data.next_key) next = data.next_key; else more = false;
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
     }
 
-    // --- RENDER LISTS (V153 SORTING) ---
     function renderLists(groups){
         for(let t in groups){
             let h=`<div class="ml-header">TYPE ${t}</div>`;
             let keys=Object.keys(groups[t]);
-            
-            // V153: TRI PAR SCORE (CONFIG)
             keys.sort((a,b) => {
-                let scoreA = groups[t][a].sortScore;
-                let scoreB = groups[t][b].sortScore;
+                let scoreA = groups[t][a].sortScore; let scoreB = groups[t][b].sortScore;
                 if(scoreA === scoreB) return groups[t][b].unitProd - groups[t][a].unitProd;
                 return scoreA - scoreB; 
             });
-
             keys.forEach(k=>{
-                let i=groups[t][k];
-                if(i.cp===0 && i.cr===0) return;
-                let link=`https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.tid}`;
-                let st=""; 
-                if(i.cp>0) st+=`<span class="status-badge s-prod">${i.cp} ACTIF</span> `; 
-                if(i.cr>0) st+=`<span class="status-badge s-claim">${i.cr} PRÊT</span>`;
-                let unit=i.unitProd; 
-                h+=`<div class="ml-row"><div class="ml-name"><a href="${link}" target="_blank">${i.name}</a> <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${i.stack>1?'<span class="ml-mult">x'+i.stack+'</span>':''} <span style="font-size:9px;color:#555">[${i.tid}]</span></div><div class="ml-count">${st}</div><div class="ml-unit">${Math.round(unit).toLocaleString()}/u</div><div class="ml-total">${Math.round(i.tp).toLocaleString()}</div></div>`;
+                let i=groups[t][k]; if(i.cp===0 && i.cr===0) return;
+                h+=`<div class="ml-row"><div class="ml-name">${i.name} ${i.stack>1?'<span class="ml-mult">x'+i.stack+'</span>':''}</div><div class="ml-count">${i.cp} ACTIF</div><div class="ml-unit">${Math.round(i.unitProd).toLocaleString()}/u</div><div class="ml-total">${Math.round(i.tp).toLocaleString()}</div></div>`;
             });
             let c=document.getElementById('list-'+t); if(c) c.innerHTML=h;
         }
     }
 
-    // --- V157 FIX: START BUILDINGS (USER SCAN) ---
     async function startBuildings() { 
         const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
-        switchView('buildingView'); 
-        document.getElementById('globalStatsArea').style.display = 'none'; 
-        document.getElementById('buildList').style.display = 'grid'; 
-        document.getElementById('buildDash').innerHTML = ""; 
-        document.getElementById('buildList').innerHTML = ""; 
-        log(`🔍 Lecture Deck (${user})...`, "#fff"); 
-        
-        let nextKey = ""; 
-        let hasMore = true; 
-        
-        try { 
-            while(hasMore && !stopSignal) { 
-                // V157 FIX: Pass 'user' as SCOPE to query specifically their buildings
-                const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000, user); 
-                
-                if(!data.rows || data.rows.length === 0) {
-                    if(nextKey === "") log("⚠️ Aucun bâtiment trouvé pour ce joueur.", "orange");
-                    break; 
-                }
-                
-                const now = Date.now()/1000; 
-                
-                data.rows.forEach(b => { 
-                    let info = conformBuilding(b); 
-                    let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); 
-                    let isReady = now > rdyTime; 
-                    let typeColor = "#fff"; 
-                    if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; 
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; 
-                    let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; 
-                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card); 
-                }); 
-                
-                if(data.more && data.next_key) nextKey = data.next_key; 
-                else hasMore = false; 
-            } 
-            log(`✅ Deck Joueur affiché.`, "#00e676"); 
-        } catch(e){ log("Err: "+e.message, "red"); } 
+        switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; 
+        log(`🔍 Scan Joueur ${user}...`, "#fff"); 
+        let nextKey = ""; let hasMore = true; 
+        try { while(hasMore && !stopSignal) { 
+            const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000, user); 
+            if(!data.rows || data.rows.length === 0) break; 
+            const now = Date.now()/1000; 
+            data.rows.forEach(b => { 
+                let info = conformBuilding(b); let isReady = now > (parseFloat(b.last_claim) + parseFloat(b.delay)); 
+                let typeColor = info.type == "F" ? "var(--fuel)" : (info.type == "H" ? "var(--health)" : (info.type == "R" ? "var(--repair)" : "var(--supply)"));
+                let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} ${info.stack>1?'x'+info.stack:''}</div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; 
+                document.getElementById('buildList').insertAdjacentHTML('beforeend', card); 
+            }); 
+            if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; 
+        } log(`✅ Scan Joueur terminé.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } 
     }
     
-    // --- V157 FIX: START TARGET (DIVISIONS SCAN) ---
     async function startTarget() { 
-        const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
-        switchView('targetView'); 
-        const view = document.getElementById('targetView'); 
-        view.innerHTML="Recherche des divisions pour " + user + "..."; 
-        
+        const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche divisions..."; 
         try { 
-            // V157 FIX: Use Secondary Index (2) to find by Owner Name (i64)
             const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, null, 2, "i64"); 
-            
             const rows = data.rows ? data.rows : []; 
-            let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; 
-            
+            let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs)</div>`; 
             rows.forEach(r => { 
                 const zID = getProp(r, ['zoneID', 'zone_id']); 
-                const busy = isBusy(r); 
-                const dID = getId(r); 
-                htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; 
+                const zName = APP_DATA.zones[zID] ? APP_DATA.zones[zID].name : 'Zone '+zID;
+                htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${getId(r)}</div><div style="color:var(--sec)">${zName}</div><div>${isBusy(r)?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; 
             }); 
             view.innerHTML = htmlBuffer; 
         } catch(e){ log("Erreur Target: "+e.message, "red"); } 
     }
 
-    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; ZONE_ORDER.forEach(id => { const z = ZONE_DB[id]; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; }); if(grid) grid.innerHTML = htmlBuffer; }
+    async function startZoneScan() { 
+        stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
+        ZONE_DETAILS = {}; let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; 
+        for(let i=1;i<=20;i++) stats.zones[i]={count:0,active:0,idle:0};
+        let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); 
+        try { while(hasMore && !stopSignal) { 
+            const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; 
+            for(let row of data.rows) { 
+                stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); 
+                if(busy) {
+                    if(!ZONE_DETAILS[zID]) ZONE_DETAILS[zID] = [];
+                    const ownerName = row.owner || row.user || row.account || row.player;
+                    if(ownerName) ZONE_DETAILS[zID].push({ name: ownerName, time: row.end_time || 0 });
+                }
+                if(stats.zones[zID]) { 
+                    stats.zones[zID].count++; const zInfo = APP_DATA.zones[zID]; 
+                    if(busy) { 
+                        stats.zones[zID].active++; 
+                        if(zInfo) {
+                            if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } 
+                            stats.totalCostX += zInfo.costX; 
+                            const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); 
+                        }
+                    } else stats.zones[zID].idle++; 
+                } 
+            } if (stats.divs % 1000 === 0) updateZoneDash(stats); 
+            if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; 
+        } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } 
+    }
     
-    // --- SETTINGS UI ---
-    function openSettings() { document.getElementById('cfgStrategy').value = CONFIG.strategy; document.getElementById('cfgBatch').value = CONFIG.batchSize; document.getElementById('cfgDelay').value = CONFIG.delay; document.getElementById('cfgStart').value = CONFIG.startKey; document.getElementById('cfgSort').value = CONFIG.sortOrder.join(', '); document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n'); document.getElementById('cfgProxy').value = CONFIG.proxies.join('\n'); document.getElementById('settingsModal').style.display = 'flex'; }
-    function saveConfig() { CONFIG.strategy = document.getElementById('cfgStrategy').value; CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value) || 1000; CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200; CONFIG.startKey = document.getElementById('cfgStart').value.trim(); let rawSort = document.getElementById('cfgSort').value.trim().split(','); let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0); if(cleanSort.length > 0) CONFIG.sortOrder = cleanSort; let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n'); let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http')); if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc; let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n'); let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === ""); if(cleanProxy.length > 0) CONFIG.proxies = cleanProxy; closeModal('settingsModal'); log("⚙️ Configuration sauvegardée.", "#ffd700"); }
-    function resetConfig() { document.getElementById('cfgStrategy').value = 'B'; document.getElementById('cfgBatch').value = '1000'; document.getElementById('cfgDelay').value = '200'; document.getElementById('cfgStart').value = ''; alert("Configuration remise à zéro (veuillez Sauvegarder)."); }
+    function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); for(let i=1;i<=20;i++) { const data = stats.zones[i]; const card = document.getElementById(`z-card-${i}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${i}`).innerText = data.count; document.getElementById(`z-miss-${i}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${i}`).innerText = data.idle + " Rdy"; } } }
+    function openZoneDetail(id) {
+        const zInfo = APP_DATA.zones[id]; const title = zInfo ? zInfo.name : "ZONE " + id;
+        document.getElementById('zmTitle').innerText = title + " (RADAR)";
+        const rawList = ZONE_DETAILS[id] || [];
+        if(rawList.length === 0) { document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur. Lancez le scan.</div>"; document.getElementById('zoneModal').style.display = 'flex'; return; }
+        let clusters = {}; let singles = []; rawList.sort((a,b) => a.time - b.time); let processed = new Set();
+        for(let i=0; i<rawList.length; i++) {
+            if(processed.has(i)) continue;
+            let group = [rawList[i]]; processed.add(i);
+            if(rawList[i].time > 0) {
+                for(let j=i+1; j<rawList.length; j++) {
+                    if(processed.has(j)) continue;
+                    if(rawList[j].time > 0 && Math.abs(rawList[i].time - rawList[j].time) <= 2) { group.push(rawList[j]); processed.add(j); }
+                }
+            }
+            if(group.length >= 3) clusters["TIME_"+rawList[i].time] = group; else singles.push(...group);
+        }
+        let h = "";
+        for(let k in clusters) {
+            let grp = clusters[k]; let uniqueNames = [...new Set(grp.map(x=>x.name))]; if(uniqueNames.length < 2) continue;
+            h += `<div class="sybil-cluster"><div class="cluster-head"><span>⚠️ SUSPICION (${uniqueNames.length} comptes)</span></div>`;
+            uniqueNames.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`; }); h += `</div>`;
+        }
+        let uniqueSingles = [...new Set(singles.map(x=>x.name))];
+        uniqueSingles.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`; });
+        document.getElementById('zmBody').innerHTML = h; document.getElementById('zoneModal').style.display = 'flex';
+    }
+
+    async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = APP_DATA.zones[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 1000 === 0) updateEcoDisplay(); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
+    function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * APP_DATA.rates.TU_WAX * APP_DATA.rates.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * APP_DATA.rates.TU_WAX * APP_DATA.rates.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * APP_DATA.rates.DOVX_WAX * APP_DATA.rates.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * APP_DATA.rates.DOVX_WAX * APP_DATA.rates.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * APP_DATA.rates.DOVX_WAX * APP_DATA.rates.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * APP_DATA.rates.DOVX_WAX * APP_DATA.rates.WAX_USD)); }
+
+    function initGrid() { const grid = document.getElementById('zonesArea'); let htmlBuffer = ""; for(let id=1; id<=20; id++) { const z = APP_DATA.zones[id]; if(!z) continue; let costDisplay = z.cost > 0 ? `<span class="z-burn">-${z.cost.toLocaleString()}/TU</span>` : `<span class="z-burn-x">-${z.costX.toLocaleString()} DOVX</span>`; htmlBuffer += `<div class="zone" id="z-card-${id}" onclick="openZoneDetail(${id})"><div class="z-head"><span>${z.name}</span><span id="z-count-${id}">0</span></div><div class="z-metrics"><div class="z-row"><span>Coût:</span> ${costDisplay}</div><div class="z-row"><span>Gain Win:</span> <span class="z-earn">+${z.reward}</span></div></div><div class="z-act-text"><span style="color:var(--warn)" id="z-miss-${id}">0 act.</span><span style="color:var(--main)" id="z-rdy-${id}">0 rdy</span></div></div>`; } if(grid) grid.innerHTML = htmlBuffer; }
+    function checkFunding(account) { window.open(`https://wax.bloks.io/account/${account}`, '_blank'); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function setTarget(name) { closeModal('zoneModal'); document.getElementById('targetIn').value = name; switchView('targetView'); }
+
+    // --- CONFIG UI ---
+    function openSettings() { 
+        document.getElementById('cfgStrategy').value = SYSTEM_CONFIG.strategy; document.getElementById('cfgBatch').value = SYSTEM_CONFIG.batchSize; document.getElementById('cfgDelay').value = SYSTEM_CONFIG.delay; document.getElementById('cfgStart').value = SYSTEM_CONFIG.startKey; 
+        document.getElementById('cfgSort').value = SYSTEM_CONFIG.sortOrder.join(', '); document.getElementById('cfgRpc').value = SYSTEM_CONFIG.rpcs.join('\n'); document.getElementById('cfgProxy').value = SYSTEM_CONFIG.proxies.join('\n');
+        document.getElementById('cfgZones').value = JSON.stringify(APP_DATA.zones, null, 4); document.getElementById('cfgTemplates').value = JSON.stringify(APP_DATA.templates, null, 4);
+        document.getElementById('settingsModal').style.display = 'flex'; 
+    }
+    function saveConfig() {
+        SYSTEM_CONFIG.strategy = document.getElementById('cfgStrategy').value; SYSTEM_CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value)||1000; SYSTEM_CONFIG.delay = parseInt(document.getElementById('cfgDelay').value)||200; SYSTEM_CONFIG.startKey = document.getElementById('cfgStart').value.trim();
+        let rawSort = document.getElementById('cfgSort').value.trim().split(','); let cleanSort = rawSort.map(s => s.trim()).filter(s => s.length > 0); if(cleanSort.length > 0) SYSTEM_CONFIG.sortOrder = cleanSort;
+        let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n'); let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http')); if(cleanRpc.length > 0) SYSTEM_CONFIG.rpcs = cleanRpc;
+        let rawProxy = document.getElementById('cfgProxy').value.trim().split('\n'); let cleanProxy = rawProxy.map(r => r.trim()).filter(r => r.startsWith('http') || r === ""); if(cleanProxy.length > 0) SYSTEM_CONFIG.proxies = cleanProxy;
+        try { APP_DATA.zones = JSON.parse(document.getElementById('cfgZones').value); APP_DATA.templates = JSON.parse(document.getElementById('cfgTemplates').value); } catch(e) { alert("JSON Invalide: "+e.message); return; }
+        localStorage.setItem('DOV_SYS', JSON.stringify(SYSTEM_CONFIG)); localStorage.setItem('DOV_DATA', JSON.stringify(APP_DATA));
+        closeModal('settingsModal'); log("⚙️ Config Sauvegardée.", "#ffd700"); initGrid();
+    }
+    function resetConfig() { if(confirm("Reset Total ?")) { localStorage.removeItem('DOV_SYS'); localStorage.removeItem('DOV_DATA'); location.reload(); } }
 
     window.onload = function() { initApp(); }
 </script>
