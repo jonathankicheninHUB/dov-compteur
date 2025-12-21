@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V135 (CORRECTED IDs)</title>
+    <title>DoV - COMMAND V137 (AUTO INDEX)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -64,7 +64,7 @@
         .d-id:hover { color:#fff; border-color:#fff; }
         .d-cnt { font-weight:bold; color:#fff; }
 
-        /* VUES COMMUNES */
+        /* VUES COMMUNES (INTACTES) */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-top: 2px solid #444; display: flex; flex-direction: column; justify-content: center; }
         .stat-val { display: block; font-size: 18px; color: #fff; font-weight: bold; }
@@ -112,7 +112,7 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V135 CORRECTED IDs</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V137 AUTO INDEX</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
@@ -139,16 +139,12 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            
             <label class="inp-label" style="color:var(--sec)">STRATÉGIE DE SCAN</label>
             <select id="scanStrategy" style="margin-bottom:10px;">
-                <option value="B">B. RPC ROTATION (Rapide & Sûr)</option>
-                <option value="C">C. HYBRIDE (God Mode + Auto-Name)</option>
-                <option value="A">A. Séquentiel (Simple)</option>
+                <option value="B">B. RPC ROTATION (Rapide)</option>
+                <option value="A">A. Séquentiel (Safe)</option>
             </select>
-
-            <button class="btn-global" onclick="dispatchGlobalScan()">SCAN MASTER (ALL)</button>
-            
+            <button class="btn-global" onclick="startAutoScan()">SCAN MASTER (AUTO-INDEX)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
@@ -210,7 +206,7 @@
             <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
                 <div class="g-main-count">
                     <div class="g-mc-left">
-                        <div style="font-weight:bold; color:#fff" id="scanModeTitle">SCAN GLOBAL (CYCLE 24H)</div>
+                        <div style="font-weight:bold; color:#fff" id="scanModeTitle">INITIALISATION...</div>
                         <div class="scan-stats-row">
                             <div class="scan-stat-item"><span style="color:#888">Lignes scannées:</span> <b id="cntRows">0</b></div>
                             <div class="scan-stat-item"><span style="color:var(--main)">Total Cartes (NFTs):</span> <b id="cntAssets">0</b></div>
@@ -230,7 +226,6 @@
                     <div class="ml-col c-r" id="list-R"><div class="ml-header">REPAIR</div></div>
                     <div class="ml-col c-s" id="list-S"><div class="ml-header">SUPPLY</div></div>
                 </div>
-                
                 <div class="debug-box">
                     <div class="debug-title">RAPPORT DE SCAN (TEMPLATES TROUVÉS)</div>
                     <div class="debug-grid" id="debugGrid"></div>
@@ -242,93 +237,24 @@
     </main>
 </div>
 
-<div class="logs" id="console">> V135. DICTIONARY CORRECTED.</div>
+<div class="logs" id="console">> V137. SYSTEME AUTO-INDEX.</div>
 
 <script>
-    // --- 1. LE REGISTRE DES TEMPLATES (Source de Vérité - CORRIGÉ V135) ---
-    // Clé = ID, Valeur = { Nom, BaseProdHeure }
-    const TEMPLATE_REGISTRY = {
-        // --- FUEL ---
-        "490122": { n: "C_F1_PRODUCER_FUEL",  b: 5.40 }, 
-        "492383": { n: "C_F1_PRODUCER_FUEL",  b: 5.40 },
-        "492373": { n: "R_F1_PRODUCER_FUEL",  b: 16.20 }, // <--- MODIFICATION DEMANDÉE
-        "492385": { n: "C_F2_PRODUCER_FUEL",  b: 12.15 },
-        "492389": { n: "C_F3_PRODUCER_FUEL",  b: 30.38 },
-        "492397": { n: "C_F4_PRODUCER_FUEL",  b: 83.53 }, 
-        "492379": { n: "R_F1_PRODUCER_FUEL",  b: 16.20 },
-        "492376": { n: "R_F2_PRODUCER_FUEL",  b: 36.45 },
-        "492386": { n: "R_F3_PRODUCER_FUEL",  b: 91.13 },
-        "492390": { n: "R_F4_PRODUCER_FUEL",  b: 250.59 },
-        "492380": { n: "E_F1_PRODUCER_FUEL",  b: 48.60 },
-        "492381": { n: "E_F2_PRODUCER_FUEL",  b: 109.35 },
-        "492387": { n: "E_F3_PRODUCER_FUEL",  b: 273.38 },
-        "492388": { n: "E_F4_PRODUCER_FUEL",  b: 751.78 },
-        "492368": { n: "L_F1_PRODUCER_FUEL",  b: 145.80 },
-        "492370": { n: "L_F2_PRODUCER_FUEL",  b: 328.05 },
-        "492372": { n: "L_F3_PRODUCER_FUEL",  b: 820.13 },
-        "544068": { n: "S1_OWNER_FUEL",       b: 2255.34 },
-        "492391": { n: "SC_F3_PRODUCER_FUEL", b: 121.50 },
-
-        // --- HEALTH ---
-        "492394": { n: "C_F1_PRODUCER_HEALTH", b: 5.40 },
-        "492395": { n: "C_F2_PRODUCER_HEALTH", b: 12.15 },
-        "492396": { n: "C_F3_PRODUCER_HEALTH", b: 30.38 },
-        "492397": { n: "C_F4_PRODUCER_HEALTH", b: 83.53 }, 
-        "492399": { n: "R_F1_PRODUCER_HEALTH", b: 16.20 },
-        "492401": { n: "R_F2_PRODUCER_HEALTH", b: 36.45 },
-        "492535": { n: "R_F3_PRODUCER_HEALTH", b: 91.13 },
-        "492537": { n: "R_F4_PRODUCER_HEALTH", b: 250.59 },
-        "492539": { n: "E_F1_PRODUCER_HEALTH", b: 48.60 },
-        "492543": { n: "E_F2_PRODUCER_HEALTH", b: 109.35 },
-        "492545": { n: "E_F3_PRODUCER_HEALTH", b: 273.38 },
-        "492546": { n: "E_F4_PRODUCER_HEALTH", b: 751.78 },
-        "492550": { n: "L_F1_PRODUCER_HEALTH", b: 145.80 },
-        "492554": { n: "L_F2_PRODUCER_HEALTH", b: 328.05 },
-        "492555": { n: "L_F3_PRODUCER_HEALTH", b: 820.13 },
-        "544070": { n: "S1_OWNER_HEALTH",      b: 2255.34 },
-
-        // --- REPAIR ---
-        "492460": { n: "C_F1_PRODUCER_REPAIR", b: 5.40 },
-        "492461": { n: "C_F2_PRODUCER_REPAIR", b: 12.15 },
-        "492462": { n: "C_F3_PRODUCER_REPAIR", b: 30.38 },
-        "492463": { n: "C_F4_PRODUCER_REPAIR", b: 83.53 },
-        "492464": { n: "R_F1_PRODUCER_REPAIR", b: 16.20 },
-        "492465": { n: "R_F2_PRODUCER_REPAIR", b: 36.45 },
-        "492466": { n: "R_F3_PRODUCER_REPAIR", b: 91.13 },
-        "492467": { n: "R_F4_PRODUCER_REPAIR", b: 250.59 },
-        "492469": { n: "E_F1_PRODUCER_REPAIR", b: 48.60 },
-        "492471": { n: "E_F2_PRODUCER_REPAIR", b: 109.35 },
-        "492472": { n: "E_F3_PRODUCER_REPAIR", b: 273.38 },
-        "492473": { n: "E_F4_PRODUCER_REPAIR", b: 751.78 },
-        "492474": { n: "L_F1_PRODUCER_REPAIR", b: 145.80 },
-        "492475": { n: "L_F2_PRODUCER_REPAIR", b: 328.05 },
-        "492476": { n: "L_F3_PRODUCER_REPAIR", b: 820.13 },
-        "544071": { n: "S1_OWNER_REPAIR",      b: 2255.34 },
-
-        // --- SUPPLY ---
-        "492507": { n: "C_F1_PRODUCER_SUPPLY", b: 5.40 },
-        "492509": { n: "C_F2_PRODUCER_SUPPLY", b: 12.15 },
-        "492511": { n: "C_F3_PRODUCER_SUPPLY", b: 30.38 },
-        "492513": { n: "C_F4_PRODUCER_SUPPLY", b: 83.53 },
-        "492515": { n: "R_F1_PRODUCER_SUPPLY", b: 16.20 },
-        "492518": { n: "R_F2_PRODUCER_SUPPLY", b: 36.45 },
-        "492521": { n: "R_F3_PRODUCER_SUPPLY", b: 91.13 },
-        "492523": { n: "R_F4_PRODUCER_SUPPLY", b: 250.59 },
-        "492526": { n: "E_F1_PRODUCER_SUPPLY", b: 48.60 },
-        "492528": { n: "E_F2_PRODUCER_SUPPLY", b: 109.35 },
-        "492529": { n: "E_F3_PRODUCER_SUPPLY", b: 273.38 },
-        "492530": { n: "E_F4_PRODUCER_SUPPLY", b: 751.78 },
-        "492532": { n: "L_F1_PRODUCER_SUPPLY", b: 145.80 },
-        "492533": { n: "L_F2_PRODUCER_SUPPLY", b: 328.05 },
-        "492534": { n: "L_F3_PRODUCER_SUPPLY", b: 820.13 },
-        "544069": { n: "S1_OWNER_SUPPLY",      b: 2255.34 }
-    };
-
+    // --- VARIABLES GLOBALES ---
+    let TEMPLATE_DB = {}; // Se remplira toute seule
+    const RPC_MATRIX = [
+        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
+        "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
+        "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
+        "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
+        "https://api.hivebp.io", "https://wax.blacklusion.io"
+    ];
+    let stopSignal = false; let rpcIndex = 0; 
     let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
     const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
     const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
     const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
+    let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
@@ -340,47 +266,78 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    const RPC_MATRIX = [
-        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
-        "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
-        "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
-        "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
-        "https://api.hivebp.io", "https://wax.blacklusion.io"
-    ];
-    
-    // --- ATOMIC FETCH (POUR LE MODE HYBRIDE) ---
-    async function fetchUnknownID(tid) {
-        try {
-            const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
-            const res = await fetch(url);
-            const json = await res.json();
-            if(json.success && json.data.immutable_data.name) {
-                TEMPLATE_NAMES[tid] = { n: json.data.immutable_data.name, b: 0 }; // Base 0 car inconnu
-                return json.data.immutable_data.name;
+    // --- PHASE 1 : INDEXATION ATOMIC ---
+    async function loadAllTemplates() {
+        const proxy = document.getElementById('inpProxy').value.trim();
+        const baseApi = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=dovdivisions&schema_name=warbuildings&limit=500";
+        let page = 1;
+        let hasMore = true;
+        log("🔄 Indexation Collection DOV...", "#sec");
+
+        while(hasMore && !stopSignal) {
+            try {
+                let url = `${baseApi}&page=${page}`;
+                if(proxy.length > 5) url = proxy + encodeURIComponent(url);
+                
+                const res = await fetch(url);
+                const json = await res.json();
+                
+                if(json.success && json.data.length > 0) {
+                    json.data.forEach(t => {
+                        TEMPLATE_DB[t.template_id] = t.immutable_data.name;
+                    });
+                    log(`📦 Page ${page} lue. Total: ${Object.keys(TEMPLATE_DB).length} IDs connus.`, "#aaa");
+                    page++;
+                } else {
+                    hasMore = false;
+                }
+            } catch(e) {
+                log("⚠️ Erreur Indexation: " + e.message, "orange");
+                hasMore = false; 
             }
-        } catch(e) { return null; }
+        }
+        log("✅ Indexation Terminée.", "#00e676");
     }
 
-    async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
+    // --- PHASE 2 : DÉDUCTION INTELLIGENTE DU BASE POWER ---
+    function getBaseFromName(name) {
+        if(!name) return 0;
+        // Grille officielle
+        if(name.includes("S1")) return 2255.34;
+        if(name.includes("L_F3")) return 820.13;
+        if(name.includes("L_F2")) return 328.05;
+        if(name.includes("L_F1")) return 145.80;
+        if(name.includes("E_F4")) return 751.78;
+        if(name.includes("E_F3")) return 273.38;
+        if(name.includes("E_F2")) return 109.35;
+        if(name.includes("E_F1")) return 48.60;
+        if(name.includes("R_F4")) return 250.59;
+        if(name.includes("R_F3")) return 91.13;
+        if(name.includes("R_F2")) return 36.45;
+        if(name.includes("R_F1")) return 16.20;
+        if(name.includes("C_F4")) return 83.53;
+        if(name.includes("C_F3")) return 30.38;
+        if(name.includes("C_F2")) return 12.15;
+        if(name.includes("C_F1")) return 5.40;
+        if(name.includes("SC_F2")) return 54.00;
+        if(name.includes("SC_F3")) return 121.50;
+        return 0;
+    }
+
+    // --- PHASE 3 : FETCH & PROCESS ---
+    async function robustFetch(code, table, lowerBound, limit=1000) {
         let attempts = 0;
         while(attempts < 20 && !stopSignal) {
-            const server = RPC_MATRIX[rpcIndex % RPC_MATRIX.length];
-            rpcIndex++; 
+            const server = RPC_MATRIX[rpcIndex % RPC_MATRIX.length]; rpcIndex++;
             const url = server + "/v1/chain/get_table_rows";
-            
             try {
                 if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = "RPC: " + new URL(server).hostname;
                 const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
                 const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
-                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
-                
                 const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
                 return await res.json();
-            } catch(e) { 
-                attempts++; 
-                await new Promise(r => setTimeout(r, 200)); 
-            }
+            } catch(e) { attempts++; await new Promise(r => setTimeout(r, 200)); }
         }
         throw new Error("Arrêt (Reseau Saturé).");
     }
@@ -388,60 +345,55 @@
     function conformBuilding(b) {
         let tid = b.template_id.toString(); 
         
-        // 1. LISTE STACK (Priorité Absolue si dispo)
-        let stack = (b.asset_ids && Array.isArray(b.asset_ids)) ? b.asset_ids.length : 0;
+        // 1. Identification via Index
+        let name = TEMPLATE_DB[tid] || `INCONNU [${tid}]`;
         
+        // 2. Déduction Base
+        let baseProd = getBaseFromName(name);
+
+        // 3. Lecture Puissance Totale
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
 
-        let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H";
-        else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
-
-        // 2. DICTIONNAIRE
-        let def = TEMPLATE_NAMES[tid];
-        let name = `INCONNU [${tid}]`;
-        let baseProd = 0;
-
-        if (def) {
-            name = def.n;
-            baseProd = def.b;
-            // SI STACK NON TROUVÉ DANS LISTE (CAS RPC LIGHT), ON LE CALCULE
-            if (stack === 0 && baseProd > 0) {
-                stack = Math.round(hourlyProd / baseProd);
-                if (stack < 1) stack = 1;
-            }
-        } else {
-            // Inconnu, on suppose stack 1 si pas de liste
-            if (stack === 0) stack = 1;
+        // 4. Calcul Stack
+        let stack = 1;
+        if (baseProd > 0) {
+            stack = Math.round(hourlyProd / baseProd);
+            if (stack < 1) stack = 1;
+        } else if (b.asset_ids && Array.isArray(b.asset_ids)) {
+            stack = b.asset_ids.length; // Fallback si base inconnue
         }
 
+        // 5. Type
+        let pType = "F";
+        if(name.includes("FUEL") || rawStr.includes("DOVF")) pType="F";
+        else if(name.includes("HEALTH") || rawStr.includes("DOVH")) pType="H";
+        else if(name.includes("REPAIR") || rawStr.includes("DOVR")) pType="R";
+        else if(name.includes("SUPPLY") || rawStr.includes("DOVS")) pType="S";
+
         let cost24 = hourlyProd * 24 * 0.085; 
-        
         let unitProd = baseProd > 0 ? (baseProd * 24) : (dailyProd / stack);
 
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd };
     }
 
-    // --- DISPATCHER ---
-    async function dispatchGlobalScan() {
+    async function startAutoScan() {
         const strategy = document.getElementById('scanStrategy').value;
-        const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX ROTATION" : "MODE HYBRIDE (GOD)");
-        
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
-        if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
+        document.getElementById('scanModeTitle').innerText = "1. INDEXATION...";
 
-        if (strategy === 'A') await runSequentialScan(1000, false);
-        else if (strategy === 'B') await runSequentialScan(2000, false); 
-        else if (strategy === 'C') await runSequentialScan(500, true);   
-    }
+        // ETAPE 1 : INDEXATION
+        await loadAllTemplates();
 
-    async function runSequentialScan(batchSize, useHybrid) {
-        log(`🌍 DÉMARRAGE ${useHybrid ? 'HYBRIDE' : 'MATRIX'}...`, "#fff");
+        if(stopSignal) return;
+
+        // ETAPE 2 : SCAN
+        document.getElementById('scanModeTitle').innerText = "2. SCAN GLOBAL (EN COURS)";
+        let batchSize = strategy === 'B' ? 2000 : 1000;
         let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
         let scanRows = 0; let scanAssets = 0;
@@ -453,12 +405,7 @@
             
             scanRows += data.rows.length;
 
-            for(let b of data.rows) {
-                if(useHybrid && !TEMPLATE_NAMES[b.template_id]) {
-                    document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
-                    await fetchUnknownID(b.template_id);
-                }
-
+            data.rows.forEach(b => {
                 stats.total++;
                 let info = conformBuilding(b); 
                 scanAssets += info.stack; 
@@ -476,24 +423,23 @@
                     stats.cost += info.cost24;
                     stats.p[info.type] += info.prod24;
                 } else { groups[info.type][k].cr++; }
-            }
+            });
             
-            if(document.getElementById('cntRows')) {
-                document.getElementById('cntRows').innerText = scanRows.toLocaleString();
-                document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
-                document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
-                ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
-                
-                let dbgHTML = "";
-                for(let tid in templateAudit) {
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
-                    let n = templateAudit[tid].name;
-                    let color = n.includes("INCONNU") ? "var(--warn)" : "#aaa";
-                    dbgHTML += `<div class="d-row"><a href="${link}" target="_blank" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
-                }
-                document.getElementById('debugGrid').innerHTML = dbgHTML;
-                renderLists(groups);
+            // UI
+            document.getElementById('cntRows').innerText = scanRows.toLocaleString();
+            document.getElementById('cntAssets').innerText = scanAssets.toLocaleString();
+            document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString() + " DOVX";
+            ['F','H','R','S'].forEach(t=>document.getElementById('pwr-'+t).innerText=Math.round(stats.p[t]).toLocaleString());
+            
+            let dbgHTML = "";
+            for(let tid in templateAudit) {
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${tid}`;
+                let n = templateAudit[tid].name;
+                let color = n.includes("INCONNU") ? "var(--warn)" : "#aaa";
+                dbgHTML += `<div class="d-row"><a href="${link}" target="_blank" class="d-id">[${tid}]</a> <span style="font-size:9px; color:${color}; overflow:hidden; white-space:nowrap; width:80px;">${n}</span> <span class="d-cnt">x${templateAudit[tid].count}</span></div>`;
             }
+            document.getElementById('debugGrid').innerHTML = dbgHTML;
+            renderLists(groups);
             
             if (data.more) next = data.next_key; else more = false;
         } log("✅ SCAN TERMINÉ.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Erreur: " + e.message, "red"); }
