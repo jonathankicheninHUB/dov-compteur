@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V230 (GLOBAL COLLECTION)</title>
+    <title>DoV - COMMAND V231 (NO SC)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -125,7 +125,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V230</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V231</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">COLLECTION SCANNER</span>
@@ -184,14 +184,14 @@
 
 <script>
     // --- UTILS ---
-    const STORAGE_KEY = 'DOV_DATA_V230';
+    const STORAGE_KEY = 'DOV_DATA_V231';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // --- DATA (SUPPLY ADDED) ---
+    // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
         resourceDefs: {
@@ -208,29 +208,13 @@
         },
         templates: {
             // FUEL
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
+            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, 
             // HEALTH
             "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
             // REPAIR
             "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
-            // SUPPLY (UPDATED)
-            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 },
-            "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
-            "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 },
-            "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
-            "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 },
-            "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 },
-            "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 },
-            "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
-            "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 },
-            "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 },
-            "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 },
-            "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
-            "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 },
-            "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 },
-            "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 },
-            "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 },
-            "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            // SUPPLY
+            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
         }
     };
 
@@ -247,19 +231,15 @@
     function buildUI() {
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
-        // ORDERED: F, H, R, S
-        const order = ["F", "H", "R", "S"];
-        
-        for(let k of order) {
+        for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            // UPDATED CARD WITH 24H INDICATOR & OFFLINE COUNT
+            // KPI CARD WITH 24H INDICATOR
             areaC.innerHTML += `
             <div class="kpi-card ${rd.class}">
                 <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
                 <div class="kc-val" id="val-${k}">0</div>
                 <div class="kc-sub">PROD / HOUR</div>
-                
-                <div style="margin-top:15px; padding-top:10px; border-top:1px solid #333;">
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;">
                     <div class="kc-val-24 val" id="val24-${k}">0</div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
                         <span class="kc-sub">PROD 24H</span>
@@ -268,7 +248,7 @@
                 </div>
             </div>`;
             
-            // UPDATED TABLE WITH ACT / TOT
+            // TABLE
             areaL.innerHTML += `
             <div class="data-panel">
                 <div class="dp-head">
@@ -285,6 +265,7 @@
 
     function processRow(row) {
         let tid = row.template_id.toString();
+        // RULE OF 4 (ARRAY LENGTH)
         let count = row.asset_ids ? row.asset_ids.length : 1;
         let tpl = DATA.templates[tid];
         let name = tpl ? tpl.name : `UNK_${tid}`;
@@ -309,50 +290,37 @@
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
         let next = ""; 
-        // INIT STATS WITH OFFLINE COUNTER
+        // INIT STATS
         let stats = { totalCost:0, types:{F:{p:0,c:0,off:0}, H:{p:0,c:0,off:0}, R:{p:0,c:0,off:0}, S:{p:0,c:0,off:0}} }; 
         let groups = {};
         for(let k in DATA.resourceDefs) { groups[k] = []; }
         let rowCount = 0; let assetCount = 0;
-        
         try {
             while(!stopSignal) {
-                // FIXED: SCOPE IS 'dovutilstake' (GLOBAL MONOLITH SCAN), NOT TARGET
+                // GLOBAL MONOLITH SCAN (CONTRACT SCOPE)
                 let res = await fetch(DATA.apiConfig.endpoint, { method:'POST', body:JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}) });
                 let json = await res.json(); if(!json.rows || json.rows.length === 0) break;
-                
                 const now = Date.now()/1000;
                 for(let r of json.rows) {
                     rowCount++; let d = processRow(r); assetCount += d.count;
                     
-                    // Determine Active Status
-                    let finish = parseFloat(r.last_claim) + parseFloat(r.delay);
-                    let isActive = now < finish;
+                    let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
+                    
+                    if(!isActive) stats.types[d.type].off += d.count;
 
-                    // Add to stats if offline
-                    if (!isActive) {
-                        stats.types[d.type].off += d.count;
-                    }
-
-                    // Aggregation Logic
+                    // AGGREGATION LOGIC
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(!existing) {
-                        // Init group with 0 active, 0 total
                         existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 };
                         groups[d.type].push(existing);
                     }
+                    
+                    existing.tot += d.count; // ALWAYS COUNT TOTAL
 
-                    // ALWAYS increment Total Count
-                    existing.tot += d.count;
-
-                    // IF ACTIVE: increment Active Count & Production
                     if(isActive) {
-                        existing.act += d.count; 
-                        existing.totH += d.hourly; 
-                        existing.totD += d.daily; 
-                        existing.costH += d.costH; 
-                        existing.costD += d.costD;
-                        
+                        existing.act += d.count;
+                        existing.totH += d.hourly; existing.totD += d.daily; 
+                        existing.costH += d.costH; existing.costD += d.costD;
                         stats.types[d.type].p += d.hourly; 
                         stats.types[d.type].c += d.costD; 
                         stats.totalCost += d.costD;
@@ -366,33 +334,29 @@
 
     function updateGlobalUI(rows, assets, stats, groups) {
         getId('cntRows').innerText = fmt(rows); getId('cntAssets').innerText = fmt(assets); getId('gTotalCost').innerText = fmt(stats.totalCost);
-        
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            // UPDATE KPI VALUES
+            // UPDATE KPI
             getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); // 24H Projection
-            getId(`off-${k}`).innerText = fmt(stats.types[k].off); // Offline Count
-            
-            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            
-            // SORT & DISPLAY ROWS
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); // 24H VALUE
+            getId(`off-${k}`).innerText = fmt(stats.types[k].off); // OFFLINE COUNT
+
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
-                // RENDER ACT / TOT
+                // DISPLAY ACT / TOT
                 html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="color:var(--green)">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
     }
 
-    async function startZoneScan() { /* ... Same V199 ... */ }
-    async function startEconomyScan() { /* ... Same V199 ... */ }
-    async function startTargetBuildings() { /* ... Same V199 ... */ }
-    async function startTargetDivisions() { /* ... Same V199 ... */ }
+    async function startZoneScan() { /* ... Same as V199 ... */ }
+    async function startEconomyScan() { /* ... Same as V199 ... */ }
+    async function startTargetBuildings() { /* ... Same as V199 ... */ }
+    async function startTargetDivisions() { /* ... Same as V199 ... */ }
 
     function openSettings() { getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); getId('settingsModal').style.display = 'flex'; }
     function saveConfig() { try { DATA.resourceDefs = JSON.parse(getId('cfgResources').value); DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); DATA.zones = JSON.parse(getId('cfgZones').value); DATA.templates = JSON.parse(getId('cfgTemplates').value); localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); closeModal('settingsModal'); init(); } catch(e) { alert("JSON ERROR"); } }
