@@ -218,12 +218,14 @@
 </div>
 
 <script>
+    // --- UTILS ---
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
+    // --- DATA ---
     const DEFAULT_DATA = {
         apiConfig: { endpoint: "https://wax.greymass.com/v1/chain/get_table_rows" },
         resourceDefs: {
@@ -323,10 +325,8 @@
         }
     }
 
-    // --- STRICT LOGIC: 4 BUILDINGS ---
     function processRow(row) {
         let tid = row.template_id.toString();
-        // SAFE ARRAY CHECK
         let assetList = (row.asset_ids && Array.isArray(row.asset_ids)) ? row.asset_ids : [];
         let count = assetList.length; // THE TRUTH: 4 IDs = 4 Buildings
         
@@ -364,9 +364,10 @@
                     let d = processRow(r); 
                     assetCount += d.count;
                     
-                    // DEBUG LOG TO SEE WHAT HAPPENS
+                    // LOGS FOR DEBUGGING
                     console.log(`Scan: ${d.name} (${d.id}) -> Count: ${d.count}`);
 
+                    // AGGREGATE
                     let existing = groups[d.type].find(x => x.name === d.name);
                     if(existing) { 
                         existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; 
@@ -396,7 +397,7 @@
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
-                // CLICK EVENT USES ID ONLY
+                // BUTTON CALLS FUNCTION WITH ID ONLY
                 html += `
                 <div class="dt-grid dt-row">
                     <div class="cell">
@@ -432,7 +433,7 @@
             let walletLink = `${DATA.gameConfig.accountBase}/${item.owner}`;
             html += `<tr>
                 <td><a href="${assetLink}" target="_blank" class="ext">${item.assetId} ↗</a></td>
-                <td><a href="${walletLink}" target="_blank" class="ext" style="color:var(--blue); font-weight:700;">${item.owner} ↗</a></td>
+                <td><a href="${walletLink}" target="_blank" class="ext" style="font-weight:700; color:var(--blue)">${item.owner} ↗</a></td>
                 <td style="color:var(--green)">STAKED</td>
             </tr>`;
         });
@@ -484,6 +485,7 @@
             let json = await res.json(); if(!json.rows) break;
             for(let r of json.rows) {
                 let d = processRow(r); let rd = DATA.resourceDefs[d.type]; 
+                // Link to template on Atomic
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${d.id}`;
                 tbody.insertAdjacentHTML('beforeend', `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="ext">${d.name}</a></div><div class="cell c-center" style="color:var(--green); font-weight:700;">${d.count}</div><div class="cell c-right" style="color:#666">${fmtDec(d.nominal)}</div><div class="cell c-right ${rd ? rd.class : ''} val" style="font-weight:700;">${fmtDec(d.hourly)}</div><div class="cell c-right" style="color:#888;">${fmtDec(d.daily)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(d.costD)}</div></div>`);
             }
