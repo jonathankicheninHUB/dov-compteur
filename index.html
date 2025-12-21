@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V144 (UNIFIED ENGINE)</title>
+    <title>DoV - COMMAND V145 (GOD MODE SETTINGS)</title>
     <style>
         /* --- STYLE ORIGINAL V70 (INTACT) --- */
         :root { 
@@ -23,7 +23,8 @@
         button { width: 100%; padding: 10px; cursor: pointer; border: none; font-weight: bold; font-family: monospace; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; transition:0.2s; }
         button:hover { opacity: 0.8; }
         .btn-zone { background: var(--main); color: #000; } .btn-eco { background: var(--gold); color: #000; } .btn-stop { background: var(--alert); color: #fff; display: none; } .btn-target { background: var(--sec); color: #000; } .btn-build { background: #9b59b6; color: #fff; } .btn-global { background: #fff; color: #000; }
-        input, select { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
+        .btn-settings { background: #444; color: #fff; border:1px solid #666; margin-bottom:15px; } .btn-settings:hover { background: #666; }
+        input, select, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: monospace; margin-bottom: 5px; }
         .inp-label { font-size: 10px; color: #888; margin-bottom: 2px; display: block; }
         
         /* UI BATIMENTS */
@@ -110,13 +111,19 @@
         .b-badge-claim { background: var(--warn); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; animation: pulse 2s infinite; }
         .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 15px; }
 
-        /* MODAL INSPECTOR */
+        /* MODAL COMMON */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--sec); width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .modal-box { background: #111; border: 1px solid var(--sec); width: 600px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         .modal-head { padding: 10px 15px; background: #222; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-weight: bold; color: var(--sec); text-transform: uppercase; }
         .modal-close { cursor: pointer; color: #fff; font-weight: bold; }
-        .modal-body { padding: 10px; overflow-y: auto; color: #ccc; font-size: 11px; }
+        .modal-body { padding: 15px; overflow-y: auto; color: #ccc; font-size: 11px; }
+        
+        /* SETTINGS FORM */
+        .set-group { margin-bottom: 15px; border: 1px solid #333; padding: 10px; }
+        .set-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display:block; border-bottom:1px solid #444; padding-bottom:3px; }
+        .set-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
+        .btn-action { background: var(--main); color: #000; width: auto; display: inline-block; padding: 5px 15px; }
         
         .sybil-cluster { border: 1px solid var(--alert); background: rgba(255, 23, 68, 0.1); margin-bottom: 8px; padding: 5px; border-radius: 3px; }
         .cluster-head { color: var(--alert); font-weight: bold; font-size: 10px; border-bottom: 1px solid #444; margin-bottom: 4px; display: flex; justify-content: space-between; }
@@ -130,24 +137,22 @@
 <body>
 
 <header>
-    <h1>DoV COMMAND <span style="color:var(--sec)">V144 UNIFIED ENGINE</span></h1>
+    <h1>DoV COMMAND <span style="color:var(--sec)">V145 GOD MODE</span></h1>
     <span class="rpc-badge" id="rpcStatus">PRÊT</span>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
+        <button class="btn-settings" onclick="openSettings()">⚙️ PARAMÈTRES AVANCÉS</button>
+        
         <div class="box" style="border-color: var(--gold)">
-            <div class="box-title" style="color:var(--gold)">CONFIGURATION</div>
+            <div class="box-title" style="color:var(--gold)">CONFIGURATION RAPIDE</div>
             <label class="inp-label">Prix WAX ($)</label>
             <input type="number" id="inpWax" value="0.00786" step="0.00001" class="inp-money" onchange="updateRates()">
             <label class="inp-label">Parité DOVX</label>
             <input type="number" id="inpDovx" value="0.00528553" step="0.00000001" onchange="updateRates()">
             <label class="inp-label">Parité TU</label>
             <input type="number" id="inpTu" value="0.00045262" step="0.00000001" onchange="updateRates()">
-            <div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
-                <label class="inp-label">CORS Proxy</label>
-                <input type="text" id="inpProxy" value="https://corsproxy.io/?" placeholder="https://your-proxy.com/?">
-            </div>
         </div>
         <div class="box">
             <div class="box-title">1. Global (Monde)</div>
@@ -157,12 +162,6 @@
         </div>
         <div class="box">
             <div class="box-title">2. Batiments (Buildings)</div>
-            <label class="inp-label" style="color:var(--sec)">STRATÉGIE DE SCAN</label>
-            <select id="scanStrategy" style="margin-bottom:10px;">
-                <option value="B">B. RPC ROTATION (Recommandé)</option>
-                <option value="C">C. HYBRIDE (God Mode)</option>
-                <option value="A">A. Séquentiel (Safe)</option>
-            </select>
             <button class="btn-global" onclick="dispatchGlobalScan()">SCAN MASTER (ALL)</button>
             <div style="border-top:1px solid #333; margin: 10px 0;"></div>
             <div class="box-title">3. Joueur (Target)</div>
@@ -221,7 +220,6 @@
         
         <div id="buildingView" class="view-section">
             <div id="buildDash"></div>
-            
             <div id="globalStatsArea" style="display:none; margin-bottom:20px;">
                 <div class="g-main-count">
                     <div class="g-mc-left">
@@ -250,7 +248,6 @@
                     <div class="debug-grid" id="debugGrid"></div>
                 </div>
             </div>
-
             <div id="buildList" class="build-grid"></div>
         </div>
     </main>
@@ -260,7 +257,7 @@
     <div class="modal-box">
         <div class="modal-head">
             <div class="modal-title" id="zmTitle">RADAR MULTI-COMPTES</div>
-            <div class="modal-close" onclick="closeModal()">X</div>
+            <div class="modal-close" onclick="closeModal('zoneModal')">X</div>
         </div>
         <div class="modal-body" id="zmBody">
             <div style="text-align:center; padding:10px;">En attente de scan...</div>
@@ -268,13 +265,115 @@
     </div>
 </div>
 
-<div class="logs" id="console">> V144. UNIFIED ENGINE READY.</div>
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-box" style="width:700px;">
+        <div class="modal-head">
+            <div class="modal-title">⚙️ PARAMÈTRES AVANCÉS (GOD MODE)</div>
+            <div class="modal-close" onclick="closeModal('settingsModal')">X</div>
+        </div>
+        <div class="modal-body">
+            <div class="set-group">
+                <span class="set-title">STRATÉGIE & PERFORMANCE</span>
+                <div class="set-row">
+                    <div>
+                        <label class="inp-label">Mode de Scan</label>
+                        <select id="cfgStrategy">
+                            <option value="B">Matrix Rotation (Rec.)</option>
+                            <option value="A">Séquentiel (Lent)</option>
+                            <option value="C">Hybride (Auto-Index)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="inp-label">Taille des Paquets (Batch)</label>
+                        <input type="number" id="cfgBatch" value="1000">
+                    </div>
+                </div>
+                <div class="set-row">
+                    <div>
+                        <label class="inp-label">Délai entre requêtes (ms)</label>
+                        <input type="number" id="cfgDelay" value="200">
+                    </div>
+                    <div>
+                        <label class="inp-label">Start Key (Optionnel)</label>
+                        <input type="text" id="cfgStart" placeholder="ex: 5000">
+                    </div>
+                </div>
+            </div>
+
+            <div class="set-group">
+                <span class="set-title">RÉSEAU & RPC (1 URL par ligne)</span>
+                <textarea id="cfgRpc" style="height:150px; font-size:10px; white-space:pre;"></textarea>
+            </div>
+
+            <div style="text-align:right;">
+                <button class="btn-action" style="background:#444;" onclick="resetConfig()">RÉINITIALISER</button>
+                <button class="btn-action" onclick="saveConfig()">SAUVEGARDER</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="logs" id="console">> V145. GOD MODE READY.</div>
 
 <script>
-    // --- MEMOIRE ---
-    let ZONE_DETAILS = {}; 
+    // --- CONFIGURATION CENTRALE (V145) ---
+    let CONFIG = {
+        strategy: 'B',
+        batchSize: 1000,
+        delay: 200,
+        startKey: '',
+        rpcs: [
+            "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
+            "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
+            "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
+            "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
+            "https://api.hivebp.io", "https://wax.blacklusion.io"
+        ]
+    };
 
-    // --- DICTATURE DU NOMMAGE ---
+    // --- LOGIQUE SETTINGS ---
+    function openSettings() {
+        document.getElementById('cfgStrategy').value = CONFIG.strategy;
+        document.getElementById('cfgBatch').value = CONFIG.batchSize;
+        document.getElementById('cfgDelay').value = CONFIG.delay;
+        document.getElementById('cfgStart').value = CONFIG.startKey;
+        document.getElementById('cfgRpc').value = CONFIG.rpcs.join('\n');
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function saveConfig() {
+        CONFIG.strategy = document.getElementById('cfgStrategy').value;
+        CONFIG.batchSize = parseInt(document.getElementById('cfgBatch').value) || 1000;
+        CONFIG.delay = parseInt(document.getElementById('cfgDelay').value) || 200;
+        CONFIG.startKey = document.getElementById('cfgStart').value.trim();
+        
+        // Parse RPC List
+        let rawRpc = document.getElementById('cfgRpc').value.trim().split('\n');
+        let cleanRpc = rawRpc.map(r => r.trim()).filter(r => r.startsWith('http'));
+        if(cleanRpc.length > 0) CONFIG.rpcs = cleanRpc;
+
+        closeModal('settingsModal');
+        log("⚙️ Configuration mise à jour.", "#ffd700");
+    }
+
+    function resetConfig() {
+        // Reset to safe defaults
+        document.getElementById('cfgStrategy').value = 'B';
+        document.getElementById('cfgBatch').value = '1000';
+        document.getElementById('cfgDelay').value = '200';
+        document.getElementById('cfgStart').value = '';
+        alert("Configuration remise à zéro (veuillez Sauvegarder).");
+    }
+
+    // --- VARIABLES GLOBALES ---
+    let ZONE_DETAILS = {}; 
+    let stopSignal = false; let rpcIndex = 0; 
+    let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
+    const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
+    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
+    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
+
     const TEMPLATE_NAMES = {
         "490122": "C_F1_PRODUCER_FUEL",  "492383": "C_F1_PRODUCER_FUEL", "492373": "R_F1_PRODUCER_FUEL",
         "492385": "C_F2_PRODUCER_FUEL",  "492389": "C_F3_PRODUCER_FUEL", "492397": "C_F4_PRODUCER_FUEL",
@@ -282,31 +381,22 @@
         "492380": "E_F1_PRODUCER_FUEL",  "492381": "E_F2_PRODUCER_FUEL", "492387": "E_F3_PRODUCER_FUEL", "492388": "E_F4_PRODUCER_FUEL",
         "492368": "L_F1_PRODUCER_FUEL",  "492370": "L_F2_PRODUCER_FUEL", "492372": "L_F3_PRODUCER_FUEL",
         "544068": "S1_OWNER_FUEL",       "492377": "SC_F2_PRODUCER_FUEL", "492391": "SC_F3_PRODUCER_FUEL",
-
         "492394": "C_F1_PRODUCER_HEALTH", "492395": "C_F2_PRODUCER_HEALTH", "492396": "C_F3_PRODUCER_HEALTH",
         "492399": "R_F1_PRODUCER_HEALTH", "492401": "R_F2_PRODUCER_HEALTH", "492535": "R_F3_PRODUCER_HEALTH", "492537": "R_F4_PRODUCER_HEALTH",
         "492539": "E_F1_PRODUCER_HEALTH", "492543": "E_F2_PRODUCER_HEALTH", "492545": "E_F3_PRODUCER_HEALTH", "492546": "E_F4_PRODUCER_HEALTH",
         "492550": "L_F1_PRODUCER_HEALTH", "492554": "L_F2_PRODUCER_HEALTH", "492555": "L_F3_PRODUCER_HEALTH",
         "544070": "S1_OWNER_HEALTH",
-
         "492460": "C_F1_PRODUCER_REPAIR", "492461": "C_F2_PRODUCER_REPAIR", "492462": "C_F3_PRODUCER_REPAIR", "492463": "C_F4_PRODUCER_REPAIR",
         "492464": "R_F1_PRODUCER_REPAIR", "492465": "R_F2_PRODUCER_REPAIR", "492466": "R_F3_PRODUCER_REPAIR", "492467": "R_F4_PRODUCER_REPAIR",
         "492469": "E_F1_PRODUCER_REPAIR", "492471": "E_F2_PRODUCER_REPAIR", "492472": "E_F3_PRODUCER_REPAIR", "492473": "E_F4_PRODUCER_REPAIR",
         "492474": "L_F1_PRODUCER_REPAIR", "492475": "L_F2_PRODUCER_REPAIR", "492476": "L_F3_PRODUCER_REPAIR",
         "544071": "S1_OWNER_REPAIR",
-
         "492507": "C_F1_PRODUCER_SUPPLY", "492509": "C_F2_PRODUCER_SUPPLY", "492511": "C_F3_PRODUCER_SUPPLY", "492513": "C_F4_PRODUCER_SUPPLY",
         "492515": "R_F1_PRODUCER_SUPPLY", "492518": "R_F2_PRODUCER_SUPPLY", "492521": "R_F3_PRODUCER_SUPPLY", "492523": "R_F4_PRODUCER_SUPPLY",
         "492526": "E_F1_PRODUCER_SUPPLY", "492528": "E_F2_PRODUCER_SUPPLY", "492529": "E_F3_PRODUCER_SUPPLY", "492530": "E_F4_PRODUCER_SUPPLY",
         "492532": "L_F1_PRODUCER_SUPPLY", "492533": "L_F2_PRODUCER_SUPPLY", "492534": "L_F3_PRODUCER_SUPPLY",
         "544069": "S1_OWNER_SUPPLY"
     };
-
-    let RATES = { WAX_USD: 0.00786, DOVX_WAX: 0.00528553, TU_WAX: 0.00045262 };
-    const DOVX_CLAIM_LEVELS = [{ name: "WIN",  minPower: 1200, coeff: 1.0 },{ name: "DRAW", minPower: 500,  coeff: 0.5 },{ name: "LOST", minPower: 0,    coeff: 0.25 }];
-    const ZONE_DB = { 1:{name:"Beach 1",cost:1160,costX:0,reward:400},2:{name:"Beach 2",cost:6968,costX:0,reward:2405},3:{name:"Beach 3",cost:8800,costX:0,reward:3037},4:{name:"Bunker",cost:11120,costX:0,reward:3838},5:{name:"Forest 1",cost:14024,costX:0,reward:4839},6:{name:"Forest 2",cost:17704,costX:0,reward:6092},7:{name:"Forest 3",cost:22352,costX:0,reward:7659},8:{name:"Camp",cost:28220,costX:0,reward:9617},9:{name:"Hill 1",cost:37052,costX:0,reward:12557},10:{name:"Hill 2",cost:48652,costX:0,reward:16418},11:{name:"Hill 3",cost:64516,costX:0,reward:21703},12:{name:"Radar",cost:84712,costX:0,reward:28427},13:{name:"Plain 1",cost:99384,costX:0,reward:34300},14:{name:"Plain 2",cost:125708,costX:0,reward:42083},15:{name:"Plain 3",cost:151164,costX:0,reward:50570},16:{name:"HQ",cost:188000,costX:0,reward:64884},17:{name:"City 1",cost:0,costX:1664,reward:0},18:{name:"City 2",cost:0,costX:4448,reward:0},19:{name:"City 3",cost:0,costX:13440,reward:0},20:{name:"City 4",cost:0,costX:29120,reward:0}};
-    const ZONE_ORDER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-    let stopSignal = false; let rpcIndex = 0; let ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 };
 
     function log(msg, color="#aaa") { const c = document.getElementById('console'); if(c) c.innerHTML = `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>` + c.innerHTML; }
     function switchView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('view-active')); document.getElementById(id).classList.add('view-active'); }
@@ -318,15 +408,7 @@
     function computeDovxReward(baseReward, divisionPower) { for (let lvl of DOVX_CLAIM_LEVELS) { if (divisionPower >= lvl.minPower) return baseReward * lvl.coeff; } return 0; }
     function updateRates() { RATES.WAX_USD = parseFloat(document.getElementById('inpWax').value) || 0; RATES.DOVX_WAX = parseFloat(document.getElementById('inpDovx').value) || 0; RATES.TU_WAX = parseFloat(document.getElementById('inpTu').value) || 0; if(document.getElementById('ecoView').classList.contains('view-active')) updateEcoDisplay(); log("Taux mis à jour.", "#ffd700"); }
 
-    const RPC_MATRIX = [
-        "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eosn.io", "https://api.wax.alohaeos.com",
-        "https://wax.eu.eosamsterdam.net", "https://wax.pink.gg", "https://wax.cryptolions.io", "https://api-wax.eosarabia.net",
-        "https://wax.dapplica.io", "https://wax.eosphere.io", "https://api.waxeastern.cn", "https://wax.eosrio.io",
-        "https://wax.tmy.io", "https://api.wax.liquidstudios.io", "https://wax.eosusa.news", "https://wax.3dkrender.com",
-        "https://api.hivebp.io", "https://wax.blacklusion.io"
-    ];
-    
-    // --- ATOMIC FETCH ---
+    // --- ATOMIC ---
     async function fetchUnknownID(tid) {
         try {
             const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/dovdivisions/${tid}`;
@@ -339,34 +421,38 @@
         } catch(e) { return null; }
     }
 
-    // --- ROBUST FETCH V144 (FORCE 1000 + RETRY) ---
-    async function robustFetch(code, table, lowerBound, limit=1000, indexPosition=1, keyType="") {
+    // --- ROBUST FETCH V145 (DYNAMIC CONFIG) ---
+    async function robustFetch(code, table, lowerBound, limit=1000) {
         let attempts = 0; const customProxy = document.getElementById('inpProxy').value.trim();
-        while(attempts < 15 && !stopSignal) {
-            const server = RPC_MATRIX[rpcIndex % RPC_MATRIX.length];
+        
+        // OVERRIDE PARAMETERS FROM CONFIG
+        const effectiveLimit = CONFIG.batchSize;
+        const effectiveDelay = CONFIG.delay;
+        
+        while(attempts < 20 && !stopSignal) {
+            const server = CONFIG.rpcs[rpcIndex % CONFIG.rpcs.length];
             rpcIndex++; 
             const url = server + "/v1/chain/get_table_rows";
             let useProxy = (attempts > 2) || (customProxy.length > 5 && attempts > 0);
-            
             let proxyUrl = "https://corsproxy.io/?"; 
             if(attempts > 3) proxyUrl = "https://api.allorigins.win/raw?url=";
-            if(attempts > 6) proxyUrl = "https://thingproxy.freeboard.io/fetch/";
-            
             let finalUrl = url;
             if(useProxy && customProxy.length > 5) finalUrl = customProxy + encodeURIComponent(url); 
             else if(useProxy) finalUrl = proxyUrl + encodeURIComponent(url);
             
             try {
-                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = (useProxy?"PROXY":"DIRECT")+": "+new URL(server).hostname;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 20000); 
-                const payload = { json: true, code: code, scope: code, table: table, limit: limit, lower_bound: lowerBound };
-                if(indexPosition > 1) { payload.index_position = indexPosition; payload.key_type = keyType; payload.upper_bound = lowerBound; payload.upper_bound = lowerBound; } 
+                if(document.getElementById('rpcStatus')) document.getElementById('rpcStatus').innerText = "RPC: "+new URL(server).hostname;
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 10000); 
+                const payload = { json: true, code: code, scope: code, table: table, limit: effectiveLimit, lower_bound: lowerBound };
                 
                 const res = await fetch(finalUrl, { method: 'POST', body: JSON.stringify(payload), signal: controller.signal });
                 if(!res.ok) throw new Error("HTTP " + res.status);
+                
+                // DELAY (Throttle)
+                if(effectiveDelay > 0) await new Promise(r => setTimeout(r, effectiveDelay));
+                
                 return await res.json();
             } catch(e) { 
-                console.warn("Fetch Fail:", e.message);
                 attempts++; 
                 await new Promise(r => setTimeout(r, 200));
             }
@@ -380,44 +466,35 @@
         let rawStr = (Array.isArray(b.power)?b.power[0]:b.power) || "";
         let hourlyProd = parseFloat(rawStr.replace(/[^0-9.]/g,'')) || 0;
         let dailyProd = hourlyProd * 24;
-
         let pType = "F";
-        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H";
-        else if(rawStr.includes("DOVR")) pType="R"; else if(rawStr.includes("DOVS")) pType="S";
-
+        if(rawStr.includes("DOVF")) pType="F"; else if(rawStr.includes("DOVH")) pType="H"; else if(rawStr.includes("DOVR")) pType="S"; else if(rawStr.includes("DOVS")) pType="S";
         let name = TEMPLATE_NAMES[tid] || `INCONNU [${tid}]`;
         let cost24 = hourlyProd * 24 * 0.085; 
         let unitProd = stack > 0 ? (dailyProd / stack) : dailyProd;
-
         return { name, type:pType, prod24: dailyProd, cost24: cost24, stack, tid, unitProd: unitProd };
     }
 
-    // --- DISPATCHER ---
     async function dispatchGlobalScan() {
-        const strategy = document.getElementById('scanStrategy').value;
-        const title = strategy === 'A' ? "MODE SÉQUENTIEL" : (strategy === 'B' ? "MODE MATRIX (1000)" : "MODE HYBRIDE (GOD)");
-        
+        const title = CONFIG.strategy === 'A' ? "MODE SÉQUENTIEL" : (CONFIG.strategy === 'B' ? "MODE MATRIX" : "MODE HYBRIDE");
         stopSignal = false; switchView('buildingView');
         document.getElementById('globalStatsArea').style.display = 'block';
         document.getElementById('buildList').style.display = 'none';
         document.getElementById('btnStop').style.display = 'inline-block';
         if(document.getElementById('scanModeTitle')) document.getElementById('scanModeTitle').innerText = title;
 
-        // V144: Strategy B = 1000 lines (SAFE)
-        if (strategy === 'A') await runSequentialScan(1000, false);
-        else if (strategy === 'B') await runSequentialScan(1000, false); 
-        else if (strategy === 'C') await runSequentialScan(500, true);   
+        let start = CONFIG.startKey || "0";
+        await runSequentialScan(start, CONFIG.strategy === 'C');   
     }
 
-    async function runSequentialScan(batchSize, useHybrid) {
-        log(`🌍 DÉMARRAGE ${useHybrid ? 'HYBRIDE' : 'MATRIX'}...`, "#fff");
-        let next = "0"; let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
+    async function runSequentialScan(next, useHybrid) {
+        log(`🌍 START ${useHybrid ? 'HYBRIDE' : 'MATRIX'} (Batch: ${CONFIG.batchSize})...`, "#fff");
+        let more = true; let groups = { F: {}, H: {}, R: {}, S: {} }; let stats = { total: 0, cost: 0, p: { F: 0, H: 0, R: 0, S: 0 } };
         const now = Date.now()/1000;
         let scanRows = 0; let scanAssets = 0;
         let templateAudit = {}; 
 
         try { while (more && !stopSignal) {
-            const data = await robustFetch("dovutilstake", "buildings", next, batchSize); 
+            const data = await robustFetch("dovutilstake", "buildings", next); 
             if (!data.rows) break;
             
             scanRows += data.rows.length;
@@ -427,18 +504,13 @@
                     document.getElementById('rpcStatus').innerText = "ATOMIC CHECK: " + b.template_id;
                     await fetchUnknownID(b.template_id);
                 }
-
                 stats.total++;
                 let info = conformBuilding(b); 
                 scanAssets += info.stack; 
-
                 if(!templateAudit[info.tid]) templateAudit[info.tid] = { name: info.name, count: 0 };
                 templateAudit[info.tid].count += info.stack;
-
                 let k = info.stack > 1 ? `${info.name} (x${info.stack})` : info.name;
-                
                 if (!groups[info.type][k]) groups[info.type][k] = { name: info.name, stack: info.stack, tid: info.tid, cp: 0, cr: 0, tp: 0, unitProd: info.unitProd };
-                
                 let active = now < (parseFloat(b.last_claim) + parseFloat(b.delay));
                 if (active) {
                     groups[info.type][k].cp++; groups[info.type][k].tp += info.prod24;
@@ -464,7 +536,6 @@
                 renderLists(groups);
             }
             
-            // PAGINATION V144 FORCE
             if (data.more && data.next_key) {
                 log(`Page chargée. Suivante: ${data.next_key}`, "#444");
                 next = data.next_key;
@@ -492,66 +563,24 @@
         }
     }
 
-    // --- START BUILDINGS (V144 FIX) ---
-    async function startBuildings() { 
-        const user = document.getElementById('targetIn').value.trim().toLowerCase(); 
-        switchView('buildingView'); 
-        document.getElementById('globalStatsArea').style.display = 'none'; 
-        document.getElementById('buildList').style.display = 'grid'; 
-        document.getElementById('buildDash').innerHTML = ""; 
-        document.getElementById('buildList').innerHTML = ""; 
-        log(`🔍 Lecture Deck (${user})...`, "#fff"); 
-        let nextKey = ""; 
-        let hasMore = true; 
-        try { 
-            while(hasMore && !stopSignal) { 
-                // V144: BATCH 1000 + FORCE PAGINATION
-                const data = await robustFetch("dovutilstake", "buildings", nextKey, 1000); 
-                if(!data.rows) break; 
-                
-                const myBatch = data.rows.filter(r => r.owner === user); 
-                const now = Date.now()/1000; 
-                
-                myBatch.forEach(b => { 
-                    let info = conformBuilding(b); 
-                    let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); 
-                    let isReady = now > rdyTime; 
-                    let typeColor = "#fff"; 
-                    if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; 
-                    let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; 
-                    let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; 
-                    document.getElementById('buildList').insertAdjacentHTML('beforeend', card); 
-                }); 
-                
-                // V144: FORCE NEXT
-                if(data.more && data.next_key) nextKey = data.next_key; 
-                else hasMore = false; 
-            } 
-            log(`✅ Deck Joueur affiché.`, "#00e676"); 
-        } catch(e){ log("Err: "+e.message, "red"); } 
-    }
+    async function startBuildings() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('buildingView'); document.getElementById('globalStatsArea').style.display = 'none'; document.getElementById('buildList').style.display = 'grid'; document.getElementById('buildDash').innerHTML = ""; document.getElementById('buildList').innerHTML = ""; log(`🔍 Lecture Deck (${user})...`, "#fff"); let nextKey = ""; let hasMore = true; try { while(hasMore && !stopSignal) { const data = await robustFetch("dovutilstake", "buildings", nextKey); if(!data.rows) break; const myBatch = data.rows.filter(r => r.owner === user); const now = Date.now()/1000; myBatch.forEach(b => { let info = conformBuilding(b); let rdyTime = (parseFloat(b.last_claim) + parseFloat(b.delay)); let isReady = now > rdyTime; let typeColor = "#fff"; if(info.type == "F") typeColor = "var(--fuel)"; else if(info.type == "H") typeColor = "var(--health)"; else if(info.type == "R") typeColor = "var(--repair)"; else if(info.type == "S") typeColor = "var(--supply)"; let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${b.template_id}`; let card = `<div class="b-card"><div><div class="b-title" style="color:${typeColor}">${info.name} <a href="${link}" target="_blank" class="ml-link-icon">🔗</a> ${info.stack>1?'x'+info.stack:''} <span style="font-size:9px;color:#555">[${info.tid}]</span></div><div class="b-sub">#${b.asset_id}</div></div><div>${isReady?'<span class="b-badge-claim">PRÊT</span>':'<span class="b-badge-ok">ACTIF</span>'}</div><div class="b-stats"><div style="font-weight:bold">${Math.round(info.prod24).toLocaleString()} /24h</div></div></div>`; document.getElementById('buildList').insertAdjacentHTML('beforeend', card); }); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } log(`✅ Deck Joueur affiché.`, "#00e676"); } catch(e){ log("Err: "+e.message, "red"); } }
     
-    // --- ZONE FIX V144 ---
     async function startZoneScan() { 
         stopSignal = false; switchView('zoneView'); initGrid(); document.getElementById('btnStop').style.display = 'inline-block'; 
         ZONE_DETAILS = {}; 
         let stats = { divs: 0, burn: { fuel: 0, health: 0, repair: 0, supply: 0 }, totalCostX: 0, totalGain: 0, zones: {} }; ZONE_ORDER.forEach(id => stats.zones[id] = { count: 0, active: 0, idle: 0 }); let nextKey = ""; let hasMore = true; log("Mapping Zones...", "#fff"); 
         try { while(hasMore && !stopSignal) { 
-            // V144: BATCH 1000 + FORCE PAGINATION
-            const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 1000); if(!data.rows) break; 
+            const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; 
             for(let row of data.rows) { 
                 stats.divs++; const zID = getProp(row, ['zoneID', 'zone_id']); const busy = isBusy(row); 
                 if(busy) {
                     if(!ZONE_DETAILS[zID]) ZONE_DETAILS[zID] = [];
                     const ownerName = row.owner || row.user || row.account || row.player || row.username;
                     const endTime = row.end_time || row.end || row.finish || 0;
-                    if(ownerName) {
-                        ZONE_DETAILS[zID].push({ name: ownerName, time: endTime });
-                    }
+                    if(ownerName) ZONE_DETAILS[zID].push({ name: ownerName, time: endTime });
                 }
                 if(stats.zones[zID]) { stats.zones[zID].count++; const zInfo = ZONE_DB[zID]; if(busy) { stats.zones[zID].active++; if(zInfo.cost > 0) { stats.burn.fuel+=zInfo.cost; stats.burn.health+=zInfo.cost; stats.burn.repair+=zInfo.cost; stats.burn.supply+=zInfo.cost; } stats.totalCostX += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) stats.totalGain += computeDovxReward(zInfo.reward, power); } else stats.zones[zID].idle++; } 
             } if (stats.divs % 1000 === 0) updateZoneDash(stats); 
-            // V144: FORCE NEXT
             if(data.more && data.next_key) nextKey = data.next_key; 
             else hasMore = false; 
         } updateZoneDash(stats); log("Mapping OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log("Err: "+e.message, "red"); } 
@@ -559,76 +588,41 @@
     
     function updateZoneDash(stats) { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); setTextSafe('dDivs', fmt(stats.divs)); setTextSafe('dGain', "+ " + fmt(stats.totalGain) + " DOVX"); setTextSafe('dCostX', "- " + fmt(stats.totalCostX) + " DOVX"); setTextSafe('lFuel', "-" + fmt(stats.burn.fuel)); setTextSafe('lHealth', "-" + fmt(stats.burn.health)); setTextSafe('lRepair', "-" + fmt(stats.burn.repair)); setTextSafe('lSupply', "-" + fmt(stats.burn.supply)); ZONE_ORDER.forEach(id => { const data = stats.zones[id]; const card = document.getElementById(`z-card-${id}`); if(card && data) { if(data.count > 0) card.classList.add('active'); document.getElementById(`z-count-${id}`).innerText = data.count; document.getElementById(`z-miss-${id}`).innerText = data.active + " Act."; document.getElementById(`z-rdy-${id}`).innerText = data.idle + " Rdy"; } }); }
     
-    // --- GESTION MODALE SAFE V142 ---
     function openZoneDetail(id) {
         const title = ZONE_DB[id] ? ZONE_DB[id].name : "ZONE " + id;
         document.getElementById('zmTitle').innerText = title + " (RADAR)";
         const rawList = ZONE_DETAILS[id] || [];
-        
-        if(rawList.length === 0) {
-            document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur détecté.<br><br>1. Lancez un 'SCAN ZONES'.<br>2. Attendez la fin du scan.</div>";
-            document.getElementById('zoneModal').style.display = 'flex';
-            return;
-        }
-
-        let clusters = {}; 
-        let singles = [];
-        
-        rawList.sort((a,b) => a.time - b.time);
-        let processed = new Set();
+        if(rawList.length === 0) { document.getElementById('zmBody').innerHTML = "<div style='text-align:center; padding:20px; color:#666'>Aucun joueur détecté.<br><br>1. Lancez un 'SCAN ZONES'.<br>2. Attendez la fin du scan.</div>"; document.getElementById('zoneModal').style.display = 'flex'; return; }
+        let clusters = {}; let singles = []; rawList.sort((a,b) => a.time - b.time); let processed = new Set();
         for(let i=0; i<rawList.length; i++) {
             if(processed.has(i)) continue;
-            let group = [rawList[i]];
-            processed.add(i);
-            
+            let group = [rawList[i]]; processed.add(i);
             if(!rawList[i].time) continue; 
-
             for(let j=i+1; j<rawList.length; j++) {
                 if(processed.has(j)) continue;
-                if(rawList[j].time && Math.abs(rawList[i].time - rawList[j].time) <= 2) { 
-                    group.push(rawList[j]);
-                    processed.add(j);
-                }
+                if(rawList[j].time && Math.abs(rawList[i].time - rawList[j].time) <= 2) { group.push(rawList[j]); processed.add(j); }
             }
-            
-            if(group.length >= 3) { 
-                clusters["TIME_"+rawList[i].time] = group;
-            } else {
-                singles.push(...group);
-            }
+            if(group.length >= 3) { clusters["TIME_"+rawList[i].time] = group; } else { singles.push(...group); }
         }
-        
-        for(let i=0; i<rawList.length; i++) {
-            if(!processed.has(i)) singles.push(rawList[i]);
-        }
-
+        for(let i=0; i<rawList.length; i++) { if(!processed.has(i)) singles.push(rawList[i]); }
         let h = "";
         for(let k in clusters) {
-            let grp = clusters[k];
-            let uniqueNames = [...new Set(grp.map(x=>x.name))];
+            let grp = clusters[k]; let uniqueNames = [...new Set(grp.map(x=>x.name))];
             if(uniqueNames.length < 2) continue; 
-
             h += `<div class="sybil-cluster"><div class="cluster-head"><span>⚠️ SUSPICION (${uniqueNames.length} comptes)</span></div>`;
-            uniqueNames.forEach(n => {
-                h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`;
-            });
+            uniqueNames.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍 AUDIT</button></div>`; });
             h += `</div>`;
         }
-
         let uniqueSingles = [...new Set(singles.map(x=>x.name))];
-        uniqueSingles.forEach(n => {
-             h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`;
-        });
-
-        document.getElementById('zmBody').innerHTML = h;
-        document.getElementById('zoneModal').style.display = 'flex';
+        uniqueSingles.forEach(n => { h += `<div class="player-row"><span class="p-name" onclick="setTarget('${n}')">${n}</span><button class="btn-audit" onclick="checkFunding('${n}')">🔍</button></div>`; });
+        document.getElementById('zmBody').innerHTML = h; document.getElementById('zoneModal').style.display = 'flex';
     }
 
     function checkFunding(account) { window.open(`https://wax.bloks.io/account/${account}`, '_blank'); }
-    function closeModal() { document.getElementById('zoneModal').style.display = 'none'; }
-    function setTarget(name) { closeModal(); document.getElementById('targetIn').value = name; switchView('targetView'); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function setTarget(name) { closeModal('zoneModal'); document.getElementById('targetIn').value = name; switchView('targetView'); }
 
-    async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey, 200); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 200 === 0) updateEcoDisplay(); if(data.more) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
+    async function startEconomyScan() { stopSignal = false; switchView('ecoView'); document.getElementById('btnStop').style.display='inline-block'; ECO_DATA = { demand: { fuel:0, health:0, repair:0, supply:0 }, supply: { fuel:0, health:0, repair:0, supply:0 }, dovx: { cities:0, buildings:0, rewards:0 }, scanned: 0 }; log("Audit Eco...", "#fff"); try { let nextKey = ""; let hasMore = true; while(hasMore && !stopSignal) { const data = await robustFetch("dovpvecontrl", "sdivisions", nextKey); if(!data.rows) break; for(let row of data.rows) { ECO_DATA.scanned++; const zID = getProp(row, ['zoneID', 'zone_id']); const zInfo = ZONE_DB[zID]; const busy = isBusy(row); if(zInfo && busy) { if(zInfo.cost > 0) { ECO_DATA.demand.fuel += zInfo.cost; ECO_DATA.demand.health += zInfo.cost; ECO_DATA.demand.repair += zInfo.cost; ECO_DATA.demand.supply += zInfo.cost; } if(zInfo.costX > 0) ECO_DATA.dovx.cities += zInfo.costX; const power = extractPower(row); if(zInfo.reward > 0) ECO_DATA.dovx.rewards += computeDovxReward(zInfo.reward, power); } } if (ECO_DATA.scanned % 1000 === 0) updateEcoDisplay(); if(data.more && data.next_key) nextKey = data.next_key; else hasMore = false; } updateEcoDisplay(); log("Audit OK.", "#00e676"); document.getElementById('btnStop').style.display='none'; } catch(e) { log(e.message, "red"); } }
     function updateEcoDisplay() { const fmt = (n) => n.toLocaleString(undefined, {maximumFractionDigits:0}); const fmtUSD = (n) => "$" + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); let totalD = ECO_DATA.demand.fuel + ECO_DATA.demand.health + ECO_DATA.demand.repair + ECO_DATA.demand.supply; let totalS = ECO_DATA.supply.fuel + ECO_DATA.supply.health + ECO_DATA.supply.repair + ECO_DATA.supply.supply; let totalDovxIn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; setTextSafe('valDemandTU', fmt(totalD) + " TU"); setTextSafe('valDemandUSD', fmtUSD(totalD * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valSupplyTU', fmt(totalS) + " TU"); setTextSafe('valSupplyUSD', fmtUSD(totalS * RATES.TU_WAX * RATES.WAX_USD) + " / 24h"); setTextSafe('valDovxBurn', fmt(totalDovxIn) + " DOVX"); setTextSafe('valDovxUSD', fmtUSD(totalDovxIn * RATES.DOVX_WAX * RATES.WAX_USD) + " / 24h"); let mint = ECO_DATA.dovx.rewards; let burn = ECO_DATA.dovx.cities + ECO_DATA.dovx.buildings; let net = mint - burn; setTextSafe('valDovxMint', "+ " + fmt(mint)); setTextSafe('usdDovxMint', fmtUSD(mint * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxBurnTotal', "- " + fmt(burn)); setTextSafe('usdDovxBurnTotal', fmtUSD(burn * RATES.DOVX_WAX * RATES.WAX_USD)); setTextSafe('valDovxNet', fmt(net)); setTextSafe('usdDovxNet', fmtUSD(net * RATES.DOVX_WAX * RATES.WAX_USD)); }
     async function startTarget() { const user = document.getElementById('targetIn').value.trim().toLowerCase(); switchView('targetView'); const view = document.getElementById('targetView'); view.innerHTML="Recherche des divisions pour " + user + "..."; try { const data = await robustFetch("dovpvecontrl", "sdivisions", user, 500, 2, "i64"); const rows = data.rows ? data.rows.filter(r => (r.owner===user || r.user===user || getProp(r,['owner','account'])===user)) : []; let htmlBuffer = `<div style="background:#111; padding:10px; color:var(--sec)">JOUEUR : ${user.toUpperCase()} (${rows.length} Divs trouvées)</div>`; rows.forEach(r => { const zID = getProp(r, ['zoneID', 'zone_id']); const busy = isBusy(r); const dID = getId(r); htmlBuffer += `<div class="t-row"><div style="color:var(--main)">#${dID}</div><div style="color:var(--sec)">${ZONE_DB[zID] ? ZONE_DB[zID].name : 'Zone '+zID}</div><div>${busy?'<span class="st-mission">MISSION</span>':'<span class="st-ready">PRÊT</span>'}</div></div>`; }); view.innerHTML = htmlBuffer; } catch(e){ log("Erreur Target: "+e.message, "red"); } }
 
