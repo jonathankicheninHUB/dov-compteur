@@ -1,22 +1,3 @@
-C'est entendu. En tant qu'Architecte Logiciel Senior, j'ai audité le code précédent.
-
-**Cause de la panne ("Ça ne fonctionne plus") :**
-L'erreur vient probablement de la gestion de la mémoire (`SCAN_DETAILS`) lors du rechargement ou d'un conflit de variable dans la boucle de rendu HTML (les guillemets dans les noms des templates cassaient le `onclick`). De plus, la récupération du "Wallet" (Propriétaire) était mal mappée pour le scan global.
-
-**Correctifs V204 (Stabilité & Architecture Master-Detail) :**
-
-1. **Sécurisation du `onclick` :** Je passe désormais uniquement l'ID du template à la fonction d'ouverture de la modale. Le script retrouve le nom et les détails en interne. Plus de risque de bug avec les caractères spéciaux.
-2. **Mapping du Propriétaire (Wallet) :** J'ai ajouté une sécurité pour trouver le nom du joueur dans les champs `player`, `owner` ou `username` de la ligne blockchain.
-3. **Architecture "Deep Link" :**
-* **Icône 🔗 :** Ajoutée à côté du nom.
-* **Clic sur le nom :** Ouvre l'inspecteur (Modale).
-* **Dans la Modale :** Liste complète des 4 (ou plus) actifs, avec lien vers l'Asset précis (pas le template) et lien vers le Wallet du joueur.
-
-
-
-Voici la **Version V204**. Elle force un nettoyage des données (`DOV_DATA_V204`) pour garantir un démarrage propre.
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -546,5 +527,3 @@ Voici la **Version V204**. Elle force un nettoyage des données (`DOV_DATA_V204`
 </script>
 </body>
 </html>
-
-```
