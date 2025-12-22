@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V279 (DRILL DOWN)</title>
+    <title>DoV - COMMAND V280 (FINAL UI)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -110,7 +110,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V279</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V280</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -170,7 +170,7 @@
                     <div class="page-meta">SCANNING COLLECTION: <span id="zTotalDivsHeader" style="color:#fff; font-weight:bold;">0</span> UNITS</div>
                 </div>
                 <div class="total-cost">
-                    <div class="grp-lbl">UTILITY PRODUCTION COST (24H)</div>
+                    <div class="grp-lbl" style="font-size:16px; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:5px;">CONSOMMATION DU DOVX 24H00</div>
                     <div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px; letter-spacing:0.5px;">
                         <span class="tc-f">FUEL <span id="gBurnF">0</span></span> <span style="color:#444; margin:0 5px;">|</span>
                         <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> <span style="color:#444; margin:0 5px;">|</span>
@@ -244,8 +244,8 @@
 <div class="modal-overlay" id="zoneDetailModal"><div class="modal-box" style="width:800px;">
     <h3 id="zdTitle" style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px; display:flex; justify-content:space-between;">ZONE DETAIL <span style="color:var(--blue)" id="zdCount">0 UNITS</span></h3>
     <div style="height:400px; overflow-y:auto; margin-top:15px;">
-        <div class="dt-grid dt-header" style="grid-template-columns: 1fr 100px 100px 100px 80px;">
-            <div class="cell">OWNER</div><div class="cell c-right">ASSET ID</div><div class="cell c-right">WEIGHT</div><div class="cell c-right">MINT</div><div class="cell c-center">LINK</div>
+        <div class="dt-grid dt-header" style="grid-template-columns: 1fr 100px 100px 80px;">
+            <div class="cell">OWNER</div><div class="cell c-right">WEIGHT</div><div class="cell c-right">MINT</div><div class="cell c-center">LINK</div>
         </div>
         <div id="zdList"></div>
     </div>
@@ -255,7 +255,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V279';
+    const STORAGE_KEY = 'DOV_DATA_V280';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -468,7 +468,6 @@
                             zonesData[zid].prod += reward; stats.totalProd += reward;
 
                             // V279: STORE FOR MODAL
-                            // Use asset_id if available, or try to use primary key from dump logic (which was messy, so we fallback safely)
                             let assetId = r.asset_id || r.id || "N/A"; 
                             zoneDetailsCache[zid].push({ owner: r.owner, asset: assetId, weight: weight, reward: reward });
                         }
@@ -521,7 +520,7 @@
         getId('areaZones').innerHTML = html;
     }
 
-    // V279: MODAL LOGIC
+    // V280: MODAL LOGIC (FIXED LINKS & COLUMNS)
     function openZoneDetail(zid) {
         if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
         let list = zoneDetailsCache[zid].sort((a,b) => b.weight - a.weight);
@@ -529,10 +528,11 @@
         getId('zdTitle').innerHTML = `${zName} <span style="color:var(--blue)">${list.length} FIGHTERS</span>`;
         let html = "";
         list.forEach(i => {
-            let link = `https://wax.atomichub.io/explorer/asset/${i.asset}`;
-            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 100px 80px;">
+            // V280: WAXBLOCK LINK
+            let link = `https://waxblock.io/account/${i.owner}`;
+            // V280: REMOVED ASSET COL
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 80px;">
                 <div class="cell">${i.owner}</div>
-                <div class="cell c-right" style="color:#666">${i.asset}</div>
                 <div class="cell c-right" style="color:var(--blue)">${fmt(i.weight)}</div>
                 <div class="cell c-right" style="color:var(--purple)">${fmt(i.reward)}</div>
                 <div class="cell c-center"><a href="${link}" target="_blank" class="btn-ghost" style="padding:2px 6px; font-size:9px;">VIEW</a></div>
