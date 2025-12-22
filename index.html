@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V273 (FIXED & SAFE)</title>
+    <title>DoV - COMMAND V274 (HEAVY CLUSTER)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICT V271/V272) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICT V271 BASE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -41,13 +41,8 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* KPI CARDS (V271 STYLE) */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; 
-            position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; 
-            min-height: 140px;
-        }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
@@ -82,7 +77,6 @@
         .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
 
-        /* INSPECTOR STYLE */
         .abi-layout { display: grid; grid-template-columns: 250px 250px 1fr; gap: 15px; height: 65vh; }
         .abi-col { background: #000; border: 1px solid #333; display: flex; flex-direction: column; overflow: hidden; }
         .abi-title { padding: 8px; background: #1c1d26; color: #fff; font-weight: bold; border-bottom: 1px solid #333; font-size: 10px; }
@@ -105,7 +99,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V273</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V274</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -210,7 +204,7 @@
 <div class="modal-overlay" id="settingsModal"><div class="modal-box">
     <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
-        <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES</span><textarea id="cfgApi"></textarea></div>
+        <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES (HEAVY CLUSTER)</span><textarea id="cfgApi"></textarea></div>
         <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
         <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
         <div><span class="grp-lbl">ZONES</span><textarea id="cfgZones"></textarea></div>
@@ -224,7 +218,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V273';
+    const STORAGE_KEY = 'DOV_DATA_V274';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -233,14 +227,20 @@
 
     const DEFAULT_DATA = {
         apiConfig: { 
+            // THE HEAVY CLUSTER: 20+ NODES (RESTORED)
             rpcNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
-                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net"
+                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
+                "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax.blacklusion.io",
+                "https://wax-bp.wizardsguild.one", "https://api.wax.greeneosio.com", "https://wax.publicnode.com",
+                "https://api.wax.luminarys.io", "https://wax.tmy.io"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, rewardRatio: 0.1, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+        // DEFAULT FALLBACK ZONES (Used if blockchain fails)
         zones: { 
             1: {name:"Beach 1", cost:1160, win:400, min_w:0}, 2: {name:"Beach 2", cost:6968, win:2405, min_w:0}, 3: {name:"Beach 3", cost:8800, win:3037, min_w:0},
             4: {name:"Bunker", cost:11120, win:3838, min_w:90}, 5: {name:"Forest 1", cost:14024, win:4840, min_w:3}, 6: {name:"Forest 2", cost:17704, win:6110, min_w:3},
@@ -296,23 +296,10 @@
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
         const order = ["F", "H", "R", "S"];
-        
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
-            areaC.innerHTML += `
-            <div class="kpi-card ${rd.class}">
-                <div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div>
-                <div class="kc-sep"></div>
-                <div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div>
-                <div class="kc-sub" id="act-${k}">0 ACTIVE</div>
-            </div>`;
-            
-            areaL.innerHTML += `
-            <div class="data-panel">
-                <div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
-                <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div>
-                <div id="tbl-${k}"></div>
-            </div>`;
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
+            areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
     }
 
@@ -324,23 +311,27 @@
         return null;
     }
 
+    // --- HEAVY CLUSTER PROTOCOL V274 (2.5s Timeout + 20 RPCs) ---
     async function fetchSmartCluster(endpoint, body) {
         let nodes = DATA.apiConfig.rpcNodes;
+        // Shuffle to avoid hitting the same dead node
         let shuffled = [...nodes].sort(() => 0.5 - Math.random());
-        for(let i=0; i<8; i++) { 
-            let node = shuffled[i % shuffled.length];
+        
+        for(let i=0; i<shuffled.length; i++) { 
+            let node = shuffled[i];
             try {
                 let controller = new AbortController();
-                setTimeout(() => controller.abort(), 6000); 
+                // 2.5s TIMEOUT (AGGRESSIVE)
+                setTimeout(() => controller.abort(), 2500); 
                 let res = await fetch(node + endpoint, { method: 'POST', body: body, signal: controller.signal });
                 if(res.ok) return await res.json();
-            } catch(e) { }
+            } catch(e) { /* Try next node silently */ }
         }
-        throw new Error("CLUSTER UNREACHABLE");
+        throw new Error("CLUSTER EXHAUSTED: ALL NODES FAILED");
     }
 
     async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "SCANNING...";
         let next = ""; 
         let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
         let groups = {F:[], H:[], R:[], S:[]};
@@ -369,7 +360,7 @@
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(e); getId('cntRows').innerText = "NETWORK ERR"; }
     }
 
     function updateGlobalUI(rows, assets, stats, groups) {
@@ -397,21 +388,42 @@
         return 0;
     }
 
-    // --- LOGIC: INTELLIGENT ZONES V273 (SAFE) ---
-    // Variable to store live data safely
+    // --- LOGIC: INTELLIGENT ZONES V274 (SAFE & ROBUST) ---
+    // Stores config safely
     let liveConfig = {}; 
 
     async function fetchZoneConfig() {
         try {
+            // Using Heavy Cluster here too!
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({ json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "zones", limit: 100 }));
             if(res.rows && res.rows.length > 0) {
                 let config = {};
                 res.rows.forEach(r => {
                     let id = r.id || r.key;
                     let win=0, draw=0, loss=0; let wWin=999999, wDraw=999999, wLoss=999999; let cost=0;
-                    if(r.costs && r.costs.length > 0) cost = parseFloat(r.costs[0].value) / 10000;
-                    if(r.resolutions) { r.resolutions.forEach(res => { let val = parseFloat(res.value)/10000; if(res.key==="win") win=val; if(res.key==="draw") draw=val; if(res.key==="loss") loss=val; }); }
-                    if(r.power) { r.power.forEach(p => { let val = parseFloat(p.value)/10000; if(p.key==="win") wWin=val; if(p.key==="draw") wDraw=val; if(p.key==="loss") wLoss=val; }); }
+                    // PARSE COSTS FROM RAW DATA
+                    if(r.costs && r.costs.length > 0) {
+                        let fCost = r.costs.find(c => c.key === "DOVF");
+                        if(fCost) cost = parseFloat(fCost.value) / 10000;
+                    }
+                    // PARSE REWARDS
+                    if(r.resolutions) { 
+                        r.resolutions.forEach(res => { 
+                            let val = parseFloat(res.value)/10000; 
+                            if(res.key==="win") win=val; 
+                            if(res.key==="draw") draw=val; 
+                            if(res.key==="loss") loss=val; 
+                        }); 
+                    }
+                    // PARSE POWER THRESHOLDS
+                    if(r.power) { 
+                        r.power.forEach(p => { 
+                            let val = parseFloat(p.value)/10000; 
+                            if(p.key==="win") wWin=val; 
+                            if(p.key==="draw") wDraw=val; 
+                            if(p.key==="loss") wLoss=val; 
+                        }); 
+                    }
                     config[id] = { cost, win, draw, loss, wWin, wDraw, wLoss, name: r.name };
                 });
                 return config;
@@ -421,11 +433,13 @@
     }
 
     async function startZoneScan() {
-        stopSignal = false; switchView('viewZones'); getId('zTotalDivsHeader').innerText = "...";
+        stopSignal = false; switchView('viewZones'); getId('zTotalDivsHeader').innerText = "FETCHING CONFIG...";
         
         // SAFE INIT OF CONFIG
         let fetched = await fetchZoneConfig();
         liveConfig = fetched ? fetched : {}; // Ensure it's never null
+
+        getId('zTotalDivsHeader').innerText = "SCANNING...";
 
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
         let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
@@ -446,7 +460,6 @@
                         if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
                         if(isFighting) {
                             zonesData[zid].active++; stats.activeDivs++;
-                            
                             // SAFE ACCESS TO CONFIG
                             let zConf = liveConfig[zid] ? liveConfig[zid] : null;
                             let zStatic = DATA.zones[zid]; // Fallback
@@ -467,7 +480,7 @@
                 updateZoneUI(zonesData, stats);
                 if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(e); getId('zTotalDivsHeader').innerText = "NET FAIL"; }
         getId('zoneStatus').innerText = "Complete.";
     }
 
