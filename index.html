@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V265 (WITH ABI INSPECTOR)</title>
+    <title>DoV - COMMAND V266 (DEEP INSPECTOR)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICT) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -83,9 +83,13 @@
         .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
 
-        /* INSPECTOR STYLE */
-        .abi-row { padding:10px; border-bottom:1px solid #333; display:flex; justify-content:space-between; font-family:var(--font-num); }
-        .abi-row:hover { background:#1c1d26; }
+        /* INSPECTOR STYLE (ENHANCED) */
+        .abi-container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; height: 60vh; }
+        .abi-list { background: #000; border: 1px solid #333; overflow-y: auto; padding: 10px; }
+        .abi-viewer { background: #13141b; border: 1px solid #333; overflow-y: auto; padding: 15px; font-family: 'Courier New', monospace; color: #ddd; white-space: pre-wrap; font-size: 10px; }
+        .abi-row { padding: 8px; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .abi-row:hover { background: var(--blue); color: #fff; }
+        .abi-row.selected { background: rgba(41, 121, 255, 0.2); border-left: 3px solid var(--blue); }
 
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
@@ -100,7 +104,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V265</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V266</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">ROBUST MONITORING</span>
@@ -116,7 +120,7 @@
 
         <div class="control-group">
             <span class="grp-lbl">CONTRACT TOOLS</span>
-            <button class="btn-purple" onclick="runAbiInspector()">ABI SCANNER (TABLES)</button>
+            <button class="btn-purple" onclick="runAbiInspector()">ABI EXPLORER</button>
         </div>
 
         <div class="control-group">
@@ -189,12 +193,21 @@
         <div id="viewInspector" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--purple)">
                 <div>
-                    <h2 class="page-h1">SMART CONTRACT INSPECTOR</h2>
-                    <div class="page-meta">TARGETS: dovutilstake, dovpvecontrl</div>
+                    <h2 class="page-h1">SMART CONTRACT X-RAY</h2>
+                    <div class="page-meta">CLICK A TABLE TO INSPECT RAW DATA</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="grp-lbl">CURRENT CONTRACT</div>
+                    <div style="color:#fff; font-weight:bold;" id="inspTarget">NONE</div>
                 </div>
             </div>
-            <div id="inspectorResults" style="background:#000; padding:15px; border-radius:6px; font-family:'Courier New', monospace; min-height:200px; color:#aaa;">
-                Click "ABI SCANNER" to retrieve table list.
+            <div class="abi-container">
+                <div class="abi-list" id="abiList">
+                    <div style="padding:10px; color:#666;">Initialize Scan...</div>
+                </div>
+                <div class="abi-viewer" id="abiViewer">
+                    // RAW DATA WILL APPEAR HERE
+                </div>
             </div>
         </div>
 
@@ -220,7 +233,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V265';
+    const STORAGE_KEY = 'DOV_DATA_V266';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -532,37 +545,67 @@
         getId('areaZones').innerHTML = html;
     }
 
-    // NEW MODULE: ABI INSPECTOR (INTEGRATED)
+    // --- ABI INSPECTOR (PROFESSIONAL LEVEL) ---
     async function runAbiInspector() {
         switchView('viewInspector');
-        const area = getId('inspectorResults');
-        area.innerHTML = "SCANNING CONTRACT STRUCTURE...";
-        const targets = ["dovutilstake", "dovpvecontrl"];
+        const listArea = getId('abiList');
+        listArea.innerHTML = "SCANNING STRUCTS...";
         
-        // Get active RPC from cluster
-        let activeNode = DATA.apiConfig.rpcNodes[0]; 
-        try { 
-            let res = await fetchSmartCluster("/v1/chain/get_info", ""); 
-            // fetchSmartCluster returns JSON, we need the node URL logic inside it or simplified here
-            // Simplified for this tool: use Greymass
-            activeNode = "https://wax.greymass.com";
-        } catch(e) {}
+        let nodes = DATA.apiConfig.rpcNodes;
+        let node = nodes[0]; // Use first for structural scan
 
-        let html = "";
+        const targets = ["dovutilstake", "dovpvecontrl"];
+        let listHtml = "";
+
         for(let contract of targets) {
             try {
-                let res = await fetch(activeNode + "/v1/chain/get_abi", { method:'POST', body: JSON.stringify({account_name:contract}) });
+                let res = await fetch(node + "/v1/chain/get_abi", { method:'POST', body: JSON.stringify({account_name:contract}) });
                 let json = await res.json();
-                html += `<div style="margin-bottom:20px; border:1px solid #333; padding:10px;"><div style="color:#fff; font-weight:bold; border-bottom:1px solid #333; padding-bottom:5px;">CONTRACT: ${contract}</div>`;
+                
+                listHtml += `<div style="margin:10px 0; font-weight:bold; color:var(--purple); text-transform:uppercase;">${contract}</div>`;
+                
                 if(json.abi && json.abi.tables) {
                     json.abi.tables.forEach(t => {
-                        html += `<div class="abi-row"><span class="abi-head" style="color:#fff; font-weight:bold;">${t.name}</span><span class="abi-type" style="color:var(--orange); font-size:10px;">${t.type}</span></div>`;
+                        // MAKE ROW CLICKABLE
+                        listHtml += `<div class="abi-row" onclick="inspectTable('${contract}', '${t.name}', this)">
+                            <span>${t.name}</span>
+                            <span style="color:#666; font-size:9px;">${t.type}</span>
+                        </div>`;
                     });
-                } else { html += `<div class="log-err">NO TABLES FOUND</div>`; }
-                html += "</div>";
-            } catch(e) { html += `<div class="log-err">ERROR SCANNING ${contract}</div>`; }
+                } else { listHtml += `<div class="log-err">NO TABLES</div>`; }
+            } catch(e) { listHtml += `<div class="log-err">ERR ${contract}</div>`; }
         }
-        area.innerHTML = html;
+        listArea.innerHTML = listHtml;
+    }
+
+    async function inspectTable(contract, table, el) {
+        // UI Selection
+        document.querySelectorAll('.abi-row').forEach(e => e.classList.remove('selected'));
+        if(el) el.classList.add('selected');
+        
+        getId('inspTarget').innerText = `${contract} :: ${table}`;
+        const viewer = getId('abiViewer');
+        viewer.innerHTML = "FETCHING RAW DATA...";
+
+        let nodes = DATA.apiConfig.rpcNodes;
+        let node = nodes[0];
+
+        try {
+            let res = await fetch(node + "/v1/chain/get_table_rows", {
+                method: 'POST',
+                body: JSON.stringify({
+                    json: true,
+                    code: contract,
+                    scope: contract,
+                    table: table,
+                    limit: 50 // Inspect first 50 rows
+                })
+            });
+            let json = await res.json();
+            viewer.innerHTML = JSON.stringify(json, null, 4); // PRETTY PRINT
+        } catch(e) {
+            viewer.innerHTML = "ERROR FETCHING TABLE DATA.\n" + e.message;
+        }
     }
 
     async function startEconomyScan() { /* Same V199 */ }
