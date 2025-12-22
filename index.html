@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V261 (DATA UPDATE)</title>
+    <title>DoV - COMMAND V262 (STABLE BASE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V260 STRICT) --- */
+        /* --- ARCHITECTURE GRAPHIQUE V261 (ORIGINALE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -31,18 +31,16 @@
         
         .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
         .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
-        .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
-        .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
-        .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
+        .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
@@ -96,10 +94,10 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V261</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V262</span></div>
         
         <div class="control-group">
-            <span class="grp-lbl">ROBUST MONITORING</span>
+            <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row">
                 <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
                 <button class="btn-red" onclick="stopSignal=true">STOP</button>
@@ -113,11 +111,7 @@
         <div class="control-group">
             <span class="grp-lbl">TARGET INTELLIGENCE</span>
             <input type="text" id="targetIn" value="u2d2k.c.wam">
-            <div class="btn-row">
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetDivisions()">DIVISIONS</button>
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetBuildings()">BUILDINGS</button>
             </div>
-        </div>
 
         <div class="control-group" style="margin-top:auto">
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;">
@@ -199,7 +193,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V261';
+    const STORAGE_KEY = 'DOV_DATA_V262';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -213,7 +207,9 @@
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
                 "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
                 "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
-                "https://wax.eosdac.io", "https://api.wax.bountyblok.io"
+                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
+                "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
+                "https://wax.tmy.io", "https://api.hivebp.io"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
@@ -227,8 +223,7 @@
             13: {name:"Plain 1", cost:99384, win:34300, min_w:0}, 14: {name:"Plain 2", cost:125708, win:43385, min_w:0}, 15: {name:"Plain 3", cost:151164, win:52171, min_w:0},
             16: {name:"HQ", cost:188000, win:64884, min_w:0}, 17:{name:"City 1",cost:0,win:0,min_w:0}, 18:{name:"City 2",cost:0,win:0,min_w:0}, 19:{name:"City 3",cost:0,win:0,min_w:0}, 20:{name:"City 4",cost:0,win:0,min_w:0}
         },
-        
-        // NEW JSON INJECTED HERE (EXACT V260 STRUCTURE BUT DATA FROM YOUR REQUEST)
+        // NEW JSON STRUCTURE
         templates: {
             "FUEL": {
                 "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
@@ -313,10 +308,10 @@
 
     // HELPER FUNCTION: Find template in nested JSON (The "Bridge")
     function findTemplate(tid) {
-        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type: 'F' };
-        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type: 'H' };
-        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type: 'R' };
-        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type: 'S' };
+        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' };
+        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' };
+        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' };
+        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' };
         return null;
     }
 
@@ -464,11 +459,13 @@
                             zonesData[zid].active++;
                             stats.activeDivs++;
                             let zInfo = DATA.zones[zid];
+                            let zCost = zInfo.cost;
+                            let zReward = zInfo.win;
                             
-                            zonesData[zid].bf += zInfo.cost; zonesData[zid].bh += zInfo.cost; zonesData[zid].br += zInfo.cost; zonesData[zid].bs += zInfo.cost;
-                            zonesData[zid].prod += zInfo.win;
-                            stats.burnF += zInfo.cost; stats.burnH += zInfo.cost; stats.burnR += zInfo.cost; stats.burnS += zInfo.cost;
-                            stats.totalProd += zInfo.win;
+                            zonesData[zid].bf += zCost; zonesData[zid].bh += zCost; zonesData[zid].br += zCost; zonesData[zid].bs += zCost;
+                            zonesData[zid].prod += zReward;
+                            stats.burnF += zCost; stats.burnH += zCost; stats.burnR += zCost; stats.burnS += zCost;
+                            stats.totalProd += zReward;
                         }
                     }
                 }
