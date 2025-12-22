@@ -2,40 +2,67 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV COMMAND V262 - STABLE & SYNC</title>
+    <title>DoV - COMMAND V260 (RESTORED)</title>
     <style>
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
             --text-main: #e0e0e0; --text-muted: #858595;
-            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', monospace; 
+            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
+
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        .layout { display: flex; width: 100%; height: 100%; }
         .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 15px; flex-shrink: 0; }
-        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: #08080a; display:flex; flex-direction:column; }
+        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); display:flex; flex-direction:column; }
+
+        /* COMPONENTS */
+        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
+        .status-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; box-shadow: 0 0 8px var(--red); }
+        .status-dot.ready { background: var(--green); box-shadow: 0 0 8px var(--green); }
         
-        /* TERMINAL LOG */
-        .terminal-box { background: #000; border: 1px solid #333; padding: 8px; border-radius: 4px; height: 120px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 9px; }
-        .log-line { color: #888; margin-bottom: 2px; } .log-ok { color: var(--green); } .log-err { color: var(--red); }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
+        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-green { background: var(--green); color: #000; }
+        .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
+        .btn-row { display: flex; gap: 8px; }
 
-        /* BUTTONS */
-        button { padding: 10px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; margin-bottom: 5px; }
-        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid var(--red); }
-        .btn-blue { background: var(--blue); color: #fff; } .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* DASHBOARD ELEMENTS */
+        /* DASHBOARD */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
+        .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
+        .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
+        .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; border-left: 4px solid #333; }
-        .kc-val { font-family: var(--font-num); font-size: 18px; font-weight: 700; color: #fff; }
+        .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* ZONES */
+        /* KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+        .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
+        .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
+        
+        .fuel .kpi-card::before { background: var(--orange); } .fuel .kc-val { color: var(--orange); } 
+        .health .kpi-card::before { background: var(--red); } .health .kc-val { color: var(--red); }
+        .repair .kpi-card::before { background: var(--blue); } .repair .kc-val { color: var(--blue); }
+        .supply .kpi-card::before { background: var(--yellow); } .supply .kc-val { color: var(--yellow); }
+
+        /* ZONES MAP */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
-        .zone-card.active { border-color: var(--blue); }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); margin-bottom: 2px; }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; height: 160px; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
+        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
 
         .view-section { display: none; } .active-view { display: block; }
     </style>
@@ -44,17 +71,23 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div style="color:#fff; font-weight:800; font-size:14px;">DOV COMMAND <span style="opacity:0.5">V262</span></div>
+        <div class="app-title"><div class="status-dot ready"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V260</span></div>
         
-        <div class="terminal-box" id="termLog"><div class="log-line">SYSTEM BOOT...</div></div>
-
         <div class="control-group">
-            <button id="btnScanGlobal" class="btn-green" onclick="startBuildingScan()">SCAN BUILDINGS</button>
-            <button id="btnScanZones" class="btn-blue" onclick="startZoneScan()">SCAN WAR MAP</button>
-            <button class="btn-red" onclick="stopSignal=true">STOP ALL</button>
+            <span class="grp-lbl">OPERATIONS</span>
+            <div class="btn-row">
+                <button class="btn-green" onclick="dispatchGlobalScan()">BUILDINGS</button>
+                <button class="btn-red" onclick="stopSignal=true">STOP</button>
+            </div>
+            <button class="btn-blue" onclick="startZoneScan()">WAR MAP (GLOBAL)</button>
         </div>
 
-        <div style="margin-top:auto">
+        <div class="control-group">
+            <span class="grp-lbl">INTEL TARGET</span>
+            <input type="text" id="targetIn" value="u2d2k.c.wam">
+        </div>
+
+        <div class="control-group" style="margin-top:auto">
             <button class="btn-ghost" onclick="hardReset()">FACTORY RESET</button>
         </div>
     </aside>
@@ -62,23 +95,16 @@
     <main class="main-content">
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
-                <div><h2 style="color:#fff;margin:0">BUILDING PRODUCTION</h2><div id="buildMeta">Ready.</div></div>
-                <div style="text-align:right"><div style="font-size:9px">DAILY MAINTENANCE</div><div class="tc-val" id="gTotalCost">0</div></div>
+                <div><h2 class="page-h1">GLOBAL STAKE PRODUCTION</h2><div class="page-meta">REAL-TIME BLOCKCHAIN FEED</div></div>
+                <div class="total-cost"><div class="grp-lbl">DAILY MAINTENANCE</div><div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div></div>
             </div>
-            <div class="kpi-grid" id="buildKpis">
-                </div>
-            <div id="buildList" style="background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; overflow:hidden;"></div>
+            <div class="kpi-grid" id="areaCards"></div>
         </div>
 
         <div id="viewZones" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--blue); padding-left:15px">
-                <div><h2 style="color:#fff;margin:0">GLOBAL WAR MAP</h2><div>COLLECTION SCAN</div></div>
-                <div style="text-align:right"><div style="font-size:9px">DIVISIONS FOUND</div><div class="tc-val" id="zTotalDivsHeader">0</div></div>
-            </div>
-            <div class="kpi-grid">
-                <div class="kpi-card" style="border-left-color:var(--green)"><div style="font-size:9px">IN FIGHT</div><div class="kc-val" id="zActiveDivs">0</div></div>
-                <div class="kpi-card" style="border-left-color:var(--blue)"><div style="font-size:9px">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight">0</div></div>
-                <div class="kpi-card" style="border-left-color:var(--purple)"><div style="font-size:9px">DAILY REWARD</div><div class="kc-val" id="zTotalProd">0</div></div>
+            <div class="dashboard-header">
+                <div><h2 class="page-h1">GLOBAL WAR MAP</h2><div class="page-meta">COLLECTION SCAN: dovpvecontrl</div></div>
+                <div class="total-cost"><div class="grp-lbl">ACTIVE DIVS</div><div><span class="tc-val" id="zActiveDivs">0</span></div></div>
             </div>
             <div class="zones-map" id="areaZones"></div>
         </div>
@@ -86,10 +112,8 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V262';
-    const getId = (id) => document.getElementById(id);
     let stopSignal = false;
-    let ACTIVE_RPC = "https://wax.greymass.com";
+    const ACTIVE_RPC = "https://wax.greymass.com";
 
     const DATA = {
         zones: { 
@@ -101,7 +125,6 @@
             16: {name:"HQ", cost:188000, win:64884, min_w:0}
         },
         templates: {
-            // FUEL
             "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 },
             "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
             "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 },
@@ -111,7 +134,6 @@
             "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
             "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 },
             "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            // HEALTH
             "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
             "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 },
             "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 },
@@ -121,7 +143,6 @@
             "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 },
             "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 },
             "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
-            // REPAIR
             "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 },
             "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
             "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 },
@@ -131,7 +152,6 @@
             "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 },
             "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
             "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
-            // SUPPLY
             "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
             "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
             "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 },
@@ -144,123 +164,92 @@
         }
     };
 
-    function log(m, cls="") {
-        let l = getId('termLog');
-        l.innerHTML += `<div class="log-line ${cls}">> ${m}</div>`;
-        l.scrollTop = l.scrollHeight;
+    function initUI() {
+        const area = document.getElementById('areaCards');
+        area.innerHTML = `
+            <div class="fuel"><div class="kpi-card"><div class="kc-title">FUEL/H</div><div class="kc-val" id="val-F">0</div></div></div>
+            <div class="health"><div class="kpi-card"><div class="kc-title">HEALTH/H</div><div class="kc-val" id="val-H">0</div></div></div>
+            <div class="repair"><div class="kpi-card"><div class="kc-title">REPAIR/H</div><div class="kc-val" id="val-R">0</div></div></div>
+            <div class="supply"><div class="kpi-card"><div class="kc-title">SUPPLY/H</div><div class="kc-val" id="val-S">0</div></div></div>
+        `;
     }
 
-    function buildUI() {
-        const types = { F:"FUEL", H:"HEALTH", R:"REPAIR", S:"SUPPLY" };
-        const kGrid = getId('buildKpis'); kGrid.innerHTML = '';
-        Object.entries(types).forEach(([k,v]) => {
-            kGrid.innerHTML += `<div class="kpi-card" style="border-left-color:var(--${k==='F'?'orange':k==='H'?'red':k==='R'?'blue':'yellow'})">
-                <div style="font-size:9px">${v} / HOUR</div><div class="kc-val" id="val-${k}">0</div><div style="font-size:9px" id="act-${k}">0 ACTIVE</div>
-            </div>`;
+    async function callRPC(code, scope, table, lower = "") {
+        const res = await fetch(ACTIVE_RPC + "/v1/chain/get_table_rows", {
+            method: 'POST', body: JSON.stringify({json:true, code, scope, table, limit:1000, lower_bound:lower})
         });
-        renderZones({}, {total:0, active:0, weight:0, reward:0});
+        return res.json();
     }
 
-    async function fetchRPC(code, scope, table, lower="") {
-        try {
-            let res = await fetch(ACTIVE_RPC + "/v1/chain/get_table_rows", {
-                method: 'POST', body: JSON.stringify({json:true, code, scope, table, limit:1000, lower_bound:lower})
-            });
-            return res.ok ? await res.json() : {rows:[]};
-        } catch(e) { return {rows:[]}; }
-    }
-
-    // --- BUILDING SCAN ---
-    async function startBuildingScan() {
-        stopSignal = false; getId('viewGlobal').classList.add('active-view'); getId('viewZones').classList.remove('active-view');
-        log("SCANNING BUILDINGS (COLLECTION)...");
-        let stats = { cost:0, F:0, H:0, R:0, S:0, aF:0, aH:0, aR:0, aS:0 };
-        let next = "";
+    async function dispatchGlobalScan() {
+        stopSignal = false; document.getElementById('viewGlobal').style.display = 'block'; document.getElementById('viewZones').style.display = 'none';
+        let stats = { cost:0, F:0, H:0, R:0, S:0 }; let next = "";
         while(!stopSignal) {
-            let json = await fetchRPC("dovutilstake", "dovutilstake", "buildings", next);
-            if(!json.rows.length) break;
+            let data = await callRPC("dovutilstake", "dovutilstake", "buildings", next);
             const now = Date.now()/1000;
-            json.rows.forEach(r => {
-                let tpl = DATA.templates[r.template_id];
-                if(!tpl) return;
+            data.rows.forEach(r => {
+                let tpl = DATA.templates[r.template_id]; if(!tpl) return;
                 let count = r.asset_ids ? r.asset_ids.length : 1;
-                let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                if(active) {
-                    let h = count * tpl.prod;
-                    if(tpl.name.includes("FUEL")) { stats.F+=h; stats.aF+=count; }
-                    else if(tpl.name.includes("HEALTH")) { stats.H+=h; stats.aH+=count; }
-                    else if(tpl.name.includes("REPAIR")) { stats.R+=h; stats.aR+=count; }
-                    else if(tpl.name.includes("SUPPLY")) { stats.S+=h; stats.aS+=count; }
-                    stats.cost += (h * 24 * 0.085);
+                let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
+                if(isActive) {
+                    let prod = count * tpl.prod;
+                    if(tpl.name.includes("FUEL")) stats.F += prod;
+                    else if(tpl.name.includes("HEALTH")) stats.H += prod;
+                    else if(tpl.name.includes("REPAIR")) stats.R += prod;
+                    else if(tpl.name.includes("SUPPLY")) stats.S += prod;
+                    stats.cost += (prod * 24 * 0.085);
                 }
             });
-            updateBuildUI(stats);
-            if(json.more) next = json.next_key; else break;
+            document.getElementById('val-F').innerText = stats.F.toFixed(2);
+            document.getElementById('val-H').innerText = stats.H.toFixed(2);
+            document.getElementById('val-R').innerText = stats.R.toFixed(2);
+            document.getElementById('val-S').innerText = stats.S.toFixed(2);
+            document.getElementById('gTotalCost').innerText = Math.round(stats.cost).toLocaleString();
+            if(!data.more) break; next = data.next_key;
         }
-        log("BUILDING SCAN COMPLETE.", "log-ok");
     }
 
-    function updateBuildUI(s) {
-        getId('val-F').innerText = s.F.toFixed(2); getId('val-H').innerText = s.H.toFixed(2);
-        getId('val-R').innerText = s.R.toFixed(2); getId('val-S').innerText = s.S.toFixed(2);
-        getId('act-F').innerText = s.aF + " ASSETS"; getId('act-H').innerText = s.aH + " ASSETS";
-        getId('act-R').innerText = s.aR + " ASSETS"; getId('act-S').innerText = s.aS + " ASSETS";
-        getId('gTotalCost').innerText = Math.round(s.cost).toLocaleString() + " DOVX";
-    }
-
-    // --- ZONE SCAN ---
     async function startZoneScan() {
-        stopSignal = false; getId('viewZones').classList.add('active-view'); getId('viewGlobal').classList.remove('active-view');
-        log("SCANNING WAR MAP (COLLECTION)...");
-        let stats = { total:0, active:0, weight:0, reward:0 };
-        let zData = {}; Object.keys(DATA.zones).forEach(id => zData[id] = { count:0, active:0, weight:0 });
-        let next = "";
+        stopSignal = false; document.getElementById('viewGlobal').style.display = 'none'; document.getElementById('viewZones').style.display = 'block';
+        let zStats = {}; Object.keys(DATA.zones).forEach(id => zStats[id] = {active:0, total:0, weight:0});
+        let activeDivs = 0; let next = "";
         while(!stopSignal) {
-            let json = await fetchRPC("dovpvecontrl", "dovpvecontrl", "sdivisions", next);
-            if(!json.rows.length) break;
+            let data = await callRPC("dovpvecontrl", "dovpvecontrl", "sdivisions", next);
             const now = Date.now()/1000;
-            json.rows.forEach(r => {
-                let zid = r.zone_id || r.zoneID;
-                if(!zData[zid]) return;
-                zData[zid].count++; stats.total++;
-                let et = parseFloat(r.unlock_time || 0);
-                let isFighting = et > (et > 1000000000000 ? Date.now() : now);
-                if(isFighting) {
-                    zData[zid].active++; stats.active++;
-                    let w = parseFloat(r.weight || 0);
-                    zData[zid].weight += w; stats.weight += w;
-                    stats.reward += DATA.zones[zid].win;
+            data.rows.forEach(r => {
+                let zid = r.zone_id || r.zoneID; if(!zStats[zid]) return;
+                zStats[zid].total++;
+                let et = parseFloat(r.unlock_time);
+                if(et > (et > 1000000000000 ? Date.now() : now)) {
+                    zStats[zid].active++; activeDivs++;
+                    zStats[zid].weight += parseFloat(r.weight);
                 }
             });
-            renderZones(zData, stats);
-            if(json.more) next = json.next_key; else break;
+            renderZones(zStats, activeDivs);
+            if(!data.more) break; next = data.next_key;
         }
-        log("WAR MAP SCAN COMPLETE.", "log-ok");
     }
 
-    function renderZones(data, s) {
-        getId('zTotalDivsHeader').innerText = s.total;
-        getId('zActiveDivs').innerText = s.active;
-        getId('zTotalWeight').innerText = s.weight.toLocaleString();
-        getId('zTotalProd').innerText = s.reward.toLocaleString();
+    function renderZones(stats, totalActive) {
+        document.getElementById('zActiveDivs').innerText = totalActive;
         let html = "";
         Object.keys(DATA.zones).forEach(id => {
-            let z = DATA.zones[id]; let d = data[id] || {count:0, active:0, weight:0};
-            html += `<div class="zone-card ${d.active>0?'active':''}">
-                <div class="zc-top"><span>${z.name}</span><span>${d.active}/${d.count}</span></div>
+            let z = DATA.zones[id]; let s = stats[id];
+            html += `<div class="zone-card ${s.active>0?'active':''}">
+                <div class="zc-top"><span>${z.name}</span><span>${s.active}/${s.total}</span></div>
                 <div class="zc-mid">
-                    <div class="zs-item"><span>WEIGHT</span><span style="color:var(--blue)">${d.weight}</span></div>
+                    <div class="zs-item"><span>WEIGHT</span><span style="color:var(--blue)">${s.weight.toFixed(0)}</span></div>
                     <div class="zs-item"><span>WIN/U</span><span style="color:var(--green)">${z.win}</span></div>
                     <div class="zs-item"><span>COST/U</span><span style="color:var(--orange)">${z.cost}</span></div>
                 </div>
-                <div class="zc-bot"><span>REQ: ${z.min_w}W</span><span style="color:var(--purple)">${(d.active*z.win).toLocaleString()}</span></div>
+                <div class="zc-bot"><span>REQ: ${z.min_w}W</span><span style="color:var(--purple)">${(s.active*z.win).toLocaleString()}</span></div>
             </div>`;
         });
-        getId('areaZones').innerHTML = html;
+        document.getElementById('areaZones').innerHTML = html;
     }
 
-    function hardReset() { if(confirm("RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
-    window.onload = () => { buildUI(); log("READY."); };
+    function hardReset() { if(confirm("RESET?")) { location.reload(); } }
+    window.onload = initUI;
 </script>
 </body>
 </html>
