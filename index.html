@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V284 (MARKET DATA)</title>
+    <title>DoV - COMMAND V285 (LIVE MARKET FIX)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -111,7 +111,7 @@
         .acc-content { display:none; background:#08080a; padding:10px; border-left:2px solid var(--blue); margin-top:5px; grid-column: 1 / -1; }
         .acc-active { display:block; }
 
-        /* V284 MARKET TICKER */
+        /* MARKET TICKER */
         .market-ticker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
         .ticker-item { background: #191a21; border: 1px solid #333; padding: 10px; border-radius: 4px; text-align: center; }
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
@@ -123,7 +123,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V284</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V285</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -227,7 +227,7 @@
             </div>
             
             <div class="market-ticker" id="marketTicker">
-                <div class="ticker-item" style="opacity:0.5;">LOADING MARKETS...</div>
+                <div class="ticker-item" style="opacity:0.5;">INITIALIZING LIVE FEED...</div>
             </div>
 
             <div class="kpi-grid eco" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
@@ -321,7 +321,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V284';
+    const STORAGE_KEY = 'DOV_DATA_V285';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -377,11 +377,7 @@
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false;
     let zoneDetailsCache = {}; 
-    // V284: REVISED STATS FOR USD VALUATION (BY TYPE)
-    let ecoStats = { 
-        buildings: { active:0, cost:0, prodF:0, prodH:0, prodR:0, prodS:0 }, 
-        divisions: { active:0, mint:0, cost:0 } 
-    };
+    let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, cost:0 }, divisions: { active:0, mint:0, cost:0 } };
     let marketData = { WAX:0, DOVX:0, DOVF:0, DOVH:0, DOVR:0, DOVS:0 };
 
     function init() {
@@ -425,7 +421,7 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // --- V284: MARKET DATA FETCH ---
+    // --- V285: MARKET DATA FETCH (CORS FIX) ---
     async function fetchMarketData() {
         try {
             // 1. WAX Price (Coingecko)
@@ -433,41 +429,38 @@
             let cgJson = await cg.json();
             marketData.WAX = cgJson.wax ? cgJson.wax.usd : 0;
 
-            // 2. DoV Tokens (Alcor)
-            // Fetch all markets is heavy but simplest to find correct pair ID without manual config
-            let al = await fetch("https://wax.alcor.exchange/api/markets"); 
+            // 2. DoV Tokens (Alcor via Proxy CORS + API V2)
+            let proxyUrl = "https://api.allorigins.win/raw?url=";
+            let targetUrl = encodeURIComponent("https://wax.alcor.exchange/api/v2/tickers");
+            
+            let al = await fetch(proxyUrl + targetUrl); 
             let alJson = await al.json();
             
-            // Map symbols to Alcor data
             let targets = ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"];
             
-            targets.forEach(sym => {
-                // Find market: Quote=WAX, Base=Token (Contract dovvaultfort)
-                let m = alJson.find(x => x.quote_token.symbol === "WAX" && x.base_token.symbol === sym && x.base_token.contract === "dovvaultfort");
-                if(m) {
-                    marketData[sym] = m.last_price;
+            alJson.forEach(t => {
+                if(t.quote_currency === "WAX" && targets.includes(t.base_currency)) {
+                    marketData[t.base_currency] = t.last_price;
                 }
             });
 
             renderTicker();
-        } catch(e) { console.error("Market Data Error", e); }
+            if(getId('ecoMint').innerText !== "0") updateEcoUI();
+
+        } catch(e) { 
+            console.error("Market Data Error (CORS/Network):", e); 
+            getId('marketTicker').innerHTML = '<div class="ticker-item" style="color:var(--red); width:100%;">API CONNECTION FAILED (TRY REFRESH)</div>';
+        }
     }
 
     function renderTicker() {
         let html = "";
-        // WAX
         html += `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${marketData.WAX.toFixed(4)}</div></div>`;
-        
-        // TOKENS
         let tokens = ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"];
         tokens.forEach(t => {
             let priceWax = marketData[t] || 0;
             let priceUsd = priceWax * marketData.WAX;
-            html += `<div class="ticker-item">
-                <div class="t-sym">${t}</div>
-                <div class="t-price">${priceWax.toFixed(4)} WAX</div>
-                <div class="t-usd">$${priceUsd.toFixed(6)}</div>
-            </div>`;
+            html += `<div class="ticker-item"><div class="t-sym">${t}</div><div class="t-price">${priceWax.toFixed(4)} WAX</div><div class="t-usd">$${priceUsd.toFixed(6)}</div></div>`;
         });
         getId('marketTicker').innerHTML = html;
     }
@@ -500,15 +493,12 @@
                         stats.types[tpl.type].p += hourly; stats.types[tpl.type].c += costD; stats.totalCost += costD;
                     }
                 }
-                
-                // V284: SPLIT PROD FOR VALUATION
                 ecoStats.buildings.active = assetCount;
                 ecoStats.buildings.prodF = stats.types.F.p;
                 ecoStats.buildings.prodH = stats.types.H.p;
                 ecoStats.buildings.prodR = stats.types.R.p;
                 ecoStats.buildings.prodS = stats.types.S.p;
                 ecoStats.buildings.cost = stats.totalCost;
-
                 updateGlobalUI(rowCount, assetCount, stats, groups);
                 if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
@@ -607,11 +597,8 @@
 
     async function startEconomyScan() {
         switchView('viewEco');
-        
-        // V284: FETCH MARKETS
         getId('ecoStatus').innerText = "FETCHING MARKETS...";
         await fetchMarketData();
-
         if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) {
             getId('ecoStatus').innerText = "AUTO-PILOT: SCANNING BUILDINGS...";
             await dispatchGlobalScan();
@@ -626,24 +613,18 @@
 
     function updateEcoUI() {
         let totalTVL = ecoStats.buildings.active + ecoStats.divisions.active;
-        
-        // V284: VOLUME
         let volF = ecoStats.buildings.prodF * 24;
         let volH = ecoStats.buildings.prodH * 24;
         let volR = ecoStats.buildings.prodR * 24;
         let volS = ecoStats.buildings.prodS * 24;
         let volX = ecoStats.divisions.mint;
-
         let totalGDP_Units = volF + volH + volR + volS + volX;
         
-        // V284: USD VALUATION
-        // Value = (Vol * PriceWAX * WaxUSD)
         let valF = volF * (marketData.DOVF || 0) * marketData.WAX;
         let valH = volH * (marketData.DOVH || 0) * marketData.WAX;
         let valR = volR * (marketData.DOVR || 0) * marketData.WAX;
         let valS = volS * (marketData.DOVS || 0) * marketData.WAX;
         let valX = volX * (marketData.DOVX || 0) * marketData.WAX;
-        
         let totalGDP_USD = valF + valH + valR + valS + valX;
 
         let totalBurn = ecoStats.buildings.cost + ecoStats.divisions.cost;
@@ -651,15 +632,13 @@
         
         getId('ecoTVL').innerText = fmt(totalTVL);
         getId('ecoMint').innerText = fmt(totalGDP_Units);
-        getId('ecoMintUsd').innerText = fmtUsd(totalGDP_USD) + " (EST)"; // SHOW USD
-        
+        getId('ecoMintUsd').innerText = fmtUsd(totalGDP_USD) + " (EST)";
         getId('ecoBurn').innerText = fmt(totalBurn);
         getId('ecoYield').innerText = fmt(yieldVal);
         
         let dailyBuildingProd = volF + volH + volR + volS;
         getId('secBuildAct').innerText = fmt(ecoStats.buildings.active);
         getId('secBuildFlow').innerText = `+${fmt(dailyBuildingProd)} / -${fmt(ecoStats.buildings.cost)}`;
-        
         getId('secDivAct').innerText = fmt(ecoStats.divisions.active);
         getId('secDivFlow').innerText = `+${fmt(ecoStats.divisions.mint)} / -${fmt(ecoStats.divisions.cost)}`;
     }
