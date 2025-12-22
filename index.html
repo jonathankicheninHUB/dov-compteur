@@ -2,79 +2,57 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V289 (BI EDITION)</title>
+    <title>DoV - COMMAND V290 (RESCUE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
             --text-main: #e0e0e0; --text-muted: #858595;
             --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
-
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
         .layout { display: flex; width: 100%; height: 100%; }
         .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 15px; flex-shrink: 0; z-index: 10; }
         .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); display:flex; flex-direction:column; }
-
         .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; margin-bottom: 10px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
         button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        
         .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
         .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
         .btn-purple { background: var(--purple); color: #fff; }
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
-
-        /* LOGS */
-        .console-log {
-            flex: 1; background: #000; border: 1px solid #333; border-radius: 4px; padding: 10px;
-            font-family: var(--font-num); font-size: 9px; color: #0f0; overflow-y: auto;
-            white-space: pre-wrap; display: flex; flex-direction: column-reverse;
-            max-height: 300px; margin-top: auto;
-        }
+        .console-log { flex: 1; background: #000; border: 1px solid #333; border-radius: 4px; padding: 10px; font-family: var(--font-num); font-size: 9px; color: #0f0; overflow-y: auto; white-space: pre-wrap; display: flex; flex-direction: column-reverse; max-height: 300px; margin-top: auto; }
         .log-entry { margin-bottom: 2px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-time { color: #555; margin-right: 5px; }
-
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
-
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { 
-            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; 
-            position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; 
-            min-height: 140px; 
-        }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
         .kc-val-huge { font-family: var(--font-num); font-size: 26px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -1px; }
         .kc-sub { font-size: 10px; color: #666; font-family: var(--font-num); margin-top: auto; }
         .kc-sep { height:1px; background:rgba(255,255,255,0.1); margin:8px 0; }
-
         .fuel .kpi-card::before { background: var(--orange); } .fuel .kc-val, .fuel .kc-val-huge { color: var(--orange); } 
         .health .kpi-card::before { background: var(--red); } .health .kc-val, .health .kc-val-huge { color: var(--red); } 
         .repair .kpi-card::before { background: var(--blue); } .repair .kc-val, .repair .kc-val-huge { color: var(--blue); } 
         .supply .kpi-card::before { background: var(--yellow); } .supply .kc-val, .supply .kc-val-huge { color: var(--yellow); } 
         .eco .kpi-card::before { background: #fff; }
-
         .pie-container { display: flex; align-items: center; justify-content: center; height: 100%; }
         .pie-chart { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(var(--green) 0% 0%, #333 0% 100%); display: flex; align-items: center; justify-content: center; position: relative; }
         .pie-chart::after { content: ''; position: absolute; width: 60px; height: 60px; background: var(--bg-panel); border-radius: 50%; }
         .pie-val { position: absolute; z-index: 2; font-family: var(--font-num); font-weight: 700; color: #fff; font-size: 14px; }
-
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -87,7 +65,6 @@
         .cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
-        
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; cursor: pointer; transition: 0.2s; }
         .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-color: var(--blue); }
@@ -97,78 +74,51 @@
         .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
         .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
-
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
-
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
-        textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
-        
-        /* MARKET TICKER */
         .market-ticker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
         .ticker-item { background: #191a21; border: 1px solid #333; padding: 10px; border-radius: 4px; text-align: center; }
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
         .t-price { font-family: var(--font-num); color: var(--blue); font-size: 11px; margin-top: 4px; }
         .t-usd { font-family: var(--font-num); color: #666; font-size: 10px; }
-        
         .acc-btn { cursor:pointer; font-weight:bold; color:var(--blue); }
         .acc-content { display:none; background:#08080a; padding:10px; border-left:2px solid var(--blue); margin-top:5px; grid-column: 1 / -1; }
+        #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
     </style>
 </head>
 <body>
-
+<div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V289</span></div>
-        
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V290</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
-            <div class="btn-row">
-                <button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button>
-            </div>
-            <div class="btn-row">
-                <button class="btn-blue" onclick="startZoneScan()">DIVISIONS</button>
-                <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
-            </div>
+            <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
+            <div class="btn-row"><button class="btn-blue" onclick="startZoneScan()">DIVISIONS</button><button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button></div>
         </div>
-
-        <div class="control-group">
-            <span class="grp-lbl">TARGET INTELLIGENCE</span>
-            <input type="text" id="targetIn" value="u2d2k.c.wam">
-            <div class="btn-row">
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetDivisions()">DIVISIONS</button>
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetBuildings()">BUILDINGS</button>
-            </div>
-        </div>
-
+        <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
         <div class="control-group" style="margin-top:auto">
-            <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;">
-                <span>TEMPLATES DB</span> <span id="dictSize" style="color:#fff">0</span>
-            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V289 Ready. Prices Locked.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V290 Rescue Mode Active.</div></div>
     </aside>
 
     <main class="main-content">
         <div id="viewGlobal" class="view-section active-view">
-            <div class="dashboard-header">
-                <div><h2 class="page-h1">PRODUCTION BÂTIMENTS</h2><div class="page-meta">COLLECTION SCAN &bull; ROWS: <span id="cntRows">0</span></div></div>
-                <div class="total-cost"><div class="grp-lbl">DAILY MAINTENANCE</div><div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div></div>
-            </div>
-            <div class="kpi-grid" id="areaCards"></div>
-            <div class="tables-grid" id="areaLists"></div>
+            <div class="dashboard-header"><div><h2 class="page-h1">PRODUCTION BÂTIMENTS</h2><div class="page-meta">ROWS: <span id="cntRows">0</span></div></div><div class="total-cost"><div class="grp-lbl">DAILY MAINTENANCE</div><div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div></div></div>
+            <div class="kpi-grid" id="areaCards"></div><div class="tables-grid" id="areaLists"></div>
         </div>
 
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">SCANNING COLLECTION: <span id="zTotalDivsHeader" style="color:#fff; font-weight:bold;">0</span> UNITS</div></div>
+                <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">UNITS: <span id="zTotalDivsHeader">0</span></div></div>
                 <div class="total-cost">
-                    <div class="grp-lbl" style="font-size:16px; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:5px;">CONSOMMATION DU DOVX 24H00</div>
-                    <div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px; letter-spacing:0.5px;">
+                    <div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div>
+                    <div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;">
                         <span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span>
                     </div>
                     <div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div>
@@ -184,40 +134,17 @@
         </div>
 
         <div id="viewEco" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--orange)">
-                <div><h2 class="page-h1">INVESTOR DASHBOARD</h2><div class="page-meta" id="ecoStatus">BUSINESS INTELLIGENCE</div></div>
-            </div>
-            
+            <div class="dashboard-header" style="border-left: 4px solid var(--orange)"><div><h2 class="page-h1">INVESTOR DASHBOARD</h2><div class="page-meta" id="ecoStatus">BUSINESS INTELLIGENCE</div></div></div>
             <div class="market-ticker" id="marketTicker"></div>
-
             <div class="kpi-grid eco" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
-                <div class="kpi-card">
-                    <div class="kc-title">UNIQUE WALLETS</div>
-                    <div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div>
-                    <div class="kc-sub">OWNERS</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">NFT MARKET CAP (EST)</div>
-                    <div class="kc-val" style="color:#fff" id="ecoNftCap">0</div>
-                    <div class="kc-sub" id="ecoNftCapUsd">$0.00</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">TVL (ASSETS COUNT)</div>
-                    <div class="kc-val" id="ecoTVL">0</div>
-                    <div class="kc-sub">UNITS STAKED</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">DAILY GDP (VALUE)</div>
-                    <div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div>
-                    <div class="kc-sub" id="ecoGdpWax">0 WAX</div>
-                </div>
+                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div></div>
+                <div class="kpi-card"><div class="kc-title">NFT MARKET CAP</div><div class="kc-val" style="color:#fff" id="ecoNftCap">0</div><div class="kc-sub" id="ecoNftCapUsd">$0.00</div></div>
+                <div class="kpi-card"><div class="kc-title">TVL (UNITS)</div><div class="kc-val" id="ecoTVL">0</div></div>
+                <div class="kpi-card"><div class="kc-title">DAILY GDP</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
             </div>
-
             <div class="data-panel" style="margin-bottom:25px;">
-                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS (PRODUCTION)</span></div>
-                <div class="dt-grid dt-header" style="grid-template-columns: 100px 1fr 1fr;">
-                    <div class="cell">PERIOD</div><div class="cell c-right">GROSS REVENUE (WAX)</div><div class="cell c-right">GROSS REVENUE (USD)</div>
-                </div>
+                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS</span></div>
+                <div class="dt-grid dt-header" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">PERIOD</div><div class="cell c-right">GROSS (WAX)</div><div class="cell c-right">GROSS (USD)</div></div>
                 <div id="projTable"></div>
             </div>
         </div>
@@ -231,20 +158,15 @@
 </div></div>
 
 <script>
-    // /// --- CONFIGURATION FINANCIERE (A MODIFIER) --- ///
-    // Entrez ici les valeurs FIXES pour vos investisseurs.
+    // --- CONFIGURATION FINANCIERE (A MODIFIER ICI) ---
     const CONFIG_PRIX = {
-        WAX_USD: 0.0075,      // Prix du WAX en Dollars
-        DOVX_WAX: 0,00528553,      // Prix DOVX en WAX
-        DOVF_WAX: 0,00045262,     // Prix DOVF en WAX
-        DOVH_WAX: 0,00045262,     // Prix DOVH en WAX
-        DOVR_WAX: 0,00045262,     // Prix DOVR en WAX
-        DOVS_WAX: 0,00045262,     // Prix DOVS en WAX
-        PRIX_MOYEN_NFT_USD: 10 // Valeur moyenne estimée d'un NFT (Bâtiment/Unité) en Dollars pour le Market Cap
+        WAX_USD: 0.05,
+        DOVX_WAX: 0.1, DOVF_WAX: 0.05, DOVH_WAX: 0.05, DOVR_WAX: 0.05, DOVS_WAX: 0.05,
+        PRIX_MOYEN_NFT_USD: 10
     };
-    // /// --------------------------------------------- ///
 
-    const STORAGE_KEY = 'DOV_DATA_V289';
+    // --- SYSTEM CORE ---
+    const STORAGE_KEY = 'DOV_DATA_V290'; // NEW KEY TO PURGE OLD DATA
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -252,14 +174,17 @@
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD'});
     
+    // ERROR TRAP
+    window.onerror = function(msg, url, line) {
+        let errBanner = getId('error-banner');
+        errBanner.style.display = 'block';
+        errBanner.innerText = `CRITICAL ERROR: ${msg} (Line ${line}). Please Reset.`;
+        return false;
+    };
+
     function log(msg) {
         let c = getId('sysLog');
-        if(c) { 
-            let d = document.createElement("div"); 
-            d.className="log-entry"; 
-            d.innerHTML=`<span class="log-time">${new Date().toLocaleTimeString()}</span>${msg}`;
-            c.prepend(d); 
-        }
+        if(c) { let d = document.createElement("div"); d.className="log-entry"; d.innerHTML=`<span class="log-time">${new Date().toLocaleTimeString()}</span>${msg}`; c.prepend(d); }
     }
 
     const DEFAULT_DATA = {
@@ -287,22 +212,20 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0 }, divisions: { active:0, mint:0 }, uniqueWallets: new Set() };
 
     function init() {
+        // V290: FORCED NEW INSTALL LOGIC
         const local = localStorage.getItem(STORAGE_KEY);
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
+        
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
-        getId('dictSize').innerText = count;
+        if(getId('dictSize')) getId('dictSize').innerText = count;
         buildUI();
         renderTicker();
-        log("Ready. Mode: Hardcoded Financials.");
+        log("Ready. Mode: Rescue V290.");
     }
 
     function renderTicker() {
-        // V289: RENDER FROM CONFIG CONSTANTS
         let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`;
-        const tokens = [
-            { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX },
-            { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX }
-        ];
+        const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ];
         tokens.forEach(t => {
             let usd = t.p * CONFIG_PRIX.WAX_USD;
             html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(4)}</div></div>`;
@@ -349,7 +272,7 @@
         let stats = { types:{F:{p:0,a:0,t:0}, H:{p:0,a:0,t:0}, R:{p:0,a:0,t:0}, S:{p:0,a:0,t:0}} }; 
         let groups = {F:[], H:[], R:[], S:[]};
         let rowCount = 0; let assetCount = 0;
-        ecoStats.uniqueWallets.clear(); // Reset Wallet Count
+        ecoStats.uniqueWallets.clear(); 
 
         try {
             while(!stopSignal) {
@@ -362,11 +285,7 @@
                     rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
                     stats.types[tpl.type].t += count;
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(isActive) {
-                        stats.types[tpl.type].a += count;
-                        ecoStats.uniqueWallets.add(r.owner); // V289: Count Wallet
-                    }
-                    
+                    if(isActive) { stats.types[tpl.type].a += count; ecoStats.uniqueWallets.add(r.owner); }
                     let existing = groups[tpl.type].find(x => x.name === tpl.name);
                     if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0 }; groups[tpl.type].push(existing); }
                     existing.tot += count;
@@ -428,7 +347,7 @@
                         if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
                         if(isFighting) {
                             zonesData[zid].active++; stats.activeDivs++;
-                            ecoStats.uniqueWallets.add(r.owner); // V289: Count Wallet
+                            ecoStats.uniqueWallets.add(r.owner); 
                             let zConf = SMART_ZONES_BIBLE[zid];
                             let currentCost = zConf.cost;
                             let isCity = [17, 18, 19, 20].includes(parseInt(zid));
@@ -437,7 +356,7 @@
                                 zonesData[zid].bf += currentCost; zonesData[zid].bh += currentCost; zonesData[zid].br += currentCost; zonesData[zid].bs += currentCost;
                                 stats.bf += currentCost; stats.bh += currentCost; stats.br += currentCost; stats.bs += currentCost;
                             }
-                            let reward = zConf.win; // Simplified win
+                            let reward = zConf.win; 
                             zonesData[zid].prod += reward; stats.totalProd += reward;
                             zoneDetailsCache[zid].push({ owner: r.owner, reward: reward });
                         }
@@ -484,11 +403,9 @@
     }
 
     function updateEcoUI() {
-        // V289 CALCULATIONS
         let totalTVL = ecoStats.buildings.active + ecoStats.divisions.active;
         let nftMarketCap = totalTVL * CONFIG_PRIX.PRIX_MOYEN_NFT_USD;
 
-        // PRODUCTION (Daily)
         let volF = ecoStats.buildings.prodF * 24; let volH = ecoStats.buildings.prodH * 24;
         let volR = ecoStats.buildings.prodR * 24; let volS = ecoStats.buildings.prodS * 24;
         let valF_W = volF * CONFIG_PRIX.DOVF_WAX; let valH_W = volH * CONFIG_PRIX.DOVH_WAX;
@@ -497,17 +414,15 @@
         let dailyWaxProd = valF_W + valH_W + valR_W + valS_W;
         let dailyUsdProd = dailyWaxProd * CONFIG_PRIX.WAX_USD;
 
-        // MILITARY (Daily)
         let volX = ecoStats.divisions.mint;
         let valX_W = volX * CONFIG_PRIX.DOVX_WAX;
         let valX_USD = valX_W * CONFIG_PRIX.WAX_USD;
 
-        // TOTAL GDP
         let totalWaxGDP = dailyWaxProd + valX_W;
         let totalUsdGDP = totalWaxGDP * CONFIG_PRIX.WAX_USD;
 
         getId('ecoWallets').innerText = fmt(ecoStats.uniqueWallets.size);
-        getId('ecoNftCap').innerText = fmt(totalTVL * 100) + " WAX (EST)"; // Based on arbitrary 100wax/asset or logic
+        getId('ecoNftCap').innerText = fmt(totalTVL * 100) + " WAX (EST)"; 
         getId('ecoNftCapUsd').innerText = fmtUsd(nftMarketCap);
         
         getId('ecoTVL').innerText = fmt(totalTVL);
@@ -515,7 +430,6 @@
         getId('ecoGdpUsd').innerText = fmtUsd(totalUsdGDP);
         getId('ecoGdpWax').innerText = fmtDec(totalWaxGDP) + " WAX";
 
-        // PROJECTION TABLE
         let html = `
             <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr; background:rgba(0,255,0,0.05);"><div class="cell"><b>INDUSTRY (24H)</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyWaxProd)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyUsdProd)}</div></div>
             <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">IND. MONTH</div><div class="cell c-right" style="color:#888">${fmtDec(dailyWaxProd*30)} W</div><div class="cell c-right" style="color:#888">${fmtUsd(dailyUsdProd*30)}</div></div>
@@ -528,7 +442,7 @@
         getId('projTable').innerHTML = html;
     }
 
-    function openZoneDetail(zid) { /* SIMPLIFIED FOR V289 */
+    function openZoneDetail(zid) { 
         if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
         let list = zoneDetailsCache[zid];
         let groups = {};
@@ -541,11 +455,10 @@
         getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
     }
     
-    async function initInspector() { /* HIDDEN V289 */ alert("Inspector disabled in V289"); }
-    async function startTargetBuildings() { /* HIDDEN */ }
-    async function startTargetDivisions() { /* HIDDEN */ }
-    function openSettings() { alert("Use Code Config in V289."); }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+    async function initInspector() { alert("Use V285 for Inspector"); }
+    async function startTargetBuildings() { } async function startTargetDivisions() { }
+    function openSettings() { alert("Use Code Config in V290"); }
 
     window.onload = init;
 </script>
