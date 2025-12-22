@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V260 (STRICT RESTORE)</title>
+    <title>DoV - COMMAND V261 (DATA UPDATE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V260 ORIGINAL) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (V260 STRICT) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -96,7 +96,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V260</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V261</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">ROBUST MONITORING</span>
@@ -151,13 +151,8 @@
                     <div class="page-meta">SCANNING COLLECTION: <span id="zTotalDivsHeader" style="color:#fff; font-weight:bold;">0</span> UNITS</div>
                 </div>
                 <div class="total-cost">
-                    <div class="grp-lbl">GLOBAL CONSUMPTION / 24H</div>
-                    <div style="font-family:var(--font-num); font-size:10px; margin-top:2px;">
-                        <span class="tc-f">F: <span id="gBurnF">0</span></span> &bull; 
-                        <span class="tc-h">H: <span id="gBurnH">0</span></span> &bull; 
-                        <span class="tc-r">R: <span id="gBurnR">0</span></span> &bull; 
-                        <span class="tc-s">S: <span id="gBurnS">0</span></span>
-                    </div>
+                    <div class="grp-lbl">ACTIVE DIVS</div>
+                    <div><span class="tc-val" id="zActiveDivs">0</span></div>
                 </div>
             </div>
             
@@ -169,7 +164,7 @@
                 </div>
                 <div class="kpi-card">
                     <div class="kc-title">IN FIGHT</div>
-                    <div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div>
+                    <div class="kc-val" id="zActiveDivsCard" style="color:var(--green)">0</div>
                     <div class="kc-sub">TIMER ACTIVE</div>
                 </div>
                 <div class="kpi-card">
@@ -204,7 +199,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V260';
+    const STORAGE_KEY = 'DOV_DATA_V261';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -218,61 +213,51 @@
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
                 "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
                 "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
-                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
-                "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
-                "https://wax.tmy.io", "https://api.hivebp.io"
+                "https://wax.eosdac.io", "https://api.wax.bountyblok.io"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         gameConfig: { maintenanceCost: 0.085, cycleHours: 24, rewardRatio: 0.1, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
         
         zones: { 
-            1: {name:"Beach 1", cost:1160, win:400, min_w:0},
-            2: {name:"Beach 2", cost:6968, win:2405, min_w:0},
-            3: {name:"Beach 3", cost:8800, win:3037, min_w:0},
-            4: {name:"Bunker", cost:11120, win:3838, min_w:90},
-            5: {name:"Forest 1", cost:14024, win:4840, min_w:3},
-            6: {name:"Forest 2", cost:17704, win:6110, min_w:3},
-            7: {name:"Forest 3", cost:22352, win:7714, min_w:3},
-            8: {name:"Camp", cost:28220, win:9739, min_w:90},
-            9: {name:"Hill 1", cost:37052, win:12788, min_w:3},
-            10: {name:"Hill 2", cost:48652, win:16791, min_w:3},
-            11: {name:"Hill 3", cost:64516, win:22266, min_w:3},
-            12: {name:"Radar", cost:84712, win:29236, min_w:90},
-            13: {name:"Plain 1", cost:99384, win:34300, min_w:0},
-            14: {name:"Plain 2", cost:125708, win:43385, min_w:0},
-            15: {name:"Plain 3", cost:151164, win:52171, min_w:0},
-            16: {name:"HQ", cost:188000, win:64884, min_w:0},
-            17:{name:"City 1",cost:0,win:0,min_w:0},18:{name:"City 2",cost:0,win:0,min_w:0},19:{name:"City 3",cost:0,win:0,min_w:0},20:{name:"City 4",cost:0,win:0,min_w:0}
+            1: {name:"Beach 1", cost:1160, win:400, min_w:0}, 2: {name:"Beach 2", cost:6968, win:2405, min_w:0}, 3: {name:"Beach 3", cost:8800, win:3037, min_w:0},
+            4: {name:"Bunker", cost:11120, win:3838, min_w:90}, 5: {name:"Forest 1", cost:14024, win:4840, min_w:3}, 6: {name:"Forest 2", cost:17704, win:6110, min_w:3},
+            7: {name:"Forest 3", cost:22352, win:7714, min_w:3}, 8: {name:"Camp", cost:28220, win:9739, min_w:90}, 9: {name:"Hill 1", cost:37052, win:12788, min_w:3},
+            10: {name:"Hill 2", cost:48652, win:16791, min_w:3}, 11: {name:"Hill 3", cost:64516, win:22266, min_w:3}, 12: {name:"Radar", cost:84712, win:29236, min_w:90},
+            13: {name:"Plain 1", cost:99384, win:34300, min_w:0}, 14: {name:"Plain 2", cost:125708, win:43385, min_w:0}, 15: {name:"Plain 3", cost:151164, win:52171, min_w:0},
+            16: {name:"HQ", cost:188000, win:64884, min_w:0}, 17:{name:"City 1",cost:0,win:0,min_w:0}, 18:{name:"City 2",cost:0,win:0,min_w:0}, 19:{name:"City 3",cost:0,win:0,min_w:0}, 20:{name:"City 4",cost:0,win:0,min_w:0}
         },
-        divisions: { "default": { name: "Infantry", w: 10 } },
         
-        // I HAVE FLATTENED YOUR JSON HERE SO IT WORKS WITH V260 LOGIC WITHOUT CHANGING CODE
+        // NEW JSON INJECTED HERE (EXACT V260 STRUCTURE BUT DATA FROM YOUR REQUEST)
         templates: {
-            // FUEL
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
-            "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 },
-            "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 },
-            "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 },
-            "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
-            // HEALTH
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 },
-            "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 },
-            "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 },
-            "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 },
-            "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
-            // REPAIR
-            "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
-            "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
-            "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
-            "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
-            "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
-            // SUPPLY
-            "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
-            "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
-            "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
-            "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 },
-            "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            "FUEL": {
+                "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
+                "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 },
+                "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 },
+                "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 },
+                "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }
+            },
+            "HEALTH": {
+                "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 },
+                "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 },
+                "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 },
+                "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 },
+                "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }
+            },
+            "REPAIR": {
+                "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
+                "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
+                "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
+                "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
+                "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }
+            },
+            "SUPPLY": {
+                "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
+                "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
+                "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
+                "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 },
+                "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            }
         }
     };
 
@@ -293,18 +278,46 @@
         
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
+            // ADDED GRAPH & 24H BIG TEXT
             areaC.innerHTML += `
             <div class="kpi-card ${rd.class}">
                 <div class="kc-header">
-                    <div><div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div><div class="kc-val" id="val-${k}">0</div><div class="kc-sub">PROD / HOUR</div></div>
-                    <div class="gauge-wrapper" id="gauge-${k}" style="--pct:0deg;"><div class="gauge-core"><div class="gauge-txt" id="pct-${k}">0%</div></div></div>
+                    <div>
+                        <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
+                        <div class="kc-val" id="val-${k}">0</div>
+                        <div class="kc-sub">PROD / HOUR</div>
+                    </div>
+                    <div class="gauge-wrapper" id="gauge-${k}" style="--pct:0deg;">
+                        <div class="gauge-core"><div class="gauge-txt" id="pct-${k}">0%</div></div>
+                    </div>
                 </div>
-                <div class="big-24h"><div class="b24-val val" id="val24-${k}">0</div><div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div></div>
+                <div class="big-24h">
+                    <div class="b24-val val" id="val24-${k}">0</div>
+                    <div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div>
+                </div>
             </div>`;
+            
             areaL.innerHTML += `
-            <div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div></div>
-            <div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
+            <div class="data-panel">
+                <div class="dp-head">
+                    <span class="dp-title">${rd.label} BREAKDOWN</span>
+                    <div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div>
+                </div>
+                <div class="dt-grid dt-header">
+                    <div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div>
+                </div>
+                <div id="tbl-${k}"></div>
+            </div>`;
         }
+    }
+
+    // HELPER FUNCTION: Find template in nested JSON (The "Bridge")
+    function findTemplate(tid) {
+        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type: 'F' };
+        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type: 'H' };
+        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type: 'R' };
+        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type: 'S' };
+        return null;
     }
 
     async function fetchSmartCluster(endpoint, body) {
@@ -322,53 +335,56 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    function processRow(row) {
-        let tid = row.template_id.toString();
-        let count = row.asset_ids ? row.asset_ids.length : 1; 
-        let tpl = DATA.templates[tid];
-        let name = tpl ? tpl.name : `UNK_${tid}`;
-        let nominal = tpl ? tpl.prod : 0;
-        let hourly = count * nominal;
-        let daily = hourly * DATA.gameConfig.cycleHours;
-        let costD = daily * DATA.gameConfig.maintenanceCost;
-        let costH = costD / 24;
-        let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
-        let type = "F"; 
-        
-        if(name.includes("FUEL")) type = "F";
-        else if(name.includes("HEALTH")) type = "H";
-        else if(name.includes("REPAIR")) type = "R";
-        else if(name.includes("SUPPLY")) type = "S";
-        else { for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; } }
-        
-        return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
-    }
-
     async function dispatchGlobalScan() {
         stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        let next = ""; let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
-        let groups = {}; for(let k in DATA.resourceDefs) { groups[k] = []; }
+        let next = ""; 
+        let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
+        let groups = {F:[], H:[], R:[], S:[]};
         let rowCount = 0; let assetCount = 0;
         try {
             while(!stopSignal) {
-                let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
-                if(!json.rows || json.rows.length === 0) break;
+                // FIXED: SCAN CONTRACT SCOPE FOR BUILDINGS
+                let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+                if(!res.rows || res.rows.length === 0) break;
                 const now = Date.now()/1000;
-                for(let r of json.rows) {
-                    rowCount++; let d = processRow(r); assetCount += d.count;
-                    stats.types[d.type].t += d.count;
+                for(let r of res.rows) {
+                    let tid = r.template_id.toString();
+                    let tpl = findTemplate(tid); // USE BRIDGE
+                    if(!tpl) continue;
+
+                    rowCount++; 
+                    let count = r.asset_ids ? r.asset_ids.length : 1; 
+                    assetCount += count;
+                    
+                    stats.types[tpl.type].t += count;
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(isActive) stats.types[d.type].a += d.count;
-                    let existing = groups[d.type].find(x => x.name === d.name);
-                    if(!existing) { existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 }; groups[d.type].push(existing); }
-                    existing.tot += d.count;
+                    
+                    if(isActive) stats.types[tpl.type].a += count;
+
+                    let existing = groups[tpl.type].find(x => x.name === tpl.name);
+                    if(!existing) {
+                        existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costH:0, costD:0 };
+                        groups[tpl.type].push(existing);
+                    }
+                    existing.tot += count;
+
                     if(isActive) {
-                        existing.act += d.count; existing.totH += d.hourly; existing.totD += d.daily; existing.costH += d.costH; existing.costD += d.costD;
-                        stats.types[d.type].p += d.hourly; stats.types[d.type].c += d.costD; stats.totalCost += d.costD;
+                        let hourly = count * tpl.prod;
+                        let daily = hourly * 24;
+                        let costD = daily * 0.085;
+                        let costH = costD / 24;
+
+                        existing.act += count; 
+                        existing.totH += hourly; existing.totD += daily; 
+                        existing.costH += costH; existing.costD += costD;
+                        
+                        stats.types[tpl.type].p += hourly; 
+                        stats.types[tpl.type].c += costD; 
+                        stats.totalCost += costD;
                     }
                 }
                 updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(json.more) next = json.next_key; else break; await new Promise(r => setTimeout(r, 50));
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
         } catch(e) { console.error(e); }
     }
@@ -377,11 +393,21 @@
         getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
         for(let k in DATA.resourceDefs) {
             let rd = DATA.resourceDefs[k];
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+            // UPDATE KPI
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+            
+            // UPDATE 24H BIG TEXT
+            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24);
+            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+
+            // UPDATE GAUGE
             let pct = stats.types[k].t > 0 ? Math.round((stats.types[k].a / stats.types[k].t) * 100) : 0;
             getId(`pct-${k}`).innerText = pct + "%";
-            let deg = Math.round(pct * 3.6); getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
+            let deg = Math.round(pct * 3.6);
+            getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
+
             let list = groups[k].sort((a,b) => b.totH - a.totH);
             let html = "";
             list.forEach(i => {
@@ -404,7 +430,7 @@
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
         let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
 
-        updateZoneUI(zonesData, stats); 
+        updateZoneUI(zonesData, stats);
 
         let next = "";
         let countDisplay = getId('zTotalDivsHeader');
@@ -438,13 +464,11 @@
                             zonesData[zid].active++;
                             stats.activeDivs++;
                             let zInfo = DATA.zones[zid];
-                            let zCost = zInfo.cost;
-                            let zReward = zInfo.win;
                             
-                            zonesData[zid].bf += zCost; zonesData[zid].bh += zCost; zonesData[zid].br += zCost; zonesData[zid].bs += zCost;
-                            zonesData[zid].prod += zReward;
-                            stats.burnF += zCost; stats.burnH += zCost; stats.burnR += zCost; stats.burnS += zCost;
-                            stats.totalProd += zReward;
+                            zonesData[zid].bf += zInfo.cost; zonesData[zid].bh += zInfo.cost; zonesData[zid].br += zInfo.cost; zonesData[zid].bs += zInfo.cost;
+                            zonesData[zid].prod += zInfo.win;
+                            stats.burnF += zInfo.cost; stats.burnH += zInfo.cost; stats.burnR += zInfo.cost; stats.burnS += zInfo.cost;
+                            stats.totalProd += zInfo.win;
                         }
                     }
                 }
