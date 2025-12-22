@@ -2,89 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V261 (SYNCED DATA)</title>
+    <title>DoV COMMAND V262 - STABLE & SYNC</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (IMMUTABLE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
             --text-main: #e0e0e0; --text-muted: #858595;
-            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
+            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', monospace; 
         }
-
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-        .layout { display: flex; width: 100%; height: 100%; }
         .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 15px; flex-shrink: 0; }
-        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); display:flex; flex-direction:column; }
-
-        /* COMPONENTS */
-        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
-        .status-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; box-shadow: 0 0 8px var(--red); transition:0.3s; }
-        .status-dot.ready { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: #08080a; display:flex; flex-direction:column; }
         
-        .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .terminal-box {
-            background: #000; border: 1px solid #333; padding: 8px; border-radius: 4px; 
-            height: 120px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 9px; 
-            display: flex; flex-direction: column; gap: 2px;
-        }
-        .log-line { color: #888; } .log-ok { color: var(--green); } .log-err { color: var(--red); }
+        /* TERMINAL LOG */
+        .terminal-box { background: #000; border: 1px solid #333; padding: 8px; border-radius: 4px; height: 120px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 9px; }
+        .log-line { color: #888; margin-bottom: 2px; } .log-ok { color: var(--green); } .log-err { color: var(--red); }
 
-        input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        /* BUTTONS */
+        button { padding: 10px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; margin-bottom: 5px; }
+        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid var(--red); }
+        .btn-blue { background: var(--blue); color: #fff; } .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
-        .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
-        .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
-        .btn-row { display: flex; gap: 8px; }
-
-        /* DASHBOARD */
+        /* DASHBOARD ELEMENTS */
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
-        .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
-        .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
-        .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
-        .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
-
-        /* KPI CARDS */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
-        .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
-        .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
-        
-        .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
-        .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; border-left: 4px solid #333; }
+        .kc-val { font-family: var(--font-num); font-size: 18px; font-weight: 700; color: #fff; }
 
-        .fuel .kpi-card::before { background: var(--orange); } .fuel .kc-val { color: var(--orange); } 
-        .health .kpi-card::before { background: var(--red); } .health .kc-val { color: var(--red); }
-        .repair .kpi-card::before { background: var(--blue); } .repair .kc-val { color: var(--blue); }
-        .supply .kpi-card::before { background: var(--yellow); } .supply .kc-val { color: var(--yellow); }
-
-        /* DATA TABLES */
-        .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-        .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; }
-        .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
-        .dt-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; }
-        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; background: rgba(0,0,0,0.2); }
-        .dt-row { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; }
-
-        /* ZONES MAP */
+        /* ZONES */
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; height: 160px; display: flex; flex-direction: column; justify-content: space-between; }
-        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
-        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
-        .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone-card.active { border-color: var(--blue); }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); margin-bottom: 2px; }
 
         .view-section { display: none; } .active-view { display: block; }
     </style>
@@ -93,54 +44,41 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot" id="globalStatus"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V261</span></div>
+        <div style="color:#fff; font-weight:800; font-size:14px;">DOV COMMAND <span style="opacity:0.5">V262</span></div>
         
-        <div class="control-group">
-            <span class="grp-lbl">SYSTEM PREP</span>
-            <div class="terminal-box" id="termLog">
-                <div class="log-line">BOOTING PROTOCOL...</div>
-            </div>
-        </div>
+        <div class="terminal-box" id="termLog"><div class="log-line">SYSTEM BOOT...</div></div>
 
         <div class="control-group">
-            <span class="grp-lbl">OPERATIONS</span>
-            <div class="btn-row">
-                <button id="btnScanGlobal" class="btn-green" onclick="dispatchGlobalScan()" disabled>BUILDINGS</button>
-                <button class="btn-red" onclick="stopSignal=true">STOP</button>
-            </div>
-            <button id="btnScanZones" class="btn-blue" onclick="startZoneScan()" disabled>WAR MAP (GLOBAL)</button>
+            <button id="btnScanGlobal" class="btn-green" onclick="startBuildingScan()">SCAN BUILDINGS</button>
+            <button id="btnScanZones" class="btn-blue" onclick="startZoneScan()">SCAN WAR MAP</button>
+            <button class="btn-red" onclick="stopSignal=true">STOP ALL</button>
         </div>
 
-        <div class="control-group">
-            <span class="grp-lbl">INTEL TARGET</span>
-            <input type="text" id="targetIn" value="u2d2k.c.wam">
-        </div>
-
-        <div class="control-group" style="margin-top:auto">
-            <button class="btn-ghost" onclick="openSettings()">SETTINGS</button>
-            <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
+        <div style="margin-top:auto">
+            <button class="btn-ghost" onclick="hardReset()">FACTORY RESET</button>
         </div>
     </aside>
 
     <main class="main-content">
         <div id="viewGlobal" class="view-section active-view">
             <div class="dashboard-header">
-                <div><h2 class="page-h1">GLOBAL STAKE PRODUCTION</h2><div class="page-meta">SYNCED WITH BIBLE DATA</div></div>
-                <div class="total-cost"><div class="grp-lbl">TOTAL DAILY COST</div><div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div></div>
+                <div><h2 style="color:#fff;margin:0">BUILDING PRODUCTION</h2><div id="buildMeta">Ready.</div></div>
+                <div style="text-align:right"><div style="font-size:9px">DAILY MAINTENANCE</div><div class="tc-val" id="gTotalCost">0</div></div>
             </div>
-            <div class="kpi-grid" id="areaCards"></div>
-            <div class="tables-grid" id="areaLists"></div>
+            <div class="kpi-grid" id="buildKpis">
+                </div>
+            <div id="buildList" style="background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; overflow:hidden;"></div>
         </div>
 
         <div id="viewZones" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">GLOBAL WAR MAP</h2><div class="page-meta">SCANNING SCOPE: dovpvecontrl</div></div>
-                <div class="total-cost"><div class="grp-lbl">TOTAL UNITS FOUND</div><div><span class="tc-val" id="zTotalDivsHeader">0</span></div></div>
+            <div class="dashboard-header" style="border-left: 4px solid var(--blue); padding-left:15px">
+                <div><h2 style="color:#fff;margin:0">GLOBAL WAR MAP</h2><div>COLLECTION SCAN</div></div>
+                <div style="text-align:right"><div style="font-size:9px">DIVISIONS FOUND</div><div class="tc-val" id="zTotalDivsHeader">0</div></div>
             </div>
-            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="kpi-card"><div class="kc-title">IN FIGHT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div></div>
-                <div class="kpi-card"><div class="kc-title">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight" style="color:var(--blue)">0</div></div>
-                <div class="kpi-card"><div class="kc-title">DAILY REWARD</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div></div>
+            <div class="kpi-grid">
+                <div class="kpi-card" style="border-left-color:var(--green)"><div style="font-size:9px">IN FIGHT</div><div class="kc-val" id="zActiveDivs">0</div></div>
+                <div class="kpi-card" style="border-left-color:var(--blue)"><div style="font-size:9px">TOTAL WEIGHT</div><div class="kc-val" id="zTotalWeight">0</div></div>
+                <div class="kpi-card" style="border-left-color:var(--purple)"><div style="font-size:9px">DAILY REWARD</div><div class="kc-val" id="zTotalProd">0</div></div>
             </div>
             <div class="zones-map" id="areaZones"></div>
         </div>
@@ -148,16 +86,12 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V261';
+    const STORAGE_KEY = 'DOV_DATA_V262';
     const getId = (id) => document.getElementById(id);
-    const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
-    const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
-    const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    let stopSignal = false;
+    let ACTIVE_RPC = "https://wax.greymass.com";
 
-    const DEFAULT_DATA = {
-        apiConfig: { rpcNodes: ["https://wax.greymass.com", "https://wax.eosio.online", "https://api.wax.alohaeos.com"] },
-        resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
+    const DATA = {
         zones: { 
             1: {name:"Beach 1", cost:1160, win:400, min_w:0}, 2: {name:"Beach 2", cost:6968, win:2405, min_w:0}, 3: {name:"Beach 3", cost:8800, win:3037, min_w:0},
             4: {name:"Bunker", cost:11120, win:3838, min_w:90}, 5: {name:"Forest 1", cost:14024, win:4840, min_w:3}, 6: {name:"Forest 2", cost:17704, win:6110, min_w:3},
@@ -167,6 +101,7 @@
             16: {name:"HQ", cost:188000, win:64884, min_w:0}
         },
         templates: {
+            // FUEL
             "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 },
             "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 },
             "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 },
@@ -176,6 +111,7 @@
             "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 },
             "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 },
             "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 },
+            // HEALTH
             "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 },
             "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 },
             "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 },
@@ -185,6 +121,7 @@
             "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 },
             "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 },
             "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 },
+            // REPAIR
             "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 },
             "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
             "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 },
@@ -194,6 +131,7 @@
             "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 },
             "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
             "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 },
+            // SUPPLY
             "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 },
             "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
             "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 },
@@ -206,142 +144,123 @@
         }
     };
 
-    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let stopSignal = false;
-    let ACTIVE_RPC = "";
-
-    function log(msg, type="") {
-        let el = document.createElement('div');
-        el.className = "log-line " + type; el.innerText = "> " + msg;
-        getId('termLog').appendChild(el); getId('termLog').scrollTop = getId('termLog').scrollHeight;
-    }
-
-    async function init() {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
-        buildUI();
-        runPrepSequence();
-    }
-
-    async function runPrepSequence() {
-        log("CHECKING DATA INTEGRITY...");
-        if(Object.keys(DATA.templates).length > 50) log("DICTIONARY: OK (" + Object.keys(DATA.templates).length + ")", "log-ok");
-        log("LOCATING FASTEST RPC...");
-        for(let node of DATA.apiConfig.rpcNodes) {
-            try {
-                let start = Date.now();
-                let res = await fetch(node + "/v1/chain/get_info", { signal: AbortSignal.timeout(2000) });
-                if(res.ok) { ACTIVE_RPC = node; log("CONNECTED: " + new URL(node).hostname + " ("+(Date.now()-start)+"ms)", "log-ok"); break; }
-            } catch(e) {}
-        }
-        if(ACTIVE_RPC) {
-            log("PINGING CONTRACTS...");
-            try {
-                let res = await fetch(ACTIVE_RPC + "/v1/chain/get_table_rows", { method: 'POST', body: JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1}) });
-                if(res.ok) { log("PROTOCOL ONLINE", "log-ok"); getId('globalStatus').classList.add('ready'); document.querySelectorAll('button:disabled').forEach(b => b.disabled = false); }
-            } catch(e) { log("PING FAILED", "log-err"); }
-        } else { log("FATAL: NO RPC", "log-err"); }
+    function log(m, cls="") {
+        let l = getId('termLog');
+        l.innerHTML += `<div class="log-line ${cls}">> ${m}</div>`;
+        l.scrollTop = l.scrollHeight;
     }
 
     function buildUI() {
-        const areaC = getId('areaCards'); const areaL = getId('areaLists'); areaC.innerHTML = ''; areaL.innerHTML = '';
-        const order = ["F", "H", "R", "S"];
-        for(let k of order) {
-            let rd = DATA.resourceDefs[k];
-            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
-            areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span></div><div class="dt-grid dt-header"><div>TEMPLATE</div><div>ACT</div><div>PROD/H</div><div>COST/H</div><div>DAILY</div></div><div id="tbl-${k}"></div></div>`;
-        }
+        const types = { F:"FUEL", H:"HEALTH", R:"REPAIR", S:"SUPPLY" };
+        const kGrid = getId('buildKpis'); kGrid.innerHTML = '';
+        Object.entries(types).forEach(([k,v]) => {
+            kGrid.innerHTML += `<div class="kpi-card" style="border-left-color:var(--${k==='F'?'orange':k==='H'?'red':k==='R'?'blue':'yellow'})">
+                <div style="font-size:9px">${v} / HOUR</div><div class="kc-val" id="val-${k}">0</div><div style="font-size:9px" id="act-${k}">0 ACTIVE</div>
+            </div>`;
+        });
+        renderZones({}, {total:0, active:0, weight:0, reward:0});
     }
 
-    async function fetchRPC(body) {
-        try { let res = await fetch(ACTIVE_RPC + "/v1/chain/get_table_rows", { method:'POST', body: body }); return res.ok ? await res.json() : {rows:[]}; } catch(e) { return {rows:[]}; }
-    }
-
-    // --- BUILDING SCAN (SYNCED) ---
-    async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        let next = ""; let stats = { totalCost:0, types:{F:{p:0,a:0}, H:{p:0,a:0}, R:{p:0,a:0}, S:{p:0,a:0}} }; 
-        let groups = { F:[], H:[], R:[], S:[] };
+    async function fetchRPC(code, scope, table, lower="") {
         try {
-            while(!stopSignal) {
-                let json = await fetchRPC(JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
-                if(!json.rows || json.rows.length === 0) break;
-                const now = Date.now()/1000;
-                for(let r of json.rows) {
-                    let tid = r.template_id.toString();
-                    let tpl = DATA.templates[tid] || {name: "UNK_"+tid, prod:0};
-                    let count = r.asset_ids ? r.asset_ids.length : 1;
-                    let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    
-                    let type = "F";
-                    if(tpl.name.includes("FUEL")) type="F"; else if(tpl.name.includes("HEALTH")) type="H"; else if(tpl.name.includes("REPAIR")) type="R"; else if(tpl.name.includes("SUPPLY")) type="S";
-
-                    if(isActive) {
-                        let hourly = count * tpl.prod;
-                        let cost = hourly * 24 * DATA.gameConfig.maintenanceCost;
-                        stats.types[type].p += hourly;
-                        stats.types[type].a += count;
-                        stats.totalCost += cost;
-                    }
-                }
-                updateGlobalUI(json.rows.length, stats);
-                if(json.more) next = json.next_key; else break;
-            }
-        } catch(e) { log("SCAN ERROR", "log-err"); }
+            let res = await fetch(ACTIVE_RPC + "/v1/chain/get_table_rows", {
+                method: 'POST', body: JSON.stringify({json:true, code, scope, table, limit:1000, lower_bound:lower})
+            });
+            return res.ok ? await res.json() : {rows:[]};
+        } catch(e) { return {rows:[]}; }
     }
 
-    function updateGlobalUI(rows, stats) {
-        getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
-        for(let k in stats.types) { getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`act-${k}`).innerText = stats.types[k].a + " ASSETS"; }
-    }
-
-    // --- ZONE SCAN (GLOBAL) ---
-    async function startZoneScan() {
-        stopSignal = false; switchView('viewZones'); getId('zTotalDivsHeader').innerText = "...";
-        let stats = { active:0, weight:0, reward:0, total:0 };
-        let zData = {}; Object.keys(DATA.zones).forEach(id => zData[id] = { count:0, active:0, weight:0, reward:0 });
+    // --- BUILDING SCAN ---
+    async function startBuildingScan() {
+        stopSignal = false; getId('viewGlobal').classList.add('active-view'); getId('viewZones').classList.remove('active-view');
+        log("SCANNING BUILDINGS (COLLECTION)...");
+        let stats = { cost:0, F:0, H:0, R:0, S:0, aF:0, aH:0, aR:0, aS:0 };
         let next = "";
-        try {
-            while(!stopSignal) {
-                let json = await fetchRPC(JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
-                if(!json.rows) break;
-                const now = Date.now()/1000;
-                for(let r of json.rows) {
-                    let zid = r.zone_id || r.zoneID;
-                    if(zData[zid]) {
-                        zData[zid].count++; stats.total++;
-                        let weight = parseFloat(r.weight || 0);
-                        let et = parseFloat(r.unlock_time || 0);
-                        let isFighting = et > (et > 1000000000000 ? Date.now() : now);
-                        if(isFighting) {
-                            zData[zid].active++; stats.active++;
-                            zData[zid].weight += weight; stats.weight += weight;
-                            zData[zid].reward += DATA.zones[zid].win; stats.reward += DATA.zones[zid].win;
-                        }
-                    }
+        while(!stopSignal) {
+            let json = await fetchRPC("dovutilstake", "dovutilstake", "buildings", next);
+            if(!json.rows.length) break;
+            const now = Date.now()/1000;
+            json.rows.forEach(r => {
+                let tpl = DATA.templates[r.template_id];
+                if(!tpl) return;
+                let count = r.asset_ids ? r.asset_ids.length : 1;
+                let active = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
+                if(active) {
+                    let h = count * tpl.prod;
+                    if(tpl.name.includes("FUEL")) { stats.F+=h; stats.aF+=count; }
+                    else if(tpl.name.includes("HEALTH")) { stats.H+=h; stats.aH+=count; }
+                    else if(tpl.name.includes("REPAIR")) { stats.R+=h; stats.aR+=count; }
+                    else if(tpl.name.includes("SUPPLY")) { stats.S+=h; stats.aS+=count; }
+                    stats.cost += (h * 24 * 0.085);
                 }
-                renderZones(zData, stats);
-                if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
-            }
-        } catch(e) {}
+            });
+            updateBuildUI(stats);
+            if(json.more) next = json.next_key; else break;
+        }
+        log("BUILDING SCAN COMPLETE.", "log-ok");
     }
 
-    function renderZones(data, stats) {
-        getId('zTotalDivsHeader').innerText = fmt(stats.total);
-        getId('zActiveDivs').innerText = fmt(stats.active);
-        getId('zTotalWeight').innerText = fmt(stats.weight);
-        getId('zTotalProd').innerText = fmt(stats.reward);
+    function updateBuildUI(s) {
+        getId('val-F').innerText = s.F.toFixed(2); getId('val-H').innerText = s.H.toFixed(2);
+        getId('val-R').innerText = s.R.toFixed(2); getId('val-S').innerText = s.S.toFixed(2);
+        getId('act-F').innerText = s.aF + " ASSETS"; getId('act-H').innerText = s.aH + " ASSETS";
+        getId('act-R').innerText = s.aR + " ASSETS"; getId('act-S').innerText = s.aS + " ASSETS";
+        getId('gTotalCost').innerText = Math.round(s.cost).toLocaleString() + " DOVX";
+    }
+
+    // --- ZONE SCAN ---
+    async function startZoneScan() {
+        stopSignal = false; getId('viewZones').classList.add('active-view'); getId('viewGlobal').classList.remove('active-view');
+        log("SCANNING WAR MAP (COLLECTION)...");
+        let stats = { total:0, active:0, weight:0, reward:0 };
+        let zData = {}; Object.keys(DATA.zones).forEach(id => zData[id] = { count:0, active:0, weight:0 });
+        let next = "";
+        while(!stopSignal) {
+            let json = await fetchRPC("dovpvecontrl", "dovpvecontrl", "sdivisions", next);
+            if(!json.rows.length) break;
+            const now = Date.now()/1000;
+            json.rows.forEach(r => {
+                let zid = r.zone_id || r.zoneID;
+                if(!zData[zid]) return;
+                zData[zid].count++; stats.total++;
+                let et = parseFloat(r.unlock_time || 0);
+                let isFighting = et > (et > 1000000000000 ? Date.now() : now);
+                if(isFighting) {
+                    zData[zid].active++; stats.active++;
+                    let w = parseFloat(r.weight || 0);
+                    zData[zid].weight += w; stats.weight += w;
+                    stats.reward += DATA.zones[zid].win;
+                }
+            });
+            renderZones(zData, stats);
+            if(json.more) next = json.next_key; else break;
+        }
+        log("WAR MAP SCAN COMPLETE.", "log-ok");
+    }
+
+    function renderZones(data, s) {
+        getId('zTotalDivsHeader').innerText = s.total;
+        getId('zActiveDivs').innerText = s.active;
+        getId('zTotalWeight').innerText = s.weight.toLocaleString();
+        getId('zTotalProd').innerText = s.reward.toLocaleString();
         let html = "";
-        Object.keys(data).forEach(id => {
-            let z = DATA.zones[id]; let d = data[id];
-            html += `<div class="zone-card ${d.active>0?'active':''}"><div class="zc-top"><span>${z.name}</span><span>${d.active}/${d.count}</span></div><div class="zc-mid"><div class="zs-item"><span>WIN</span><span class="tc-s">${fmt(d.reward)}</span></div><div class="zs-item"><span>WEIGHT</span><span class="tc-r">${fmt(d.weight)}</span></div><div class="zs-item"><span>COST</span><span class="tc-f">${fmt(d.active*z.cost)}</span></div></div><div class="zc-bot"><span>MIN: ${z.min_w}W</span><span class="log-ok">WIN: ${z.win}</span></div></div>`;
+        Object.keys(DATA.zones).forEach(id => {
+            let z = DATA.zones[id]; let d = data[id] || {count:0, active:0, weight:0};
+            html += `<div class="zone-card ${d.active>0?'active':''}">
+                <div class="zc-top"><span>${z.name}</span><span>${d.active}/${d.count}</span></div>
+                <div class="zc-mid">
+                    <div class="zs-item"><span>WEIGHT</span><span style="color:var(--blue)">${d.weight}</span></div>
+                    <div class="zs-item"><span>WIN/U</span><span style="color:var(--green)">${z.win}</span></div>
+                    <div class="zs-item"><span>COST/U</span><span style="color:var(--orange)">${z.cost}</span></div>
+                </div>
+                <div class="zc-bot"><span>REQ: ${z.min_w}W</span><span style="color:var(--purple)">${(d.active*z.win).toLocaleString()}</span></div>
+            </div>`;
         });
         getId('areaZones').innerHTML = html;
     }
 
-    function openSettings() { alert("Settings updated via DATA variable."); }
-    function hardReset() { localStorage.removeItem(STORAGE_KEY); location.reload(); }
-    window.onload = init;
+    function hardReset() { if(confirm("RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+    window.onload = () => { buildUI(); log("READY."); };
 </script>
 </body>
 </html>
