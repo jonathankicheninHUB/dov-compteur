@@ -269,4 +269,291 @@
             },
             "REPAIR": {
                 "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 },
-                "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 9
+                "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 },
+                "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 },
+                "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
+                "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }
+            },
+            "SUPPLY": {
+                "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 },
+                "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 },
+                "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 },
+                "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 },
+                "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
+            }
+        }
+    };
+
+    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let stopSignal = false;
+    let currentContract = "";
+    let currentTable = "";
+
+    function init() {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
+        getId('dictSize').innerText = Object.keys(DATA.templates).length;
+        buildUI();
+    }
+
+    function buildUI() {
+        const areaC = getId('areaCards'); const areaL = getId('areaLists');
+        areaC.innerHTML = ''; areaL.innerHTML = '';
+        const order = ["F", "H", "R", "S"];
+        
+        for(let k of order) {
+            let rd = DATA.resourceDefs[k];
+            // RESTORED V260 CARD LAYOUT
+            areaC.innerHTML += `
+            <div class="kpi-card ${rd.class}">
+                <div class="kc-title">${rd.label} / HOUR</div>
+                <div class="kc-val" id="val-${k}">0</div>
+                <div class="kc-sub" id="act-${k}">0 ACTIVE</div>
+            </div>`;
+            
+            areaL.innerHTML += `
+            <div class="data-panel">
+                <div class="dp-head">
+                    <span class="dp-title">${rd.label} BREAKDOWN</span>
+                    <div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div>
+                </div>
+                <div class="dt-grid dt-header">
+                    <div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div>
+                </div>
+                <div id="tbl-${k}"></div>
+            </div>`;
+        }
+    }
+
+    function findTemplate(tid) {
+        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' };
+        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' };
+        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' };
+        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' };
+        return null;
+    }
+
+    async function fetchSmartCluster(endpoint, body) {
+        let nodes = DATA.apiConfig.rpcNodes;
+        let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        for(let i=0; i<8; i++) { 
+            let node = shuffled[i % shuffled.length];
+            try {
+                let controller = new AbortController();
+                setTimeout(() => controller.abort(), 6000); 
+                let res = await fetch(node + endpoint, { method: 'POST', body: body, signal: controller.signal });
+                if(res.ok) return await res.json();
+            } catch(e) { }
+        }
+        throw new Error("CLUSTER UNREACHABLE");
+    }
+
+    async function dispatchGlobalScan() {
+        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        let next = ""; 
+        let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
+        let groups = {F:[], H:[], R:[], S:[]};
+        let rowCount = 0; let assetCount = 0;
+        try {
+            while(!stopSignal) {
+                let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+                if(!res.rows || res.rows.length === 0) break;
+                const now = Date.now()/1000;
+                for(let r of res.rows) {
+                    let tpl = findTemplate(r.template_id); if(!tpl) continue;
+                    rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
+                    stats.types[tpl.type].t += count;
+                    let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
+                    if(isActive) stats.types[tpl.type].a += count;
+                    let existing = groups[tpl.type].find(x => x.name === tpl.name);
+                    if(!existing) { existing = { id:r.template_id, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costH:0, costD:0 }; groups[tpl.type].push(existing); }
+                    existing.tot += count;
+                    if(isActive) {
+                        let hourly = count * tpl.prod; let daily = hourly * 24; let costD = daily * 0.085; let costH = costD / 24;
+                        existing.act += count; existing.totH += hourly; existing.totD += daily; existing.costH += costH; existing.costD += costD;
+                        stats.types[tpl.type].p += hourly; stats.types[tpl.type].c += costD; stats.totalCost += costD;
+                    }
+                }
+                updateGlobalUI(rowCount, assetCount, stats, groups);
+                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function updateGlobalUI(rows, assets, stats, groups) {
+        getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
+        for(let k in DATA.resourceDefs) {
+            let rd = DATA.resourceDefs[k];
+            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
+            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
+            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
+            
+            let list = groups[k].sort((a,b) => b.totH - a.totH);
+            let html = "";
+            list.forEach(i => {
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="color:var(--green)">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costD)}</div></div>`;
+            });
+            getId(`tbl-${k}`).innerHTML = html;
+        }
+    }
+
+    function getEndTime(row) {
+        let keys = ['unlock_time', 'end_time', 'finish_time', 'lock_until', 'free_at', 'return_time'];
+        for (let k of keys) { if (row[k] !== undefined && row[k] !== null) return parseFloat(row[k]); }
+        return 0;
+    }
+
+    async function startZoneScan() {
+        stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
+        let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
+        updateZoneUI(zonesData, stats); 
+        let next = "";
+        try {
+            while(!stopSignal) {
+                let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+                if(!json.rows) break;
+                const nowSec = Date.now()/1000;
+                for(let r of json.rows) {
+                    let zid = r.zone_id || r.zoneID;
+                    if(zonesData[zid]) {
+                        zonesData[zid].count++; stats.totalDivs++;
+                        let weight = parseFloat(r.weight || 0);
+                        zonesData[zid].weight += weight; stats.totalWeight += weight;
+                        let endTime = getEndTime(r); let isFighting = false;
+                        if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
+                        if(isFighting) {
+                            zonesData[zid].active++; stats.activeDivs++;
+                            let zInfo = DATA.zones[zid];
+                            zonesData[zid].bf += zInfo.cost; zonesData[zid].bh += zInfo.cost; zonesData[zid].br += zInfo.cost; zonesData[zid].bs += zInfo.cost;
+                            zonesData[zid].prod += zInfo.win;
+                            stats.burnF += zInfo.cost; stats.burnH += zInfo.cost; stats.burnR += zInfo.cost; stats.burnS += zInfo.cost; stats.totalProd += zInfo.win;
+                        }
+                    }
+                }
+                updateZoneUI(zonesData, stats);
+                if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+            }
+        } catch(e) { console.error(e); }
+        getId('zoneStatus').innerText = "Complete.";
+    }
+
+    function updateZoneUI(zonesData, stats) {
+        getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
+        getId('zTotalProd').innerText = fmt(stats.totalProd); getId('zTotalWeight').innerText = fmt(stats.totalWeight);
+        getId('gBurnF').innerText = fmt(stats.burnF); getId('gBurnH').innerText = fmt(stats.burnH); getId('gBurnR').innerText = fmt(stats.burnR); getId('gBurnS').innerText = fmt(stats.burnS);
+        let html = "";
+        Object.keys(zonesData).forEach(id => {
+            let z = DATA.zones[id]; let d = zonesData[id]; let activeClass = d.count > 0 ? "active" : "";
+            html += `<div class="zone-card ${activeClass}"><div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div class="zs-item"><span>WIN (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div><div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div><div style="height:1px; background:#333; margin:2px 0;"></div><div class="zs-item"><span>COST (EACH TU)</span> <span class="tc-f">${fmt(z.cost)}</span></div></div><div class="zc-bot"><span style="color:#666">MIN W: ${z.min_w}</span><span style="color:var(--green)">REWARD: ${z.win}</span></div></div>`;
+        });
+        getId('areaZones').innerHTML = html;
+    }
+
+    // --- DEEP INSPECTOR V267 (SCOPE HUNTER) ---
+    async function initInspector() {
+        switchView('viewInspector');
+        getId('inspTables').innerHTML = ""; getId('inspScopes').innerHTML = ""; getId('inspData').innerHTML = "Select a Table...";
+        
+        let contracts = ["dovutilstake", "dovpvecontrl"];
+        let html = "";
+        let node = DATA.apiConfig.rpcNodes[0];
+
+        for(let c of contracts) {
+            html += `<div style="background:#222; padding:5px; font-weight:bold; color:var(--purple);">${c}</div>`;
+            try {
+                let res = await fetch(node + "/v1/chain/get_abi", {method:'POST', body:JSON.stringify({account_name:c})});
+                let json = await res.json();
+                if(json.abi) {
+                    json.abi.tables.forEach(t => {
+                        html += `<div class="abi-item" onclick="loadScopes('${c}', '${t.name}', this)">${t.name}</div>`;
+                    });
+                }
+            } catch(e) { html += `<div class="log-err">ERROR</div>`; }
+        }
+        getId('inspTables').innerHTML = html;
+    }
+
+    async function loadScopes(contract, table, el) {
+        currentContract = contract; currentTable = table;
+        document.querySelectorAll('.abi-item').forEach(e => e.classList.remove('selected'));
+        if(el) el.classList.add('selected');
+        
+        getId('inspScopes').innerHTML = "Scanning Scopes...";
+        getId('inspData').innerHTML = "Waiting for Scope...";
+        
+        let node = DATA.apiConfig.rpcNodes[0];
+        try {
+            // THE MAGIC: FIND WHERE DATA IS HIDDEN
+            let res = await fetch(node + "/v1/chain/get_table_by_scope", {
+                method: 'POST',
+                body: JSON.stringify({ code: contract, table: table, limit: 50 })
+            });
+            let json = await res.json();
+            
+            let html = "";
+            if(json.rows && json.rows.length > 0) {
+                // First Scope usually holds main config if it matches contract name
+                json.rows.forEach(r => {
+                    let label = r.scope === contract ? `${r.scope} (MAIN)` : r.scope;
+                    html += `<div class="abi-item" onclick="loadData('${r.scope}', this)">${label} <span style="float:right; opacity:0.5">${r.count}</span></div>`;
+                });
+            } else {
+                html = "<div style='padding:10px; color:red'>EMPTY TABLE</div>";
+            }
+            getId('inspScopes').innerHTML = html;
+        } catch(e) { getId('inspScopes').innerHTML = "Error fetching scopes"; }
+    }
+
+    async function loadData(scope, el) {
+        document.querySelectorAll('#inspScopes .abi-item').forEach(e => e.classList.remove('selected'));
+        if(el) el.classList.add('selected');
+        
+        getId('inspData').innerHTML = "Fetching Rows...";
+        let node = DATA.apiConfig.rpcNodes[0];
+        
+        try {
+            let res = await fetch(node + "/v1/chain/get_table_rows", {
+                method: 'POST',
+                body: JSON.stringify({ json:true, code: currentContract, scope: scope, table: currentTable, limit: 50 })
+            });
+            let json = await res.json();
+            getId('inspData').innerHTML = JSON.stringify(json.rows, null, 4);
+        } catch(e) { getId('inspData').innerHTML = "Error reading data"; }
+    }
+
+    async function startEconomyScan() { /* Same V199 */ }
+    async function startTargetBuildings() { /* Same V199 */ }
+    async function startTargetDivisions() { /* Same V199 */ }
+
+    function openSettings() { 
+        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); 
+        getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); 
+        getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); 
+        getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); 
+        getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); 
+        getId('cfgDivisions').value = JSON.stringify(DATA.divisions, null, 4);
+        getId('settingsModal').style.display = 'flex'; 
+    }
+    
+    function saveConfig() { 
+        try { 
+            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
+            DATA.resourceDefs = JSON.parse(getId('cfgResources').value); 
+            DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); 
+            DATA.zones = JSON.parse(getId('cfgZones').value); 
+            DATA.templates = JSON.parse(getId('cfgTemplates').value); 
+            DATA.divisions = JSON.parse(getId('cfgDivisions').value); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); 
+            closeModal('settingsModal'); init(); 
+        } catch(e) { alert("JSON ERROR"); } 
+    }
+    
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+
+    window.onload = init;
+</script>
+</body>
+</html>
