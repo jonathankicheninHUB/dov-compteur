@@ -1,587 +1,283 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>DoV - COMMAND V260 (INTERFACE RESTORED)</title>
-    <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (ORIGINAL) --- */
-        :root {
-            --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
-            --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
-            --text-main: #e0e0e0; --text-muted: #858595;
-            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
-        }
+<meta charset="UTF-8" />
+<title>DoV Command — Config Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; background: var(--bg-app); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+<style>
+    body {
+        margin: 0;
+        font-family: monospace;
+        background: #0e0e11;
+        color: #e0e0e0;
+    }
 
-        .layout { display: flex; width: 100%; height: 100%; }
-        .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px; gap: 20px; flex-shrink: 0; }
-        .main-content { flex: 1; overflow-y: auto; padding: 25px; background: linear-gradient(180deg, var(--bg-app) 0%, #08080a 100%); display:flex; flex-direction:column; }
+    header {
+        padding: 12px 16px;
+        background: #15151c;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #222;
+    }
 
-        /* COMPONENTS */
-        .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; }
-        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-        .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        input { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
-        button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        
-        .btn-green { background: var(--green); color: #000; } .btn-red { background: rgba(255, 59, 48, 0.15); color: var(--red); border: 1px solid rgba(255, 59, 48, 0.3); }
-        .btn-blue { background: var(--blue); color: #fff; } .btn-orange { background: var(--orange); color: #000; }
-        .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
-        .btn-row { display: flex; gap: 8px; }
+    button {
+        background: #00e676;
+        color: #000;
+        border: none;
+        padding: 8px 12px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+    }
 
-        /* DASHBOARD */
-        .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
-        .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
-        .page-meta { font-family: var(--font-num); font-size: 10px; color: #666; margin-top: 5px; }
-        .total-cost { text-align: right; }
-        .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
-        .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
+    button.warn {
+        background: #ff1744;
+        color: #fff;
+    }
 
-        /* KPI CARDS */
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
-        .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
-        .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 5px; }
-        .kc-sub { font-size: 9px; color: #444; margin-top: 2px; }
+    main {
+        padding: 16px;
+    }
 
-        /* GRAPHS */
-        .kc-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .big-24h { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .b24-val { font-family: var(--font-num); font-size: 26px; font-weight: 800; line-height: 1; }
-        .b24-lbl { font-size: 9px; color: #666; font-weight: 700; margin-top: 4px; display:flex; justify-content:space-between;}
-        .gauge-wrapper { width: 40px; height: 40px; position: relative; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; }
-        .gauge-core { width: 32px; height: 32px; background: var(--bg-panel); border-radius: 50%; position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .gauge-txt { font-size: 9px; font-weight: 700; color: #fff; font-family: var(--font-num); }
+    .card {
+        background: #15151c;
+        border: 1px solid #222;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
 
-        .fuel .kpi-card::before { background: var(--orange); } .fuel .val { color: var(--orange); } .fuel .gauge-wrapper { background: conic-gradient(var(--orange) var(--pct), #333 0deg); }
-        .health .kpi-card::before { background: var(--red); } .health .val { color: var(--red); } .health .gauge-wrapper { background: conic-gradient(var(--red) var(--pct), #333 0deg); }
-        .repair .kpi-card::before { background: var(--blue); } .repair .val { color: var(--blue); } .repair .gauge-wrapper { background: conic-gradient(var(--blue) var(--pct), #333 0deg); }
-        .supply .kpi-card::before { background: var(--yellow); } .supply .val { color: var(--yellow); } .supply .gauge-wrapper { background: conic-gradient(var(--yellow) var(--pct), #333 0deg); }
+    .card h3 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #00e676;
+    }
 
-        /* TABLES */
-        .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-        .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
-        .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
-        .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
-        .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 70px 70px; }
-        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-        .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
-        .dt-row:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .c-right { text-align: right; justify-content: flex-end; }
-        .c-center { text-align: center; justify-content: center; }
-        
-        /* ZONES MAP (BIBLE DATA) */
-        .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; }
-        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
-        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
-        .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
-        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
-        .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
+    textarea {
+        width: 100%;
+        height: 160px;
+        background: #0e0e11;
+        color: #e0e0e0;
+        border: 1px solid #333;
+        padding: 8px;
+        resize: vertical;
+    }
 
-        .view-section { display: none; } .active-view { display: block; }
-        a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
-        a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
+    #settingsModal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
 
-        /* MODALS (FIXED) */
-        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center; }
-        .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
-        textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
-    </style>
+    #settingsContent {
+        width: 90%;
+        max-width: 1100px;
+        max-height: 90vh;
+        overflow: auto;
+        background: #0e0e11;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    footer {
+        text-align: center;
+        font-size: 12px;
+        opacity: 0.6;
+        margin-top: 16px;
+    }
+</style>
 </head>
+
 <body>
 
-<div class="layout">
-    <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V260</span></div>
-        
-        <div class="control-group">
-            <span class="grp-lbl">ROBUST MONITORING</span>
-            <div class="btn-row">
-                <button class="btn-green" onclick="dispatchGlobalScan()">SCAN GLOBAL</button>
-                <button class="btn-red" onclick="stopSignal=true">STOP</button>
-            </div>
-            <div class="btn-row">
-                <button class="btn-blue" onclick="startZoneScan()">ALL ZONES</button>
-                <button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button>
-            </div>
+<header>
+    <div>🧠 DoV Command — Config Engine</div>
+    <div>
+        <button onclick="openSettings()">⚙️ Config</button>
+        <button class="warn" onclick="hardReset()">♻ Reset</button>
+    </div>
+</header>
+
+<main>
+    <div class="card">
+        <h3>📊 État actuel</h3>
+        Templates chargés : <span id="dictSize">0</span>
+    </div>
+</main>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal">
+    <div id="settingsContent">
+
+        <div class="card">
+            <h3>🔗 RPC Nodes</h3>
+            <textarea id="cfgApi"></textarea>
         </div>
 
-        <div class="control-group">
-            <span class="grp-lbl">TARGET INTELLIGENCE</span>
-            <input type="text" id="targetIn" value="u2d2k.c.wam">
-            <div class="btn-row">
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetDivisions()">DIVISIONS</button>
-                <button class="btn-ghost" style="color:#fff" onclick="startTargetBuildings()">BUILDINGS</button>
-            </div>
+        <div class="card">
+            <h3>📦 Ressources</h3>
+            <textarea id="cfgResources"></textarea>
         </div>
 
-        <div class="control-group" style="margin-top:auto">
-            <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;">
-                <span>DB SIZE</span> <span id="dictSize" style="color:#fff">0</span>
-            </div>
-            <button class="btn-ghost" onclick="openSettings()">SETTINGS</button>
-            <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <div id="viewGlobal" class="view-section active-view">
-            <div class="dashboard-header">
-                <div>
-                    <h2 class="page-h1">GLOBAL PRODUCTION</h2>
-                    <div class="page-meta">COLLECTION SCAN &bull; ROWS: <span id="cntRows">0</span></div>
-                </div>
-                <div class="total-cost">
-                    <div class="grp-lbl">DAILY MAINTENANCE</div>
-                    <div><span class="tc-val" id="gTotalCost">0</span> <span class="tc-unit">DOVX</span></div>
-                </div>
-            </div>
-            <div class="kpi-grid" id="areaCards"></div>
-            <div class="tables-grid" id="areaLists"></div>
+        <div class="card">
+            <h3>⚖️ Règles</h3>
+            <textarea id="cfgGameRules"></textarea>
         </div>
 
-        <div id="viewZones" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div>
-                    <h2 class="page-h1">GLOBAL WAR MAP</h2>
-                    <div class="page-meta">SCANNING COLLECTION: <span id="zTotalDivsHeader" style="color:#fff; font-weight:bold;">0</span> UNITS</div>
-                </div>
-                <div class="total-cost">
-                    <div class="grp-lbl">GLOBAL CONSUMPTION / 24H</div>
-                    <div style="font-family:var(--font-num); font-size:10px; margin-top:2px;">
-                        <span class="tc-f">F: <span id="gBurnF">0</span></span> &bull; 
-                        <span class="tc-h">H: <span id="gBurnH">0</span></span> &bull; 
-                        <span class="tc-r">R: <span id="gBurnR">0</span></span> &bull; 
-                        <span class="tc-s">S: <span id="gBurnS">0</span></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
-                <div class="kpi-card">
-                    <div class="kc-title">TOTAL DIVISIONS</div>
-                    <div class="kc-val" id="zTotalDivs">0</div>
-                    <div class="kc-sub">ALL PLAYERS STAKED</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">IN FIGHT</div>
-                    <div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div>
-                    <div class="kc-sub">TIMER ACTIVE</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">TOTAL WEIGHT</div>
-                    <div class="kc-val" id="zTotalWeight" style="color:var(--blue)">0</div>
-                    <div class="kc-sub">COMBAT POWER</div>
-                </div>
-            </div>
-
-            <div class="zones-map" id="areaZones"></div>
+        <div class="card">
+            <h3>🗺️ Zones</h3>
+            <textarea id="cfgZones"></textarea>
         </div>
 
-        <div id="viewEco" class="view-section"><div class="dashboard-header" style="border-left: 4px solid var(--orange)"><h2 class="page-h1">MACRO ECONOMICS</h2><div class="page-meta" id="ecoStatus">Ready.</div></div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);"><div class="kpi-card"><div class="kc-title">GLOBAL DEMAND</div><div class="kc-val" id="valDemandTU">0</div><div class="kc-sub">TU BURN / DAY</div></div><div class="kpi-card"><div class="kc-title">ACTIVE ZONES</div><div class="kc-val" id="valActiveZones">0</div></div><div class="kpi-card"><div class="kc-title">DOVX BURN</div><div class="kc-val" style="color:var(--purple)" id="valDovxBurn">0</div><div class="kc-sub">ESTIMATED / DAY</div></div></div></div>
-        <div id="viewTarget" class="view-section"><div class="dashboard-header"><h2 class="page-h1">TARGET INSPECTOR</h2><div class="page-meta" id="targetMeta">Ready.</div></div><div id="areaTarget" class="tables-grid" style="grid-template-columns: 1fr;"></div></div>
-    </main>
+        <div class="card">
+            <h3>🧩 Templates</h3>
+            <textarea id="cfgTemplates"></textarea>
+        </div>
+
+        <div class="card">
+            <h3>🏷️ Divisions</h3>
+            <textarea id="cfgDivisions"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+            <button onclick="saveConfig()">💾 Save</button>
+            <button class="warn" onclick="closeSettings()">✖ Close</button>
+        </div>
+
+    </div>
 </div>
 
-<div class="modal-overlay" id="settingsModal"><div class="modal-box">
-    <h3 style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM CONFIG</h3>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
-        <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES (CLUSTER)</span><textarea id="cfgApi"></textarea></div>
-        <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
-        <div><span class="grp-lbl">RULES</span><textarea id="cfgGameRules"></textarea></div>
-        <div><span class="grp-lbl">ZONES (BIBLE DATA)</span><textarea id="cfgZones"></textarea></div>
-        <div><span class="grp-lbl">TEMPLATES</span><textarea id="cfgTemplates"></textarea></div>
-        <div style="grid-column: 1 / -1;"><span class="grp-lbl">DIVISIONS (WEIGHTS)</span><textarea id="cfgDivisions"></textarea></div>
-    </div>
-    <div style="text-align:right; margin-top:15px;">
-        <button class="btn-green" style="width:auto; display:inline-block;" onclick="saveConfig()">SAVE & RESTART</button>
-        <button class="btn-ghost" style="width:auto; display:inline-block;" onclick="closeModal('settingsModal')">CANCEL</button>
-    </div>
-</div></div>
+<footer>
+    DoV Engine — Data first · Deterministic · Upgrade-proof
+</footer>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V260';
-    const getId = (id) => document.getElementById(id);
-    const closeModal = (id) => getId(id).style.display = 'none';
-    const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
-    const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
-    const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+/* =========================================================
+   CONFIG
+========================================================= */
+const STORAGE_KEY = "DOV_COMMAND_CONFIG_V261";
 
-    const DEFAULT_DATA = {
-        apiConfig: { 
-            rpcNodes: [
-                "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
-                "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
-                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net",
-                "https://api.wax.liquidstudios.io", "https://wax.cryptolions.io", "https://api-wax.eosauthority.com",
-                "https://wax.eosdac.io", "https://api.wax.bountyblok.io", "https://wax-bp.wizardsguild.one",
-                "https://wax.blacklusion.io", "https://api.wax.greeneosio.com", "https://waxapi.ledgerwise.io",
-                "https://wax.tmy.io", "https://api.hivebp.io"
-            ]
-        },
-        resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
-        gameConfig: { maintenanceCost: 0.085, cycleHours: 24, rewardRatio: 0.1, tokenMap: { "DOVF": "F", "DOVH": "H", "DOVR": "R", "DOVS": "S" } },
-        
-        // ZONES: DATA FROM "BIBLE" SCREENSHOT
-        zones: { 
-            1: {name:"Beach 1", cost:1160, win:400, min_w:0},
-            2: {name:"Beach 2", cost:6968, win:2405, min_w:0},
-            3: {name:"Beach 3", cost:8800, win:3037, min_w:0},
-            4: {name:"Bunker", cost:11120, win:3838, min_w:90},
-            5: {name:"Forest 1", cost:14024, win:4840, min_w:3},
-            6: {name:"Forest 2", cost:17704, win:6110, min_w:3},
-            7: {name:"Forest 3", cost:22352, win:7714, min_w:3},
-            8: {name:"Camp", cost:28220, win:9739, min_w:90},
-            9: {name:"Hill 1", cost:37052, win:12788, min_w:3},
-            10: {name:"Hill 2", cost:48652, win:16791, min_w:3},
-            11: {name:"Hill 3", cost:64516, win:22266, min_w:3},
-            12: {name:"Radar", cost:84712, win:29236, min_w:90},
-            13: {name:"Plain 1", cost:99384, win:34300, min_w:0},
-            14: {name:"Plain 2", cost:125708, win:43385, min_w:0},
-            15: {name:"Plain 3", cost:151164, win:52171, min_w:0},
-            16: {name:"HQ", cost:188000, win:64884, min_w:0},
-            17:{name:"City 1",cost:0,win:0,min_w:0},18:{name:"City 2",cost:0,win:0,min_w:0},19:{name:"City 3",cost:0,win:0,min_w:0},20:{name:"City 4",cost:0,win:0,min_w:0}
-        },
-        divisions: { "default": { name: "Infantry", w: 10 } },
-        templates: {
-            "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492383": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492385": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492363": { "name": "C_F2_PRODUCER_FUEL (VAR)", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL (VAR)", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492379": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492386": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492390": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492380": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492381": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492387": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492388": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492370": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492372": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 }, "492392": { "name": "S1_OWNER_FUEL (VAR)", "prod": 2255.34 }, "492377": { "name": "SC_F2_PRODUCER_FUEL", "prod": 54.00 }, "492391": { "name": "SC_F3_PRODUCER_FUEL", "prod": 121.50 },
-            "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 }, "492460": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492461": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492462": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492463": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492464": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492565": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492466": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492467": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492469": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492471": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492472": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492473": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492474": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492475": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492476": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "544071": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 },
-            "492507": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492509": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492511": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492513": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492515": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492518": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492521": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492523": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492526": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492528": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492529": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492530": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492532": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492533": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492534": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544069": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 }
-        }
-    };
+/* =========================================================
+   DEFAULT DATA (FACTORY STATE)
+========================================================= */
+const DEFAULT_DATA = {
+    apiConfig: {
+        rpcNodes: [
+            "https://wax.greymass.com",
+            "https://wax.pink.gg"
+        ]
+    },
+    resourceDefs: {
+        cpu: { label: "CPU", unit: "ms" },
+        net: { label: "NET", unit: "kb" }
+    },
+    gameConfig: {
+        cycleDuration: 24,
+        taxRate: 0.06
+    },
+    zones: {
+        beach: { yield: 1.2 },
+        bunker: { yield: 5.8 }
+    },
+    templates: {
+        "1001": { name: "Beach RT", zone: "beach" },
+        "2001": { name: "Bunker RT", zone: "bunker" }
+    },
+    divisions: {
+        common: { color: "#aaa" },
+        rare: { color: "#4fc3f7" }
+    }
+};
 
-    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    let stopSignal = false;
+let DATA = null;
 
-    function init() {
+/* =========================================================
+   UTILS
+========================================================= */
+const getId = id => document.getElementById(id);
+
+/* =========================================================
+   INIT
+========================================================= */
+function init() {
     let loaded = null;
 
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) loaded = JSON.parse(raw);
     } catch (e) {
-        console.warn("⚠️ Corrupted local storage, fallback to defaults");
+        console.warn("⚠️ Storage corrompu, retour usine");
     }
 
     DATA = loaded ? structuredClone(loaded) : structuredClone(DEFAULT_DATA);
-
-    getId('dictSize').innerText = Object.keys(DATA.templates || {}).length;
-    buildUI();
+    getId("dictSize").innerText = Object.keys(DATA.templates || {}).length;
 }
 
+init();
 
-    function buildUI() {
-        const areaC = getId('areaCards'); const areaL = getId('areaLists');
-        areaC.innerHTML = ''; areaL.innerHTML = '';
-        const order = ["F", "H", "R", "S"];
-        
-        for(let k of order) {
-            let rd = DATA.resourceDefs[k];
-            // ADDED GRAPH & 24H BIG TEXT
-            areaC.innerHTML += `
-            <div class="kpi-card ${rd.class}">
-                <div class="kc-header">
-                    <div>
-                        <div class="kc-title"><span>${rd.label}</span><span>LIVE</span></div>
-                        <div class="kc-val" id="val-${k}">0</div>
-                        <div class="kc-sub">PROD / HOUR</div>
-                    </div>
-                    <div class="gauge-wrapper" id="gauge-${k}" style="--pct:0deg;">
-                        <div class="gauge-core"><div class="gauge-txt" id="pct-${k}">0%</div></div>
-                    </div>
-                </div>
-                <div class="big-24h">
-                    <div class="b24-val val" id="val24-${k}">0</div>
-                    <div class="b24-lbl"><span>PROD 24H</span> <span style="color:#aaa" id="act-${k}">0 ACTIVE</span></div>
-                </div>
-            </div>`;
-            
-            areaL.innerHTML += `
-            <div class="data-panel">
-                <div class="dp-head">
-                    <span class="dp-title">${rd.label} BREAKDOWN</span>
-                    <div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span> <span style="color:#888; margin-left:5px;">COST:</span> <span id="bcost-${k}" style="color:var(--purple)">0</span></div>
-                </div>
-                <div class="dt-grid dt-header">
-                    <div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/H</div><div class="cell c-right" style="color:var(--purple)">COST/24</div>
-                </div>
-                <div id="tbl-${k}"></div>
-            </div>`;
-        }
-    }
-
-    async function fetchSmartCluster(endpoint, body) {
-        let nodes = DATA.apiConfig.rpcNodes;
-        let shuffled = [...nodes].sort(() => 0.5 - Math.random());
-        for(let i=0; i<8; i++) { 
-            let node = shuffled[i % shuffled.length];
-            try {
-                let controller = new AbortController();
-                setTimeout(() => controller.abort(), 6000); 
-                let res = await fetch(node + endpoint, { method: 'POST', body: body, signal: controller.signal });
-                if(res.ok) return await res.json();
-            } catch(e) { }
-        }
-        throw new Error("CLUSTER UNREACHABLE");
-    }
-
-    function processRow(row) {
-        let tid = row.template_id.toString();
-        let count = row.asset_ids ? row.asset_ids.length : 1; 
-        let tpl = DATA.templates[tid];
-        let name = tpl ? tpl.name : `UNK_${tid}`;
-        let nominal = tpl ? tpl.prod : 0;
-        let hourly = count * nominal;
-        let daily = hourly * DATA.gameConfig.cycleHours;
-        let costD = daily * DATA.gameConfig.maintenanceCost;
-        let costH = costD / 24;
-        let rawStr = (Array.isArray(row.power) ? row.power[0] : row.power) || "";
-        let type = "F"; 
-        
-        if(name.includes("FUEL")) type = "F";
-        else if(name.includes("HEALTH")) type = "H";
-        else if(name.includes("REPAIR")) type = "R";
-        else if(name.includes("SUPPLY")) type = "S";
-        else { for(let t in DATA.gameConfig.tokenMap) if(rawStr.includes(t)) { type = DATA.gameConfig.tokenMap[t]; break; } }
-        
-        return { id:tid, name, type, count, hourly, daily, costH, costD, nominal };
-    }
-
-    async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
-        let next = ""; 
-        let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
-        let groups = {};
-        for(let k in DATA.resourceDefs) { groups[k] = []; }
-        let rowCount = 0; let assetCount = 0;
-        try {
-            while(!stopSignal) {
-                // FIXED: SCAN CONTRACT SCOPE FOR BUILDINGS
-                let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
-                if(!res.rows || res.rows.length === 0) break;
-                const now = Date.now()/1000;
-                for(let r of res.rows) {
-                    rowCount++; let d = processRow(r); assetCount += d.count;
-                    
-                    // Count Total
-                    stats.types[d.type].t += d.count;
-
-                    // Active Check
-                    let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(isActive) stats.types[d.type].a += d.count;
-
-                    let existing = groups[d.type].find(x => x.name === d.name);
-                    if(!existing) {
-                        existing = { id:d.id, name:d.name, act:0, tot:0, unit:d.nominal, totH:0, totD:0, costH:0, costD:0 };
-                        groups[d.type].push(existing);
-                    }
-                    
-                    existing.tot += d.count;
-
-                    if(isActive) {
-                        existing.act += d.count; 
-                        existing.totH += d.hourly; existing.totD += d.daily; 
-                        existing.costH += d.costH; existing.costD += d.costD;
-                        stats.types[d.type].p += d.hourly; 
-                        stats.types[d.type].c += d.costD; 
-                        stats.totalCost += d.costD;
-                    }
-                }
-                updateGlobalUI(rowCount, assetCount, stats, groups);
-                if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
-            }
-        } catch(e) { console.error(e); }
-    }
-
-    function updateGlobalUI(rows, assets, stats, groups) {
-        getId('cntRows').innerText = fmt(rows); getId('gTotalCost').innerText = fmt(stats.totalCost);
-        for(let k in DATA.resourceDefs) {
-            let rd = DATA.resourceDefs[k];
-            // UPDATE KPI
-            getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
-            getId(`bcost-${k}`).innerText = fmt(stats.types[k].c);
-            
-            // UPDATE 24H BIG TEXT
-            getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24);
-            getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE";
-
-            // UPDATE GAUGE
-            let pct = stats.types[k].t > 0 ? Math.round((stats.types[k].a / stats.types[k].t) * 100) : 0;
-            getId(`pct-${k}`).innerText = pct + "%";
-            // Set css var --pct using degrees (0% = 0deg, 100% = 360deg)
-            let deg = Math.round(pct * 3.6);
-            getId(`gauge-${k}`).style.setProperty('--pct', deg + 'deg');
-
-            let list = groups[k].sort((a,b) => b.totH - a.totH);
-            let html = "";
-            list.forEach(i => {
-                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
-                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="color:var(--green)">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costH)}</div><div class="cell c-right" style="color:var(--purple)">${fmtDec(i.costD)}</div></div>`;
-            });
-            getId(`tbl-${k}`).innerHTML = html;
-        }
-    }
-
-    function getEndTime(row) {
-        // SMART TIMER DETECTION (V248)
-        let keys = ['unlock_time', 'end_time', 'finish_time', 'lock_until', 'free_at', 'return_time'];
-        for (let k of keys) { if (row[k] !== undefined && row[k] !== null) return parseFloat(row[k]); }
-        return 0;
-    }
-
-    async function startZoneScan() {
-        stopSignal = false; switchView('viewZones'); getId('zoneStatus').innerText = "Scanning..."; getId('areaZones').innerHTML = "";
-        
-        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
-        let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
-
-        // IMPORTANT FIX: Initial render so UI is never blank
-        updateZoneUI(zonesData, stats);
-
-        let next = "";
-        let countDisplay = getId('zTotalDivsHeader');
-        
-        // FIXED SCOPE: GLOBAL COLLECTION (dovpvecontrl)
-        let target = "dovpvecontrl";
-
-        try {
-            while(!stopSignal) {
-                // FIXED SCOPE: CONTRACT (dovpvecontrl) to see EVERYONE'S divisions
-                let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:target, table:"sdivisions", limit:1000, lower_bound:next}));
-                if(!json.rows) break;
-                
-                const nowSec = Date.now()/1000;
-                
-                for(let r of json.rows) {
-                    let zid = r.zone_id || r.zoneID;
-                    if(zonesData[zid]) {
-                        zonesData[zid].count++;
-                        stats.totalDivs++;
-                        countDisplay.innerText = fmt(stats.totalDivs);
-
-                        let weight = parseFloat(r.weight || 0);
-                        zonesData[zid].weight += weight;
-                        stats.totalWeight += weight;
-
-                        let endTime = getEndTime(r);
-                        let isFighting = false;
-                        if (endTime > 1000000000000) isFighting = endTime > Date.now();
-                        else isFighting = endTime > nowSec;
-
-                        if(isFighting) {
-                            zonesData[zid].active++;
-                            stats.activeDivs++;
-                            let zInfo = DATA.zones[zid];
-                            let zCost = zInfo.cost;
-                            let zReward = zInfo.win;
-                            
-                            zonesData[zid].bf += zCost; zonesData[zid].bh += zCost; zonesData[zid].br += zCost; zonesData[zid].bs += zCost;
-                            zonesData[zid].prod += zReward;
-                            stats.burnF += zCost; stats.burnH += zCost; stats.burnR += zCost; stats.burnS += zCost;
-                            stats.totalProd += zReward;
-                        }
-                    }
-                }
-                updateZoneUI(zonesData, stats);
-                if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
-            }
-        } catch(e) { console.error(e); }
-        getId('zoneStatus').innerText = "Complete.";
-    }
-
-    function updateZoneUI(zonesData, stats) {
-        getId('zTotalDivs').innerText = fmt(stats.totalDivs);
-        getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalProd').innerText = fmt(stats.totalProd);
-        getId('zTotalWeight').innerText = fmt(stats.totalWeight);
-        getId('gBurnF').innerText = fmt(stats.burnF); getId('gBurnH').innerText = fmt(stats.burnH); getId('gBurnR').innerText = fmt(stats.burnR); getId('gBurnS').innerText = fmt(stats.burnS);
-
-        let html = "";
-        Object.keys(zonesData).forEach(id => {
-            let z = DATA.zones[id];
-            let d = zonesData[id];
-            let activeClass = d.count > 0 ? "active" : "";
-            html += `
-            <div class="zone-card ${activeClass}">
-                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
-                <div class="zc-mid">
-                    <div class="zs-item"><span>WIN (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
-                    <div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div>
-                    <div style="height:1px; background:#333; margin:2px 0;"></div>
-                    <div class="zs-item"><span>COST (EACH TU)</span> <span class="tc-f">${fmt(z.cost)}</span></div>
-                </div>
-                <div class="zc-bot">
-                    <span style="color:#666">MIN W: ${z.min_w}</span>
-                    <span style="color:var(--green)">REWARD: ${z.win}</span>
-                </div>
-            </div>`;
-        });
-        getId('areaZones').innerHTML = html;
-    }
-
-    async function startEconomyScan() { /* Same V199 */ }
-    async function startTargetBuildings() { /* Same V199 */ }
-    async function startTargetDivisions() { /* Same V199 */ }
-
-    function openSettings() {
-    getId('cfgApi').value = JSON.stringify(DATA.apiConfig?.rpcNodes || [], null, 2);
-    getId('cfgResources').value = JSON.stringify(DATA.resourceDefs || {}, null, 2);
-    getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig || {}, null, 2);
-    getId('cfgZones').value = JSON.stringify(DATA.zones || {}, null, 2);
-    getId('cfgTemplates').value = JSON.stringify(DATA.templates || {}, null, 2);
-    getId('cfgDivisions').value = JSON.stringify(DATA.divisions || {}, null, 2);
-
-    getId('settingsModal').style.display = 'flex';
+/* =========================================================
+   SETTINGS
+========================================================= */
+function openSettings() {
+    getId('cfgApi').value = JSON.stringify(DATA.apiConfig.rpcNodes, null, 2);
+    getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 2);
+    getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 2);
+    getId('cfgZones').value = JSON.stringify(DATA.zones, null, 2);
+    getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 2);
+    getId('cfgDivisions').value = JSON.stringify(DATA.divisions, null, 2);
+    getId('settingsModal').style.display = "flex";
 }
 
-    
-   function saveConfig() {
+function closeSettings() {
+    getId('settingsModal').style.display = "none";
+}
+
+/* =========================================================
+   SAVE
+========================================================= */
+function saveConfig() {
     try {
         const newData = structuredClone(DATA);
 
-        newData.apiConfig = {
-            rpcNodes: JSON.parse(getId('cfgApi').value)
-        };
+        newData.apiConfig = { rpcNodes: JSON.parse(getId('cfgApi').value) };
         newData.resourceDefs = JSON.parse(getId('cfgResources').value);
         newData.gameConfig = JSON.parse(getId('cfgGameRules').value);
         newData.zones = JSON.parse(getId('cfgZones').value);
         newData.templates = JSON.parse(getId('cfgTemplates').value);
         newData.divisions = JSON.parse(getId('cfgDivisions').value);
 
-        // --- MINIMAL SANITY CHECKS ---
-        if (!Array.isArray(newData.apiConfig.rpcNodes)) throw new Error("RPC nodes must be an array");
-        if (Object.keys(newData.templates).length === 0) throw new Error("Templates cannot be empty");
+        if (!Array.isArray(newData.apiConfig.rpcNodes)) {
+            throw new Error("rpcNodes doit être un tableau");
+        }
+        if (Object.keys(newData.templates).length === 0) {
+            throw new Error("Templates vides interdits");
+        }
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
         location.reload();
 
     } catch (e) {
-        alert("❌ CONFIG ERROR\n\n" + e.message);
+        alert("❌ Erreur de configuration\n\n" + e.message);
         console.error(e);
     }
 }
 
-    
-  function hardReset() {
-    if (!confirm("⚠️ Factory reset ? All custom config will be lost.")) return;
+/* =========================================================
+   RESET
+========================================================= */
+function hardReset() {
+    if (!confirm("Reset usine ?")) return;
     localStorage.removeItem(STORAGE_KEY);
     location.reload();
 }
-
-
-    window.onload = init;
 </script>
+
 </body>
 </html>
