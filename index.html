@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V276 (FULL METRICS)</title>
+    <title>DoV - COMMAND V277 (VISUAL INTELLIGENCE)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICT V271 BASE) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -41,12 +41,12 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
-        /* KPI CARDS (V271 STYLE) */
+        /* KPI CARDS V277 */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { 
             background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; 
             position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; 
-            min-height: 140px;
+            min-height: 140px; 
         }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
@@ -59,6 +59,20 @@
         .health .kpi-card::before { background: var(--red); } .health .kc-val, .health .kc-val-huge { color: var(--red); } 
         .repair .kpi-card::before { background: var(--blue); } .repair .kc-val, .repair .kc-val-huge { color: var(--blue); } 
         .supply .kpi-card::before { background: var(--yellow); } .supply .kc-val, .supply .kc-val-huge { color: var(--yellow); } 
+
+        /* PIE CHART CSS */
+        .pie-container { display: flex; align-items: center; justify-content: center; height: 100%; }
+        .pie-chart {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: conic-gradient(var(--green) 0% 0%, #333 0% 100%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .pie-chart::after {
+            content: ''; position: absolute; width: 60px; height: 60px; 
+            background: var(--bg-panel); border-radius: 50%;
+        }
+        .pie-val { position: absolute; z-index: 2; font-family: var(--font-num); font-weight: 700; color: #fff; font-size: 14px; }
 
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .data-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; }
@@ -105,7 +119,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V276</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V277</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -186,15 +200,18 @@
                     <div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div>
                     <div class="kc-sub">TIMER ACTIVE</div>
                 </div>
-                <div class="kpi-card">
-                    <div class="kc-title">TOTAL WEIGHT</div>
-                    <div class="kc-val" id="zTotalWeight" style="color:var(--blue)">0</div>
-                    <div class="kc-sub">COMBAT POWER</div>
+                <div class="kpi-card" style="align-items:center; justify-content:center;">
+                    <div class="pie-container">
+                        <div class="pie-chart" id="zPieChart">
+                            <span class="pie-val" id="zPieVal">0%</span>
+                        </div>
+                    </div>
+                    <div class="kc-sub" style="margin-top:5px; text-align:center;">ACTIVE RATIO</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kc-title">TOTAL REWARD</div>
+                    <div class="kc-title">TOTAL DOVX MINT</div>
                     <div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div>
-                    <div class="kc-sub">DOVX / 24H (WIN+DRAW+LOSS)</div>
+                    <div class="kc-sub">GLOBAL DAILY YIELD</div>
                 </div>
             </div>
 
@@ -234,7 +251,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V276';
+    const STORAGE_KEY = 'DOV_DATA_V277';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -444,7 +461,8 @@
                     let zid = r.zone_id || r.zoneID;
                     if(zonesData[zid]) {
                         zonesData[zid].count++; stats.totalDivs++;
-                        let weight = parseFloat(r.weight || 0);
+                        // WEIGHT FIX V277 (POWER OR WEIGHT)
+                        let weight = parseFloat(r.weight || r.power || 0);
                         zonesData[zid].weight += weight; stats.totalWeight += weight;
                         let endTime = getEndTime(r); let isFighting = false;
                         if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
@@ -452,16 +470,15 @@
                             zonesData[zid].active++; stats.activeDivs++;
                             let zConf = SMART_ZONES_BIBLE[zid];
                             
-                            // CALCUL DU BURN REEL (POUR TOUS LES TOKENS)
-                            let cost = zConf.cost;
-                            zonesData[zid].bf += cost; zonesData[zid].bh += cost; zonesData[zid].br += cost; zonesData[zid].bs += cost;
-                            stats.burnF += cost; stats.burnH += cost; stats.burnR += cost; stats.burnS += cost;
+                            let currentCost = zConf.cost;
+                            zonesData[zid].bf += currentCost; zonesData[zid].bh += currentCost; zonesData[zid].br += currentCost; zonesData[zid].bs += currentCost;
+                            stats.burnF += currentCost; stats.burnH += currentCost; stats.burnR += currentCost; stats.burnS += currentCost;
                             
-                            // CALCUL DU GAIN REEL (WIN/DRAW/LOSS)
                             let reward = 0;
                             if(weight >= zConf.wWin) reward = zConf.win;
                             else if(weight >= zConf.wDraw) reward = zConf.draw;
                             else if(weight >= zConf.wLoss) reward = zConf.loss;
+                            else reward = 0;
                             
                             zonesData[zid].prod += reward; stats.totalProd += reward;
                         }
@@ -478,11 +495,18 @@
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs);
         getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalWeight').innerText = fmt(stats.totalWeight);
-        // NEW V276: GLOBAL REWARD CARD
+        
+        // PIE CHART UPDATE V277
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0;
+        let pChart = getId('zPieChart');
+        if(pChart) {
+            pChart.style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`;
+            getId('zPieVal').innerText = activePct.toFixed(0) + "%";
+        }
+
+        // TOTAL MINT DOVX V277
         getId('zTotalProd').innerText = fmt(stats.totalProd); 
         
-        // GLOBAL BURN HEADER
         getId('gBurnF').innerText = fmt(stats.burnF); getId('gBurnH').innerText = fmt(stats.burnH); getId('gBurnR').innerText = fmt(stats.burnR); getId('gBurnS').innerText = fmt(stats.burnS);
         
         let html = "";
@@ -490,11 +514,11 @@
             let z = SMART_ZONES_BIBLE[id];
             let d = zonesData[id];
             let activeClass = d.count > 0 ? "active" : "";
-            // NEW V276: ZONE CARD WITH BURN DETAILS
+            // V277 MINT LABEL
             html += `<div class="zone-card ${activeClass}">
                 <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
                 <div class="zc-mid">
-                    <div class="zs-item"><span>WIN (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
                     <div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div>
                     <div style="height:1px; background:#333; margin:2px 0;"></div>
                     <div class="zs-item" style="color:#888; font-size:9px;">BURN 24H</div>
