@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V293 (FINAL GOLD)</title>
+    <title>DoV - COMMAND V299 (DATA ROOM)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -89,24 +89,38 @@
         .val-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; border-bottom: 1px dotted #333; padding: 2px 0; }
         .val-row span:last-child { color: #fff; font-family: var(--font-num); }
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
+        
+        /* DATA ROOM SPECIFIC */
+        .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .dr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .dr-item { background: #000; padding: 10px; border: 1px solid #333; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+        .dr-item a { color: #fff; text-decoration: none; } .dr-item a:hover { color: var(--blue); }
+        .dr-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; margin: 0 auto 20px auto; display: block; object-fit: cover; }
     </style>
 </head>
 <body>
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V293</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V299</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
             <div class="btn-row"><button class="btn-blue" onclick="startZoneScan()">DIVISIONS</button><button class="btn-orange" onclick="startEconomyScan()">ECONOMY</button></div>
         </div>
+        
+        <div class="control-group">
+            <span class="grp-lbl">PROJECT INTELLIGENCE</span>
+            <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
+        </div>
+
         <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
         <div class="control-group" style="margin-top:auto">
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V293 Active. Persist ON.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V299. Data Room Ready.</div></div>
     </aside>
 
     <main class="main-content">
@@ -139,19 +153,29 @@
             <div class="dashboard-header" style="border-left: 4px solid var(--orange)"><div><h2 class="page-h1">INVESTOR DASHBOARD</h2><div class="page-meta" id="ecoStatus">BUSINESS INTELLIGENCE</div></div></div>
             <div class="market-ticker" id="marketTicker"></div>
             <div class="kpi-grid eco" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
-                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div></div>
+                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div><div class="kc-sub">ALL OWNERS (ACTIVE + PASSIVE)</div></div>
                 <div class="kpi-card"><div class="kc-title">NFT MARKET CAP</div><div class="kc-val" style="color:#fff" id="ecoNftCap">0</div><div class="kc-sub" id="ecoNftCapUsd">$0.00</div></div>
-                <div class="kpi-card"><div class="kc-title">TVL (UNITS)</div><div class="kc-val" id="ecoTVL">0</div></div>
-                <div class="kpi-card"><div class="kc-title">DAILY GDP</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
+                <div class="kpi-card"><div class="kc-title">TOTAL ASSETS</div><div class="kc-val" id="ecoTVL">0</div><div class="kc-sub">BUILDINGS + UNITS</div></div>
+                <div class="kpi-card"><div class="kc-title">DAILY GDP (VALUE)</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
             </div>
             <div class="data-panel" style="margin-bottom:25px;">
-                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS</span></div>
-                <div class="dt-grid dt-header" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">PERIOD</div><div class="cell c-right">GROSS (WAX)</div><div class="cell c-right">GROSS (USD)</div></div>
+                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS (REVENUE)</span></div>
+                <div class="dt-grid dt-header" style="grid-template-columns: 150px 1fr 1fr;"><div class="cell">PERIOD</div><div class="cell c-right">GROSS (WAX)</div><div class="cell c-right">GROSS (USD)</div></div>
                 <div id="projTable"></div>
             </div>
         </div>
     </main>
 </div>
+
+<div class="modal-overlay" id="dataRoomModal"><div class="modal-box" style="width:700px;">
+    <img src="https://ipfs.io/ipfs/QmcR7QTbt2tYHxMZ8rsH45FxYU8fuHPCy7UeAguZW3QupE" class="dr-logo" alt="DOV Logo">
+    <h3 style="text-align:center; color:#fff; margin-top:0;">DAWN OF VICTORY - INVESTOR DATA ROOM</h3>
+    <p style="color:#888; font-size:11px; text-align:center; margin-bottom:20px; font-style:italic;">Fight with the allies on this first-ever WWII game on the blockchain. Build your divisions and lead the war inside Supreme HQ.</p>
+    
+    <div id="drContent"></div>
+    
+    <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('dataRoomModal')">CLOSE</button></div>
+</div></div>
 
 <div class="modal-overlay" id="zoneDetailModal"><div class="modal-box" style="width:800px;">
     <h3 id="zdTitle" style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">ZONE DETAIL</h3>
@@ -160,20 +184,47 @@
 </div></div>
 
 <script>
-    // --- CONFIGURATION FINANCIERE ---
+    // --- CONFIGURATION FINANCIERE (VALEURS PRECISES) ---
     const CONFIG_PRIX = {
-        WAX_USD: 0.05,
-        DOVX_WAX: 0.1, DOVF_WAX: 0.05, DOVH_WAX: 0.05, DOVR_WAX: 0.05, DOVS_WAX: 0.05,
-        PRIX_MOYEN_NFT_USD: 10
+        WAX_USD: 0.00751, 
+        DOVX_WAX: 0.00528553,
+        DOVR_WAX: 0.00045262,
+        DOVF_WAX: 0.00045262,
+        DOVH_WAX: 0.00045262,
+        DOVS_WAX: 0.00045262,
+        PRIX_MOYEN_NFT_USD: 10 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V293';
+    // --- PROJECT METADATA (V299) ---
+    const PROJECT_DATA = {
+        links: [
+            { name: "Official Website", url: "https://dawnofvictory.io/" },
+            { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" },
+            { name: "Beta Access", url: "https://beta.dawnofvictory.io/" },
+            { name: "Twitter", url: "https://twitter.com/DOVNFT" },
+            { name: "Telegram", url: "https://t.me/dawnofvictorynft" },
+            { name: "Discord", url: "https://discord.gg/N5tB9j75em" }
+        ],
+        markets: [
+            { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" },
+            { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" },
+            { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" },
+            { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" },
+            { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" },
+            { name: "Instant Swap", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" }
+        ],
+        contracts: [
+            "dovutilstake", "dovpvecontrl", "dawnfvictory", "blenderizerx", "atomicpacksx", "atomicdropsx"
+        ]
+    };
+
+    const STORAGE_KEY = 'DOV_DATA_V299';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD'});
+    const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD', minimumFractionDigits: 4});
     
     window.onerror = function(msg, url, line) {
         let errBanner = getId('error-banner');
@@ -209,8 +260,8 @@
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false;
     let zoneDetailsCache = {}; 
-    let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, uniqueWallets: 0 };
-    let marketData = { WAX:0, DOVX:0, DOVF:0, DOVH:0, DOVR:0, DOVS:0 };
+    let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
+    let runtimeWalletSet = new Set(); 
 
     function init() {
         const local = localStorage.getItem(STORAGE_KEY);
@@ -218,7 +269,6 @@
             try { 
                 let loaded = JSON.parse(local); 
                 DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
-                // V293: RESTORE ECO STATS
                 if(loaded.ecoStats) ecoStats = loaded.ecoStats;
             } catch(e){} 
         }
@@ -226,14 +276,10 @@
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         if(getId('dictSize')) getId('dictSize').innerText = count;
         
-        marketData.WAX = CONFIG_PRIX.WAX_USD;
-        marketData.DOVX = CONFIG_PRIX.DOVX_WAX; marketData.DOVF = CONFIG_PRIX.DOVF_WAX;
-        marketData.DOVH = CONFIG_PRIX.DOVH_WAX; marketData.DOVR = CONFIG_PRIX.DOVR_WAX; marketData.DOVS = CONFIG_PRIX.DOVS_WAX;
-
         buildUI();
         renderTicker();
-        updateEcoUI(); // V293: RENDER STATS IMMEDIATELY IF SAVED
-        // V293: RE-RENDER SPECIFIC TABS TO SHOW DATA
+        updateEcoUI(); 
+        
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) {
              getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost);
              getId('cntRows').innerText = fmt(ecoStats.buildings.active);
@@ -242,15 +288,44 @@
              getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active);
         }
 
-        log("Ready. Mode: Gold V293 (Persistent).");
+        log("Ready. Mode: V299 Data Room.");
+    }
+
+    // V299: DATA ROOM MODAL
+    function openDataRoom() {
+        let html = "";
+        
+        // OFFICIAL LINKS
+        html += `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`;
+        PROJECT_DATA.links.forEach(l => {
+            html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`;
+        });
+        html += `</div></div>`;
+
+        // LIQUIDITY
+        html += `<div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`;
+        PROJECT_DATA.markets.forEach(m => {
+            html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`;
+        });
+        html += `</div></div>`;
+
+        // CONTRACTS
+        html += `<div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`;
+        PROJECT_DATA.contracts.forEach(c => {
+            html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`;
+        });
+        html += `</div></div>`;
+
+        getId('drContent').innerHTML = html;
+        getId('dataRoomModal').style.display = 'flex';
     }
 
     function renderTicker() {
-        let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${marketData.WAX}</div></div>`;
-        const tokens = [ { s:"DOVX", p: marketData.DOVX }, { s:"DOVF", p: marketData.DOVF }, { s:"DOVH", p: marketData.DOVH }, { s:"DOVR", p: marketData.DOVR }, { s:"DOVS", p: marketData.DOVS } ];
+        let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`;
+        const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ];
         tokens.forEach(t => {
-            let usd = t.p * marketData.WAX;
-            html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(4)}</div></div>`;
+            let usd = t.p * CONFIG_PRIX.WAX_USD;
+            html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`;
         });
         getId('marketTicker').innerHTML = html;
     }
@@ -287,7 +362,6 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // V293: SILENT MODE SUPPORT
     async function dispatchGlobalScan(silent = false) {
         stopSignal = false; 
         if(!silent) switchView('viewGlobal'); 
@@ -297,8 +371,7 @@
         let stats = { totalCost:0, types:{F:{p:0,a:0,t:0}, H:{p:0,a:0,t:0}, R:{p:0,a:0,t:0}, S:{p:0,a:0,t:0}} }; 
         let groups = {F:[], H:[], R:[], S:[]};
         let rowCount = 0; let assetCount = 0;
-        let walletSet = new Set(); // Local set for this scan
-
+        
         try {
             while(!stopSignal) {
                 let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
@@ -309,8 +382,11 @@
                     let tpl = findTemplate(tid); if(!tpl) continue;
                     rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
                     stats.types[tpl.type].t += count;
+                    runtimeWalletSet.add(r.owner); 
+                    
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(isActive) { stats.types[tpl.type].a += count; walletSet.add(r.owner); }
+                    if(isActive) { stats.types[tpl.type].a += count; }
+                    
                     let existing = groups[tpl.type].find(x => x.name === tpl.name);
                     if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); }
                     existing.tot += count;
@@ -329,8 +405,6 @@
                 updateGlobalUI(rowCount, stats, groups);
                 if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
             }
-            // V293: MERGE WALLETS
-            ecoStats.uniqueWallets = walletSet.size; // Store size only to persist
             saveData();
             log(`Buildings Scan Done. ${assetCount} Assets.`);
         } catch(e) { log("Error Buildings: " + e.message); }
@@ -377,13 +451,12 @@
                     let zid = r.zone_id || r.zoneID;
                     if(zonesData[zid]) {
                         zonesData[zid].count++; stats.totalDivs++;
+                        runtimeWalletSet.add(r.owner); 
+                        
                         let endTime = getEndTime(r); let isFighting = false;
                         if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
                         if(isFighting) {
                             zonesData[zid].active++; stats.activeDivs++;
-                            // ecoStats.uniqueWallets is handled in Buildings for simplicity/speed or needs merge. 
-                            // For V293 we trust Building Owners count as primary or we would need double Set merge which is heavy. 
-                            // Keeping building owners as proxy for "Unique Wallets".
                             let zConf = SMART_ZONES_BIBLE[zid];
                             let currentCost = zConf.cost;
                             let isCity = [17, 18, 19, 20].includes(parseInt(zid));
@@ -435,49 +508,57 @@
     async function startEconomyScan() {
         switchView('viewEco');
         getId('ecoStatus').innerText = "AUTO-PILOT: SCANNING ALL ASSETS...";
-        // V293: CALL SILENTLY
+        runtimeWalletSet.clear(); 
         await dispatchGlobalScan(true);
         await startZoneScan(true);
+        ecoStats.uniqueWalletCount = runtimeWalletSet.size;
+        saveData();
         getId('ecoStatus').innerText = "REPORT GENERATED.";
         updateEcoUI();
     }
 
     function updateEcoUI() {
         let totalTVL = ecoStats.buildings.active + ecoStats.divisions.active;
-        let nftMarketCap = totalTVL * CONFIG_PRIX.PRIX_MOYEN_NFT_USD;
+        let nftMarketCapWax = totalTVL * CONFIG_PRIX.PRIX_MOYEN_NFT_USD / CONFIG_PRIX.WAX_USD;
+        let nftMarketCapUsd = totalTVL * CONFIG_PRIX.PRIX_MOYEN_NFT_USD;
 
         let volF = ecoStats.buildings.prodF * 24; let volH = ecoStats.buildings.prodH * 24;
         let volR = ecoStats.buildings.prodR * 24; let volS = ecoStats.buildings.prodS * 24;
-        let valF_W = volF * marketData.DOVF; let valH_W = volH * marketData.DOVH;
-        let valR_W = volR * marketData.DOVR; let valS_W = volS * marketData.DOVS;
+        let valF_W = volF * CONFIG_PRIX.DOVF_WAX; let valH_W = volH * CONFIG_PRIX.DOVH_WAX;
+        let valR_W = volR * CONFIG_PRIX.DOVR_WAX; let valS_W = volS * CONFIG_PRIX.DOVS_WAX;
         
         let dailyWaxProd = valF_W + valH_W + valR_W + valS_W;
-        let dailyUsdProd = dailyWaxProd * marketData.WAX;
+        let dailyUsdProd = dailyWaxProd * CONFIG_PRIX.WAX_USD;
 
         let volX = ecoStats.divisions.mint;
-        let valX_W = volX * marketData.DOVX;
-        let valX_USD = valX_W * marketData.WAX;
+        let valX_W = volX * CONFIG_PRIX.DOVX_WAX;
+        let valX_USD = valX_W * CONFIG_PRIX.WAX_USD;
 
         let totalWaxGDP = dailyWaxProd + valX_W;
-        let totalUsdGDP = totalWaxGDP * marketData.WAX;
+        let totalUsdGDP = totalWaxGDP * CONFIG_PRIX.WAX_USD;
 
-        getId('ecoWallets').innerText = fmt(ecoStats.uniqueWallets);
-        getId('ecoNftCap').innerText = fmt(totalTVL * 100) + " WAX (EST)"; 
-        getId('ecoNftCapUsd').innerText = fmtUsd(nftMarketCap);
+        getId('ecoWallets').innerText = fmt(ecoStats.uniqueWalletCount);
+        getId('ecoNftCap').innerText = fmt(nftMarketCapWax) + " WAX"; 
+        getId('ecoNftCapUsd').innerText = fmtUsd(nftMarketCapUsd);
         
         getId('ecoTVL').innerText = fmt(totalTVL);
         
         getId('ecoGdpUsd').innerText = fmtUsd(totalUsdGDP);
         getId('ecoGdpWax').innerText = fmtDec(totalWaxGDP) + " WAX";
 
+        let m_wax = (dailyWaxProd * 30) + (valX_W * 30);
+        let m_usd = (dailyUsdProd * 30) + (valX_USD * 30);
+        let y_wax = (dailyWaxProd * 365) + (valX_W * 365);
+        let y_usd = (dailyUsdProd * 365) + (valX_USD * 365);
+
         let html = `
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr; background:rgba(0,255,0,0.05);"><div class="cell"><b>INDUSTRY (24H)</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyWaxProd)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyUsdProd)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">IND. MONTH</div><div class="cell c-right" style="color:#888">${fmtDec(dailyWaxProd*30)} W</div><div class="cell c-right" style="color:#888">${fmtUsd(dailyUsdProd*30)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">IND. YEAR</div><div class="cell c-right" style="color:#888">${fmtDec(dailyWaxProd*365)} W</div><div class="cell c-right" style="color:#888">${fmtUsd(dailyUsdProd*365)}</div></div>
-            <div style="height:10px;"></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr; background:rgba(41,121,255,0.05);"><div class="cell"><b>MILITARY (24H)</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(valX_W)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(valX_USD)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">MIL. MONTH</div><div class="cell c-right" style="color:#888">${fmtDec(valX_W*30)} W</div><div class="cell c-right" style="color:#888">${fmtUsd(valX_USD*30)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">MIL. YEAR</div><div class="cell c-right" style="color:#888">${fmtDec(valX_W*365)} W</div><div class="cell c-right" style="color:#888">${fmtUsd(valX_USD*365)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 150px 1fr 1fr; background:rgba(0,255,0,0.05);"><div class="cell"><b>INDUSTRY (24H)</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyWaxProd)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyUsdProd)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 150px 1fr 1fr; background:rgba(41,121,255,0.05);"><div class="cell"><b>MILITARY (24H)</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(valX_W)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(valX_USD)}</div></div>
+            <div style="height:10px; border-bottom:1px solid #333; margin-bottom:10px;"></div>
+            
+            <div class="dt-grid dt-row" style="grid-template-columns: 150px 1fr 1fr;"><div class="cell">TOTAL ECOSYSTEM (24H)</div><div class="cell c-right" style="color:#fff">${fmtDec(totalWaxGDP)} W</div><div class="cell c-right" style="color:#fff">${fmtUsd(totalUsdGDP)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 150px 1fr 1fr;"><div class="cell">TOTAL MONTH (30D)</div><div class="cell c-right" style="color:#fff">${fmtDec(m_wax)} W</div><div class="cell c-right" style="color:#fff">${fmtUsd(m_usd)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 150px 1fr 1fr;"><div class="cell" style="color:var(--purple); font-weight:bold;">TOKEN ECONOMY (YEAR)</div><div class="cell c-right" style="color:var(--purple); font-weight:bold;">${fmtDec(y_wax)} W</div><div class="cell c-right" style="color:var(--purple); font-weight:bold;">${fmtUsd(y_usd)}</div></div>
         `;
         getId('projTable').innerHTML = html;
     }
@@ -495,15 +576,11 @@
         getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
     }
     
-    function saveData() { 
-        DATA.ecoStats = ecoStats; 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); 
-        log("Data Saved.");
-    }
+    function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
     async function initInspector() { alert("Use V285 for Inspector"); }
     async function startTargetBuildings() { } async function startTargetDivisions() { }
-    function openSettings() { alert("Use Code Config in V293"); }
+    function openSettings() { alert("Use Code Config in V299"); }
 
     window.onload = init;
 </script>
