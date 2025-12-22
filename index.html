@@ -265,11 +265,21 @@
     let stopSignal = false;
 
     function init() {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; } catch(e){} }
-        getId('dictSize').innerText = Object.keys(DATA.templates).length;
-        buildUI();
+    let loaded = null;
+
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) loaded = JSON.parse(raw);
+    } catch (e) {
+        console.warn("⚠️ Corrupted local storage, fallback to defaults");
     }
+
+    DATA = loaded ? structuredClone(loaded) : structuredClone(DEFAULT_DATA);
+
+    getId('dictSize').innerText = Object.keys(DATA.templates || {}).length;
+    buildUI();
+}
+
 
     function buildUI() {
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
@@ -525,30 +535,51 @@
     async function startTargetBuildings() { /* Same V199 */ }
     async function startTargetDivisions() { /* Same V199 */ }
 
-    function openSettings() { 
-        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); 
-        getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); 
-        getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); 
-        getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); 
-        getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); 
-        getId('cfgDivisions').value = JSON.stringify(DATA.divisions, null, 4);
-        getId('settingsModal').style.display = 'flex'; 
-    }
+    function openSettings() {
+    getId('cfgApi').value = JSON.stringify(DATA.apiConfig?.rpcNodes || [], null, 2);
+    getId('cfgResources').value = JSON.stringify(DATA.resourceDefs || {}, null, 2);
+    getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig || {}, null, 2);
+    getId('cfgZones').value = JSON.stringify(DATA.zones || {}, null, 2);
+    getId('cfgTemplates').value = JSON.stringify(DATA.templates || {}, null, 2);
+    getId('cfgDivisions').value = JSON.stringify(DATA.divisions || {}, null, 2);
+
+    getId('settingsModal').style.display = 'flex';
+}
+
     
-    function saveConfig() { 
-        try { 
-            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
-            DATA.resourceDefs = JSON.parse(getId('cfgResources').value); 
-            DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); 
-            DATA.zones = JSON.parse(getId('cfgZones').value); 
-            DATA.templates = JSON.parse(getId('cfgTemplates').value); 
-            DATA.divisions = JSON.parse(getId('cfgDivisions').value); 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); 
-            closeModal('settingsModal'); init(); 
-        } catch(e) { alert("JSON ERROR"); } 
+   function saveConfig() {
+    try {
+        const newData = structuredClone(DATA);
+
+        newData.apiConfig = {
+            rpcNodes: JSON.parse(getId('cfgApi').value)
+        };
+        newData.resourceDefs = JSON.parse(getId('cfgResources').value);
+        newData.gameConfig = JSON.parse(getId('cfgGameRules').value);
+        newData.zones = JSON.parse(getId('cfgZones').value);
+        newData.templates = JSON.parse(getId('cfgTemplates').value);
+        newData.divisions = JSON.parse(getId('cfgDivisions').value);
+
+        // --- MINIMAL SANITY CHECKS ---
+        if (!Array.isArray(newData.apiConfig.rpcNodes)) throw new Error("RPC nodes must be an array");
+        if (Object.keys(newData.templates).length === 0) throw new Error("Templates cannot be empty");
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+        location.reload();
+
+    } catch (e) {
+        alert("❌ CONFIG ERROR\n\n" + e.message);
+        console.error(e);
     }
+}
+
     
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+  function hardReset() {
+    if (!confirm("⚠️ Factory reset ? All custom config will be lost.")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+}
+
 
     window.onload = init;
 </script>
