@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V272 (INTELLIGENT ZONES)</title>
+    <title>DoV - COMMAND V272 (INTELLIGENT WAR)</title>
     <style>
-        /* --- DESIGN SYSTEM : FINANCIAL DARK (V271 STRICT) --- */
+        /* --- DESIGN SYSTEM : FINANCIAL DARK (STRICT V271 BASE) --- */
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
@@ -41,6 +41,7 @@
         .tc-val { font-family: var(--font-num); font-size: 24px; font-weight: 700; color: #fff; }
         .tc-unit { color: var(--purple); font-size: 12px; font-weight: 700; }
 
+        /* KPI CARDS (V271 STYLE - TALLER) */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { 
             background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; 
@@ -396,200 +397,33 @@
         return 0;
     }
 
-    // --- NEW INTELLIGENT ZONES LOGIC V272 ---
+    // --- V272 LOGIC RETAINED: INTELLIGENT ZONES ---
     async function fetchZoneConfig() {
         try {
-            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "zones", limit: 100
-            }));
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({ json: true, code: "dovpvecontrl", scope: "dovpvecontrl", table: "zones", limit: 100 }));
             if(res.rows && res.rows.length > 0) {
                 let config = {};
                 res.rows.forEach(r => {
-                    // PARSING RAW DATA FROM BLOCKCHAIN
                     let id = r.id || r.key;
-                    let win = 0, draw = 0, loss = 0;
-                    let wWin = 999999, wDraw = 999999, wLoss = 999999;
-                    let cost = 0;
-
-                    // Parse Costs (Usually first cost in array is fuel/all)
-                    if(r.costs && r.costs.length > 0) cost = parseFloat(r.costs[0].value) / 10000;
-
-                    // Parse Rewards (Resolutions)
-                    if(r.resolutions) {
-                        r.resolutions.forEach(res => {
-                            let val = parseFloat(res.value) / 10000;
-                            if(res.key === "win") win = val;
-                            if(res.key === "draw") draw = val;
-                            if(res.key === "loss") loss = val;
-                        });
+                    let win=0, draw=0, loss=0; let wWin=999999, wDraw=999999, wLoss=999999; let cost=0;
+                    
+                    // PARSE COSTS FROM RAW DATA
+                    if(r.costs && r.costs.length > 0) {
+                        let fCost = r.costs.find(c => c.key === "DOVF");
+                        if(fCost) cost = parseFloat(fCost.value) / 10000;
                     }
 
-                    // Parse Power Thresholds (Weights)
-                    // In the dump, power array has keys matching resolutions (win, draw, loss) with weight thresholds
-                    if(r.power) {
-                        r.power.forEach(p => {
-                            let val = parseFloat(p.value) / 10000; // Normalizing weight if needed
-                            if(p.key === "win") wWin = val;
-                            if(p.key === "draw") wDraw = val;
-                            if(p.key === "loss") wLoss = val;
-                        });
+                    // PARSE REWARDS
+                    if(r.resolutions) { 
+                        r.resolutions.forEach(res => { 
+                            let val = parseFloat(res.value)/10000; 
+                            if(res.key==="win") win=val; 
+                            if(res.key==="draw") draw=val; 
+                            if(res.key==="loss") loss=val; 
+                        }); 
                     }
 
-                    config[id] = { cost, win, draw, loss, wWin, wDraw, wLoss, name: r.name };
-                });
-                return config;
-            }
-        } catch(e) { console.log("Config fetch failed, using fallback"); }
-        return null;
-    }
-
-    async function startZoneScan() {
-        stopSignal = false; switchView('viewZones'); getId('zTotalDivsHeader').innerText = "...";
-        
-        // STEP 1: HYDRATE CONFIG
-        let liveConfig = await fetchZoneConfig();
-        
-        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0 };
-        let zonesData = {}; Object.keys(DATA.zones).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, weight: 0, bf:0, bh:0, br:0, bs:0 }; });
-        updateZoneUI(zonesData, stats); 
-        
-        let next = "";
-        try {
-            while(!stopSignal) {
-                let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
-                if(!json.rows) break;
-                const nowSec = Date.now()/1000;
-                
-                for(let r of json.rows) {
-                    let zid = r.zone_id || r.zoneID;
-                    if(zonesData[zid]) {
-                        zonesData[zid].count++; stats.totalDivs++;
-                        let weight = parseFloat(r.weight || 0);
-                        zonesData[zid].weight += weight; stats.totalWeight += weight;
-                        
-                        let endTime = getEndTime(r); let isFighting = false;
-                        if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
-                        
-                        if(isFighting) {
-                            zonesData[zid].active++; stats.activeDivs++;
-                            
-                            // INTELLIGENT LOGIC STARTS HERE
-                            let zConf = liveConfig && liveConfig[zid] ? liveConfig[zid] : null;
-                            let zStatic = DATA.zones[zid]; // Fallback
-                            
-                            // Cost Calculation
-                            let currentCost = zConf ? zConf.cost : zStatic.cost;
-                            zonesData[zid].bf += currentCost; zonesData[zid].bh += currentCost; zonesData[zid].br += currentCost; zonesData[zid].bs += currentCost;
-                            stats.burnF += currentCost; stats.burnH += currentCost; stats.burnR += currentCost; stats.burnS += currentCost;
-
-                            // Reward Calculation (The Referee)
-                            let reward = 0;
-                            if(zConf) {
-                                // Dynamic Referee
-                                if(weight >= zConf.wWin) reward = zConf.win;
-                                else if(weight >= zConf.wDraw) reward = zConf.draw;
-                                else if(weight >= zConf.wLoss) reward = zConf.loss;
-                                else reward = 0;
-                            } else {
-                                // Static Fallback (Optimistic)
-                                reward = zStatic.win;
-                            }
-                            
-                            zonesData[zid].prod += reward;
-                            stats.totalProd += reward;
-                        }
-                    }
-                }
-                updateZoneUI(zonesData, stats);
-                if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
-            }
-        } catch(e) { console.error(e); }
-        getId('zoneStatus').innerText = "Complete.";
-    }
-
-    function updateZoneUI(zonesData, stats) {
-        getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zTotalProd').innerText = fmt(stats.totalProd); getId('zTotalWeight').innerText = fmt(stats.totalWeight);
-        getId('gBurnF').innerText = fmt(stats.burnF); getId('gBurnH').innerText = fmt(stats.burnH); getId('gBurnR').innerText = fmt(stats.burnR); getId('gBurnS').innerText = fmt(stats.burnS);
-        
-        let html = "";
-        Object.keys(zonesData).forEach(id => {
-            let z = DATA.zones[id]; let d = zonesData[id]; let activeClass = d.count > 0 ? "active" : "";
-            html += `<div class="zone-card ${activeClass}"><div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div class="zs-item"><span>WIN (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div><div class="zs-item"><span>WEIGHT</span> <span style="color:var(--blue)">${fmt(d.weight)}</span></div><div style="height:1px; background:#333; margin:2px 0;"></div><div class="zs-item"><span>COST (EACH TU)</span> <span class="tc-f">${fmt(z.cost)}</span></div></div><div class="zc-bot"><span style="color:#666">MIN W: ${z.min_w}</span><span style="color:var(--green)">REWARD: ${z.win}</span></div></div>`;
-        });
-        getId('areaZones').innerHTML = html;
-    }
-
-    async function initInspector() {
-        switchView('viewInspector');
-        getId('inspTables').innerHTML = ""; getId('inspScopes').innerHTML = ""; getId('inspData').innerHTML = "Select a Table...";
-        let contracts = ["dovutilstake", "dovpvecontrl"]; let html = ""; let node = DATA.apiConfig.rpcNodes[0];
-        for(let c of contracts) {
-            html += `<div style="background:#222; padding:5px; font-weight:bold; color:var(--purple);">${c}</div>`;
-            try {
-                let res = await fetch(node + "/v1/chain/get_abi", {method:'POST', body:JSON.stringify({account_name:c})});
-                let json = await res.json();
-                if(json.abi) { json.abi.tables.forEach(t => { html += `<div class="abi-item" onclick="loadScopes('${c}', '${t.name}', this)">${t.name}</div>`; }); }
-            } catch(e) { html += `<div class="log-err">ERROR</div>`; }
-        }
-        getId('inspTables').innerHTML = html;
-    }
-
-    async function loadScopes(contract, table, el) {
-        currentContract = contract; currentTable = table;
-        document.querySelectorAll('.abi-item').forEach(e => e.classList.remove('selected')); if(el) el.classList.add('selected');
-        getId('inspScopes').innerHTML = "Scanning Scopes..."; getId('inspData').innerHTML = "Waiting for Scope...";
-        let node = DATA.apiConfig.rpcNodes[0];
-        try {
-            let res = await fetch(node + "/v1/chain/get_table_by_scope", { method: 'POST', body: JSON.stringify({ code: contract, table: table, limit: 50 }) });
-            let json = await res.json();
-            let html = "";
-            if(json.rows && json.rows.length > 0) { json.rows.forEach(r => { let label = r.scope === contract ? `${r.scope} (MAIN)` : r.scope; html += `<div class="abi-item" onclick="loadData('${r.scope}', this)">${label} <span style="float:right; opacity:0.5">${r.count}</span></div>`; }); } else { html = "<div style='padding:10px; color:red'>EMPTY TABLE</div>"; }
-            getId('inspScopes').innerHTML = html;
-        } catch(e) { getId('inspScopes').innerHTML = "Error fetching scopes"; }
-    }
-
-    async function loadData(scope, el) {
-        document.querySelectorAll('#inspScopes .abi-item').forEach(e => e.classList.remove('selected')); if(el) el.classList.add('selected');
-        getId('inspData').innerHTML = "Fetching Rows...";
-        let node = DATA.apiConfig.rpcNodes[0];
-        try {
-            let res = await fetch(node + "/v1/chain/get_table_rows", { method: 'POST', body: JSON.stringify({ json:true, code: currentContract, scope: scope, table: currentTable, limit: 50 }) });
-            let json = await res.json();
-            getId('inspData').innerHTML = JSON.stringify(json.rows, null, 4);
-        } catch(e) { getId('inspData').innerHTML = "Error reading data"; }
-    }
-
-    async function startEconomyScan() { /* Same V199 */ }
-    async function startTargetBuildings() { /* Same V199 */ }
-    async function startTargetDivisions() { /* Same V199 */ }
-
-    function openSettings() { 
-        getId('cfgApi').value = JSON.stringify(DATA.apiConfig, null, 4); 
-        getId('cfgResources').value = JSON.stringify(DATA.resourceDefs, null, 4); 
-        getId('cfgGameRules').value = JSON.stringify(DATA.gameConfig, null, 4); 
-        getId('cfgZones').value = JSON.stringify(DATA.zones, null, 4); 
-        getId('cfgTemplates').value = JSON.stringify(DATA.templates, null, 4); 
-        getId('cfgDivisions').value = JSON.stringify(DATA.divisions, null, 4);
-        getId('settingsModal').style.display = 'flex'; 
-    }
-    
-    function saveConfig() { 
-        try { 
-            DATA.apiConfig = JSON.parse(getId('cfgApi').value);
-            DATA.resourceDefs = JSON.parse(getId('cfgResources').value); 
-            DATA.gameConfig = JSON.parse(getId('cfgGameRules').value); 
-            DATA.zones = JSON.parse(getId('cfgZones').value); 
-            DATA.templates = JSON.parse(getId('cfgTemplates').value); 
-            DATA.divisions = JSON.parse(getId('cfgDivisions').value); 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); 
-            closeModal('settingsModal'); init(); 
-        } catch(e) { alert("JSON ERROR"); } 
-    }
-    
-    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
-
-    window.onload = init;
-</script>
-</body>
-</html>
+                    // PARSE POWER THRESHOLDS
+                    if(r.power) { 
+                        r.power.forEach(p => { 
+                            let val = parseFloat(p.value)/
