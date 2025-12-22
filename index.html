@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V287 (MULTI-PROXY)</title>
+    <title>DoV - COMMAND V288 (PROJECTIONS)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -35,7 +35,7 @@
         .btn-ghost { background: transparent; border: 1px solid #333; color: #888; }
         .btn-row { display: flex; gap: 8px; }
 
-        /* V287 CONSOLE LOG */
+        /* LOGS */
         .console-log {
             flex: 1; background: #000; border: 1px solid #333; border-radius: 4px; padding: 10px;
             font-family: var(--font-num); font-size: 9px; color: #0f0; overflow-y: auto;
@@ -117,19 +117,16 @@
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
         
-        /* ACCORDION */
         .acc-btn { cursor:pointer; font-weight:bold; color:var(--blue); }
         .acc-content { display:none; background:#08080a; padding:10px; border-left:2px solid var(--blue); margin-top:5px; grid-column: 1 / -1; }
         .acc-active { display:block; }
 
-        /* MARKET TICKER */
         .market-ticker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
         .ticker-item { background: #191a21; border: 1px solid #333; padding: 10px; border-radius: 4px; text-align: center; }
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
         .t-price { font-family: var(--font-num); color: var(--blue); font-size: 11px; margin-top: 4px; }
         .t-usd { font-family: var(--font-num); color: #666; font-size: 10px; }
         
-        /* ECO VALUATION LINES */
         .val-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; border-bottom: 1px dotted #333; padding: 2px 0; }
         .val-row span:last-child { color: #fff; font-family: var(--font-num); }
     </style>
@@ -138,7 +135,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V287</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V288</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -173,9 +170,7 @@
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
         
-        <div class="console-log" id="sysLog">
-            <div class="log-entry"><span class="log-time">SYS:</span>System Ready. V287 Active.</div>
-        </div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V288 Ready.</div></div>
     </aside>
 
     <main class="main-content">
@@ -208,38 +203,15 @@
                         <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> <span style="color:#444; margin:0 5px;">|</span>
                         <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span>
                     </div>
-                    <div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">
-                        CITY DOVX BURN: <span id="gCityBurn">0</span>
-                    </div>
+                    <div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div>
                 </div>
             </div>
-            
             <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
-                <div class="kpi-card">
-                    <div class="kc-title">TOTAL DIVISIONS</div>
-                    <div class="kc-val" id="zTotalDivs">0</div>
-                    <div class="kc-sub">ALL PLAYERS STAKED</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">IN FIGHT</div>
-                    <div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div>
-                    <div class="kc-sub">TIMER ACTIVE</div>
-                </div>
-                <div class="kpi-card" style="align-items:center; justify-content:center;">
-                    <div class="pie-container">
-                        <div class="pie-chart" id="zPieChart">
-                            <span class="pie-val" id="zPieVal">0%</span>
-                        </div>
-                    </div>
-                    <div class="kc-sub" style="margin-top:5px; text-align:center;">ACTIVE RATIO</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kc-title">TOTAL DOVX MINT</div>
-                    <div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div>
-                    <div class="kc-sub">GLOBAL DAILY YIELD</div>
-                </div>
+                <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div><div class="kc-sub">ALL PLAYERS STAKED</div></div>
+                <div class="kpi-card"><div class="kc-title">IN FIGHT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div><div class="kc-sub">TIMER ACTIVE</div></div>
+                <div class="kpi-card" style="align-items:center; justify-content:center;"><div class="pie-container"><div class="pie-chart" id="zPieChart"><span class="pie-val" id="zPieVal">0%</span></div></div><div class="kc-sub" style="margin-top:5px; text-align:center;">ACTIVE RATIO</div></div>
+                <div class="kpi-card"><div class="kc-title">TOTAL DOVX MINT</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div><div class="kc-sub">GLOBAL DAILY YIELD</div></div>
             </div>
-
             <div class="zones-map" id="areaZones"></div>
         </div>
 
@@ -275,13 +247,18 @@
                 </div>
             </div>
 
+            <div class="data-panel" style="margin-bottom:25px;">
+                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTION (ESTIMATED)</span></div>
+                <div class="dt-grid dt-header" style="grid-template-columns: 100px 1fr 1fr;">
+                    <div class="cell">PERIOD</div><div class="cell c-right">GROSS REVENUE (WAX)</div><div class="cell c-right">GROSS REVENUE (USD)</div>
+                </div>
+                <div id="projTable"></div>
+            </div>
+
             <div class="data-panel">
                 <div class="dp-head"><span class="dp-title">SECTOR ANALYSIS</span></div>
                 <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                    <div class="cell">SECTOR</div>
-                    <div class="cell c-center">ACTIVE UNITS</div>
-                    <div class="cell c-right">TOKEN FLOW (24H)</div>
-                    <div class="cell c-right">STATUS</div>
+                    <div class="cell">SECTOR</div><div class="cell c-center">ACTIVE UNITS</div><div class="cell c-right">TOKEN FLOW (24H)</div><div class="cell c-right">STATUS</div>
                 </div>
                 <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                     <div class="cell" style="color:var(--blue); font-weight:bold;">INDUSTRIAL (BUILDINGS)</div>
@@ -325,7 +302,7 @@
                 <input type="text" id="prcDOVR" placeholder="DOVR">
                 <input type="text" id="prcDOVS" placeholder="DOVS">
             </div>
-            <div style="font-size:9px; color:#666; margin-top:3px;">* Leave empty to use API Alcor.</div>
+            <div style="font-size:9px; color:#666; margin-top:3px;">* Input value (e.g. 0.05) to force price. Leave empty to use Alcor API.</div>
         </div>
         <div style="grid-column: 1 / -1;"><span class="grp-lbl">RPC NODES</span><textarea id="cfgApi"></textarea></div>
         <div><span class="grp-lbl">RESOURCES</span><textarea id="cfgResources"></textarea></div>
@@ -354,7 +331,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V287';
+    const STORAGE_KEY = 'DOV_DATA_V288';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -362,23 +339,21 @@
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD'});
     
-    // V286 LOGGING
     function log(msg, type="info") {
         let div = document.createElement("div");
         div.className = "log-entry " + (type === "err" ? "log-err" : type === "warn" ? "log-warn" : "");
-        let time = new Date().toLocaleTimeString();
-        div.innerHTML = `<span class="log-time">${time}</span>${msg}`;
+        div.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString()}</span>${msg}`;
         let c = getId('sysLog');
         if(c) { c.prepend(div); if(c.children.length > 50) c.removeChild(c.lastChild); }
     }
 
     const DEFAULT_DATA = {
-        customPrices: { DOVX:null, DOVF:null, DOVH:null, DOVR:null, DOVS:null }, // V286
+        customPrices: { DOVX:null, DOVF:null, DOVH:null, DOVR:null, DOVS:null },
         apiConfig: { 
             rpcNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", 
                 "https://wax.pink.gg", "https://api.wax.alohaeos.com", "https://wax.dapplica.io",
-                "https://api.waxsweden.org", "https://wax.eosphere.io", "https://wax.eu.eosamsterdam.net"
+                "https://api.waxsweden.org", "https://wax.eosphere.io"
             ]
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
@@ -430,7 +405,6 @@
                 if(el && DATA.customPrices[k]) el.value = DATA.customPrices[k];
             });
         }
-        // V287: Correct DB Count (Total Templates)
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         getId('dictSize').innerText = count;
         buildUI();
@@ -474,7 +448,7 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // V287: MULTI-PROXY FETCH
+    // V288: ROBUST MARKET DATA
     async function fetchMarketData() {
         log("Fetching Market Data...");
         try {
@@ -484,49 +458,48 @@
             marketData.WAX = cgJson.wax ? cgJson.wax.usd : 0;
             log(`WAX Price: $${marketData.WAX}`);
 
-            // 2. TOKENS
+            // 2. TOKENS: Check Manual Overrides FIRST (Priority)
+            let tokens = ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"];
+            let manualSet = {};
             let alcorNeeded = false;
-            ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"].forEach(t => {
-                if(DATA.customPrices[t]) {
+
+            tokens.forEach(t => {
+                if(DATA.customPrices[t] && DATA.customPrices[t] !== "") {
                     marketData[t] = parseFloat(DATA.customPrices[t]);
+                    manualSet[t] = true;
                     log(`Using Manual Price for ${t}: ${marketData[t]} WAX`);
                 } else {
+                    manualSet[t] = false;
                     alcorNeeded = true;
                 }
             });
 
             if(alcorNeeded) {
                 log("Fetching Alcor Data via Multi-Proxy...");
-                let proxies = [
-                    "https://api.allorigins.win/raw?url=",
-                    "https://corsproxy.io/?",
-                    "https://thingproxy.freeboard.io/fetch/"
-                ];
+                let proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?", "https://thingproxy.freeboard.io/fetch/"];
                 let targetUrl = encodeURIComponent("https://wax.alcor.exchange/api/v2/tickers");
-                let success = false;
-
+                
                 for(let p of proxies) {
                     try {
                         let al = await fetch(p + targetUrl);
                         if(al.ok) {
                             let alJson = await al.json();
-                            let targets = ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"];
                             alJson.forEach(t => {
-                                if(t.quote_currency === "WAX" && targets.includes(t.base_currency)) {
-                                    if(!DATA.customPrices[t.base_currency]) marketData[t.base_currency] = t.last_price;
+                                if(t.quote_currency === "WAX" && tokens.includes(t.base_currency)) {
+                                    // ONLY Update if NO Manual Price
+                                    if(!manualSet[t.base_currency]) {
+                                        marketData[t.base_currency] = t.last_price;
+                                    }
                                 }
                             });
-                            success = true;
-                            log("Alcor Data Fetched Successfully.");
-                            break; // Stop loop
+                            log("Alcor Data Fetched.");
+                            break; 
                         }
                     } catch(e) { log(`Proxy failed: ${p}`, "warn"); }
                 }
-                if(!success) log("ALL PROXIES FAILED. Prices may be 0.", "err");
             }
 
             renderTicker();
-            // Check if UI element exists before updating to avoid crash
             if(getId('ecoMint') && getId('ecoMint').innerText !== "0") updateEcoUI();
 
         } catch(e) { 
@@ -540,13 +513,14 @@
         ["DOVX", "DOVF", "DOVH", "DOVR", "DOVS"].forEach(t => {
             let priceWax = marketData[t] || 0;
             let priceUsd = priceWax * marketData.WAX;
-            html += `<div class="ticker-item"><div class="t-sym">${t}</div><div class="t-price">${priceWax.toFixed(4)} WAX</div><div class="t-usd">$${priceUsd.toFixed(6)}</div></div>`;
+            let isManual = (DATA.customPrices[t] && DATA.customPrices[t] !== "") ? "*" : "";
+            html += `<div class="ticker-item"><div class="t-sym">${t}${isManual}</div><div class="t-price">${priceWax.toFixed(4)} WAX</div><div class="t-usd">$${priceUsd.toFixed(6)}</div></div>`;
         });
         getId('marketTicker').innerHTML = html;
     }
 
     async function dispatchGlobalScan() {
-        stopSignal = false; switchView('viewGlobal'); getId('cntRows').innerText = "...";
+        stopSignal = false; switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "...";
         log("Starting Buildings Scan...");
         let next = ""; 
         let stats = { totalCost:0, types:{F:{p:0,c:0,a:0,t:0}, H:{p:0,c:0,a:0,t:0}, R:{p:0,c:0,a:0,t:0}, S:{p:0,c:0,a:0,t:0}} }; 
@@ -611,7 +585,7 @@
     }
 
     async function startZoneScan() {
-        stopSignal = false; switchView('viewZones'); getId('zTotalDivsHeader').innerText = "SCANNING...";
+        stopSignal = false; switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
         log("Starting Divisions Scan...");
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, totalWeight: 0, burnF:0, burnH:0, burnR:0, burnS:0, cityBurn:0 };
         zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
@@ -664,10 +638,11 @@
             }
             log(`Divisions Scan Complete. ${stats.activeDivs} Fighting.`);
         } catch(e) { log("Error Scanning Divisions: " + e.message, "err"); }
-        getId('zoneStatus').innerText = "Complete.";
+        if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete.";
     }
 
     function updateZoneUI(zonesData, stats) {
+        if(!getId('zTotalDivsHeader')) return;
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs);
         getId('zTotalDivs').innerText = fmt(stats.totalDivs);
         getId('zActiveDivs').innerText = fmt(stats.activeDivs);
@@ -684,14 +659,8 @@
             let d = zonesData[id];
             let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
-            let burnHtml = "";
-            if(isCity) {
-                burnHtml = `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>`;
-            } else {
-                burnHtml = `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div>
-                    <div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
-            }
-
+            let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
+                                  : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
             html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div><div style="height:1px; background:#333; margin:2px 0;"></div>${burnHtml}</div><div class="zc-bot"><span style="color:#666">MIN W: ${z.wWin}</span><span style="color:var(--green)">REWARD: ${z.win}</span></div></div>`;
         });
         getId('areaZones').innerHTML = html;
@@ -712,6 +681,7 @@
             getId('ecoStatus').innerText = "REPORT READY.";
         }
         updateEcoUI();
+        updateProjections(); // V288
     }
 
     function getValRows(unitAmount, waxAmount, usdAmount) {
@@ -724,7 +694,6 @@
 
     function updateEcoUI() {
         let totalTVL = ecoStats.buildings.active + ecoStats.divisions.active;
-        
         let volF = ecoStats.buildings.prodF * 24; let volH = ecoStats.buildings.prodH * 24;
         let volR = ecoStats.buildings.prodR * 24; let volS = ecoStats.buildings.prodS * 24;
         let volX = ecoStats.divisions.mint;
@@ -764,7 +733,28 @@
         getId('secDivFlow').innerText = `+${fmt(volX)}`;
     }
 
-    function openZoneDetail(zid) {
+    // V288: PROJECTIONS
+    function updateProjections() {
+        let volF = ecoStats.buildings.prodF * 24; let volH = ecoStats.buildings.prodH * 24;
+        let volR = ecoStats.buildings.prodR * 24; let volS = ecoStats.buildings.prodS * 24;
+        let volX = ecoStats.divisions.mint;
+        
+        let valF_W = volF * (marketData.DOVF || 0); let valH_W = volH * (marketData.DOVH || 0);
+        let valR_W = volR * (marketData.DOVR || 0); let valS_W = volS * (marketData.DOVS || 0);
+        let valX_W = volX * (marketData.DOVX || 0);
+        
+        let dayWAX = valF_W + valH_W + valR_W + valS_W + valX_W;
+        let dayUSD = dayWAX * marketData.WAX;
+
+        let html = `
+            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">24H (DAY)</div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dayWAX)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dayUSD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">30D (MONTH)</div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dayWAX*30)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dayUSD*30)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 100px 1fr 1fr;"><div class="cell">365D (YEAR)</div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dayWAX*365)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dayUSD*365)}</div></div>
+        `;
+        getId('projTable').innerHTML = html;
+    }
+
+    function openZoneDetail(zid) { 
         if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
         let list = zoneDetailsCache[zid];
         let zName = SMART_ZONES_BIBLE[zid].name;
