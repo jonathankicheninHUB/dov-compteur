@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V301 (AUDIT)</title>
+    <title>DoV - COMMAND V301 (AUDIT TOOL)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -89,12 +89,15 @@
         .val-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; border-bottom: 1px dotted #333; padding: 2px 0; }
         .val-row span:last-child { color: #fff; font-family: var(--font-num); }
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
+        
+        /* DATA ROOM SPECIFIC */
         .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
         .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
         .dr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .dr-item { background: #000; padding: 10px; border: 1px solid #333; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
         .dr-item a { color: #fff; text-decoration: none; } .dr-item a:hover { color: var(--blue); }
         .dr-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; margin: 0 auto 20px auto; display: block; object-fit: cover; }
+        
         /* V301 PROGRESS BAR */
         .progress-bar-container { width:100%; background:#111; height:10px; border-radius:5px; margin-top:10px; overflow:hidden; }
         .progress-bar { width:0%; height:100%; background:var(--green); transition:0.2s; }
@@ -155,7 +158,7 @@
             <div class="dashboard-header" style="border-left: 4px solid var(--orange)"><div><h2 class="page-h1">INVESTOR DASHBOARD</h2><div class="page-meta" id="ecoStatus">BUSINESS INTELLIGENCE</div></div></div>
             <div class="market-ticker" id="marketTicker"></div>
             <div class="kpi-grid eco" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
-                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div><div class="kc-sub">AUDITED HOLDERS</div></div>
+                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div><div class="kc-sub">AUDITED HOLDERS (ATOMIC)</div></div>
                 <div class="kpi-card"><div class="kc-title">NFT MARKET CAP</div><div class="kc-val" style="color:#fff" id="ecoNftCap">0</div><div class="kc-sub" id="ecoNftCapUsd">$0.00</div></div>
                 <div class="kpi-card"><div class="kc-title">TOTAL ASSETS</div><div class="kc-val" id="ecoTVL">0</div><div class="kc-sub">CIRCULATING SUPPLY</div></div>
                 <div class="kpi-card"><div class="kc-title">DAILY GDP (VALUE)</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
