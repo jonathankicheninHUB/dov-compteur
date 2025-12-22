@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V282 (INVESTOR DASHBOARD)</title>
+    <title>DoV - COMMAND V283 (FINAL AUTO)</title>
     <style>
         /* --- DESIGN SYSTEM : FINANCIAL DARK --- */
         :root {
@@ -106,7 +106,7 @@
         .modal-box { width:650px; background:var(--bg-panel); border:1px solid var(--border); padding:20px; border-radius:6px; box-shadow:0 20px 50px #000; max-height:90vh; overflow-y:auto; }
         textarea { width:100%; height:100px; background:#000; border:1px solid #333; color:#ccc; font-family:var(--font-num); padding:10px; }
         
-        /* ACCORDION V282 */
+        /* ACCORDION */
         .acc-btn { cursor:pointer; font-weight:bold; color:var(--blue); }
         .acc-content { display:none; background:#08080a; padding:10px; border-left:2px solid var(--blue); margin-top:5px; grid-column: 1 / -1; }
         .acc-active { display:block; }
@@ -116,7 +116,7 @@
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V282</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V283</span></div>
         
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
@@ -310,7 +310,7 @@
 </div></div>
 
 <script>
-    const STORAGE_KEY = 'DOV_DATA_V282';
+    const STORAGE_KEY = 'DOV_DATA_V283';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -540,21 +540,41 @@
         getId('areaZones').innerHTML = html;
     }
 
+    // --- V283: AUTO-SCAN LOGIC ---
     async function startEconomyScan() {
-        switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING NETWORK... (DUAL MODE)";
-        ecoStats = { buildings: { active:0, prod:0, cost:0 }, divisions: { active:0, mint:0, cost:0 } };
+        switchView('viewEco');
+        // If empty, trigger auto-scan
+        if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) {
+            getId('ecoStatus').innerText = "AUTO-PILOT: SCANNING BUILDINGS...";
+            await dispatchGlobalScan(); // Runs until finished
+            getId('ecoStatus').innerText = "AUTO-PILOT: SCANNING DIVISIONS...";
+            await startZoneScan(); // Runs until finished
+            getId('ecoStatus').innerText = "DATA ACQUIRED. REPORT GENERATED.";
+        } else {
+            getId('ecoStatus').innerText = "REPORT READY.";
+        }
         updateEcoUI();
-        if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) { alert("Data missing. Please run 'BÂTIMENTS' then 'DIVISIONS' scans to populate this report."); }
     }
 
     function updateEcoUI() {
         let totalTVL = ecoStats.buildings.active + ecoStats.divisions.active;
-        let totalGDP = ecoStats.buildings.prod + ecoStats.divisions.mint; 
+        // V283: MATH FIX (Hourly Prod * 24 + Daily Mint)
+        let dailyBuildingProd = ecoStats.buildings.prod * 24;
+        let totalGDP = dailyBuildingProd + ecoStats.divisions.mint; 
+        
         let totalBurn = ecoStats.buildings.cost + ecoStats.divisions.cost;
         let yieldVal = totalGDP - totalBurn; 
-        getId('ecoTVL').innerText = fmt(totalTVL); getId('ecoMint').innerText = fmt(totalGDP); getId('ecoBurn').innerText = fmt(totalBurn); getId('ecoYield').innerText = fmt(yieldVal);
-        getId('secBuildAct').innerText = fmt(ecoStats.buildings.active); getId('secBuildFlow').innerText = `+${fmt(ecoStats.buildings.prod)} / -${fmt(ecoStats.buildings.cost)}`;
-        getId('secDivAct').innerText = fmt(ecoStats.divisions.active); getId('secDivFlow').innerText = `+${fmt(ecoStats.divisions.mint)} / -${fmt(ecoStats.divisions.cost)}`;
+        
+        getId('ecoTVL').innerText = fmt(totalTVL);
+        getId('ecoMint').innerText = fmt(totalGDP);
+        getId('ecoBurn').innerText = fmt(totalBurn);
+        getId('ecoYield').innerText = fmt(yieldVal);
+        
+        getId('secBuildAct').innerText = fmt(ecoStats.buildings.active);
+        getId('secBuildFlow').innerText = `+${fmt(dailyBuildingProd)} / -${fmt(ecoStats.buildings.cost)}`;
+        
+        getId('secDivAct').innerText = fmt(ecoStats.divisions.active);
+        getId('secDivFlow').innerText = `+${fmt(ecoStats.divisions.mint)} / -${fmt(ecoStats.divisions.cost)}`;
     }
 
     // --- V282: MODAL AGGREGATION LOGIC ---
@@ -563,7 +583,6 @@
         let list = zoneDetailsCache[zid];
         let zName = SMART_ZONES_BIBLE[zid].name;
         
-        // AGGREGATION
         let groups = {};
         list.forEach(item => {
             if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0, weight:0, assets:[] };
@@ -573,7 +592,6 @@
             groups[item.owner].assets.push(item);
         });
 
-        // SORT BY COUNT (BIGGEST FLEET FIRST)
         let sortedOwners = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count);
 
         getId('zdTitle').innerHTML = `${zName} <span style="color:var(--blue)">${sortedOwners.length} OWNERS</span>`;
@@ -581,7 +599,6 @@
         let html = "";
         sortedOwners.forEach(owner => {
             let g = groups[owner];
-            // PARENT ROW
             html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;">
                 <div class="cell" style="font-weight:bold; color:#fff;">${owner}</div>
                 <div class="cell c-right" style="color:var(--blue)">${g.count} DIVS</div>
@@ -589,7 +606,6 @@
                 <div class="cell c-center"><span class="acc-btn" onclick="toggleAcc('${owner}')">[+]</span></div>
             </div>`;
             
-            // ACCORDION CONTENT (HIDDEN)
             html += `<div id="acc-${owner}" class="acc-content">`;
             g.assets.forEach(a => {
                 let comp = a.units.length > 0 ? a.units.map(u => u.key).join(", ") : "Unknown";
