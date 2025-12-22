@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V294 (MARKET CAP)</title>
+    <title>DoV - COMMAND V297 (INTEGRITY)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -95,7 +95,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V294</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V297</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -106,7 +106,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V294. Hardcoded Finance.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V297. Integrity Check OK.</div></div>
     </aside>
 
     <main class="main-content">
@@ -139,9 +139,9 @@
             <div class="dashboard-header" style="border-left: 4px solid var(--orange)"><div><h2 class="page-h1">INVESTOR DASHBOARD</h2><div class="page-meta" id="ecoStatus">BUSINESS INTELLIGENCE</div></div></div>
             <div class="market-ticker" id="marketTicker"></div>
             <div class="kpi-grid eco" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
-                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div><div class="kc-sub">OWNERS (BUILDINGS + DIVS)</div></div>
-                <div class="kpi-card"><div class="kc-title">NFT MARKET CAP (EST)</div><div class="kc-val" style="color:#fff" id="ecoNftCap">0</div><div class="kc-sub" id="ecoNftCapUsd">$0.00</div></div>
-                <div class="kpi-card"><div class="kc-title">TVL (ASSETS)</div><div class="kc-val" id="ecoTVL">0</div></div>
+                <div class="kpi-card"><div class="kc-title">UNIQUE WALLETS</div><div class="kc-val-huge" style="color:var(--blue)" id="ecoWallets">0</div><div class="kc-sub">ALL OWNERS (ACTIVE + PASSIVE)</div></div>
+                <div class="kpi-card"><div class="kc-title">NFT MARKET CAP</div><div class="kc-val" style="color:#fff" id="ecoNftCap">0</div><div class="kc-sub" id="ecoNftCapUsd">$0.00</div></div>
+                <div class="kpi-card"><div class="kc-title">TOTAL ASSETS</div><div class="kc-val" id="ecoTVL">0</div><div class="kc-sub">BUILDINGS + UNITS</div></div>
                 <div class="kpi-card"><div class="kc-title">DAILY GDP (VALUE)</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
             </div>
             <div class="data-panel" style="margin-bottom:25px;">
@@ -162,22 +162,22 @@
 <script>
     // --- CONFIGURATION FINANCIERE (VALEURS UTILISATEUR) ---
     const CONFIG_PRIX = {
-        WAX_USD: 0.00751,
+        WAX_USD: 0.00751, 
         DOVX_WAX: 0.00528553,
         DOVR_WAX: 0.00045262,
         DOVF_WAX: 0.00045262,
         DOVH_WAX: 0.00045262,
         DOVS_WAX: 0.00045262,
-        PRIX_MOYEN_NFT_WAX: 100 // Estimation moyenne d'un NFT en WAX pour le Market Cap
+        PRIX_MOYEN_NFT_WAX: 100 // MOYENNE
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V294';
+    const STORAGE_KEY = 'DOV_DATA_V297';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD'});
+    const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD', minimumFractionDigits: 4});
     
     window.onerror = function(msg, url, line) {
         let errBanner = getId('error-banner');
@@ -214,7 +214,6 @@
     let stopSignal = false;
     let zoneDetailsCache = {}; 
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, uniqueWalletCount: 0 };
-    // Set for runtime, Count for storage
     let runtimeWalletSet = new Set(); 
 
     function init() {
@@ -242,7 +241,7 @@
              getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active);
         }
 
-        log("Ready. Mode: V294 Market Cap.");
+        log("Ready. Mode: V297 Integrity.");
     }
 
     function renderTicker() {
@@ -250,7 +249,7 @@
         const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ];
         tokens.forEach(t => {
             let usd = t.p * CONFIG_PRIX.WAX_USD;
-            html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(4)}</div></div>`;
+            html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`;
         });
         getId('marketTicker').innerHTML = html;
     }
@@ -262,6 +261,7 @@
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
             areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
+            // V297: RESTORED COST COLUMN
             areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
     }
@@ -297,9 +297,6 @@
         let groups = {F:[], H:[], R:[], S:[]};
         let rowCount = 0; let assetCount = 0;
         
-        // Use Global Runtime Set
-        // Note: We don't clear here because we want to merge with divisions. We clear at start of Economy Scan.
-
         try {
             while(!stopSignal) {
                 let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
@@ -310,11 +307,11 @@
                     let tpl = findTemplate(tid); if(!tpl) continue;
                     rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
                     stats.types[tpl.type].t += count;
+                    runtimeWalletSet.add(r.owner); 
+                    
                     let isActive = now < (parseFloat(r.last_claim) + parseFloat(r.delay));
-                    if(isActive) { 
-                        stats.types[tpl.type].a += count; 
-                        runtimeWalletSet.add(r.owner); 
-                    }
+                    if(isActive) { stats.types[tpl.type].a += count; }
+                    
                     let existing = groups[tpl.type].find(x => x.name === tpl.name);
                     if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); }
                     existing.tot += count;
@@ -352,6 +349,7 @@
             let html = "";
             list.forEach(i => {
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                // V297: COST COLUMN
                 html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="color:var(--green)">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
@@ -379,11 +377,12 @@
                     let zid = r.zone_id || r.zoneID;
                     if(zonesData[zid]) {
                         zonesData[zid].count++; stats.totalDivs++;
+                        runtimeWalletSet.add(r.owner); 
+                        
                         let endTime = getEndTime(r); let isFighting = false;
                         if (endTime > 1000000000000) isFighting = endTime > Date.now(); else isFighting = endTime > nowSec;
                         if(isFighting) {
                             zonesData[zid].active++; stats.activeDivs++;
-                            runtimeWalletSet.add(r.owner); 
                             let zConf = SMART_ZONES_BIBLE[zid];
                             let currentCost = zConf.cost;
                             let isCity = [17, 18, 19, 20].includes(parseInt(zid));
@@ -466,7 +465,7 @@
         let totalUsdGDP = totalWaxGDP * CONFIG_PRIX.WAX_USD;
 
         getId('ecoWallets').innerText = fmt(ecoStats.uniqueWalletCount);
-        getId('ecoNftCap').innerText = fmt(nftMarketCapWax) + " WAX (EST)"; 
+        getId('ecoNftCap').innerText = fmt(nftMarketCapWax) + " WAX"; 
         getId('ecoNftCapUsd').innerText = fmtUsd(nftMarketCapUsd);
         
         getId('ecoTVL').innerText = fmt(totalTVL);
@@ -474,7 +473,7 @@
         getId('ecoGdpUsd').innerText = fmtUsd(totalUsdGDP);
         getId('ecoGdpWax').innerText = fmtDec(totalWaxGDP) + " WAX";
 
-        // V294: ADDED TOTAL SECTION
+        // V296: ADDED TOTAL SECTION
         let m_wax = (dailyWaxProd * 30) + (valX_W * 30);
         let m_usd = (dailyUsdProd * 30) + (valX_USD * 30);
         let y_wax = (dailyWaxProd * 365) + (valX_W * 365);
@@ -509,7 +508,7 @@
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
     async function initInspector() { alert("Use V285 for Inspector"); }
     async function startTargetBuildings() { } async function startTargetDivisions() { }
-    function openSettings() { alert("Use Code Config in V294"); }
+    function openSettings() { alert("Use Code Config in V297"); }
 
     window.onload = init;
 </script>
