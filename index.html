@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V307 (STABLE)</title>
+    <title>DoV - COMMAND V309 (SMART FILTER)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -58,6 +58,7 @@
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
+        /* V309 Grid */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -95,7 +96,6 @@
         .dr-item { background: #000; padding: 10px; border: 1px solid #333; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
         .dr-item a { color: #fff; text-decoration: none; } .dr-item a:hover { color: var(--blue); }
         .dr-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; margin: 0 auto 20px auto; display: block; object-fit: cover; }
-        
         .sys-clock { font-family:var(--font-num); color:var(--orange); font-size:11px; margin-left:auto; display:flex; gap:10px; align-items:center; border:1px solid #333; padding:5px 10px; border-radius:4px; background:#000; }
         .clock-copy { opacity:0.7; }
         #chartContainer { width:100%; height:280px; background:#08080a; border:1px solid #333; border-radius:4px; margin-bottom:15px; position:relative; }
@@ -111,7 +111,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V307</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V309</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -137,7 +137,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V307. Systems Online.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V309. Smart Filter Restored.</div></div>
     </aside>
 
     <main class="main-content">
@@ -240,8 +240,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "blenderizerx", "atomicpacksx", "atomicdropsx" ]
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V307';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V307';
+    const STORAGE_KEY = 'DOV_DATA_V309';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V309';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -292,7 +292,7 @@
         buildUI(); renderTicker(); updateEcoUI(); 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V307 Stable.");
+        log("Ready. Mode: V309 Smart Filter.");
     }
 
     function buildUI() {
@@ -438,31 +438,35 @@
         }
     }
 
+    // FIXED V309: SMART FILTER RESTORED
     async function startZoneScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
-        log("Scanning Divisions..."); 
+        log("Scanning Divisions (Smart Filter)..."); 
         
-        // FIXED V307: Re-added missing initialization
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
         let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
-        
+        zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
+
         try { while(!stopSignal) {
             let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
             if(!json.rows) break;
-            const nowSec = Date.now()/1000;
             for(let r of json.rows) {
                 let zid = r.zone_id || r.zoneID;
                 if(zonesData[zid]) {
                     zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); 
-                    let end=0; let keys=['unlock_time','end_time','finish_time','lock_until']; for(let k of keys) if(r[k]) end=parseFloat(r[k]);
-                    let isFighting = end > 1000000000000 ? end > Date.now() : end > nowSec;
+                    
+                    // V309 FILTER: CHECK TIME
+                    let end = parseFloat(r.unlock_time || r.end_time || 0);
+                    let isFighting = end > (Date.now()/1000); // Only count if future
+                    
                     if(isFighting) {
                         zonesData[zid].active++; stats.activeDivs++;
                         let zConf = SMART_ZONES_BIBLE[zid];
                         let isCity = [17, 18, 19, 20].includes(parseInt(zid));
                         if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } else { zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; }
                         zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win;
+                        zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win });
                     }
                 }
             }
@@ -475,7 +479,8 @@
     function updateZoneUI(zonesData, stats) {
         if(!getId('zTotalDivsHeader')) return;
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zPieVal').innerText = "100%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% 100%, #333 100% 100%)`;
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0;
+        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`;
         getId('zTotalProd').innerText = fmt(stats.totalProd); getId('gBurnF').innerText = fmt(stats.bf); getId('gCityBurn').innerText = fmt(stats.cityBurn);
         let html = "";
         Object.keys(zonesData).forEach(id => {
