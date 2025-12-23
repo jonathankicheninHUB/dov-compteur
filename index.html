@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V314 (WAR ROOM PRO)</title>
+    <title>DoV - COMMAND V315 (STABLE RESTORE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -89,12 +89,15 @@
         .val-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; border-bottom: 1px dotted #333; padding: 2px 0; }
         .val-row span:last-child { color: #fff; font-family: var(--font-num); }
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
+        
+        /* DATA ROOM SPECIFIC */
         .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
         .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
         .dr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .dr-item { background: #000; padding: 10px; border: 1px solid #333; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
         .dr-item a { color: #fff; text-decoration: none; } .dr-item a:hover { color: var(--blue); }
         .dr-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; margin: 0 auto 20px auto; display: block; object-fit: cover; }
+        
         .sys-clock { font-family:var(--font-num); color:var(--orange); font-size:11px; margin-left:auto; display:flex; gap:10px; align-items:center; border:1px solid #333; padding:5px 10px; border-radius:4px; background:#000; }
         .clock-copy { opacity:0.7; }
         #chartContainer { width:100%; height:280px; background:#08080a; border:1px solid #333; border-radius:4px; margin-bottom:15px; position:relative; }
@@ -105,28 +108,17 @@
         .chart-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
         .analysis-box { background:rgba(41,121,255,0.1); border-left:3px solid var(--blue); padding:10px; color:#ccc; font-size:11px; margin-bottom:15px; font-family:var(--font-ui); }
         
-        /* V314: WAR ROOM PRO DESIGN */
-        .wr-grid { display:grid; grid-template-columns: 1fr 200px 1fr; gap:15px; height: 100%; }
-        .wr-panel { background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; display:flex; flex-direction:column; overflow:hidden; }
-        .wr-head { background:#15161d; padding:10px; border-bottom:1px solid var(--border); font-weight:800; font-size:11px; text-transform:uppercase; text-align:center; letter-spacing:1px; }
-        .wr-content { padding:10px; flex:1; overflow-y:auto; font-family:var(--font-num); font-size:10px; color:#888; }
-        .wr-row { display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:4px 0; }
-        .wr-row span:last-child { color:#fff; font-weight:700; }
-        .wr-center { display:flex; flex-direction:column; gap:10px; justify-content:center; }
-        .wr-stat { background:#000; border:1px solid var(--border); padding:10px; border-radius:4px; text-align:center; }
-        .wr-lbl { color:#666; font-size:9px; text-transform:uppercase; margin-bottom:4px; }
-        .wr-val { font-family:var(--font-num); font-size:14px; font-weight:800; color:#fff; }
-        .rec-card { border:1px solid; border-radius:4px; padding:10px; text-align:center; margin-top:auto; font-family:var(--font-ui); }
-        .rec-ok { border-color:var(--green); background:rgba(0,240,144,0.05); color:var(--green); }
-        .rec-bad { border-color:var(--red); background:rgba(255,59,48,0.05); color:var(--red); }
-        .rec-title { font-weight:900; font-size:12px; margin-bottom:5px; display:block; }
+        /* V315 SIMULATOR (STABLE) */
+        .sim-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+        .sim-result { background:var(--bg-panel); border:1px solid var(--border); padding:15px; border-radius:6px; margin-top:20px; text-align:center; }
+        .rec-box { margin-top:10px; font-size:14px; font-weight:bold; color:var(--yellow); padding:10px; border:1px dashed var(--yellow); border-radius:4px; }
     </style>
 </head>
 <body>
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V314</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V315</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -153,7 +145,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V314. War Room UX Upgrade.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V315. Restored & Stable.</div></div>
     </aside>
 
     <main class="main-content">
@@ -220,7 +212,7 @@
                 <button class="chart-btn" onclick="switchChart('tvl')">TVL GROWTH</button>
             </div>
             <div id="chartContainer"><canvas id="analyticsChart"></canvas></div>
-            <div id="financialInsight" class="analysis-box">Waiting for data to generate insights...</div>
+            <div id="financialInsight" class="analysis-box">Waiting for data...</div>
             <div class="data-panel">
                 <div class="dp-head"><span class="dp-title">LOG HISTORY (EXTENDED)</span></div>
                 <div class="dt-grid dt-header" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell">TIMESTAMP</div><div class="cell">TYPE</div><div class="cell c-right">REV (USD)</div><div class="cell c-right">COST (USD)</div><div class="cell c-right">NET (USD)</div><div class="cell c-right">ASSETS</div></div>
@@ -230,47 +222,27 @@
 
         <div id="viewSim" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--yellow)">
-                <div><h2 class="page-h1" style="color:var(--yellow)">WAR ROOM SIMULATOR</h2><div class="page-meta">CAPACITY PLANNING & FORECAST</div></div>
+                <div><h2 class="page-h1" style="color:var(--yellow)">WAR ROOM SIMULATOR</h2><div class="page-meta">CAPACITY PLANNING</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
-            <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <button class="btn-yellow" style="width:200px; font-weight:bold;" onclick="runSimulation()">GENERATE RANDOM SCENARIO</button>
-                <span style="font-size:10px; color:#666;">SIMULATION RUNNING ON ISOLATED ENVIRONMENT</span>
+            <div style="margin-bottom:20px;">
+                <button class="btn-yellow" style="width:200px; font-weight:bold;" onclick="runSimulation()">GENERATE SCENARIO</button>
             </div>
-            
-            <div id="simContent" class="wr-grid">
-                <div class="wr-panel" style="border-top:2px solid var(--blue)">
-                    <div class="wr-head" style="color:var(--blue)">DEMAND (MILITARY)</div>
-                    <div class="wr-content" id="simArmyList">Initialize Scenario...</div>
-                    <div class="wr-stat" style="border-top:1px solid #333">
-                        <div class="wr-lbl">CONSUMPTION</div>
-                        <div class="wr-val" style="color:var(--red)" id="simConsum">0 TU</div>
-                    </div>
+            <div class="sim-grid">
+                <div class="data-panel">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--blue)">DEPLOYED FORCES</span></div>
+                    <div id="simArmyList" style="padding:10px; font-family:var(--font-num); color:#ccc;">Click Generate...</div>
                 </div>
-
-                <div class="wr-center">
-                    <div class="wr-stat">
-                        <div class="wr-lbl">NET TU BALANCE</div>
-                        <div class="wr-val" id="simNetTU">0</div>
-                    </div>
-                    <div id="simRec" class="rec-card" style="border-color:#333; background:#111; color:#666;">
-                        <span class="rec-title">STATUS: IDLE</span>
-                        Waiting for simulation data...
-                    </div>
-                    <div class="wr-stat">
-                        <div class="wr-lbl">NET DOVX BALANCE</div>
-                        <div class="wr-val" id="simNetDOVX">0</div>
-                    </div>
+                <div class="data-panel">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--green)">INDUSTRIAL BASE</span></div>
+                    <div id="simBuildList" style="padding:10px; font-family:var(--font-num); color:#ccc;">Click Generate...</div>
                 </div>
-
-                <div class="wr-panel" style="border-top:2px solid var(--green)">
-                    <div class="wr-head" style="color:var(--green)">SUPPLY (INDUSTRY)</div>
-                    <div class="wr-content" id="simBuildList">Initialize Scenario...</div>
-                    <div class="wr-stat" style="border-top:1px solid #333">
-                        <div class="wr-lbl">PRODUCTION</div>
-                        <div class="wr-val" style="color:var(--green)" id="simProd">0 TU</div>
-                    </div>
-                </div>
+            </div>
+            <div class="sim-result">
+                <h3 style="margin:0 0 10px 0; color:#fff;">SIMULATION REPORT (24H)</h3>
+                <div class="dt-grid dt-header"><div class="cell">METRIC</div><div class="cell c-right">PRODUCTION (+)</div><div class="cell c-right">CONSUMPTION (-)</div><div class="cell c-right">NET BALANCE</div></div>
+                <div id="simBalanceTable"></div>
+                <div id="simRec" class="rec-box">AWAITING ORDERS...</div>
             </div>
         </div>
     </main>
@@ -295,8 +267,8 @@
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V314';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V314';
+    const STORAGE_KEY = 'DOV_DATA_V315';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V315';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -321,17 +293,19 @@
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         templates: {
-            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 } },
-            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 } },
-            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 } },
-            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 } }
+            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 } },
+            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 } },
+            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 } },
+            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 } }
         }
     };
 
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400 }, 2: { name:"Beach 2", cost:6968, win:2405 }, 3: { name:"Beach 3", cost:8800, win:3037 }, 4: { name:"Bunker", cost:11120, win:3838 }, 
         5: { name:"Forest 1", cost:14024, win:4840 }, 6: { name:"Forest 2", cost:17704, win:6110 }, 7: { name:"Forest 3", cost:22352, win:7714 }, 8: { name:"Camp", cost:28220, win:9739 }, 
-        17: { name:"City 1", cost:1664, win:0 }
+        9: { name:"Hill 1", cost:37052, win:12788 }, 10: { name:"Hill 2", cost:48652, win:16791 }, 11: { name:"Hill 3", cost:64516, win:22266 }, 12: { name:"Radar", cost:84712, win:29236 }, 
+        13: { name:"Plain 1", cost:99384, win:34300 }, 14: { name:"Plain 2", cost:125708, win:43385 }, 15: { name:"Plain 3", cost:151164, win:52171 }, 16: { name:"HQ", cost:188000, win:64884 }, 
+        17: { name:"City 1", cost:1664, win:0 }, 18: { name:"City 2", cost:4448, win:0 }, 19: { name:"City 3", cost:13440, win:0 }, 20: { name:"Bridge", cost:29856, win:0 }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -349,11 +323,12 @@
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; if(loaded.ecoStats) ecoStats = loaded.ecoStats; } catch(e){} }
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         if(getId('dictSize')) getId('dictSize').innerText = count;
+        
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V314 War Room Pro.");
+        log("Ready. Mode: V315 Stable Restore.");
     }
 
     function buildUI() {
@@ -553,4 +528,79 @@
             let z = SMART_ZONES_BIBLE[id]; let d = zonesData[id]; let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
-                                  : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt
+                                  : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
+            html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div><div style="height:1px; background:#333; margin:2px 0;"></div>${burnHtml}</div></div>`;
+        });
+        getId('areaZones').innerHTML = html;
+    }
+
+    async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
+
+    function updateEcoUI() {
+        let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX);
+        let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX;
+        let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD;
+        getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets;
+        getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX";
+        let html = `
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`;
+        getId('projTable').innerHTML = html;
+    }
+
+    function openDataRoom() {
+        let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`;
+        PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; });
+        html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`;
+        PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; });
+        html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`;
+        PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; });
+        html += `</div></div>`;
+        getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex';
+    }
+
+    function openZoneDetail(zid) { 
+        if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
+        let list = zoneDetailsCache[zid];
+        let groups = {};
+        list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; });
+        let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count);
+        let html = "";
+        sorted.forEach(owner => {
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`;
+        });
+        getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
+    }
+
+    // WAR ROOM (V315: SAFE MODE)
+    function showSimView() { switchView('viewSim'); }
+    function runSimulation() {
+        let simDivs = []; let totalDivs = 0; let estimatedTUCost = 0; let estimatedDOVXMint = 0; let beachZones = [1, 2, 3, 4]; let simHtmlDivs = "";
+        beachZones.forEach(zid => {
+            let count = Math.floor(Math.random() * 20) + 5; let z = SMART_ZONES_BIBLE[zid];
+            simDivs.push({ name: z.name, count: count, win: z.win }); totalDivs += count; estimatedDOVXMint += (count * z.win * 24); estimatedTUCost += (count * 100 * 24); 
+            simHtmlDivs += `<div>${z.name}: <span style="color:#fff; font-weight:bold;">${count} Units</span></div>`;
+        });
+        getId('simArmyList').innerHTML = simHtmlDivs + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL: ${totalDivs} Divisions</div>`;
+        let simBuilds = []; let totalTUProd = 0; let totalDOVXCost = 0; let types = ["F", "H", "R", "S"]; let simHtmlBuilds = "";
+        types.forEach(t => {
+            let cCount = Math.floor(Math.random() * 10) + 1; let rCount = Math.floor(Math.random() * 5); let prodC = 5.4; let prodR = 12.15;
+            let hourly = (cCount * prodC) + (rCount * prodR); let daily = hourly * 24; let cost = daily * 0.085;
+            totalTUProd += daily; totalDOVXCost += cost; simHtmlBuilds += `<div>${t}-Ind: ${cCount} Com / ${rCount} Rare (+${fmtDec(daily)} TU)</div>`;
+        });
+        getId('simBuildList').innerHTML = simHtmlBuilds + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL COST: ${fmtDec(totalDOVXCost)} DOVX</div>`;
+        let netTU = totalTUProd - estimatedTUCost; let netDOVX = estimatedDOVXMint - totalDOVXCost;
+        let htmlBal = `<div class="dt-grid dt-row"><div class="cell"><b>TU RESERVES</b></div><div class="cell c-right" style="color:var(--green)">${fmt(totalTUProd)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(estimatedTUCost)}</div><div class="cell c-right" style="color:${netTU>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netTU)}</div></div>
+            <div class="dt-grid dt-row"><div class="cell"><b>DOVX TREASURY</b></div><div class="cell c-right" style="color:var(--green)">${fmt(estimatedDOVXMint)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalDOVXCost)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)}</div></div>`;
+        getId('simBalanceTable').innerHTML = htmlBal;
+        let msg = "";
+        if (netTU < 0) { let missing = Math.abs(netTU); let buildingsNeeded = Math.ceil(missing / (5.4 * 24)); msg = `CRITICAL ALERT: TU DEFICIT (-${fmt(missing)}). CONSTRUCT ~${buildingsNeeded} COMMON BUILDINGS IMMEDIATELY.`; getId('simRec').style.color = "var(--red)"; getId('simRec').style.borderColor = "var(--red)"; } 
+        else { let surplus = netTU; let potentialDivs = Math.floor(surplus / (100 * 24)); msg = `SURPLUS: +${fmt(surplus)} TU. YOU CAN SUSTAIN ~${potentialDivs} MORE DIVISIONS.`; getId('simRec').style.color = "var(--green)"; getId('simRec').style.borderColor = "var(--green)"; }
+        getId('simRec').innerText = msg;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
