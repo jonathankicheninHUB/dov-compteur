@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V312 (FUSION)</title>
+    <title>DoV - COMMAND V313 (FINAL GOLD)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -107,7 +107,6 @@
         .chart-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
         .analysis-box { background:rgba(41,121,255,0.1); border-left:3px solid var(--blue); padding:10px; color:#ccc; font-size:11px; margin-bottom:15px; font-family:var(--font-ui); }
         
-        /* V311 SIMULATOR */
         .sim-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
         .sim-result { background:var(--bg-panel); border:1px solid var(--border); padding:15px; border-radius:6px; margin-top:20px; text-align:center; }
         .rec-box { margin-top:10px; font-size:14px; font-weight:bold; color:var(--yellow); padding:10px; border:1px dashed var(--yellow); border-radius:4px; }
@@ -117,7 +116,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V312</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V313</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -144,7 +143,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V312. System Repaired.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V313. Systems & 20 RPCs Online.</div></div>
     </aside>
 
     <main class="main-content">
@@ -211,7 +210,7 @@
                 <button class="chart-btn" onclick="switchChart('tvl')">TVL GROWTH</button>
             </div>
             <div id="chartContainer"><canvas id="analyticsChart"></canvas></div>
-            <div id="financialInsight" class="analysis-box">Waiting for data...</div>
+            <div id="financialInsight" class="analysis-box">Waiting for data to generate insights...</div>
             <div class="data-panel">
                 <div class="dp-head"><span class="dp-title">LOG HISTORY (EXTENDED)</span></div>
                 <div class="dt-grid dt-header" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell">TIMESTAMP</div><div class="cell">TYPE</div><div class="cell c-right">REV (USD)</div><div class="cell c-right">COST (USD)</div><div class="cell c-right">NET (USD)</div><div class="cell c-right">ASSETS</div></div>
@@ -264,10 +263,10 @@
     // --- CONFIG ---
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
-    const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
+    const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" }, { name: "Beta Access", url: "https://beta.dawnofvictory.io/" }, { name: "Twitter", url: "https://twitter.com/DOVNFT" }, { name: "Telegram", url: "https://t.me/dawnofvictorynft" }, { name: "Discord", url: "https://discord.gg/N5tB9j75em" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" }, { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" }, { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" }, { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" }, { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" }, { name: "Instant Swap", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "blenderizerx", "atomicpacksx", "atomicdropsx" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V312';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V312';
+    const STORAGE_KEY = 'DOV_DATA_V313';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V313';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -279,20 +278,32 @@
     function log(msg) { let c = getId('sysLog'); if(c) { let d = document.createElement("div"); d.className="log-entry"; d.innerHTML=`<span class="log-time">${new Date().toLocaleTimeString()}</span>${msg}`; c.prepend(d); } }
 
     const DEFAULT_DATA = {
-        apiConfig: { rpcNodes: ["https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io"] },
+        apiConfig: { 
+            rpcNodes: [
+                "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io",
+                "https://wax.dapplica.io", "https://wax.eosphere.io", "https://wax.eosusa.io",
+                "https://wax-public1.neftyblocks.com", "https://wax-public2.neftyblocks.com",
+                "https://wax.eosrio.io", "https://api.wax.detroitledger.tech", "https://wax.oiac.io",
+                "https://api.hivebp.io", "https://api2.hivebp.io", "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", "https://wax.blacklusion.io", "https://api.waxsweden.org",
+                "https://wax-bp.wizardsguild.one", "https://api.wax.alohaeos.com", "https://wax.eu.eosamsterdam.net"
+            ] 
+        },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         templates: {
-            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 } },
-            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 } },
-            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 } },
-            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 } }
+            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 } },
+            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 } },
+            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 } },
+            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 } }
         }
     };
 
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400 }, 2: { name:"Beach 2", cost:6968, win:2405 }, 3: { name:"Beach 3", cost:8800, win:3037 }, 4: { name:"Bunker", cost:11120, win:3838 }, 
         5: { name:"Forest 1", cost:14024, win:4840 }, 6: { name:"Forest 2", cost:17704, win:6110 }, 7: { name:"Forest 3", cost:22352, win:7714 }, 8: { name:"Camp", cost:28220, win:9739 }, 
-        17: { name:"City 1", cost:1664, win:0 }
+        9: { name:"Hill 1", cost:37052, win:12788 }, 10: { name:"Hill 2", cost:48652, win:16791 }, 11: { name:"Hill 3", cost:64516, win:22266 }, 12: { name:"Radar", cost:84712, win:29236 }, 
+        13: { name:"Plain 1", cost:99384, win:34300 }, 14: { name:"Plain 2", cost:125708, win:43385 }, 15: { name:"Plain 3", cost:151164, win:52171 }, 16: { name:"HQ", cost:188000, win:64884 }, 
+        17: { name:"City 1", cost:1664, win:0 }, 18: { name:"City 2", cost:4448, win:0 }, 19: { name:"City 3", cost:13440, win:0 }, 20: { name:"Bridge", cost:29856, win:0 }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -314,7 +325,7 @@
         buildUI(); renderTicker(); updateEcoUI(); 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V312 Fusion.");
+        log("Ready. Mode: V313 Final Gold.");
     }
 
     function buildUI() {
@@ -460,7 +471,7 @@
         }
     }
 
-    // FIXED V312: RESTORED V310 LOGIC (Populate BF/BH/BR/BS + Cache)
+    // FIXED V313: RESTORED COST DISPLAY AND 20 RPC NODES
     async function startZoneScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
         log("Scanning Divisions (Detailed)..."); 
