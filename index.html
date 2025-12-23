@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V306 (STABLE)</title>
+    <title>DoV - COMMAND V307 (STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -58,7 +58,6 @@
         .dp-head { padding: 10px 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
-        /* V306: 8 Cols */
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 90px 70px 70px; }
         .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
@@ -112,7 +111,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V306</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V307</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -138,7 +137,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V306. System Stabilized.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V307. Systems Online.</div></div>
     </aside>
 
     <main class="main-content">
@@ -241,8 +240,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "blenderizerx", "atomicpacksx", "atomicdropsx" ]
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V306';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V306';
+    const STORAGE_KEY = 'DOV_DATA_V307';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V307';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -279,16 +278,21 @@
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
 
+    // GLOBAL FUNCTIONS (MOVED UP FOR SAFETY)
+    function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LOG_STORAGE_KEY); location.reload(); } }
+
     function init() {
         const local = localStorage.getItem(STORAGE_KEY);
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; if(loaded.ecoStats) ecoStats = loaded.ecoStats; } catch(e){} }
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         if(getId('dictSize')) getId('dictSize').innerText = count;
+        
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V306 Stable.");
+        log("Ready. Mode: V307 Stable.");
     }
 
     function buildUI() {
@@ -436,7 +440,13 @@
 
     async function startZoneScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
-        log("Scanning Divisions..."); let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; let next = "";
+        log("Scanning Divisions..."); 
+        
+        // FIXED V307: Re-added missing initialization
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
+        let next = "";
+        let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
+        
         try { while(!stopSignal) {
             let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
             if(!json.rows) break;
