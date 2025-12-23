@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V311 (WAR ROOM)</title>
+    <title>DoV - COMMAND V312 (FUSION)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -98,6 +98,7 @@
         .dr-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; margin: 0 auto 20px auto; display: block; object-fit: cover; }
         .sys-clock { font-family:var(--font-num); color:var(--orange); font-size:11px; margin-left:auto; display:flex; gap:10px; align-items:center; border:1px solid #333; padding:5px 10px; border-radius:4px; background:#000; }
         .clock-copy { opacity:0.7; }
+        
         #chartContainer { width:100%; height:280px; background:#08080a; border:1px solid #333; border-radius:4px; margin-bottom:15px; position:relative; }
         canvas { display:block; width:100%; height:100%; }
         .stats-table-wrapper { max-height:300px; overflow-y:auto; }
@@ -106,7 +107,7 @@
         .chart-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
         .analysis-box { background:rgba(41,121,255,0.1); border-left:3px solid var(--blue); padding:10px; color:#ccc; font-size:11px; margin-bottom:15px; font-family:var(--font-ui); }
         
-        /* V311 SPECIFIC */
+        /* V311 SIMULATOR */
         .sim-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
         .sim-result { background:var(--bg-panel); border:1px solid var(--border); padding:15px; border-radius:6px; margin-top:20px; text-align:center; }
         .rec-box { margin-top:10px; font-size:14px; font-weight:bold; color:var(--yellow); padding:10px; border:1px dashed var(--yellow); border-radius:4px; }
@@ -116,7 +117,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V311</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V312</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -143,7 +144,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V311. War Room Online.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V312. System Repaired.</div></div>
     </aside>
 
     <main class="main-content">
@@ -265,8 +266,8 @@
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V311';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V311';
+    const STORAGE_KEY = 'DOV_DATA_V312';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V312';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -313,7 +314,7 @@
         buildUI(); renderTicker(); updateEcoUI(); 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V311 War Room.");
+        log("Ready. Mode: V312 Fusion.");
     }
 
     function buildUI() {
@@ -325,82 +326,6 @@
             areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
             areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
-    }
-
-    // V311: WAR ROOM LOGIC
-    function showSimView() { switchView('viewSim'); }
-    
-    function runSimulation() {
-        log("Simulating Scenario...");
-        // 1. Random Divisions (Plage 1-4 : IDs 1,2,3,4)
-        let simDivs = [];
-        let totalDivs = 0; let estimatedTUCost = 0; let estimatedDOVXMint = 0;
-        let beachZones = [1, 2, 3, 4];
-        let simHtmlDivs = "";
-        
-        beachZones.forEach(zid => {
-            let count = Math.floor(Math.random() * 20) + 5; // 5 to 25 divs
-            let z = SMART_ZONES_BIBLE[zid];
-            simDivs.push({ name: z.name, count: count, win: z.win });
-            totalDivs += count;
-            estimatedDOVXMint += (count * z.win * 24); // Daily
-            // Simulate TU Burn: Assume 1 Fight = 100 TU (Mixed)
-            estimatedTUCost += (count * 100 * 24); 
-            simHtmlDivs += `<div>${z.name}: <span style="color:#fff; font-weight:bold;">${count} Units</span></div>`;
-        });
-        getId('simArmyList').innerHTML = simHtmlDivs + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL: ${totalDivs} Divisions</div>`;
-
-        // 2. Random Buildings (Common/Rare F/H/R/S)
-        let simBuilds = [];
-        let totalTUProd = 0; let totalDOVXCost = 0;
-        let types = ["F", "H", "R", "S"];
-        let simHtmlBuilds = "";
-        
-        types.forEach(t => {
-            // Common (F1) & Rare (F2)
-            let cCount = Math.floor(Math.random() * 10) + 1;
-            let rCount = Math.floor(Math.random() * 5);
-            
-            // Prod ref (approx from default data): C=5.4, R=12.15
-            let prodC = 5.4; let prodR = 12.15;
-            
-            let hourly = (cCount * prodC) + (rCount * prodR);
-            let daily = hourly * 24;
-            let cost = daily * 0.085;
-            
-            totalTUProd += daily;
-            totalDOVXCost += cost;
-            
-            simHtmlBuilds += `<div>${t}-Ind: ${cCount} Com / ${rCount} Rare (+${fmtDec(daily)} TU)</div>`;
-        });
-        getId('simBuildList').innerHTML = simHtmlBuilds + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL COST: ${fmtDec(totalDOVXCost)} DOVX</div>`;
-
-        // 3. Balance
-        let netTU = totalTUProd - estimatedTUCost;
-        let netDOVX = estimatedDOVXMint - totalDOVXCost;
-        
-        let htmlBal = `
-            <div class="dt-grid dt-row"><div class="cell"><b>TU RESERVES</b></div><div class="cell c-right" style="color:var(--green)">${fmt(totalTUProd)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(estimatedTUCost)}</div><div class="cell c-right" style="color:${netTU>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netTU)}</div></div>
-            <div class="dt-grid dt-row"><div class="cell"><b>DOVX TREASURY</b></div><div class="cell c-right" style="color:var(--green)">${fmt(estimatedDOVXMint)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalDOVXCost)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)}</div></div>
-        `;
-        getId('simBalanceTable').innerHTML = htmlBal;
-
-        // 4. Recommendation
-        let msg = "";
-        if (netTU < 0) {
-            let missing = Math.abs(netTU);
-            let buildingsNeeded = Math.ceil(missing / (5.4 * 24)); // Based on Common Prod
-            msg = `CRITICAL ALERT: TU DEFICIT (-${fmt(missing)}). CONSTRUCT ~${buildingsNeeded} COMMON BUILDINGS IMMEDIATELY.`;
-            getId('simRec').style.color = "var(--red)";
-            getId('simRec').style.borderColor = "var(--red)";
-        } else {
-            let surplus = netTU;
-            let potentialDivs = Math.floor(surplus / (100 * 24)); // Based on 100 TU/fight
-            msg = `SURPLUS: +${fmt(surplus)} TU. YOU CAN SUSTAIN ~${potentialDivs} MORE DIVISIONS.`;
-            getId('simRec').style.color = "var(--green)";
-            getId('simRec').style.borderColor = "var(--green)";
-        }
-        getId('simRec').innerText = msg;
     }
 
     function renderTicker() {
@@ -535,9 +460,10 @@
         }
     }
 
+    // FIXED V312: RESTORED V310 LOGIC (Populate BF/BH/BR/BS + Cache)
     async function startZoneScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
-        log("Scanning Divisions (V310 Logic)..."); 
+        log("Scanning Divisions (Detailed)..."); 
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
@@ -551,17 +477,14 @@
                 let zid = r.zone_id || r.zoneID;
                 if(zonesData[zid]) {
                     zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); 
-                    
                     let end = parseFloat(r.unlock_time || r.end_time || 0);
                     let isFighting = end > (Date.now()/1000); 
-                    
                     if(isFighting) {
                         zonesData[zid].active++; stats.activeDivs++;
                         let zConf = SMART_ZONES_BIBLE[zid];
                         let isCity = [17, 18, 19, 20].includes(parseInt(zid));
                         if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } 
                         else { 
-                            // V310: ACCUMULATE BURN PER RESOURCE TYPE TO DISPLAY IT
                             zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; 
                             zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; 
                             zonesData[zid].br += zConf.cost; stats.br += zConf.cost; 
@@ -581,7 +504,8 @@
     function updateZoneUI(zonesData, stats) {
         if(!getId('zTotalDivsHeader')) return;
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
-        getId('zPieVal').innerText = "100%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% 100%, #333 100% 100%)`;
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0;
+        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`;
         getId('zTotalProd').innerText = fmt(stats.totalProd); 
         getId('gBurnF').innerText = fmt(stats.bf); getId('gBurnH').innerText = fmt(stats.bh); getId('gBurnR').innerText = fmt(stats.br); getId('gBurnS').innerText = fmt(stats.bs);
         getId('gCityBurn').innerText = fmt(stats.cityBurn);
@@ -606,8 +530,8 @@
         getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets;
         getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX";
         let html = `
-            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr; background:rgba(0,255,0,0.05);"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr; background:rgba(41,121,255,0.05);"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
             <div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`;
         getId('projTable').innerHTML = html;
     }
@@ -621,6 +545,33 @@
         PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; });
         html += `</div></div>`;
         getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex';
+    }
+
+    // WAR ROOM LOGIC (V311)
+    function showSimView() { switchView('viewSim'); }
+    function runSimulation() {
+        let simDivs = []; let totalDivs = 0; let estimatedTUCost = 0; let estimatedDOVXMint = 0; let beachZones = [1, 2, 3, 4]; let simHtmlDivs = "";
+        beachZones.forEach(zid => {
+            let count = Math.floor(Math.random() * 20) + 5; let z = SMART_ZONES_BIBLE[zid];
+            simDivs.push({ name: z.name, count: count, win: z.win }); totalDivs += count; estimatedDOVXMint += (count * z.win * 24); estimatedTUCost += (count * 100 * 24); 
+            simHtmlDivs += `<div>${z.name}: <span style="color:#fff; font-weight:bold;">${count} Units</span></div>`;
+        });
+        getId('simArmyList').innerHTML = simHtmlDivs + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL: ${totalDivs} Divisions</div>`;
+        let simBuilds = []; let totalTUProd = 0; let totalDOVXCost = 0; let types = ["F", "H", "R", "S"]; let simHtmlBuilds = "";
+        types.forEach(t => {
+            let cCount = Math.floor(Math.random() * 10) + 1; let rCount = Math.floor(Math.random() * 5); let prodC = 5.4; let prodR = 12.15;
+            let hourly = (cCount * prodC) + (rCount * prodR); let daily = hourly * 24; let cost = daily * 0.085;
+            totalTUProd += daily; totalDOVXCost += cost; simHtmlBuilds += `<div>${t}-Ind: ${cCount} Com / ${rCount} Rare (+${fmtDec(daily)} TU)</div>`;
+        });
+        getId('simBuildList').innerHTML = simHtmlBuilds + `<div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">TOTAL COST: ${fmtDec(totalDOVXCost)} DOVX</div>`;
+        let netTU = totalTUProd - estimatedTUCost; let netDOVX = estimatedDOVXMint - totalDOVXCost;
+        let htmlBal = `<div class="dt-grid dt-row"><div class="cell"><b>TU RESERVES</b></div><div class="cell c-right" style="color:var(--green)">${fmt(totalTUProd)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(estimatedTUCost)}</div><div class="cell c-right" style="color:${netTU>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netTU)}</div></div>
+            <div class="dt-grid dt-row"><div class="cell"><b>DOVX TREASURY</b></div><div class="cell c-right" style="color:var(--green)">${fmt(estimatedDOVXMint)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalDOVXCost)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--blue)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)}</div></div>`;
+        getId('simBalanceTable').innerHTML = htmlBal;
+        let msg = "";
+        if (netTU < 0) { let missing = Math.abs(netTU); let buildingsNeeded = Math.ceil(missing / (5.4 * 24)); msg = `CRITICAL ALERT: TU DEFICIT (-${fmt(missing)}). CONSTRUCT ~${buildingsNeeded} COMMON BUILDINGS IMMEDIATELY.`; getId('simRec').style.color = "var(--red)"; getId('simRec').style.borderColor = "var(--red)"; } 
+        else { let surplus = netTU; let potentialDivs = Math.floor(surplus / (100 * 24)); msg = `SURPLUS: +${fmt(surplus)} TU. YOU CAN SUSTAIN ~${potentialDivs} MORE DIVISIONS.`; getId('simRec').style.color = "var(--green)"; getId('simRec').style.borderColor = "var(--green)"; }
+        getId('simRec').innerText = msg;
     }
 
     function openZoneDetail(zid) { 
