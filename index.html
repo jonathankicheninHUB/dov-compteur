@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V316 (GAP ANALYZER)</title>
+    <title>DoV - COMMAND V317 (GOLD STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -104,8 +104,6 @@
         .chart-btn { padding:5px 10px; border:1px solid #444; background:#111; color:#888; font-size:10px; cursor:pointer; border-radius:4px; }
         .chart-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
         .analysis-box { background:rgba(41,121,255,0.1); border-left:3px solid var(--blue); padding:10px; color:#ccc; font-size:11px; margin-bottom:15px; font-family:var(--font-ui); }
-        
-        /* V316 SIMULATOR (GAP ANALYZER) */
         .sim-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
         .sim-result { background:var(--bg-panel); border:1px solid var(--border); padding:15px; border-radius:6px; margin-top:20px; text-align:center; }
         .rec-box { margin-top:10px; font-size:14px; font-weight:bold; color:var(--yellow); padding:10px; border:1px dashed var(--yellow); border-radius:4px; }
@@ -118,7 +116,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V316</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V317</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -145,7 +143,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V316. Gap Analyzer Ready.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V317. Auto-Repair Active.</div></div>
     </aside>
 
     <main class="main-content">
@@ -268,8 +266,8 @@
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V316';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V316';
+    const STORAGE_KEY = 'DOV_DATA_V317';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V317';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -294,10 +292,10 @@
         },
         resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
         templates: {
-            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 } },
-            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 } },
-            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 } },
-            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 } }
+            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 } },
+            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 } },
+            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 } },
+            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 } }
         }
     };
 
@@ -319,14 +317,31 @@
 
     function init() {
         const local = localStorage.getItem(STORAGE_KEY);
-        if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; if(loaded.ecoStats) ecoStats = loaded.ecoStats; } catch(e){} }
+        if(local) { 
+            try { 
+                let loaded = JSON.parse(local); 
+                DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
+                if(loaded.ecoStats) {
+                    ecoStats = loaded.ecoStats;
+                    // V317: AUTO-PATCH OLD DATA
+                    if(!ecoStats.burns) ecoStats.burns = {F:0, H:0, R:0, S:0};
+                }
+            } catch(e){} 
+        }
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         if(getId('dictSize')) getId('dictSize').innerText = count;
+        
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
-        if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
-        if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V316 Gap Analyzer.");
+        
+        if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
+            getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
+            getId('cntRows').innerText = fmt(ecoStats.buildings.active); 
+        }
+        if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
+            getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
+        }
+        log("Ready. Mode: V317 Auto-Repair.");
     }
 
     function buildUI() {
@@ -506,11 +521,13 @@
                     }
                 }
             }
-            // SAVE BURNS TO ECOSTATS FOR V316
+            // V317 PATCH: SAVE BURNS SAFELY
             ecoStats.divisions.active = stats.activeDivs; 
             ecoStats.divisions.mint = stats.totalProd; 
             ecoStats.cityBurn = stats.cityBurn;
-            ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs;
+            if(ecoStats.burns) {
+                ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs;
+            }
 
             updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
         } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); }
@@ -546,8 +563,8 @@
         getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets;
         getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX";
         let html = `
-            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr; background:rgba(0,255,0,0.05);"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
-            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr; background:rgba(41,121,255,0.05);"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
             <div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`;
         getId('projTable').innerHTML = html;
     }
@@ -576,10 +593,11 @@
         getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
     }
 
-    // V316: GAP ANALYZER LOGIC
+    // V317: GAP ANALYZER (STABLE)
     function showSimView() { switchView('viewSim'); }
     
     function runSimulation() {
+        if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; }
         if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) {
             alert("No data available. Please perform OPERATIONS scans first.");
             return;
