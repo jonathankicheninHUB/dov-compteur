@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V317 (GOLD STABLE)</title>
+    <title>DoV - COMMAND V318 (FULL MAP)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -116,7 +116,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V317</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V318</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -143,7 +143,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V317. Auto-Repair Active.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V318. Full Map Restored.</div></div>
     </aside>
 
     <main class="main-content">
@@ -266,8 +266,8 @@
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V317';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V317';
+    const STORAGE_KEY = 'DOV_DATA_V318';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V318';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -299,10 +299,13 @@
         }
     };
 
+    // FIXED V318: RESTORED FULL ZONE LIST (20 ZONES)
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400 }, 2: { name:"Beach 2", cost:6968, win:2405 }, 3: { name:"Beach 3", cost:8800, win:3037 }, 4: { name:"Bunker", cost:11120, win:3838 }, 
         5: { name:"Forest 1", cost:14024, win:4840 }, 6: { name:"Forest 2", cost:17704, win:6110 }, 7: { name:"Forest 3", cost:22352, win:7714 }, 8: { name:"Camp", cost:28220, win:9739 }, 
-        17: { name:"City 1", cost:1664, win:0 }
+        9: { name:"Hill 1", cost:37052, win:12788 }, 10: { name:"Hill 2", cost:48652, win:16791 }, 11: { name:"Hill 3", cost:64516, win:22266 }, 12: { name:"Radar", cost:84712, win:29236 }, 
+        13: { name:"Plain 1", cost:99384, win:34300 }, 14: { name:"Plain 2", cost:125708, win:43385 }, 15: { name:"Plain 3", cost:151164, win:52171 }, 16: { name:"HQ", cost:188000, win:64884 }, 
+        17: { name:"City 1", cost:1664, win:0 }, 18: { name:"City 2", cost:4448, win:0 }, 19: { name:"City 3", cost:13440, win:0 }, 20: { name:"Bridge", cost:29856, win:0 }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -323,7 +326,6 @@
                 DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
                 if(loaded.ecoStats) {
                     ecoStats = loaded.ecoStats;
-                    // V317: AUTO-PATCH OLD DATA
                     if(!ecoStats.burns) ecoStats.burns = {F:0, H:0, R:0, S:0};
                 }
             } catch(e){} 
@@ -341,7 +343,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V317 Auto-Repair.");
+        log("Ready. Mode: V318 Full Map.");
     }
 
     function buildUI() {
@@ -493,6 +495,7 @@
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
+        // FIXED V318: FULL 20 ZONES LIST FROM V299
         let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
         zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
 
@@ -593,7 +596,7 @@
         getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
     }
 
-    // V317: GAP ANALYZER (STABLE)
+    // V316: GAP ANALYZER LOGIC
     function showSimView() { switchView('viewSim'); }
     
     function runSimulation() {
