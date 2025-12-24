@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V326 (NAMED BADGES)</title>
+    <title>DoV - COMMAND V327 (CORRECTED RARITY)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
             --text-main: #e0e0e0; --text-muted: #858595;
-            /* ATOMIC HUB RARITY COLORS */
+            
+            /* ATOMIC HUB RARITY COLORS (CORRECTED) */
             --r-common: #787878;
             --r-rare: #4b90ea;
-            --r-epic: #a64dff;
+            --r-epic: #a64dff; /* VRAI VIOLET EPIC */
             --r-leg: #ffae00;
             
             --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
@@ -117,7 +118,7 @@
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         
-        /* NEW BADGE STYLES V326 */
+        /* NEW BADGE STYLES V326/7 */
         .badge-named { 
             display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px;
             padding: 3px 8px; border-radius:4px; 
@@ -129,10 +130,10 @@
         }
         .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
         
-        /* RARITY CLASSES */
+        /* RARITY CLASSES - CORRECTED V327 */
         .r-common { border-color: var(--r-common); color: var(--r-common); background: rgba(120,120,120,0.15); }
         .r-rare { border-color: var(--r-rare); color: var(--r-rare); background: rgba(75,144,234,0.15); }
-        .r-epic { border-color: var(--r-epic); color: var(--r-epic); background: rgba(166,77,255,0.15); }
+        .r-epic { border-color: var(--r-epic); color: var(--r-epic); background: rgba(166,77,255,0.15); } /* PURPLE */
         .r-leg { border-color: var(--r-leg); color: var(--r-leg); background: rgba(255,174,0,0.15); }
 
         .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; }
@@ -149,7 +150,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V326</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V327</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -178,7 +179,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V326. Dictionary Loaded.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V327. Rarity Colors Fixed.</div></div>
     </aside>
 
     <main class="main-content">
@@ -358,6 +359,7 @@
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     
+    // UPDATED V323: FULL DATA ROOM LINKS
     const PROJECT_DATA = { 
         links: [ 
             { name: "Official Website", url: "https://dawnofvictory.io/" }, 
@@ -381,8 +383,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V326';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V326';
+    const STORAGE_KEY = 'DOV_DATA_V327';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V327';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -438,8 +440,8 @@
         20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
     };
 
-    // --- NEW: THE MASTER DICTIONARY (V326) ---
-    // Mapped from provided IDs
+    // --- NEW: THE MASTER DICTIONARY (V327) ---
+    // UPDATED RARITIES TO MATCH DOV STANDARDS
     const REQ_DICT = {
         // KEYS (Usually Rare/Blue)
         "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" },
@@ -464,18 +466,18 @@
         "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" },
         "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" },
 
-        // SPECIALISTS (Engineers, etc.)
-        "296767": { n: "🛠️ ENGINEER", r: "r-common" },
-        "296768": { n: "🛠️ ENGINEER II", r: "r-common" },
-        "296769": { n: "🛠️ ENGINEER III", r: "r-common" },
-        "296770": { n: "🛠️ ENGINEER IV", r: "r-common" },
+        // SPECIALISTS (UPDATED: Engineers are EPIC)
+        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      /* UPDATED TO PURPLE */
+        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   /* UPDATED TO PURPLE */
+        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   /* UPDATED TO GOLD */
+        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    /* UPDATED TO GOLD */
         
         "401181": { n: "🏹 RANGER", r: "r-rare" },
         "401182": { n: "🧗 CLIMBER", r: "r-epic" },
         "401184": { n: "📡 TECH", r: "r-epic" },
         "401187": { n: "🎖️ GENERAL", r: "r-leg" },
 
-        // PARTS / OTHERS (Generic mapping for remaining IDs)
+        // PARTS / OTHERS
         "295956": { n: "⚙️ PART A", r: "r-common" },
         "296754": { n: "⚙️ PART B", r: "r-common" },
         "298537": { n: "⚙️ PART C", r: "r-common" },
@@ -489,7 +491,7 @@
         "298543": { n: "⚙️ PART K", r: "r-common" },
         "298551": { n: "⚙️ PART L", r: "r-common" },
         
-        // City Requirements (IDs specific to cities)
+        // City Requirements
         "645495": { n: "📜 PERMIT A", r: "r-common" },
         "645444": { n: "📜 PERMIT B", r: "r-common" },
         "645455": { n: "📜 PERMIT C", r: "r-common" },
@@ -546,7 +548,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V326 Named Badges.");
+        log("Ready. Mode: V327 Rarity Colors Fixed.");
     }
 
     function buildUI() {
@@ -671,6 +673,7 @@
     }
 
     function onXrayContractChange() {
+        // Auto-fill scope based on contract
         let c = getId('xrayContract').value;
         let s = c; // default scope = contract
         if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
@@ -682,20 +685,29 @@
         let table = getId('xrayTable').value;
         let scope = getId('xrayScope').value;
         if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
+        
         getId('xrayResults').innerText = "Scanning...";
         log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
+        
         try {
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
                 json: true, code: contract, scope: scope, table: table, limit: 100
             }));
+            
             if(res.rows && res.rows.length > 0) {
+                // Build dynamic table
                 let headers = Object.keys(res.rows[0]);
                 let html = `<table class="xray-table"><thead><tr>`;
                 headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
                 html += `</tr></thead><tbody>`;
+                
                 res.rows.forEach(r => {
                     html += `<tr>`;
-                    headers.forEach(h => { let val = r[h]; if(typeof val === 'object') val = JSON.stringify(val); html += `<td>${val}</td>`; });
+                    headers.forEach(h => {
+                        let val = r[h];
+                        if(typeof val === 'object') val = JSON.stringify(val);
+                        html += `<td>${val}</td>`;
+                    });
                     html += `</tr>`;
                 });
                 html += `</tbody></table>`;
