@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V333 (STABLE)</title>
+    <title>DoV - COMMAND V334 (SYBIL HUNTER)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -146,7 +146,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V333</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V334</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -159,7 +159,7 @@
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
-            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL RADAR</button>
+            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL HUNTER</button>
         </div>
 
         <div class="control-group">
@@ -176,7 +176,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V333. Stable.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V334. Sybil Hunter.</div></div>
     </aside>
 
     <main class="main-content">
@@ -338,7 +338,7 @@
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     
-    // UPDATED V333: FULL DATA ROOM LINKS
+    // UPDATED V334: FULL DATA ROOM LINKS
     const PROJECT_DATA = { 
         links: [ 
             { name: "Official Website", url: "https://dawnofvictory.io/" }, 
@@ -362,8 +362,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V333';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V333';
+    const STORAGE_KEY = 'DOV_DATA_V334';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V334';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -525,7 +525,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V333 Stable.");
+        log("Ready. Mode: V334 Sybil Hunter.");
     }
 
     // --- RESTORED AUDIT FUNCTIONS (V330 FIX) ---
@@ -568,8 +568,25 @@
 
     // --- SYBIL RADAR MODULE ---
     function showSybilView() { switchView('viewSybil'); }
+
+    // V334 HELPER: Levenshtein Distance for Name Matching
+    function getLevenshtein(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+        for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
     
-    // NEW V333: AUTO SCAN WITH ERROR HANDLING
+    // UPDATED V334: AUTO SCAN WITH WHITELIST & NAME PATTERN
     async function runAutoSybilScan() {
         if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; }
         let suspects = Array.from(runtimeWalletSet).slice(0, 50); // Limit 50 to avoid freeze
@@ -578,6 +595,9 @@
         let html = "";
         let count = 0;
 
+        // V334: EXTENDED WHITELIST TO REDUCE FALSE POSITIVES
+        const WHITELIST = ["alcor.dex", "waxapps", "atomicmarket", "alcordexmain", "eosio.stake", "swap.taco", "h1ubc.wam"];
+
         for(let target of suspects) {
             count++;
             getId('sybilProgress').innerText = `${count} / ${suspects.length}`;
@@ -585,10 +605,12 @@
             try {
                 // 1. CREATOR
                 let creator = "Unknown";
-                let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
-                if(resC && resC.actions.length > 0) creator = resC.actions[0].act.data.creator;
+                try {
+                    let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
+                    if(resC && resC.actions.length > 0) creator = resC.actions[0].act.data.creator;
+                } catch(e) { creator = "N/A (API)"; } // V334: Soft fail
                 
-                // 2. FUNNEL (Simplifié : on regarde juste le dernier transfert sortant)
+                // 2. FUNNEL (Simplifié)
                 let funnel = "None";
                 let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=20&sort=desc`);
                 if(resF && resF.actions) {
@@ -596,20 +618,49 @@
                     if(lastOut) funnel = lastOut.act.data.to;
                 }
 
-                // LOGIC: High Risk if funnel != exchange and funnel != self
-                let isRisk = (funnel !== "None" && funnel !== "alcor.dex" && funnel !== "waxapps" && funnel !== "atomicmarket");
-                let riskColor = isRisk ? "var(--red)" : "var(--green)";
+                // 3. LOGIC V334: High Risk if funnel NOT in whitelist
+                let isRiskFunnel = (funnel !== "None" && !WHITELIST.includes(funnel));
                 
+                // 4. LOGIC V334: Name Pattern Matching
+                let isNamePattern = false;
+                let similarTo = "";
+                for(let other of suspects) {
+                    if(other === target) continue;
+                    // Simple logic: if length is close AND Levenshtein distance is small (<=2)
+                    if(Math.abs(target.length - other.length) < 3) {
+                        let dist = getLevenshtein(target, other);
+                        if(dist <= 2 && target.length > 5) {
+                            isNamePattern = true;
+                            similarTo = other;
+                            break;
+                        }
+                    }
+                }
+
+                // DETERMINE STATUS
+                let statusColor = "var(--green)";
+                let statusMsg = "CLEAN";
+                
+                if(isNamePattern) {
+                    statusColor = "var(--orange)";
+                    statusMsg = `NAME PATTERN (${similarTo})`;
+                }
+                if(isRiskFunnel) {
+                    statusColor = "var(--red)";
+                    statusMsg = "FUNNEL RISK";
+                }
+
                 html += `
-                <div class="sybil-card" style="border-color:${riskColor}">
+                <div class="sybil-card" style="border-color:${statusColor}">
                     <div style="color:#fff; font-weight:bold;">${target}</div>
                     <div style="font-size:10px; color:#888;">Created by: <span style="color:#fff">${creator}</span></div>
                     <div style="margin-top:5px; font-size:10px;">LAST SENT TO:</div>
-                    <div style="font-weight:bold; color:${riskColor}">${funnel}</div>
+                    <div style="font-weight:bold; color:${WHITELIST.includes(funnel) ? 'var(--green)' : '#fff'}">${funnel}</div>
+                    <div style="margin-top:5px; background:${statusColor}; color:#000; font-size:9px; font-weight:bold; border-radius:2px;">${statusMsg}</div>
                 </div>`;
                 
                 getId('sybilResults').innerHTML = html; // Update live
-                await new Promise(r => setTimeout(r, 600)); // V333: Increased delay to avoid rate limit
+                await new Promise(r => setTimeout(r, 600)); // Delay
 
             } catch(e) { 
                 console.log(e); 
