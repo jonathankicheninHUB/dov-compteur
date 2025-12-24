@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V323 (SMART LINKS)</title>
+    <title>DoV - COMMAND V324 (VISUAL REQ)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -110,10 +110,10 @@
         .gap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #333; color:#ccc; }
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
-        .badge-req { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(213,0,249,0.15); border:1px solid var(--purple); color:var(--purple); display:inline-block; margin-right:4px; font-family:var(--font-num); cursor:pointer; }
-        .badge-req:hover { background:rgba(213,0,249,0.3); }
+        .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
+        .badge-req:hover { transform:scale(1.1); }
+        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; }
         .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); }
-        .badge-offline { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(255,59,48,0.15); border:1px solid var(--red); color:var(--red); display:inline-block; font-family:var(--font-num); }
         
         /* XRAY STYLES */
         .xray-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
@@ -127,7 +127,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V323</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V324</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -156,7 +156,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V323. Data Room Updated.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V324. Visuals Preloaded.</div></div>
     </aside>
 
     <main class="main-content">
@@ -360,8 +360,9 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V323';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V323';
+    const STORAGE_KEY = 'DOV_DATA_V324';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V324';
+    const AA_API = "https://wax.api.atomicassets.io";
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -424,9 +425,9 @@
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
     
-    // NEW: AUDIT LOG
+    // NEW: IMAGE CACHE
+    let imageCache = {};
     let inactiveAssetsLog = [];
-    let rulesLoaded = false;
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LOG_STORAGE_KEY); location.reload(); } }
@@ -449,7 +450,8 @@
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         
-        // NO DYNAMIC FETCH FOR ZONES - USING HARDCODED V322 DATA
+        // --- NEW: PRELOAD IMAGES ---
+        preloadImages();
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -458,7 +460,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V323 Smart Links.");
+        log("Ready. Mode: V324 Visual Req.");
     }
 
     function buildUI() {
@@ -563,6 +565,31 @@
         let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
         for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
         throw new Error("CLUSTER UNREACHABLE");
+    }
+
+    // --- NEW: PRELOAD IMAGES ---
+    async function preloadImages() {
+        log("Initialisation des visuels...");
+        let uniqueIds = new Set();
+        Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); });
+        let idsArray = Array.from(uniqueIds);
+        if(idsArray.length === 0) return;
+
+        // BATCH REQUEST TO ATOMIC ASSETS
+        let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`;
+        try {
+            let res = await fetch(url);
+            let json = await res.json();
+            if(json.data) {
+                json.data.forEach(t => {
+                    if(t.immutable_data && t.immutable_data.img) {
+                        imageCache[t.template_id] = t.immutable_data.img;
+                    }
+                });
+                log(`${json.data.length} images chargées.`);
+                if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions);
+            }
+        } catch(e) { log("Erreur images: " + e.message); }
     }
 
     // --- XRAY MODULE FUNCTIONS ---
@@ -780,86 +807,6 @@
         }
     }
 
-    // AUDIT FUNCTIONS
-    function openAuditView() {
-        if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
-        
-        // --- ADDED TOOLBAR FOR EXPORT ---
-        let toolbar = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;">
-                <div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span>
-                    <input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;">
-                    <button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button>
-                </div>
-            </div>`;
-
-        // TRIER PAR DURÉE D'INACTIVITÉ (Pire en premier)
-        let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
-        
-        let html = "";
-        sorted.forEach(item => {
-            // RARITY COLOR
-            let rarityColor = "#ccc"; 
-            if(item.name.startsWith("R_")) rarityColor = "var(--blue)";
-            else if(item.name.startsWith("E_")) rarityColor = "var(--purple)";
-            else if(item.name.startsWith("L_")) rarityColor = "var(--orange)";
-            else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
-
-            // COPY COMMAND JSON
-            let idsString = JSON.stringify(item.ids);
-            
-            html += `
-            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
-                <div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div>
-                <div class="cell" style="color:${rarityColor}">${item.name}</div>
-                <div class="cell" style="color:#888">${item.stopDate}</div>
-                <div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div>
-                <div class="cell c-center">
-                    <button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button>
-                </div>
-            </div>`;
-        });
-        
-        getId('auditList').innerHTML = toolbar + html;
-        getId('auditModal').style.display = 'flex';
-    }
-
-    function exportAuditCsv() {
-        let days = parseFloat(document.getElementById('auditThreshold').value) || 0;
-        
-        // Filtrage
-        let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days);
-        
-        if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; }
-
-        // Génération CSV
-        let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
-        targetList.forEach(r => {
-            // FIX SAFETY FOR UNDEFINED IDs
-            let idsStr = JSON.stringify(r.ids || []); 
-            // On échappe les guillemets pour le JSON des IDs dans le CSV
-            let idsSafe = idsStr.replace(/"/g, '""'); 
-            csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
-        });
-
-        // Téléchargement
-        let blob = new Blob([csv], {type:'text/csv'});
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a'); 
-        a.href = url; 
-        a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; 
-        a.click();
-    }
-
-    function copyIds(idsArray) {
-        let text = JSON.stringify(idsArray);
-        navigator.clipboard.writeText(text).then(() => {
-            alert("IDs copiés ! Prêt pour la commande 'withdraw'.");
-        });
-    }
-
     async function startZoneScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
         log("Scanning Divisions (Detailed)..."); 
@@ -930,8 +877,14 @@
             let reqBadges = "";
             if(z.req && z.req.length > 0) {
                 z.req.forEach(r => {
-                    // NEW: LINK TO ATOMIC HUB
-                    reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`;
+                    let imgHash = imageCache[r];
+                    if(imgHash) {
+                        // VISUAL MODE
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="ID: ${r}"><img src="https://ipfs.io/ipfs/${imgHash}"></a>`;
+                    } else {
+                        // FALLBACK TEXT MODE
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`;
+                    }
                 });
             }
 
