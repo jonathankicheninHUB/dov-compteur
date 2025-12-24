@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V334 (ID MAPPING)</title>
+    <title>DoV - COMMAND V334 (PATCHED CLICK)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -70,38 +70,13 @@
         .c-right { text-align: right; justify-content: flex-end; }
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        
-        /* ZONE CARD V334 - ROBUST ID MAPPING */
-        .zone-card { 
-            background-color: #1a1a1a; /* Fallback color if image fails */
-            background-size: cover; background-position: center;
-            border: 1px solid var(--border); 
-            padding: 10px; border-radius: 4px; 
-            display: flex; flex-direction: column; justify-content: space-between; 
-            height: 160px; cursor: pointer; transition: 0.2s; 
-            position: relative; overflow: hidden;
-        }
-        .zone-card::after { 
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: linear-gradient(180deg, rgba(10,12,16,0.95) 0%, rgba(10,12,16,0.6) 50%, rgba(10,12,16,0.95) 100%); 
-            z-index: 1; pointer-events: none; 
-        }
-        .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
-
-        /* THEMES MAPPED BY ID */
-        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); background-color: #003366; }
-        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); background-color: #004400; }
-        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); background-color: #444444; }
-        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); background-color: #554400; }
-        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); background-color: #220033; }
-        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); background-color: #333333; } 
-        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); background-color: #332200; }
-        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); background-color: #002244; }
-        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); }
-
-        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
-        .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.3); }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
+        .zone-card { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; cursor: pointer; transition: 0.2s; }
+        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-color: var(--blue); }
+        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
+        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
+        .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
+        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
@@ -113,6 +88,10 @@
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
         .t-price { font-family: var(--font-num); color: var(--blue); font-size: 11px; margin-top: 4px; }
         .t-usd { font-family: var(--font-num); color: #666; font-size: 10px; }
+        .acc-btn { cursor:pointer; font-weight:bold; color:var(--blue); }
+        .acc-content { display:none; background:#08080a; padding:10px; border-left:2px solid var(--blue); margin-top:5px; grid-column: 1 / -1; }
+        .val-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; border-bottom: 1px dotted #333; padding: 2px 0; }
+        .val-row span:last-child { color: #fff; font-family: var(--font-num); }
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
         .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
         .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
@@ -135,37 +114,40 @@
         .gap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #333; color:#ccc; }
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
-        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:9px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; text-shadow: 0 1px 2px #000; }
-        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
-        .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
-        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; }
-        .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
-        .badge-req:hover { transform:scale(1.1); }
-        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
         
-        /* XRAY & SYBIL */
-        .xray-ctrl, .sybil-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
+        /* NEW BADGE STYLES V326/7 */
+        .badge-named { 
+            display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px;
+            padding: 3px 8px; border-radius:4px; 
+            font-family: var(--font-num); font-size:9px; font-weight:bold;
+            text-transform: uppercase; cursor:pointer; transition:0.2s;
+            text-decoration: none; color:#fff;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #444;
+        }
+        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
+        
+        /* RARITY CLASSES - CORRECTED V327 */
+        .r-common { border-color: var(--r-common); color: var(--r-common); background: rgba(120,120,120,0.15); }
+        .r-rare { border-color: var(--r-rare); color: var(--r-rare); background: rgba(75,144,234,0.15); }
+        .r-epic { border-color: var(--r-epic); color: var(--r-epic); background: rgba(166,77,255,0.15); } /* PURPLE */
+        .r-leg { border-color: var(--r-leg); color: var(--r-leg); background: rgba(255,174,0,0.15); }
+
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; }
+        
+        /* XRAY STYLES */
+        .xray-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
         .xray-res { background:#000; border:1px solid #333; padding:15px; border-radius:4px; min-height:200px; font-family:var(--font-num); color:#0f0; white-space:pre-wrap; overflow-x:auto; }
         .xray-table { width:100%; border-collapse:collapse; }
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
-        .sybil-ctrl { background:#150000; border:1px solid var(--red); flex-direction:column; }
-        .sybil-res { display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px; } /* Legacy */
-        .sybil-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; } /* New Cluster View */
-        .sybil-cluster { background:#220000; border:1px solid #500; border-radius:6px; overflow:hidden; }
-        .sc-head { padding:10px; background:#400000; color:#fff; font-weight:bold; font-size:11px; display:flex; justify-content:space-between; align-items:center; }
-        .sc-body { padding:10px; }
-        .sc-row { display:flex; justify-content:space-between; font-family:var(--font-num); font-size:10px; color:#ccc; border-bottom:1px dotted #442222; padding:4px 0; }
-        .sc-row:last-child { border:none; }
-        .tag-safe { background:#004400; color:#0f0; padding:2px 4px; border-radius:2px; font-size:9px; }
-        .tag-risk { background:#440000; color:#f00; padding:2px 4px; border-radius:2px; font-size:9px; }
     </style>
 </head>
 <body>
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V334</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V334-PATCH-1</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -178,8 +160,7 @@
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
-            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL RADAR</button>
-        </div>
+            </div>
 
         <div class="control-group">
             <span class="grp-lbl">BLACK BOX LOGGING</span>
@@ -195,7 +176,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V334. ID Mapping Active.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V334-PATCH. Click fix.</div></div>
     </aside>
 
     <main class="main-content">
@@ -207,37 +188,49 @@
             </div>
             <div class="kpi-grid" id="areaCards"></div><div class="tables-grid" id="areaLists"></div>
         </div>
-        
-        <div id="viewSybil" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--red)">
-                <div><h2 class="page-h1" style="color:var(--red)">SYBIL RADAR</h2><div class="page-meta">PRECISION CLUSTER ANALYSIS</div></div>
-                <div class="sys-clock"><span class="clock-copy"></span></div>
-            </div>
-            <div class="sybil-ctrl">
-                <div style="color:#fff; font-weight:bold; margin-bottom:5px;">AUTOMATED SWEEP V2 (WHITELIST ENABLED)</div>
-                <div style="font-size:11px; color:#ccc; margin-bottom:10px;">Scans active players. Ignores exchanges. Detects similar names. Groups by Funding Source.</div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-red" onclick="runAutoSybilScan()">LAUNCH FULL SCAN (TOP 50)</button>
-                    <div id="sybilProgress" style="color:var(--orange); font-family:var(--font-num); align-self:center;"></div>
-                </div>
-            </div>
-            <div id="sybilResults" class="sybil-grid"></div>
-        </div>
 
         <div id="viewXray" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--purple)">
                 <div><h2 class="page-h1">X-RAY SCANNER</h2><div class="page-meta">SMART CONTRACT INSPECTOR</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
+            
             <div class="xray-ctrl">
-                <div style="flex:1"><span class="grp-lbl">CONTRACT</span><select id="xrayContract" onchange="onXrayContractChange()"><option value="dawnfvictory">dawnfvictory (CORE)</option><option value="dovutilstake">dovutilstake (STAKING)</option><option value="dovpvecontrl">dovpvecontrl (WAR)</option></select></div>
-                <div style="width:150px;"><span class="grp-lbl">ACTION</span><button class="btn-blue" onclick="loadXrayAbi()">1. LOAD TABLES</button></div>
+                <div style="flex:1">
+                    <span class="grp-lbl">CONTRACT</span>
+                    <select id="xrayContract" onchange="onXrayContractChange()">
+                        <option value="dawnfvictory">dawnfvictory (CORE)</option>
+                        <option value="dovutilstake">dovutilstake (STAKING)</option>
+                        <option value="dovpvecontrl">dovpvecontrl (WAR)</option>
+                        <option value="atomicdropsx">atomicdropsx (DROPS)</option>
+                        <option value="atomicpacksx">atomicpacksx (PACKS)</option>
+                        <option value="blenderizerx">blenderizerx (BLEND)</option>
+                        <option value="blend.nefty">blend.nefty (NEFTY)</option>
+                        <option value="neftyblocksd">neftyblocksd (DROPS)</option>
+                        <option value="neftyblocksp">neftyblocksp (PACKS)</option>
+                    </select>
+                </div>
+                <div style="width:150px;">
+                    <span class="grp-lbl">ACTION</span>
+                    <button class="btn-blue" onclick="loadXrayAbi()">1. LOAD TABLES</button>
+                </div>
             </div>
+
             <div class="xray-ctrl">
-                <div style="flex:1"><span class="grp-lbl">TARGET TABLE</span><select id="xrayTable"><option>Load ABI first...</option></select></div>
-                <div style="flex:1"><span class="grp-lbl">SCOPE</span><input type="text" id="xrayScope" value="dawnfvictory"></div>
-                <div style="width:150px;"><span class="grp-lbl">EXECUTE</span><button class="btn-purple" onclick="runXrayScan()">2. SCAN DATA</button></div>
+                <div style="flex:1">
+                    <span class="grp-lbl">TARGET TABLE</span>
+                    <select id="xrayTable"><option>Load ABI first...</option></select>
+                </div>
+                <div style="flex:1">
+                    <span class="grp-lbl">SCOPE (FILTER)</span>
+                    <input type="text" id="xrayScope" value="dawnfvictory">
+                </div>
+                <div style="width:150px;">
+                    <span class="grp-lbl">EXECUTE</span>
+                    <button class="btn-purple" onclick="runXrayScan()">2. SCAN DATA</button>
+                </div>
             </div>
+
             <div class="xray-res" id="xrayResults">Awaiting Scan...</div>
         </div>
 
@@ -245,7 +238,13 @@
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
                 <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">UNITS: <span id="zTotalDivsHeader">0</span></div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
-                <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
+                <div class="total-cost">
+                    <div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div>
+                    <div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;">
+                        <span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span>
+                    </div>
+                    <div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div>
+                </div>
             </div>
             <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
                 <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div></div>
@@ -357,9 +356,7 @@
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     
-    // V333: WHITELIST FOR SYBIL
-    const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
-
+    // UPDATED V323: FULL DATA ROOM LINKS
     const PROJECT_DATA = { 
         links: [ 
             { name: "Official Website", url: "https://dawnofvictory.io/" }, 
@@ -383,11 +380,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V334';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V334';
-    const AA_API = "https://wax.api.atomicassets.io";
-    const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
-
+    const STORAGE_KEY = 'DOV_DATA_V334_PATCH';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V334_PATCH';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -419,6 +413,7 @@
         }
     };
 
+    // FIXED V322: CORRECTED DATA
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 
         2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 
@@ -442,21 +437,10 @@
         20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
     };
 
-    // V334: MAPPING THEME PAR ID (ROBUSTE)
-    const ZONE_BG_MAP = {
-        1: "beach", 2: "beach", 3: "beach",
-        4: "mil",
-        5: "forest", 6: "forest", 7: "forest",
-        8: "camp",
-        9: "hill", 10: "hill", 11: "hill",
-        12: "mil",
-        13: "plain", 14: "plain", 15: "plain",
-        16: "mil",
-        17: "city", 18: "city", 19: "city",
-        20: "bridge"
-    };
-
+    // --- NEW: THE MASTER DICTIONARY (V327) ---
+    // UPDATED RARITIES TO MATCH DOV STANDARDS
     const REQ_DICT = {
+        // KEYS (Usually Rare/Blue)
         "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" },
         "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" },
         "871038": { n: "🔑 KEY BUNKER", r: "r-rare" },
@@ -472,18 +456,25 @@
         "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" },
         "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" },
         "871057": { n: "🔑 KEY HQ", r: "r-rare" },
+        
+        // CITY PASSES
         "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" },
         "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" },
         "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" },
         "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" },
-        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      
-        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   
-        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   
-        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    
+
+        // SPECIALISTS (UPDATED: Engineers are EPIC)
+        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      /* UPDATED TO PURPLE */
+        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   /* UPDATED TO PURPLE */
+        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   /* UPDATED TO GOLD */
+        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    /* UPDATED TO GOLD */
+        
         "401181": { n: "🏹 RANGER", r: "r-rare" },
         "401182": { n: "🧗 CLIMBER", r: "r-epic" },
         "401184": { n: "📡 TECH", r: "r-epic" },
         "401187": { n: "🎖️ GENERAL", r: "r-leg" },
+
+        // PARTS / OTHERS
         "295956": { n: "⚙️ PART A", r: "r-common" },
         "296754": { n: "⚙️ PART B", r: "r-common" },
         "298537": { n: "⚙️ PART C", r: "r-common" },
@@ -496,6 +487,8 @@
         "298553": { n: "⚙️ PART J", r: "r-common" },
         "298543": { n: "⚙️ PART K", r: "r-common" },
         "298551": { n: "⚙️ PART L", r: "r-common" },
+        
+        // City Requirements
         "645495": { n: "📜 PERMIT A", r: "r-common" },
         "645444": { n: "📜 PERMIT B", r: "r-common" },
         "645455": { n: "📜 PERMIT C", r: "r-common" },
@@ -520,7 +513,8 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
-    let imageCache = {};
+    
+    // NEW: AUDIT LOG
     let inactiveAssetsLog = [];
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
@@ -543,7 +537,6 @@
         
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
-        preloadImages();
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -552,222 +545,597 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V334 ID Mapping.");
+        log("Ready. Mode: V334-PATCH-1 (Fix Click).");
     }
 
-    // --- LEVENSHTEIN DISTANCE (For Name Similarity) ---
-    function levenshtein(a, b) {
-        if(a.length === 0) return b.length; 
-        if(b.length === 0) return a.length;
-        const matrix = [];
-        for(let i = 0; i <= b.length; i++){ matrix[i] = [i]; }
-        for(let j = 0; j <= a.length; j++){ matrix[0][j] = j; }
-        for(let i = 1; i <= b.length; i++){
-            for(let j = 1; j <= a.length; j++){
-                if(b.charAt(i-1) == a.charAt(j-1)){ matrix[i][j] = matrix[i-1][j-1]; }
-                else { matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); }
-            }
+    function buildUI() {
+        const areaC = getId('areaCards'); const areaL = getId('areaLists');
+        areaC.innerHTML = ''; areaL.innerHTML = '';
+        const order = ["F", "H", "R", "S"];
+        for(let k of order) {
+            let rd = DATA.resourceDefs[k];
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
+            areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
-        return matrix[b.length][a.length];
     }
 
-    function checkSimilarity(target, allNames) {
-        for (let name of allNames) {
-            if (name !== target && Math.abs(name.length - target.length) < 3) {
-                let dist = levenshtein(target, name);
-                if (dist <= 2) return name; // Very similar
-            }
-        }
-        return null;
+    function renderTicker() {
+        let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`;
+        const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ];
+        tokens.forEach(t => { let usd = t.p * CONFIG_PRIX.WAX_USD; html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`; });
+        getId('marketTicker').innerHTML = html;
     }
 
-    // --- SYBIL RADAR MODULE V333 ---
-    function showSybilView() { switchView('viewSybil'); }
-    
-    async function runAutoSybilScan() {
-        if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; }
-        let suspects = Array.from(runtimeWalletSet).slice(0, 50);
-        getId('sybilResults').innerHTML = `<div style="color:#fff; grid-column:1/-1; text-align:center;">SCANNING ${suspects.length} SUSPECTS... ANALYSIS IN PROGRESS...</div>`;
-        
-        let clusters = {}; // Key: "Funnel_Dest" or "Name_Pattern"
-        let count = 0;
-
-        for(let target of suspects) {
-            count++;
-            getId('sybilProgress').innerText = `${count} / ${suspects.length}`;
-            
-            try {
-                // 1. CREATOR CHECK (Improved)
-                let creator = "Unknown";
-                // Try NewAccount action first
-                let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
-                if(resC && resC.actions.length > 0) {
-                    creator = resC.actions[0].act.data.creator;
-                } else {
-                    // Fallback: First transfer received (Funding)
-                    let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=1&sort=asc`);
-                    if(resF && resF.actions.length > 0) {
-                        let data = resF.actions[0].act.data;
-                        if(data.to === target) creator = data.from + " (Funding)";
-                    }
-                }
-                
-                // 2. FUNNEL CHECK (Whitelist Filtered)
-                let funnel = "None";
-                let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=50&sort=desc`);
-                if(resF && resF.actions) {
-                    // Find last transfer to NON-WHITELISTED address
-                    let lastOut = resF.actions.find(a => a.act.data.from === target && !SYBIL_WHITELIST.includes(a.act.data.to));
-                    if(lastOut) funnel = lastOut.act.data.to;
-                }
-
-                // 3. NAMING CHECK
-                let similarTo = checkSimilarity(target, suspects);
-
-                // 4. CLUSTERING LOGIC
-                let clusterKey = "INDEPENDENT";
-                let riskLevel = "SAFE";
-
-                if (funnel !== "None") {
-                    clusterKey = "FUNNEL: " + funnel;
-                    riskLevel = "HIGH";
-                } else if (creator !== "Unknown" && creator !== "eosio" && creator !== "wombat") { // Generic creators ignored
-                     // Check if creator created others? For now just use as group key if needed, or stick to Independent
-                }
-                
-                if(similarTo) {
-                    if(clusterKey === "INDEPENDENT") clusterKey = "PATTERN: " + target.substring(0,6) + "*";
-                    riskLevel = riskLevel === "HIGH" ? "CRITICAL" : "MEDIUM";
-                }
-
-                // Add to Cluster
-                if(!clusters[clusterKey]) clusters[clusterKey] = [];
-                clusters[clusterKey].push({ name: target, creator: creator, funnel: funnel, similar: similarTo, risk: riskLevel });
-                
-                // Update UI (Live)
-                renderSybilClusters(clusters);
-                await new Promise(r => setTimeout(r, 600)); // Rate limit
-
-            } catch(e) { console.log(e); }
-        }
-        getId('sybilProgress').innerText = "SCAN COMPLETE.";
+    function startClock() {
+        setInterval(() => {
+            const now = new Date(); const time = now.toLocaleTimeString('fr-FR'); const date = now.toLocaleDateString('fr-FR', { year:'numeric', month:'2-digit', day:'2-digit' });
+            if(getId('liveTime')) { getId('liveTime').innerText = time; getId('liveDate').innerText = date; }
+            let copies = document.querySelectorAll('.clock-copy'); copies.forEach(c => c.innerText = `${time} | ${date}`);
+        }, 1000);
     }
 
-    function renderSybilClusters(clusters) {
-        let html = "";
-        // Sort clusters by size (biggest bot networks first)
-        let sortedKeys = Object.keys(clusters).sort((a,b) => clusters[b].length - clusters[a].length);
-        
-        sortedKeys.forEach(key => {
-            let group = clusters[key];
-            let isRisk = key.includes("FUNNEL") || key.includes("PATTERN");
-            let borderColor = isRisk ? "var(--red)" : "var(--green)";
-            if(group.length < 2 && isRisk) borderColor = "var(--orange)"; // Single funnel? Maybe personal wallet.
-            
-            html += `<div class="sybil-cluster" style="border-color:${borderColor}">
-                <div class="sc-head" style="background:${borderColor === 'var(--green)' ? '#003300' : '#440000'}">
-                    <span>${key}</span>
-                    <span>${group.length} ACCOUNTS</span>
-                </div>
-                <div class="sc-body">`;
-                
-            group.forEach(m => {
-                let riskTag = m.risk === "HIGH" || m.risk === "CRITICAL" ? `<span class="tag-risk">${m.risk}</span>` : `<span class="tag-safe">SAFE</span>`;
-                html += `<div class="sc-row">
-                    <span style="color:#fff; font-weight:bold;">${m.name}</span>
-                    <span>Created: ${m.creator.split(' ')[0]}</span>
-                    ${riskTag}
-                </div>`;
-            });
-            html += `</div></div>`;
-        });
-        getId('sybilResults').innerHTML = html;
+    async function takeLogSnapshot(isManual) {
+        if(isManual) { log("Manual Snapshot Initiated..."); await dispatchGlobalScan(true); await startZoneScan(true); }
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]");
+        let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX);
+        let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX;
+        let totalRevWax = dailyIndustryWax + dailyMilitaryWax;
+        let costWax = ecoStats.buildings.totalCost * CONFIG_PRIX.DOVX_WAX;
+        let entry = {
+            timestamp: new Date().toISOString(), type: isManual ? "MANUAL" : "AUTO",
+            revenue_usd: totalRevWax * CONFIG_PRIX.WAX_USD, cost_usd: costWax * CONFIG_PRIX.WAX_USD,
+            profit_usd: (totalRevWax - costWax) * CONFIG_PRIX.WAX_USD, assets_count: ecoStats.buildings.active + ecoStats.divisions.active
+        };
+        logs.push(entry); if(logs.length > 1000) logs.shift();
+        localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs));
+        if(isManual) { alert("Snapshot Saved."); renderStatsUI(); } else { log("Auto-Log Saved."); }
     }
 
-    async function fetchHistoryCluster(endpoint) {
-        let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
-        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
-        throw new Error("HISTORY NODES BUSY");
-    }
-
-    // --- STANDARD FUNCTIONS (Included implicitly) ---
-    function buildUI() { const areaC = getId('areaCards'); const areaL = getId('areaLists'); areaC.innerHTML = ''; areaL.innerHTML = ''; const order = ["F", "H", "R", "S"]; for(let k of order) { let rd = DATA.resourceDefs[k]; areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`; areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`; } }
-    function renderTicker() { let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`; const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ]; tokens.forEach(t => { let usd = t.p * CONFIG_PRIX.WAX_USD; html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`; }); getId('marketTicker').innerHTML = html; }
-    function startClock() { setInterval(() => { const now = new Date(); const time = now.toLocaleTimeString('fr-FR'); const date = now.toLocaleDateString('fr-FR', { year:'numeric', month:'2-digit', day:'2-digit' }); if(getId('liveTime')) { getId('liveTime').innerText = time; getId('liveDate').innerText = date; } let copies = document.querySelectorAll('.clock-copy'); copies.forEach(c => c.innerText = `${time} | ${date}`); }, 1000); }
-    async function takeLogSnapshot(isManual) { if(isManual) { log("Manual Snapshot Initiated..."); await dispatchGlobalScan(true); await startZoneScan(true); } let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalRevWax = dailyIndustryWax + dailyMilitaryWax; let costWax = ecoStats.buildings.totalCost * CONFIG_PRIX.DOVX_WAX; let entry = { timestamp: new Date().toISOString(), type: isManual ? "MANUAL" : "AUTO", revenue_usd: totalRevWax * CONFIG_PRIX.WAX_USD, cost_usd: costWax * CONFIG_PRIX.WAX_USD, profit_usd: (totalRevWax - costWax) * CONFIG_PRIX.WAX_USD, assets_count: ecoStats.buildings.active + ecoStats.divisions.active }; logs.push(entry); if(logs.length > 1000) logs.shift(); localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs)); if(isManual) { alert("Snapshot Saved."); renderStatsUI(); } else { log("Auto-Log Saved."); } }
     function startMonitoringRoutine() { setInterval(() => { takeLogSnapshot(false); }, 3600000); }
     function switchChart(mode) { currentChartMode = mode; document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); renderStatsUI(); }
     function showStatsView() { switchView('viewStats'); renderStatsUI(); }
-    function renderStatsUI() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]").reverse(); let html = ""; logs.forEach(l => { let date = new Date(l.timestamp).toLocaleString('fr-FR'); let color = l.type === "MANUAL" ? "var(--purple)" : "#666"; let rev = l.revenue_usd || 0; let cost = l.cost_usd || 0; let net = l.profit_usd || 0; let ast = l.assets_count || 0; html += `<div class="dt-grid dt-row" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell" style="color:#fff">${date}</div><div class="cell" style="color:${color}; font-weight:bold;">${l.type}</div><div class="cell c-right" style="color:var(--green)">$${rev.toFixed(2)}</div><div class="cell c-right" style="color:var(--orange)">$${cost.toFixed(2)}</div><div class="cell c-right" style="color:${net>=0?'var(--blue)':'var(--red)'}">$${net.toFixed(2)}</div><div class="cell c-right">${ast}</div></div>`; }); getId('logTable').innerHTML = html; if(logs.length > 0) { let last = logs[0]; let prev = logs.length > 1 ? logs[1] : last; let diff = last.profit_usd - prev.profit_usd; let trend = diff >= 0 ? "UP" : "DOWN"; getId('financialInsight').innerText = `LATEST: Profit $${last.profit_usd?.toFixed(2)} (${trend} $${Math.abs(diff).toFixed(2)}). Margin: ${((last.profit_usd/last.revenue_usd)*100).toFixed(1)}%.`; } if(logs.length < 2) return; let cvs = getId('analyticsChart'); let ctx = cvs.getContext('2d'); let w = cvs.width = cvs.parentElement.offsetWidth; let h = cvs.height = cvs.parentElement.offsetHeight; ctx.fillStyle = "#08080a"; ctx.fillRect(0,0,w,h); let data = logs.slice(0, 30).reverse(); if(data.length < 2) return; let maxVal = 0; data.forEach(d => { if(currentChartMode === 'pnl') maxVal = Math.max(maxVal, d.profit_usd || 0); if(currentChartMode === 'scissors') maxVal = Math.max(maxVal, d.revenue_usd || 0); if(currentChartMode === 'tvl') maxVal = Math.max(maxVal, d.assets_count || 0); }); maxVal = maxVal * 1.1; ctx.strokeStyle = "#222"; ctx.beginPath(); for(let i=0; i<5; i++) { let y = i*(h/4); ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); let step = w / (data.length - 1); if(currentChartMode === 'pnl') { ctx.fillStyle = "rgba(41, 121, 255, 0.2)"; ctx.strokeStyle = "#2979ff"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let val = d.profit_usd || 0; let x = i * step; let y = h - ((val / maxVal) * h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill(); } else if (currentChartMode === 'scissors') { ctx.strokeStyle = "#00f090"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.revenue_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); ctx.strokeStyle = "#ff3b30"; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.cost_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); } else if (currentChartMode === 'tvl') { ctx.fillStyle = "#ff9100"; let barW = (w / data.length) - 2; data.forEach((d, i) => { let hBar = ((d.assets_count||0) / maxVal) * h; ctx.fillRect(i*step, h - hBar, barW, hBar); }); } }
-    function exportLogs() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; } let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n"; logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click(); }
-    function findTemplate(tid) { if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' }; if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' }; if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' }; if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' }; return null; }
-    async function fetchSmartCluster(endpoint, body) { let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("CLUSTER UNREACHABLE"); }
-    async function preloadImages() { log("Initialisation des visuels..."); let uniqueIds = new Set(); Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); }); let idsArray = Array.from(uniqueIds); if(idsArray.length === 0) return; let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`; try { let res = await fetch(url); let json = await res.json(); if(json.data) { json.data.forEach(t => { if(t.immutable_data && t.immutable_data.img) { imageCache[t.template_id] = t.immutable_data.img; } }); log(`${json.data.length} images chargées.`); if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions); } } catch(e) { log("Erreur images: " + e.message); } }
-    
-    // --- XRAY MODULE ---
-    async function loadXrayAbi() { let contract = getId('xrayContract').value; log(`X-RAY: Loading ABI for ${contract}...`); try { let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract})); if(res.abi && res.abi.tables) { let html = ""; res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; }); getId('xrayTable').innerHTML = html; log(`X-RAY: Found ${res.abi.tables.length} tables.`); } else { log("X-RAY: No tables found or ABI access denied."); } } catch(e) { log("X-RAY Error: " + e.message); } }
-    function onXrayContractChange() { let c = getId('xrayContract').value; let s = c; if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; getId('xrayScope').value = s; }
-    async function runXrayScan() { let contract = getId('xrayContract').value; let table = getId('xrayTable').value; let scope = getId('xrayScope').value; if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; } getId('xrayResults').innerText = "Scanning..."; log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`); try { let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({ json: true, code: contract, scope: scope, table: table, limit: 100 })); if(res.rows && res.rows.length > 0) { let headers = Object.keys(res.rows[0]); let html = `<table class="xray-table"><thead><tr>`; headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`); html += `</tr></thead><tbody>`; res.rows.forEach(r => { html += `<tr>`; headers.forEach(h => { let val = r[h]; if(typeof val === 'object') val = JSON.stringify(val); html += `<td>${val}</td>`; }); html += `</tr>`; }); html += `</tbody></table>`; getId('xrayResults').innerHTML = html; log(`X-RAY: ${res.rows.length} rows retrieved.`); } else { getId('xrayResults').innerText = "No data found (Empty table or wrong scope)."; log("X-RAY: Empty result."); } } catch(e) { getId('xrayResults').innerText = "Error: " + e.message; log("X-RAY Error: " + e.message); } }
+
+    function renderStatsUI() {
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]").reverse();
+        let html = "";
+        logs.forEach(l => {
+            let date = new Date(l.timestamp).toLocaleString('fr-FR'); let color = l.type === "MANUAL" ? "var(--purple)" : "#666";
+            let rev = l.revenue_usd || 0; let cost = l.cost_usd || 0; let net = l.profit_usd || 0; let ast = l.assets_count || 0;
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell" style="color:#fff">${date}</div><div class="cell" style="color:${color}; font-weight:bold;">${l.type}</div><div class="cell c-right" style="color:var(--green)">$${rev.toFixed(2)}</div><div class="cell c-right" style="color:var(--orange)">$${cost.toFixed(2)}</div><div class="cell c-right" style="color:${net>=0?'var(--blue)':'var(--red)'}">$${net.toFixed(2)}</div><div class="cell c-right">${ast}</div></div>`;
+        });
+        getId('logTable').innerHTML = html;
+        if(logs.length > 0) {
+            let last = logs[0]; let prev = logs.length > 1 ? logs[1] : last; let diff = last.profit_usd - prev.profit_usd;
+            let trend = diff >= 0 ? "UP" : "DOWN";
+            getId('financialInsight').innerText = `LATEST: Profit $${last.profit_usd?.toFixed(2)} (${trend} $${Math.abs(diff).toFixed(2)}). Margin: ${((last.profit_usd/last.revenue_usd)*100).toFixed(1)}%.`;
+        }
+        if(logs.length < 2) return;
+        let cvs = getId('analyticsChart'); let ctx = cvs.getContext('2d'); let w = cvs.width = cvs.parentElement.offsetWidth; let h = cvs.height = cvs.parentElement.offsetHeight;
+        ctx.fillStyle = "#08080a"; ctx.fillRect(0,0,w,h);
+        let data = logs.slice(0, 30).reverse(); if(data.length < 2) return;
+        let maxVal = 0; data.forEach(d => { if(currentChartMode === 'pnl') maxVal = Math.max(maxVal, d.profit_usd || 0); if(currentChartMode === 'scissors') maxVal = Math.max(maxVal, d.revenue_usd || 0); if(currentChartMode === 'tvl') maxVal = Math.max(maxVal, d.assets_count || 0); }); maxVal = maxVal * 1.1;
+        ctx.strokeStyle = "#222"; ctx.beginPath(); for(let i=0; i<5; i++) { let y = i*(h/4); ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke();
+        let step = w / (data.length - 1);
+        if(currentChartMode === 'pnl') {
+            ctx.fillStyle = "rgba(41, 121, 255, 0.2)"; ctx.strokeStyle = "#2979ff"; ctx.lineWidth = 2; ctx.beginPath();
+            data.forEach((d, i) => { let val = d.profit_usd || 0; let x = i * step; let y = h - ((val / maxVal) * h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+            ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill();
+        } else if (currentChartMode === 'scissors') {
+            ctx.strokeStyle = "#00f090"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.revenue_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke();
+            ctx.strokeStyle = "#ff3b30"; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.cost_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke();
+        } else if (currentChartMode === 'tvl') {
+            ctx.fillStyle = "#ff9100"; let barW = (w / data.length) - 2;
+            data.forEach((d, i) => { let hBar = ((d.assets_count||0) / maxVal) * h; ctx.fillRect(i*step, h - hBar, barW, hBar); });
+        }
+    }
+
+    function exportLogs() {
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; }
+        let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n";
+        logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; });
+        let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click();
+    }
+
+    function findTemplate(tid) {
+        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' };
+        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' };
+        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' };
+        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' };
+        return null;
+    }
+
+    async function fetchSmartCluster(endpoint, body) {
+        let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
+        throw new Error("CLUSTER UNREACHABLE");
+    }
+
+    // --- XRAY MODULE FUNCTIONS ---
+    async function loadXrayAbi() {
+        let contract = getId('xrayContract').value;
+        log(`X-RAY: Loading ABI for ${contract}...`);
+        try {
+            // Get ABI
+            let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract}));
+            if(res.abi && res.abi.tables) {
+                let html = "";
+                res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; });
+                getId('xrayTable').innerHTML = html;
+                log(`X-RAY: Found ${res.abi.tables.length} tables.`);
+            } else {
+                log("X-RAY: No tables found or ABI access denied.");
+            }
+        } catch(e) { log("X-RAY Error: " + e.message); }
+    }
+
+    function onXrayContractChange() {
+        let c = getId('xrayContract').value;
+        let s = c; // default scope = contract
+        if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
+        getId('xrayScope').value = s;
+    }
+
+    async function runXrayScan() {
+        let contract = getId('xrayContract').value;
+        let table = getId('xrayTable').value;
+        let scope = getId('xrayScope').value;
+        if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
+        getId('xrayResults').innerText = "Scanning...";
+        log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
+        try {
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
+                json: true, code: contract, scope: scope, table: table, limit: 100
+            }));
+            if(res.rows && res.rows.length > 0) {
+                let headers = Object.keys(res.rows[0]);
+                let html = `<table class="xray-table"><thead><tr>`;
+                headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
+                html += `</tr></thead><tbody>`;
+                res.rows.forEach(r => {
+                    html += `<tr>`;
+                    headers.forEach(h => { let val = r[h]; if(typeof val === 'object') val = JSON.stringify(val); html += `<td>${val}</td>`; });
+                    html += `</tr>`;
+                });
+                html += `</tbody></table>`;
+                getId('xrayResults').innerHTML = html;
+                log(`X-RAY: ${res.rows.length} rows retrieved.`);
+            } else {
+                getId('xrayResults').innerText = "No data found (Empty table or wrong scope).";
+                log("X-RAY: Empty result.");
+            }
+        } catch(e) {
+            getId('xrayResults').innerText = "Error: " + e.message;
+            log("X-RAY Error: " + e.message);
+        }
+    }
+
     function showXrayView() { switchView('viewXray'); }
 
-    // --- DISPATCHES ---
-    async function dispatchGlobalScan(silent = false) { stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "..."; log("Scanning Buildings..."); let next = ""; let stats = { totalCost:0, types:{ F:{p:0, a:0, t:0, max:0}, H:{p:0, a:0, t:0, max:0}, R:{p:0, a:0, t:0, max:0}, S:{p:0, a:0, t:0, max:0} } }; let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0; inactiveAssetsLog = []; try { while(!stopSignal) { let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})); if(!res.rows) break; const now = Date.now()/1000; for(let r of res.rows) { let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue; rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count; stats.types[tpl.type].t += count; runtimeWalletSet.add(r.owner); let potentialProd = count * tpl.prod; stats.types[tpl.type].max += potentialProd; if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) { stats.types[tpl.type].a += count; let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; let existing = groups[tpl.type].find(x => x.name === tpl.name); if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); } existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c; stats.types[tpl.type].p += h; stats.totalCost += c; } else { let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay); let stopDate = new Date(stopTime * 1000); let safeIds = r.asset_ids || []; inactiveAssetsLog.push({ owner: r.owner, name: tpl.name, ids: safeIds, stopDate: stopDate.toLocaleString('fr-FR'), daysInactive: ((now - stopTime) / 86400).toFixed(1) }); } } ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost; updateGlobalUI(rowCount, stats, groups); if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); } }
-    function updateGlobalUI(rows, stats, groups) { if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); for(let k in DATA.resourceDefs) { let rd = DATA.resourceDefs[k]; let currentProd = stats.types[k].p; let dailyProd = currentProd * 24; let maxProd = stats.types[k].max; let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0; let missingProd = maxProd - currentProd; let colorVar = 'var(--fff)'; if(rd.class === 'fuel') colorVar = 'var(--orange)'; if(rd.class === 'health') colorVar = 'var(--red)'; if(rd.class === 'repair') colorVar = 'var(--blue)'; if(rd.class === 'supply') colorVar = 'var(--yellow)'; let cardId = `card-${k}`; let cardEl = getId(cardId); if(cardEl) { cardEl.innerHTML = `<div style="margin-bottom:5px;"><div class="kc-title">DAILY PRODUCTION</div><div class="kc-val-huge" style="color:${colorVar}">${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;"><div><div style="font-size:9px; color:#888;">HOURLY</div><div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div></div><div style="text-align:right;"><div style="font-size:9px; color:#888;">CAPACITY (MAX)</div><div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div></div></div><div style="margin-bottom:5px;"><div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;"><span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span><span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span></div><div style="height:4px; background:#333; border-radius:2px; overflow:hidden;"><div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div></div></div><div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>`; } let list = groups[k].sort((a,b) => b.totH - a.totH); let html = ""; list.forEach(i => { let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`; let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0; let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)"); let rarityColor = "#ccc"; if(i.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(i.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(i.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`; }); getId(`tbl-${k}`).innerHTML = html; } }
-    async function startZoneScan(silent = false) { stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING..."; log("Scanning Divisions (Detailed)..."); let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; let next = ""; let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; }); zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; }); try { while(!stopSignal) { let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})); if(!json.rows) break; for(let r of json.rows) { let zid = r.zone_id || r.zoneID; if(zonesData[zid]) { zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); let end = parseFloat(r.unlock_time || r.end_time || 0); let isFighting = end > (Date.now()/1000); if(isFighting) { zonesData[zid].active++; stats.activeDivs++; let zConf = SMART_ZONES_BIBLE[zid]; let isCity = [17, 18, 19, 20].includes(parseInt(zid)); if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } else { zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; zonesData[zid].br += zConf.cost; stats.br += zConf.cost; zonesData[zid].bs += zConf.cost; stats.bs += zConf.cost; } zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win; zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win }); } } } ecoStats.divisions.active = stats.activeDivs; ecoStats.divisions.mint = stats.totalProd; ecoStats.cityBurn = stats.cityBurn; if(ecoStats.burns) { ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs; } updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); } if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete."; }
-    function updateZoneUI(zonesData, stats) { 
-        if(!getId('zTotalDivsHeader')) return; 
-        getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); 
-        getId('zTotalDivs').innerText = fmt(stats.totalDivs); 
-        getId('zActiveDivs').innerText = fmt(stats.activeDivs); 
-        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0; 
-        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; 
-        getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`; 
+    // MODIFIED FOR OEE (Overall Equipment Effectiveness)
+    async function dispatchGlobalScan(silent = false) {
+        stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "...";
+        log("Scanning Buildings..."); 
+        
+        let next = ""; 
+        let stats = { 
+            totalCost:0, 
+            types:{
+                F:{p:0, a:0, t:0, max:0}, // max = Potentiel Max
+                H:{p:0, a:0, t:0, max:0}, 
+                R:{p:0, a:0, t:0, max:0}, 
+                S:{p:0, a:0, t:0, max:0}
+            } 
+        }; 
+        let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0;
+        
+        // RESET AUDIT LOG
+        inactiveAssetsLog = [];
+
+        try { while(!stopSignal) {
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            const now = Date.now()/1000;
+            for(let r of res.rows) {
+                let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue;
+                rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
+                
+                stats.types[tpl.type].t += count; 
+                runtimeWalletSet.add(r.owner); 
+
+                // CALCUL CAPACITÉ MAX (OEE)
+                let potentialProd = count * tpl.prod;
+                stats.types[tpl.type].max += potentialProd;
+
+                if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
+                    stats.types[tpl.type].a += count; 
+                    let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; 
+                    let existing = groups[tpl.type].find(x => x.name === tpl.name);
+                    if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); }
+                    existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c;
+                    stats.types[tpl.type].p += h; stats.totalCost += c;
+                } else {
+                    // --- AUDIT LOGIQUE : ASSET INACTIF ---
+                    let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay);
+                    let stopDate = new Date(stopTime * 1000);
+                    // SAFETY FIX FOR CRASH: Force empty array if asset_ids is missing
+                    let safeIds = r.asset_ids || [];
+                    
+                    inactiveAssetsLog.push({
+                        owner: r.owner,
+                        name: tpl.name,
+                        ids: safeIds,
+                        stopDate: stopDate.toLocaleString('fr-FR'),
+                        daysInactive: ((now - stopTime) / 86400).toFixed(1)
+                    });
+                }
+            }
+            ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost;
+            updateGlobalUI(rowCount, stats, groups);
+            if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
+        } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); }
+    }
+
+    // MODIFIED FOR OEE DISPLAY - RESTORED DAILY PROD
+    function updateGlobalUI(rows, stats, groups) {
+        if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); 
+        
+        for(let k in DATA.resourceDefs) {
+            let rd = DATA.resourceDefs[k]; 
+            
+            // Données OEE
+            let currentProd = stats.types[k].p;
+            let dailyProd = currentProd * 24; // RESTORED
+            let maxProd = stats.types[k].max;
+            let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0;
+            let missingProd = maxProd - currentProd;
+
+            // COLOR LOGIC
+            let colorVar = 'var(--fff)';
+            if(rd.class === 'fuel') colorVar = 'var(--orange)';
+            if(rd.class === 'health') colorVar = 'var(--red)';
+            if(rd.class === 'repair') colorVar = 'var(--blue)';
+            if(rd.class === 'supply') colorVar = 'var(--yellow)';
+
+            // Injection HTML Riche dans la carte KPI
+            let cardId = `card-${k}`;
+            let cardEl = getId(cardId);
+            
+            if(cardEl) {
+                // MISE EN PAGE OPTIMISÉE (HIERARCHIE INVERSEE)
+                cardEl.innerHTML = `
+                    <div style="margin-bottom:5px;">
+                        <div class="kc-title">DAILY PRODUCTION</div>
+                        <div class="kc-val-huge" style="color:${colorVar}">
+                            ${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
+                        <div>
+                            <div style="font-size:9px; color:#888;">HOURLY</div>
+                            <div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:9px; color:#888;">CAPACITY (MAX)</div>
+                            <div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:5px;">
+                        <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;">
+                            <span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span>
+                            <span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span>
+                        </div>
+                        <div style="height:4px; background:#333; border-radius:2px; overflow:hidden;">
+                            <div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div>
+                        </div>
+                    </div>
+
+                    <div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>
+                `;
+            }
+
+            // Liste Breakdown (inchangée)
+            let list = groups[k].sort((a,b) => b.totH - a.totH); let html = "";
+            list.forEach(i => {
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0;
+                let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)");
+                
+                // --- NEW: RARITY COLOR LOGIC ---
+                let rarityColor = "#ccc"; // Default Common
+                if(i.name.startsWith("R_")) rarityColor = "var(--blue)";
+                else if(i.name.startsWith("E_")) rarityColor = "var(--purple)";
+                else if(i.name.startsWith("L_")) rarityColor = "var(--orange)";
+                else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; // S1_OWNER usually
+
+                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
+            });
+            getId(`tbl-${k}`).innerHTML = html;
+        }
+    }
+
+    async function startZoneScan(silent = false) {
+        stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
+        log("Scanning Divisions (Detailed)..."); 
+        
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
+        let next = "";
+        // FIXED V322: FULL 20 ZONES LIST WITH HARDCODED VALUES
+        let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
+        zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
+
+        try { while(!stopSignal) {
+            let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            if(!json.rows) break;
+            for(let r of json.rows) {
+                let zid = r.zone_id || r.zoneID;
+                if(zonesData[zid]) {
+                    zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); 
+                    let end = parseFloat(r.unlock_time || r.end_time || 0);
+                    let isFighting = end > (Date.now()/1000); 
+                    if(isFighting) {
+                        zonesData[zid].active++; stats.activeDivs++;
+                        let zConf = SMART_ZONES_BIBLE[zid];
+                        let isCity = [17, 18, 19, 20].includes(parseInt(zid));
+                        if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } 
+                        else { 
+                            zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; 
+                            zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; 
+                            zonesData[zid].br += zConf.cost; stats.br += zConf.cost; 
+                            zonesData[zid].bs += zConf.cost; stats.bs += zConf.cost; 
+                        }
+                        zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win;
+                        zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win });
+                    }
+                }
+            }
+            ecoStats.divisions.active = stats.activeDivs; 
+            ecoStats.divisions.mint = stats.totalProd; 
+            ecoStats.cityBurn = stats.cityBurn;
+            if(ecoStats.burns) {
+                ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs;
+            }
+
+            updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+        } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); }
+        if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete.";
+    }
+
+    function updateZoneUI(zonesData, stats) {
+        if(!getId('zTotalDivsHeader')) return;
+        getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0;
+        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`;
         getId('zTotalProd').innerText = fmt(stats.totalProd); 
-        getId('gBurnF').innerText = fmt(stats.bf); 
-        getId('gBurnH').innerText = fmt(stats.bh); 
-        getId('gBurnR').innerText = fmt(stats.br); 
-        getId('gBurnS').innerText = fmt(stats.bs); 
-        getId('gCityBurn').innerText = fmt(stats.cityBurn); 
-        let html = ""; 
-        Object.keys(zonesData).forEach(id => { 
+        getId('gBurnF').innerText = fmt(stats.bf); getId('gBurnH').innerText = fmt(stats.bh); getId('gBurnR').innerText = fmt(stats.br); getId('gBurnS').innerText = fmt(stats.bs);
+        getId('gCityBurn').innerText = fmt(stats.cityBurn);
+        
+        let html = "";
+        Object.keys(zonesData).forEach(id => {
             let z = SMART_ZONES_BIBLE[id]; 
             let d = zonesData[id]; 
-            let activeClass = d.count > 0 ? "active" : ""; 
-            let isCity = [17,18,19,20].includes(parseInt(id)); 
+            let activeClass = d.count > 0 ? "active" : "";
+            let isCity = [17,18,19,20].includes(parseInt(id));
             
-            // --- NEW V334: MAPPING PAR ID ---
-            let theme = ZONE_BG_MAP[id] || "default";
-            let bgClass = "theme-" + theme;
+            // --- NEW: WEIGHT & REQ BADGES (HARDCODED VERSION) ---
+            // USING fmtDec to show 2 decimals
+            let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`;
+            
+            let reqBadges = "";
+            if(z.req && z.req.length > 0) {
+                z.req.forEach(r => {
+                    // NEW: LOOKUP IN DICTIONARY
+                    let entry = REQ_DICT[r];
+                    if(entry) {
+                        // PATCHED V334-PATCH-1 : ADDED onclick="event.stopPropagation()"
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub" onclick="event.stopPropagation()">${entry.n}</a>`;
+                    } else {
+                        // Fallback
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;" onclick="event.stopPropagation()"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`;
+                    }
+                });
+            }
 
-            let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`; 
-            let reqBadges = ""; 
-            if(z.req && z.req.length > 0) { 
-                z.req.forEach(r => { 
-                    let entry = REQ_DICT[r]; 
-                    let imgHash = imageCache[r]; 
-                    if(entry) { 
-                        if(imgHash) { 
-                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`; 
-                        } else { 
-                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`; 
-                        } 
-                    } else { 
-                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`; 
-                    } 
-                }); 
-            } 
-            let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; 
-            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span style="text-shadow:0 2px 4px #000;">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; 
-        }); 
-        getId('areaZones').innerHTML = html; 
+            let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
+                                  : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
+            
+            html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')">
+                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
+                
+                <div class="zc-mid">
+                    <div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div>
+                    <div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div style="height:1px; background:#333; margin:2px 0;"></div>
+                    ${burnHtml}
+                </div>
+            </div>`;
+        });
+        getId('areaZones').innerHTML = html;
     }
-    
+
     async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
-    function updateEcoUI() { let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD; getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets; getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX"; let html = `<div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div><div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`; getId('projTable').innerHTML = html; }
-    function openDataRoom() { let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`; PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; }); html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`; PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; }); html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`; PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; }); html += `</div></div>`; getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex'; }
-    function openZoneDetail(zid) { if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return; let list = zoneDetailsCache[zid]; let groups = {}; list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; }); let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count); let html = ""; sorted.forEach(owner => { html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`; }); getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex'; }
+
+    function updateEcoUI() {
+        let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX);
+        let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX;
+        let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD;
+        getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets;
+        getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX";
+        let html = `
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`;
+        getId('projTable').innerHTML = html;
+    }
+
+    function openDataRoom() {
+        let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`;
+        PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; });
+        html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`;
+        PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; });
+        html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`;
+        PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; });
+        html += `</div></div>`;
+        getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex';
+    }
+
+    function openZoneDetail(zid) { 
+        if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
+        let list = zoneDetailsCache[zid];
+        let groups = {};
+        list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; });
+        let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count);
+        let html = "";
+        sorted.forEach(owner => {
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`;
+        });
+        getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
+    }
+
+    // V316: GAP ANALYZER LOGIC
     function showSimView() { switchView('viewSim'); }
-    function runSimulation() { if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; } if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) { alert("No data available. Please perform OPERATIONS scans first."); return; } let prod = { F: ecoStats.buildings.prodF * 24, H: ecoStats.buildings.prodH * 24, R: ecoStats.buildings.prodR * 24, S: ecoStats.buildings.prodS * 24 }; let burn = { F: ecoStats.burns.F, H: ecoStats.burns.H, R: ecoStats.burns.R, S: ecoStats.burns.S }; let htmlGap = ""; let htmlBuild = ""; let totalNewBurnDOVX = 0; let commonProdDaily = 5.4 * 24; let commonBurnDaily = commonProdDaily * 0.085; let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}}; Object.keys(prod).forEach(k => { let p = prod[k]; let b = burn[k]; let gap = p - b; let gapColor = gap >= 0 ? "val-green" : "val-red"; htmlGap += `<div class="gap-row"><span>${resourceMap[k].n}</span><span style="color:#888">${fmt(p)} / ${fmt(b)}</span><span class="${gapColor}">${gap >= 0 ? "+" : ""}${fmt(gap)}</span></div>`; if (gap < 0) { let deficit = Math.abs(gap); let buildingsNeeded = Math.ceil(deficit / commonProdDaily); let addedBurnDOVX = buildingsNeeded * commonBurnDaily; let costToProduceGap = deficit * 0.085; totalNewBurnDOVX += addedBurnDOVX; htmlBuild += `<div class="gap-row" style="border-color:var(--red); display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center;"><div style="line-height:1.1;"><span style="color:var(--red); font-weight:800; font-size:10px;">${resourceMap[k].n} DEFICIT</span><br><span style="font-size:9px; color:#666;">GAP: -${fmt(deficit)}</span></div><div style="text-align:center;"><span style="color:#fff; font-weight:bold;">BUILD ${buildingsNeeded}</span><br><span style="font-size:9px; color:#444;">COMMON UNITS</span></div><div style="text-align:right; line-height:1.1;"><span style="font-size:9px; color:#666;">COÛT PROD</span><br><span style="color:var(--purple); font-weight:800; font-size:12px;">${fmt(costToProduceGap)} DOVX</span></div></div>`; } else { htmlBuild += `<div class="gap-row" style="border-color:var(--green); opacity:0.5"><span style="color:var(--green)">${resourceMap[k].n} SECURE</span><span>OK</span><span>-</span></div>`; } }); getId('simGapList').innerHTML = htmlGap; getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>"; let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0); let currentMint = ecoStats.divisions.mint; let netDOVX = currentMint - (currentCost + totalNewBurnDOVX); let htmlBal = `<h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span></h3><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell">POSTE</div><div class="cell c-right">CHARGES ACTUELLES</div><div class="cell c-right">CHARGES ADD.</div><div class="cell c-right">RÉSULTAT NET</div></div><div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div><div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span></div></div>`; getId('simBalanceTable').innerHTML = htmlBal; let recBox = getId('simRec'); if (totalNewBurnDOVX > 0) { recBox.className = "rec-box"; recBox.style.color = "var(--red)"; recBox.style.borderColor = "var(--red)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.</div>`; } else { recBox.className = "rec-box"; recBox.style.color = "var(--green)"; recBox.style.borderColor = "var(--green)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.</div>`; } }
+    
+    function runSimulation() {
+        if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; }
+        if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) {
+            alert("No data available. Please perform OPERATIONS scans first.");
+            return;
+        }
+
+        // 1. GATHER REAL DATA (DAILY)
+        let prod = {
+            F: ecoStats.buildings.prodF * 24,
+            H: ecoStats.buildings.prodH * 24,
+            R: ecoStats.buildings.prodR * 24,
+            S: ecoStats.buildings.prodS * 24
+        };
+        
+        let burn = {
+            F: ecoStats.burns.F,
+            H: ecoStats.burns.H,
+            R: ecoStats.burns.R,
+            S: ecoStats.burns.S
+        };
+
+        // 2. CALCULATE GAP & NEEDS
+        let htmlGap = "";
+        let htmlBuild = "";
+        let totalNewBurnDOVX = 0;
+        let commonProdDaily = 5.4 * 24; // 129.6 TU/Day
+        let commonBurnDaily = commonProdDaily * 0.085; // DOVX cost
+
+        let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}};
+
+        Object.keys(prod).forEach(k => {
+            let p = prod[k];
+            let b = burn[k];
+            let gap = p - b;
+            let gapColor = gap >= 0 ? "val-green" : "val-red";
+            
+            // Render Gap Row
+            htmlGap += `<div class="gap-row">
+                <span>${resourceMap[k].n}</span>
+                <span style="color:#888">${fmt(p)} / ${fmt(b)}</span>
+                <span class="${gapColor}">${gap >= 0 ? "+" : ""}${fmt(gap)}</span>
+            </div>`;
+
+            // Calculate Needs if Deficit
+            if (gap < 0) {
+                let deficit = Math.abs(gap);
+                let buildingsNeeded = Math.ceil(deficit / commonProdDaily);
+                let addedBurnDOVX = buildingsNeeded * commonBurnDaily;
+                let valueWax = deficit * resourceMap[k].p;
+                let valueUsd = valueWax * CONFIG_PRIX.WAX_USD;
+                
+                // CALCUL DU COÛT TECHNIQUE (Votre formule : Spread * 0.085)
+                let costToProduceGap = deficit * 0.085;
+
+                totalNewBurnDOVX += addedBurnDOVX;
+
+                // NOUVEL AFFICHAGE (Design 3 Colonnes : Alerte | Action | Coût DOVX)
+                htmlBuild += `<div class="gap-row" style="border-color:var(--red); display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center;">
+                    <div style="line-height:1.1;">
+                        <span style="color:var(--red); font-weight:800; font-size:10px;">${resourceMap[k].n} DEFICIT</span><br>
+                        <span style="font-size:9px; color:#666;">GAP: -${fmt(deficit)}</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <span style="color:#fff; font-weight:bold;">BUILD ${buildingsNeeded}</span><br>
+                        <span style="font-size:9px; color:#444;">COMMON UNITS</span>
+                    </div>
+                    <div style="text-align:right; line-height:1.1;">
+                        <span style="font-size:9px; color:#666;">COÛT PROD</span><br>
+                        <span style="color:var(--purple); font-weight:800; font-size:12px;">${fmt(costToProduceGap)} DOVX</span>
+                    </div>
+                </div>`;
+            } else {
+                htmlBuild += `<div class="gap-row" style="border-color:var(--green); opacity:0.5">
+                    <span style="color:var(--green)">${resourceMap[k].n} SECURE</span>
+                    <span>OK</span>
+                    <span>-</span>
+                </div>`;
+            }
+        });
+
+        getId('simGapList').innerHTML = htmlGap;
+        getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>";
+
+        // 3. DOVX BALANCE (Refonte: Compte d'Exploitation)
+        // Charges = Maintenance Bâtiments + Burn des Villes (City)
+        let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0);
+        let currentMint = ecoStats.divisions.mint;
+        let projectedCost = currentCost + totalNewBurnDOVX;
+        let netDOVX = currentMint - projectedCost;
+
+        // Affichage Tableau Financier
+        let htmlBal = `
+            <h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">
+                COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span>
+            </h3>
+            <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell">POSTE</div>
+                <div class="cell c-right">CHARGES ACTUELLES</div>
+                <div class="cell c-right">CHARGES ADD.</div>
+                <div class="cell c-right">RÉSULTAT NET</div>
+            </div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div>
+                <div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div>
+                <div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div>
+                <div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">
+                    ${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span>
+                </div>
+            </div>
+        `;
+        getId('simBalanceTable').innerHTML = htmlBal;
+
+        // 4. RECOMMENDATION (Refonte: Avis de Gestion)
+        let recBox = getId('simRec');
+        if (totalNewBurnDOVX > 0) {
+            recBox.className = "rec-box";
+            recBox.style.color = "var(--red)";
+            recBox.style.borderColor = "var(--red)";
+            // Message alerte pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>
+                    IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.
+                </div>`;
+        } else {
+            recBox.className = "rec-box";
+            recBox.style.color = "var(--green)";
+            recBox.style.borderColor = "var(--green)";
+            // Message succès pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>
+                    LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.
+                </div>`;
+        }
+    }
 
     window.onload = init;
 </script>
