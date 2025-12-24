@@ -136,6 +136,7 @@
                 <button class="btn-purple" onclick="takeLogSnapshot(true)">FORCE SNAPSHOT</button>
                 <button class="btn-ghost" style="color:#fff" onclick="exportLogs()">EXPORT CSV</button>
             </div>
+            <button class="btn-red" style="margin-top:8px;" onclick="openAuditView()">AUDIT INACTIFS ⚠️</button>
         </div>
 
         <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
@@ -252,6 +253,21 @@
     <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('dataRoomModal')">CLOSE</button></div>
 </div></div>
 
+<div class="modal-overlay" id="auditModal"><div class="modal-box" style="width:800px;">
+    <h3 style="margin-top:0; color:var(--red); border-bottom:1px solid #333; padding-bottom:10px;">AUDIT RAPPORT: ACTIFS INACTIFS</h3>
+    <div style="height:400px; overflow-y:auto; margin-top:15px;">
+        <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
+            <div class="cell">WALLET (OWNER)</div>
+            <div class="cell">TEMPLATE</div>
+            <div class="cell">ARRÊTÉ LE</div>
+            <div class="cell">INACTIF</div>
+            <div class="cell c-center">ACTION</div>
+        </div>
+        <div id="auditList"></div>
+    </div>
+    <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('auditModal')">CLOSE</button></div>
+</div></div>
+
 <div class="modal-overlay" id="zoneDetailModal"><div class="modal-box" style="width:800px;">
     <h3 id="zdTitle" style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">ZONE DETAIL</h3>
     <div style="height:400px; overflow-y:auto; margin-top:15px;"><div id="zdList"></div></div>
@@ -312,6 +328,9 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
+    
+    // NEW: AUDIT LOG
+    let inactiveAssetsLog = [];
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
     function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LOG_STORAGE_KEY); location.reload(); } }
@@ -464,6 +483,9 @@
             } 
         }; 
         let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0;
+        
+        // RESET AUDIT LOG
+        inactiveAssetsLog = [];
 
         try { while(!stopSignal) {
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
@@ -487,6 +509,17 @@
                     if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); }
                     existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c;
                     stats.types[tpl.type].p += h; stats.totalCost += c;
+                } else {
+                    // --- AUDIT LOGIQUE : ASSET INACTIF ---
+                    let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay);
+                    let stopDate = new Date(stopTime * 1000);
+                    inactiveAssetsLog.push({
+                        owner: r.owner,
+                        name: tpl.name,
+                        ids: r.asset_ids,
+                        stopDate: stopDate.toLocaleString('fr-FR'),
+                        daysInactive: ((now - stopTime) / 86400).toFixed(1)
+                    });
                 }
             }
             ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost;
@@ -571,6 +604,48 @@
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
+    }
+
+    // AUDIT FUNCTIONS
+    function openAuditView() {
+        if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
+        
+        // TRIER PAR DURÉE D'INACTIVITÉ (Pire en premier)
+        let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
+        
+        let html = "";
+        sorted.forEach(item => {
+            // RARITY COLOR
+            let rarityColor = "#ccc"; 
+            if(item.name.startsWith("R_")) rarityColor = "var(--blue)";
+            else if(item.name.startsWith("E_")) rarityColor = "var(--purple)";
+            else if(item.name.startsWith("L_")) rarityColor = "var(--orange)";
+            else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
+
+            // COPY COMMAND JSON
+            let idsString = JSON.stringify(item.ids);
+            
+            html += `
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
+                <div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div>
+                <div class="cell" style="color:${rarityColor}">${item.name}</div>
+                <div class="cell" style="color:#888">${item.stopDate}</div>
+                <div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div>
+                <div class="cell c-center">
+                    <button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button>
+                </div>
+            </div>`;
+        });
+        
+        getId('auditList').innerHTML = html;
+        getId('auditModal').style.display = 'flex';
+    }
+
+    function copyIds(idsArray) {
+        let text = JSON.stringify(idsArray);
+        navigator.clipboard.writeText(text).then(() => {
+            alert("IDs copiés ! Prêt pour la commande 'withdraw'.");
+        });
     }
 
     async function startZoneScan(silent = false) {
