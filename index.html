@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V330 (STABLE)</title>
+    <title>DoV - COMMAND V331 (SYBIL HUNTER)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -171,13 +171,18 @@
         .xray-table { width:100%; border-collapse:collapse; }
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
+        
+        /* SYBIL STYLES */
+        .sybil-ctrl { background:#150000; border:1px solid var(--red); padding:15px; border-radius:4px; margin-bottom:20px; }
+        .sybil-res { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+        .sybil-box { background:#0f0505; border:1px solid #331111; padding:10px; border-radius:4px; }
     </style>
 </head>
 <body>
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V330</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V331</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -190,6 +195,7 @@
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
+            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL HUNTER</button>
         </div>
 
         <div class="control-group">
@@ -206,7 +212,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V330. Functions Restored.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V331. Sybil Hunter Active.</div></div>
     </aside>
 
     <main class="main-content">
@@ -217,6 +223,32 @@
                 <div class="total-cost"><div class="grp-lbl">MAINTENANCE DOVX / 24H</div><div><span class="tc-val" id="gTotalCost">0</span></div></div>
             </div>
             <div class="kpi-grid" id="areaCards"></div><div class="tables-grid" id="areaLists"></div>
+        </div>
+        
+        <div id="viewSybil" class="view-section">
+            <div class="dashboard-header" style="border-left: 4px solid var(--red)">
+                <div><h2 class="page-h1" style="color:var(--red)">SYBIL HUNTER</h2><div class="page-meta">FORENSIC ANALYSIS</div></div>
+                <div class="sys-clock"><span class="clock-copy"></span></div>
+            </div>
+            
+            <div class="sybil-ctrl">
+                <span class="grp-lbl" style="color:#fff">TARGET SUSPECT (WALLET)</span>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <input type="text" id="sybilTarget" value="u2d2k.c.wam" style="background:#311; border-color:var(--red);">
+                    <button class="btn-red" style="width:200px;" onclick="runSybilScan()">LANCER ENQUÊTE</button>
+                </div>
+            </div>
+            
+            <div class="sybil-res">
+                <div class="sybil-box">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--red)">1. ORIGINE DU COMPTE (CREATOR)</span></div>
+                    <div id="sybilOrigin" style="padding:15px; font-family:var(--font-num); color:#ccc;">Waiting...</div>
+                </div>
+                <div class="sybil-box">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--red)">2. FLUX SORTANTS (FUNNEL)</span></div>
+                    <div id="sybilFunnel" style="padding:15px; font-family:var(--font-num); color:#ccc;">Waiting...</div>
+                </div>
+            </div>
         </div>
 
         <div id="viewXray" class="view-section">
@@ -408,9 +440,18 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V330';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V330';
+    const STORAGE_KEY = 'DOV_DATA_V331';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V331';
     const AA_API = "https://wax.api.atomicassets.io";
+    
+    // NEW: HYPERION NODES (FOR HISTORY/SYBIL)
+    const HYPERION_NODES = [
+        "https://wax.eosrio.io",
+        "https://wax.greymass.com",
+        "https://api.waxsweden.org",
+        "https://wax.eu.eosamsterdam.net"
+    ];
+
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -442,7 +483,6 @@
         }
     };
 
-    // FIXED V322: CORRECTED DATA
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 
         2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 
@@ -466,7 +506,6 @@
         20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
     };
 
-    // --- NEW: THE MASTER DICTIONARY (V327) ---
     const REQ_DICT = {
         "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" },
         "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" },
@@ -531,8 +570,6 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
-    
-    // NEW: IMAGE CACHE
     let imageCache = {};
     let inactiveAssetsLog = [];
 
@@ -556,8 +593,6 @@
         
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
-        
-        // --- NEW: PRELOAD IMAGES ---
         preloadImages();
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
@@ -567,49 +602,22 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V330 Restored.");
+        log("Ready. Mode: V331 Sybil Hunter.");
     }
 
-    // --- RESTORED AUDIT FUNCTIONS (V330 FIX) ---
+    // --- RESTORED AUDIT FUNCTIONS ---
     function openAuditView() {
         if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
-        
-        let toolbar = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;">
-                <div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span>
-                    <input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;">
-                    <button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button>
-                </div>
-            </div>`;
-
+        let toolbar = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;"><div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div><div style="display:flex; gap:10px; align-items:center;"><span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span><input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;"><button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button></div></div>`;
         let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
-        
         let html = "";
         sorted.forEach(item => {
             let rarityColor = "#ccc"; 
-            if(item.name.startsWith("R_")) rarityColor = "var(--blue)";
-            else if(item.name.startsWith("E_")) rarityColor = "var(--purple)";
-            else if(item.name.startsWith("L_")) rarityColor = "var(--orange)";
-            else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
-
+            if(item.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(item.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(item.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
             let idsString = JSON.stringify(item.ids);
-            
-            html += `
-            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
-                <div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div>
-                <div class="cell" style="color:${rarityColor}">${item.name}</div>
-                <div class="cell" style="color:#888">${item.stopDate}</div>
-                <div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div>
-                <div class="cell c-center">
-                    <button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button>
-                </div>
-            </div>`;
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button></div></div>`;
         });
-        
-        getId('auditList').innerHTML = toolbar + html;
-        getId('auditModal').style.display = 'flex';
+        getId('auditList').innerHTML = toolbar + html; getId('auditModal').style.display = 'flex';
     }
 
     function exportAuditCsv() {
@@ -617,13 +625,8 @@
         let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days);
         if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; }
         let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
-        targetList.forEach(r => {
-            let idsStr = JSON.stringify(r.ids || []); 
-            let idsSafe = idsStr.replace(/"/g, '""'); 
-            csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
-        });
-        let blob = new Blob([csv], {type:'text/csv'});
-        let url = window.URL.createObjectURL(blob);
+        targetList.forEach(r => { let idsStr = JSON.stringify(r.ids || []); let idsSafe = idsStr.replace(/"/g, '""'); csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`; });
+        let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob);
         let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click();
     }
 
@@ -631,15 +634,66 @@
         let text = JSON.stringify(idsArray);
         navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); });
     }
-    // --- END RESTORED FUNCTIONS ---
 
-    // ... (Reste du code : buildUI, renderTicker, etc. identique à V329) ...
-    // Note: Pour abréger, je ne répète pas tout le bloc de fonctions standard (buildUI, renderTicker, etc.) 
-    // qui sont déjà présentes et correctes dans le bloc précédent, mais elles sont IMPLICITEMENT INCLUSES ICI.
-    // LE CODE COMPLET EST CELUI DE LA V329 AVEC L'AJOUT DES FONCTIONS AUDIT CI-DESSUS.
+    // --- SYBIL HUNTER MODULE ---
+    function showSybilView() { switchView('viewSybil'); }
     
-    // JE REMET LE BLOC COMPLET CI-DESSOUS POUR EVITER TOUTE AMBIGUÏTE.
+    async function runSybilScan() {
+        let target = getId('sybilTarget').value;
+        if(!target) return;
+        
+        getId('sybilOrigin').innerText = "Analyzing Genesis...";
+        getId('sybilFunnel').innerText = "Tracking Transfers...";
+        
+        // 1. Check Creator (Genesis)
+        try {
+            let res = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
+            if(res && res.actions && res.actions.length > 0) {
+                let act = res.actions[0];
+                let creator = act.act.data.creator;
+                let date = new Date(act.timestamp).toLocaleString();
+                getId('sybilOrigin').innerHTML = `<span style="color:var(--green); font-size:14px;">CREATED BY: <b>${creator}</b></span><br><span style="color:#666">${date}</span>`;
+            } else {
+                getId('sybilOrigin').innerText = "Origin: Unknown (History Limit)";
+            }
+        } catch(e) { getId('sybilOrigin').innerText = "History Error: " + e.message; }
 
+        // 2. Check Funnel (Outbound DOVX)
+        try {
+            // Looking for transfer FROM target TO anyone
+            let res = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=100&sort=desc`);
+            if(res && res.actions) {
+                let funnel = {};
+                let total = 0;
+                res.actions.forEach(a => {
+                    let d = a.act.data;
+                    if(d.from === target) { // Outbound
+                        if(!funnel[d.to]) funnel[d.to] = 0;
+                        // Rough count of txs
+                        funnel[d.to]++;
+                        total++;
+                    }
+                });
+                
+                let html = "";
+                let sorted = Object.keys(funnel).sort((a,b) => funnel[b] - funnel[a]);
+                sorted.forEach(dest => {
+                    let pct = ((funnel[dest] / total) * 100).toFixed(1);
+                    let color = pct > 50 ? "var(--red)" : (pct > 20 ? "var(--orange)" : "#ccc");
+                    html += `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #333; padding:2px 0;"><span>${dest}</span><span style="color:${color}; font-weight:bold;">${pct}% (${funnel[dest]} txs)</span></div>`;
+                });
+                getId('sybilFunnel').innerHTML = html || "No recent outbound transfers found.";
+            }
+        } catch(e) { getId('sybilFunnel').innerText = "Funnel Error: " + e.message; }
+    }
+
+    async function fetchHistoryCluster(endpoint) {
+        let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
+        throw new Error("HISTORY NODES BUSY");
+    }
+
+    // --- STANDARD FUNCTIONS ---
     function buildUI() {
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
         areaC.innerHTML = ''; areaL.innerHTML = '';
@@ -743,25 +797,19 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // --- PRELOAD IMAGES (Standard) ---
+    // --- PRELOAD IMAGES ---
     async function preloadImages() {
         log("Initialisation des visuels...");
         let uniqueIds = new Set();
         Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); });
         let idsArray = Array.from(uniqueIds);
         if(idsArray.length === 0) return;
-
-        // BATCH REQUEST TO ATOMIC ASSETS
         let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`;
         try {
             let res = await fetch(url);
             let json = await res.json();
             if(json.data) {
-                json.data.forEach(t => {
-                    if(t.immutable_data && t.immutable_data.img) {
-                        imageCache[t.template_id] = t.immutable_data.img;
-                    }
-                });
+                json.data.forEach(t => { if(t.immutable_data && t.immutable_data.img) { imageCache[t.template_id] = t.immutable_data.img; } });
                 log(`${json.data.length} images chargées.`);
                 if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions);
             }
@@ -773,23 +821,20 @@
         let contract = getId('xrayContract').value;
         log(`X-RAY: Loading ABI for ${contract}...`);
         try {
-            // Get ABI
             let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract}));
             if(res.abi && res.abi.tables) {
                 let html = "";
                 res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; });
                 getId('xrayTable').innerHTML = html;
                 log(`X-RAY: Found ${res.abi.tables.length} tables.`);
-            } else {
-                log("X-RAY: No tables found or ABI access denied.");
-            }
+            } else { log("X-RAY: No tables found or ABI access denied."); }
         } catch(e) { log("X-RAY Error: " + e.message); }
     }
 
     function onXrayContractChange() {
         let c = getId('xrayContract').value;
-        let s = c; // default scope = contract
-        if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
+        let s = c; 
+        if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; 
         getId('xrayScope').value = s;
     }
 
@@ -801,9 +846,7 @@
         getId('xrayResults').innerText = "Scanning...";
         log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
         try {
-            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                json: true, code: contract, scope: scope, table: table, limit: 100
-            }));
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({ json: true, code: contract, scope: scope, table: table, limit: 100 }));
             if(res.rows && res.rows.length > 0) {
                 let headers = Object.keys(res.rows[0]);
                 let html = `<table class="xray-table"><thead><tr>`;
@@ -817,14 +860,8 @@
                 html += `</tbody></table>`;
                 getId('xrayResults').innerHTML = html;
                 log(`X-RAY: ${res.rows.length} rows retrieved.`);
-            } else {
-                getId('xrayResults').innerText = "No data found (Empty table or wrong scope).";
-                log("X-RAY: Empty result.");
-            }
-        } catch(e) {
-            getId('xrayResults').innerText = "Error: " + e.message;
-            log("X-RAY Error: " + e.message);
-        }
+            } else { getId('xrayResults').innerText = "No data found (Empty table or wrong scope)."; log("X-RAY: Empty result."); }
+        } catch(e) { getId('xrayResults').innerText = "Error: " + e.message; log("X-RAY Error: " + e.message); }
     }
 
     function showXrayView() { switchView('viewXray'); }
@@ -1036,7 +1073,7 @@
             let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
             
-            // --- DYNAMIC BACKGROUND (FIXED V329) ---
+            // --- NEW: DYNAMIC BACKGROUND (FIXED V329) ---
             let bgClass = "type-default";
             let n = z.name.toLowerCase();
             if(n.includes("beach")) bgClass = "type-beach";
