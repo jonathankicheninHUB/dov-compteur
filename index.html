@@ -238,8 +238,6 @@
                 </div>
             </div>
             <div class="sim-result">
-                <h3 style="margin:0 0 10px 0; color:#fff;">DOVX BURN PROJECTION (24H)</h3>
-                <div class="dt-grid dt-header"><div class="cell">METRIC</div><div class="cell c-right">CURRENT BURN</div><div class="cell c-right">NEW BURN (ADDED)</div><div class="cell c-right">TOTAL PROJECTED</div></div>
                 <div id="simBalanceTable"></div>
                 <div id="simRec" class="rec-box">AWAITING CALCULATION...</div>
             </div>
@@ -683,29 +681,58 @@
         getId('simGapList').innerHTML = htmlGap;
         getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>";
 
-        // 3. DOVX BALANCE
+        // 3. DOVX BALANCE (Refonte: Compte d'Exploitation)
         let currentMint = ecoStats.divisions.mint;
         let currentCost = ecoStats.buildings.totalCost; // Existing Burn
         let projectedCost = currentCost + totalNewBurnDOVX;
         let netDOVX = currentMint - projectedCost;
 
+        // Affichage Tableau Financier
         let htmlBal = `
-            <div class="dt-grid dt-row"><div class="cell"><b>DOVX ECONOMY</b></div><div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)}</div></div>
+            <h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">
+                COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span>
+            </h3>
+            <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell">POSTE</div>
+                <div class="cell c-right">CHARGES ACTUELLES</div>
+                <div class="cell c-right">CHARGES ADD.</div>
+                <div class="cell c-right">RÉSULTAT NET</div>
+            </div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div>
+                <div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div>
+                <div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div>
+                <div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">
+                    ${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span>
+                </div>
+            </div>
         `;
         getId('simBalanceTable').innerHTML = htmlBal;
 
-        // 4. RECOMMENDATION
+        // 4. RECOMMENDATION (Refonte: Avis de Gestion)
         let recBox = getId('simRec');
         if (totalNewBurnDOVX > 0) {
             recBox.className = "rec-box";
             recBox.style.color = "var(--red)";
             recBox.style.borderColor = "var(--red)";
-            recBox.innerHTML = `ACTION REQUIRED: INCREASE PRODUCTION CAPACITY.<br>ADDED DOVX BURN: ${fmt(totalNewBurnDOVX)} / DAY.`;
+            // Message alerte pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>
+                    IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.
+                </div>`;
         } else {
             recBox.className = "rec-box";
             recBox.style.color = "var(--green)";
             recBox.style.borderColor = "var(--green)";
-            recBox.innerHTML = `LOGISTICS STABLE. NO IMMEDIATE ACTION REQUIRED.`;
+            // Message succès pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>
+                    LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.
+                </div>`;
         }
     }
 
