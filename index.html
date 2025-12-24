@@ -37,7 +37,7 @@
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
@@ -495,7 +495,7 @@
         } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); }
     }
 
-    // MODIFIED FOR OEE DISPLAY
+    // MODIFIED FOR OEE DISPLAY - RESTORED DAILY PROD
     function updateGlobalUI(rows, stats, groups) {
         if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); 
         
@@ -504,6 +504,7 @@
             
             // Données OEE
             let currentProd = stats.types[k].p;
+            let dailyProd = currentProd * 24; // RESTORED
             let maxProd = stats.types[k].max;
             let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0;
             let missingProd = maxProd - currentProd;
@@ -514,25 +515,27 @@
             
             if(cardEl) {
                 cardEl.innerHTML = `
-                    <div>
+                    <div style="margin-bottom:5px;">
                         <div class="kc-title">${rd.label} / HOUR</div>
                         <div class="kc-val">${fmtDec(currentProd)}</div>
-                        <div style="font-size:9px; color:#666; margin-top:2px;">
-                            CAPACITÉ: <span style="color:#ccc">${fmtDec(maxProd)}</span>
-                        </div>
                     </div>
                     
-                    <div style="margin:8px 0;">
+                    <div style="border-top:1px solid #333; padding-top:4px; margin-bottom:4px;">
+                        <div style="font-size:9px; color:#aaa;">DAILY: <b style="color:#fff; font-size:11px;">${fmtDec(dailyProd)}</b></div>
+                        <div style="font-size:9px; color:#666;">CAP: <span style="color:#888">${fmtDec(maxProd)}</span></div>
+                    </div>
+                    
+                    <div style="margin:5px 0;">
                         <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;">
                             <span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span>
-                            <span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OPTIMAL'}</span>
+                            <span style="color:#666">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span>
                         </div>
                         <div style="height:4px; background:#333; border-radius:2px; overflow:hidden;">
                             <div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div>
                         </div>
                     </div>
 
-                    <div class="kc-sub" id="act-${k}">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACTIVE</div>
+                    <div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>
                 `;
             }
 
@@ -554,6 +557,7 @@
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
+        // FIXED V318: FULL 20 ZONES LIST FROM V299
         let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
         zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
 
