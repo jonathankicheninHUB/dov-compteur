@@ -559,7 +559,15 @@
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
                 let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0;
                 let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)");
-                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
+                
+                // --- NEW: RARITY COLOR LOGIC ---
+                let rarityColor = "#ccc"; // Default Common
+                if(i.name.startsWith("R_")) rarityColor = "var(--blue)";
+                else if(i.name.startsWith("E_")) rarityColor = "var(--purple)";
+                else if(i.name.startsWith("L_")) rarityColor = "var(--orange)";
+                else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; // S1_OWNER usually
+
+                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
