@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V329 (FULL COVERAGE)</title>
+    <title>DoV - COMMAND V330 (STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -84,27 +84,22 @@
             height: 160px; cursor: pointer; transition: 0.2s; 
             position: relative; overflow: hidden;
         }
-        /* THE DARK OVERLAY TRICK */
         .zone-card::after {
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
             background: linear-gradient(180deg, rgba(19,20,27,0.95) 0%, rgba(19,20,27,0.7) 50%, rgba(19,20,27,0.95) 100%);
             z-index: 1; pointer-events: none;
         }
-        /* CONTENT ON TOP */
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
 
-        /* SPECIFIC BACKGROUNDS - UPDATED V329 */
-        /* Fallback Default */
         .type-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?q=80&w=400'); }
-        
         .type-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400'); }
         .type-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?q=80&w=400'); }
         .type-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=400'); }
         .type-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=400'); }
         .type-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=400'); }
-        .type-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); } /* HQ, Bunker, Radar */
-        .type-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); } /* Camp specific */
-        .type-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); } /* Bridge specific */
+        .type-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); } 
+        .type-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); }
+        .type-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); }
 
         .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
         .zone-card.active { border-color: var(--blue); }
@@ -151,20 +146,18 @@
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         
-        /* NEW BADGE STYLES V326/7 */
         .badge-named { 
             display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px;
             padding: 3px 8px; border-radius:4px; 
             font-family: var(--font-num); font-size:9px; font-weight:bold;
             text-transform: uppercase; cursor:pointer; transition:0.2s;
             text-decoration: none; color:#fff;
-            background: rgba(0,0,0,0.6); /* Slightly darker for readability on images */
+            background: rgba(0,0,0,0.6);
             border: 1px solid #444;
             text-shadow: 0 1px 2px #000;
         }
         .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
         
-        /* RARITY CLASSES - CORRECTED V327 */
         .r-common { border-color: var(--r-common); color: var(--r-common); }
         .r-rare { border-color: var(--r-rare); color: var(--r-rare); }
         .r-epic { border-color: var(--r-epic); color: var(--r-epic); }
@@ -184,7 +177,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V329</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V330</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -213,7 +206,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V329. Full Coverage.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V330. Functions Restored.</div></div>
     </aside>
 
     <main class="main-content">
@@ -392,8 +385,6 @@
     // --- CONFIG ---
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
-    
-    // UPDATED V323: FULL DATA ROOM LINKS
     const PROJECT_DATA = { 
         links: [ 
             { name: "Official Website", url: "https://dawnofvictory.io/" }, 
@@ -417,8 +408,9 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V329';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V329';
+    const STORAGE_KEY = 'DOV_DATA_V330';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V330';
+    const AA_API = "https://wax.api.atomicassets.io";
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -475,9 +467,7 @@
     };
 
     // --- NEW: THE MASTER DICTIONARY (V327) ---
-    // UPDATED RARITIES TO MATCH DOV STANDARDS
     const REQ_DICT = {
-        // KEYS (Usually Rare/Blue)
         "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" },
         "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" },
         "871038": { n: "🔑 KEY BUNKER", r: "r-rare" },
@@ -493,25 +483,18 @@
         "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" },
         "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" },
         "871057": { n: "🔑 KEY HQ", r: "r-rare" },
-        
-        // CITY PASSES
         "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" },
         "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" },
         "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" },
         "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" },
-
-        // SPECIALISTS (UPDATED: Engineers are EPIC)
-        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      /* UPDATED TO PURPLE */
-        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   /* UPDATED TO PURPLE */
-        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   /* UPDATED TO GOLD */
-        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    /* UPDATED TO GOLD */
-        
+        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      
+        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   
+        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   
+        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    
         "401181": { n: "🏹 RANGER", r: "r-rare" },
         "401182": { n: "🧗 CLIMBER", r: "r-epic" },
         "401184": { n: "📡 TECH", r: "r-epic" },
         "401187": { n: "🎖️ GENERAL", r: "r-leg" },
-
-        // PARTS / OTHERS
         "295956": { n: "⚙️ PART A", r: "r-common" },
         "296754": { n: "⚙️ PART B", r: "r-common" },
         "298537": { n: "⚙️ PART C", r: "r-common" },
@@ -524,8 +507,6 @@
         "298553": { n: "⚙️ PART J", r: "r-common" },
         "298543": { n: "⚙️ PART K", r: "r-common" },
         "298551": { n: "⚙️ PART L", r: "r-common" },
-        
-        // City Requirements
         "645495": { n: "📜 PERMIT A", r: "r-common" },
         "645444": { n: "📜 PERMIT B", r: "r-common" },
         "645455": { n: "📜 PERMIT C", r: "r-common" },
@@ -551,7 +532,8 @@
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
     
-    // NEW: AUDIT LOG
+    // NEW: IMAGE CACHE
+    let imageCache = {};
     let inactiveAssetsLog = [];
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
@@ -574,6 +556,9 @@
         
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
+        
+        // --- NEW: PRELOAD IMAGES ---
+        preloadImages();
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -582,8 +567,78 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V329 Full Coverage.");
+        log("Ready. Mode: V330 Restored.");
     }
+
+    // --- RESTORED AUDIT FUNCTIONS (V330 FIX) ---
+    function openAuditView() {
+        if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
+        
+        let toolbar = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;">
+                <div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span>
+                    <input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;">
+                    <button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button>
+                </div>
+            </div>`;
+
+        let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
+        
+        let html = "";
+        sorted.forEach(item => {
+            let rarityColor = "#ccc"; 
+            if(item.name.startsWith("R_")) rarityColor = "var(--blue)";
+            else if(item.name.startsWith("E_")) rarityColor = "var(--purple)";
+            else if(item.name.startsWith("L_")) rarityColor = "var(--orange)";
+            else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
+
+            let idsString = JSON.stringify(item.ids);
+            
+            html += `
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
+                <div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div>
+                <div class="cell" style="color:${rarityColor}">${item.name}</div>
+                <div class="cell" style="color:#888">${item.stopDate}</div>
+                <div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div>
+                <div class="cell c-center">
+                    <button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button>
+                </div>
+            </div>`;
+        });
+        
+        getId('auditList').innerHTML = toolbar + html;
+        getId('auditModal').style.display = 'flex';
+    }
+
+    function exportAuditCsv() {
+        let days = parseFloat(document.getElementById('auditThreshold').value) || 0;
+        let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days);
+        if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; }
+        let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
+        targetList.forEach(r => {
+            let idsStr = JSON.stringify(r.ids || []); 
+            let idsSafe = idsStr.replace(/"/g, '""'); 
+            csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
+        });
+        let blob = new Blob([csv], {type:'text/csv'});
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click();
+    }
+
+    function copyIds(idsArray) {
+        let text = JSON.stringify(idsArray);
+        navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); });
+    }
+    // --- END RESTORED FUNCTIONS ---
+
+    // ... (Reste du code : buildUI, renderTicker, etc. identique à V329) ...
+    // Note: Pour abréger, je ne répète pas tout le bloc de fonctions standard (buildUI, renderTicker, etc.) 
+    // qui sont déjà présentes et correctes dans le bloc précédent, mais elles sont IMPLICITEMENT INCLUSES ICI.
+    // LE CODE COMPLET EST CELUI DE LA V329 AVEC L'AJOUT DES FONCTIONS AUDIT CI-DESSUS.
+    
+    // JE REMET LE BLOC COMPLET CI-DESSOUS POUR EVITER TOUTE AMBIGUÏTE.
 
     function buildUI() {
         const areaC = getId('areaCards'); const areaL = getId('areaLists');
@@ -688,6 +743,31 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
+    // --- PRELOAD IMAGES (Standard) ---
+    async function preloadImages() {
+        log("Initialisation des visuels...");
+        let uniqueIds = new Set();
+        Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); });
+        let idsArray = Array.from(uniqueIds);
+        if(idsArray.length === 0) return;
+
+        // BATCH REQUEST TO ATOMIC ASSETS
+        let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`;
+        try {
+            let res = await fetch(url);
+            let json = await res.json();
+            if(json.data) {
+                json.data.forEach(t => {
+                    if(t.immutable_data && t.immutable_data.img) {
+                        imageCache[t.template_id] = t.immutable_data.img;
+                    }
+                });
+                log(`${json.data.length} images chargées.`);
+                if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions);
+            }
+        } catch(e) { log("Erreur images: " + e.message); }
+    }
+
     // --- XRAY MODULE FUNCTIONS ---
     async function loadXrayAbi() {
         let contract = getId('xrayContract').value;
@@ -707,7 +787,6 @@
     }
 
     function onXrayContractChange() {
-        // Auto-fill scope based on contract
         let c = getId('xrayContract').value;
         let s = c; // default scope = contract
         if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
@@ -719,29 +798,20 @@
         let table = getId('xrayTable').value;
         let scope = getId('xrayScope').value;
         if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
-        
         getId('xrayResults').innerText = "Scanning...";
         log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
-        
         try {
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
                 json: true, code: contract, scope: scope, table: table, limit: 100
             }));
-            
             if(res.rows && res.rows.length > 0) {
-                // Build dynamic table
                 let headers = Object.keys(res.rows[0]);
                 let html = `<table class="xray-table"><thead><tr>`;
                 headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
                 html += `</tr></thead><tbody>`;
-                
                 res.rows.forEach(r => {
                     html += `<tr>`;
-                    headers.forEach(h => {
-                        let val = r[h];
-                        if(typeof val === 'object') val = JSON.stringify(val);
-                        html += `<td>${val}</td>`;
-                    });
+                    headers.forEach(h => { let val = r[h]; if(typeof val === 'object') val = JSON.stringify(val); html += `<td>${val}</td>`; });
                     html += `</tr>`;
                 });
                 html += `</tbody></table>`;
@@ -966,7 +1036,7 @@
             let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
             
-            // --- NEW: DYNAMIC BACKGROUND (FIXED V329) ---
+            // --- DYNAMIC BACKGROUND (FIXED V329) ---
             let bgClass = "type-default";
             let n = z.name.toLowerCase();
             if(n.includes("beach")) bgClass = "type-beach";
@@ -975,22 +1045,23 @@
             else if(n.includes("plain")) bgClass = "type-plain";
             else if(n.includes("city")) bgClass = "type-city";
             else if(n.includes("bunker") || n.includes("hq") || n.includes("radar")) bgClass = "type-mil";
-            else if(n.includes("camp")) bgClass = "type-camp"; // NEW
-            else if(n.includes("bridge")) bgClass = "type-bridge"; // NEW
+            else if(n.includes("camp")) bgClass = "type-camp";
+            else if(n.includes("bridge")) bgClass = "type-bridge";
 
-            // --- NEW: WEIGHT & REQ BADGES (HARDCODED VERSION) ---
-            // USING fmtDec to show 2 decimals
             let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`;
             
             let reqBadges = "";
             if(z.req && z.req.length > 0) {
                 z.req.forEach(r => {
-                    // NEW: LOOKUP IN DICTIONARY
                     let entry = REQ_DICT[r];
+                    let imgHash = imageCache[r];
                     if(entry) {
-                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`;
+                        if(imgHash) {
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`;
+                        } else {
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`;
+                        }
                     } else {
-                        // Fallback
                         reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`;
                     }
                 });
