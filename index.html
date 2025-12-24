@@ -513,10 +513,13 @@
                     // --- AUDIT LOGIQUE : ASSET INACTIF ---
                     let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay);
                     let stopDate = new Date(stopTime * 1000);
+                    // SAFETY FIX FOR CRASH: Force empty array if asset_ids is missing
+                    let safeIds = r.asset_ids || [];
+                    
                     inactiveAssetsLog.push({
                         owner: r.owner,
                         name: tpl.name,
-                        ids: r.asset_ids,
+                        ids: safeIds,
                         stopDate: stopDate.toLocaleString('fr-FR'),
                         daysInactive: ((now - stopTime) / 86400).toFixed(1)
                     });
@@ -558,7 +561,9 @@
                 cardEl.innerHTML = `
                     <div style="margin-bottom:5px;">
                         <div class="kc-title">DAILY PRODUCTION</div>
-                        <div class="kc-val-huge" style="color:${colorVar}">${fmtDec(dailyProd)}</div>
+                        <div class="kc-val-huge" style="color:${colorVar}">
+                            ${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span>
+                        </div>
                     </div>
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
@@ -663,8 +668,10 @@
         // Génération CSV
         let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
         targetList.forEach(r => {
+            // FIX SAFETY FOR UNDEFINED IDs
+            let idsStr = JSON.stringify(r.ids || []); 
             // On échappe les guillemets pour le JSON des IDs dans le CSV
-            let idsSafe = JSON.stringify(r.ids).replace(/"/g, '""'); 
+            let idsSafe = idsStr.replace(/"/g, '""'); 
             csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
         });
 
