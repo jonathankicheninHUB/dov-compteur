@@ -110,8 +110,8 @@
         .gap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #333; color:#ccc; }
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
-        .badge-req { font-size:8px; padding:1px 3px; border-radius:2px; background:rgba(213,0,249,0.15); border:1px solid var(--purple); color:var(--purple); margin-left:3px; }
-        .badge-weight { font-size:8px; padding:1px 3px; border-radius:2px; background:#222; border:1px solid #444; color:#aaa; }
+        .badge-req { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(213,0,249,0.15); border:1px solid var(--purple); color:var(--purple); display:inline-block; margin-right:4px; font-family:var(--font-num); }
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); }
     </style>
 </head>
 <body>
@@ -318,11 +318,26 @@
     // FIXED V318: RESTORED FULL ZONE LIST (20 ZONES)
     // NOTE: 'minW', 'maxW', 'req' will be populated by loadZoneRules()
     const SMART_ZONES_BIBLE = {
-        1: { name:"Beach 1", cost:1160, win:400 }, 2: { name:"Beach 2", cost:6968, win:2405 }, 3: { name:"Beach 3", cost:8800, win:3037 }, 4: { name:"Bunker", cost:11120, win:3838 }, 
-        5: { name:"Forest 1", cost:14024, win:4840 }, 6: { name:"Forest 2", cost:17704, win:6110 }, 7: { name:"Forest 3", cost:22352, win:7714 }, 8: { name:"Camp", cost:28220, win:9739 }, 
-        9: { name:"Hill 1", cost:37052, win:12788 }, 10: { name:"Hill 2", cost:48652, win:16791 }, 11: { name:"Hill 3", cost:64516, win:22266 }, 12: { name:"Radar", cost:84712, win:29236 }, 
-        13: { name:"Plain 1", cost:99384, win:34300 }, 14: { name:"Plain 2", cost:125708, win:43385 }, 15: { name:"Plain 3", cost:151164, win:52171 }, 16: { name:"HQ", cost:188000, win:64884 }, 
-        17: { name:"City 1", cost:1664, win:0 }, 18: { name:"City 2", cost:4448, win:0 }, 19: { name:"City 3", cost:13440, win:0 }, 20: { name:"Bridge", cost:29856, win:0 }
+        1: { name:"Beach 1", cost:1160, win:400, minW:0, maxW:0, req:[] }, 
+        2: { name:"Beach 2", cost:6968, win:2405, minW:0, maxW:0, req:[] }, 
+        3: { name:"Beach 3", cost:8800, win:3037, minW:0, maxW:0, req:[] }, 
+        4: { name:"Bunker", cost:11120, win:3838, minW:0, maxW:0, req:[] }, 
+        5: { name:"Forest 1", cost:14024, win:4840, minW:0, maxW:0, req:[] }, 
+        6: { name:"Forest 2", cost:17704, win:6110, minW:0, maxW:0, req:[] }, 
+        7: { name:"Forest 3", cost:22352, win:7714, minW:0, maxW:0, req:[] }, 
+        8: { name:"Camp", cost:28220, win:9739, minW:0, maxW:0, req:[] }, 
+        9: { name:"Hill 1", cost:37052, win:12788, minW:0, maxW:0, req:[] }, 
+        10: { name:"Hill 2", cost:48652, win:16791, minW:0, maxW:0, req:[] }, 
+        11: { name:"Hill 3", cost:64516, win:22266, minW:0, maxW:0, req:[] }, 
+        12: { name:"Radar", cost:84712, win:29236, minW:0, maxW:0, req:[] }, 
+        13: { name:"Plain 1", cost:99384, win:34300, minW:0, maxW:0, req:[] }, 
+        14: { name:"Plain 2", cost:125708, win:43385, minW:0, maxW:0, req:[] }, 
+        15: { name:"Plain 3", cost:151164, win:52171, minW:0, maxW:0, req:[] }, 
+        16: { name:"HQ", cost:188000, win:64884, minW:0, maxW:0, req:[] }, 
+        17: { name:"City 1", cost:1664, win:0, minW:0, maxW:0, req:[] }, 
+        18: { name:"City 2", cost:4448, win:0, minW:0, maxW:0, req:[] }, 
+        19: { name:"City 3", cost:13440, win:0, minW:0, maxW:0, req:[] }, 
+        20: { name:"Bridge", cost:29856, win:0, minW:0, maxW:0, req:[] }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -487,6 +502,7 @@
             }));
 
             if(res.rows) {
+                let updateCount = 0;
                 res.rows.forEach(row => {
                     let id = row.id;
                     // If zone exists in our Bible, enrich it
@@ -495,11 +511,12 @@
                         SMART_ZONES_BIBLE[id].maxW = row.max_weight;
                         // Map requirements
                         SMART_ZONES_BIBLE[id].req = row.requirements || []; 
+                        updateCount++;
                     }
                 });
-                log("Règles de Zones mises à jour depuis la Blockchain.");
+                log(`Succès: ${updateCount} Zones mises à jour avec les données Blockchain.`);
                 // Refresh View if already active
-                if(ecoStats.divisions.active > 0) startZoneScan(true); 
+                if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions); 
             }
         } catch(e) {
             log("Erreur synchro zones: " + e.message);
@@ -777,7 +794,6 @@
         if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete.";
     }
 
-    // MODIFIED WITH DYNAMIC WEIGHTS / REQS
     function updateZoneUI(zonesData, stats) {
         if(!getId('zTotalDivsHeader')) return;
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
