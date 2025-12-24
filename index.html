@@ -350,7 +350,8 @@
         const order = ["F", "H", "R", "S"];
         for(let k of order) {
             let rd = DATA.resourceDefs[k];
-            areaC.innerHTML += `<div class="kpi-card ${rd.class}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
+            // Initial placeholder structure, content will be injected by updateGlobalUI
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
             areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
         }
     }
@@ -447,9 +448,23 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
+    // MODIFIED FOR OEE (Overall Equipment Effectiveness)
     async function dispatchGlobalScan(silent = false) {
         stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "...";
-        log("Scanning Buildings..."); let next = ""; let stats = { totalCost:0, types:{F:{p:0,a:0,t:0}, H:{p:0,a:0,t:0}, R:{p:0,a:0,t:0}, S:{p:0,a:0,t:0}} }; let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0;
+        log("Scanning Buildings..."); 
+        
+        let next = ""; 
+        let stats = { 
+            totalCost:0, 
+            types:{
+                F:{p:0, a:0, t:0, max:0}, // max = Potentiel Max
+                H:{p:0, a:0, t:0, max:0}, 
+                R:{p:0, a:0, t:0, max:0}, 
+                S:{p:0, a:0, t:0, max:0}
+            } 
+        }; 
+        let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0;
+
         try { while(!stopSignal) {
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
             if(!res.rows) break;
@@ -457,7 +472,14 @@
             for(let r of res.rows) {
                 let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue;
                 rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
-                stats.types[tpl.type].t += count; runtimeWalletSet.add(r.owner); 
+                
+                stats.types[tpl.type].t += count; 
+                runtimeWalletSet.add(r.owner); 
+
+                // CALCUL CAPACITÉ MAX (OEE)
+                let potentialProd = count * tpl.prod;
+                stats.types[tpl.type].max += potentialProd;
+
                 if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
                     stats.types[tpl.type].a += count; 
                     let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; 
@@ -473,15 +495,54 @@
         } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); }
     }
 
+    // MODIFIED FOR OEE DISPLAY
     function updateGlobalUI(rows, stats, groups) {
         if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); 
+        
         for(let k in DATA.resourceDefs) {
-            let rd = DATA.resourceDefs[k]; getId(`val-${k}`).innerText = fmtDec(stats.types[k].p); getId(`val24-${k}`).innerText = fmtDec(stats.types[k].p * 24); getId(`act-${k}`).innerText = fmt(stats.types[k].a) + " ACTIVE"; getId(`btot-${k}`).innerText = fmtDec(stats.types[k].p); 
+            let rd = DATA.resourceDefs[k]; 
+            
+            // Données OEE
+            let currentProd = stats.types[k].p;
+            let maxProd = stats.types[k].max;
+            let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0;
+            let missingProd = maxProd - currentProd;
+
+            // Injection HTML Riche dans la carte KPI
+            let cardId = `card-${k}`;
+            let cardEl = getId(cardId);
+            
+            if(cardEl) {
+                cardEl.innerHTML = `
+                    <div>
+                        <div class="kc-title">${rd.label} / HOUR</div>
+                        <div class="kc-val">${fmtDec(currentProd)}</div>
+                        <div style="font-size:9px; color:#666; margin-top:2px;">
+                            CAPACITÉ: <span style="color:#ccc">${fmtDec(maxProd)}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin:8px 0;">
+                        <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;">
+                            <span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span>
+                            <span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OPTIMAL'}</span>
+                        </div>
+                        <div style="height:4px; background:#333; border-radius:2px; overflow:hidden;">
+                            <div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div>
+                        </div>
+                    </div>
+
+                    <div class="kc-sub" id="act-${k}">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACTIVE</div>
+                `;
+            }
+
+            // Liste Breakdown (inchangée)
             let list = groups[k].sort((a,b) => b.totH - a.totH); let html = "";
             list.forEach(i => {
                 let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
                 let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0;
-                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="color:var(--green)">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
+                let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)");
+                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
             });
             getId(`tbl-${k}`).innerHTML = html;
         }
@@ -493,7 +554,6 @@
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
-        // FIXED V318: FULL 20 ZONES LIST FROM V299
         let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
         zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
 
@@ -522,7 +582,6 @@
                     }
                 }
             }
-            // V317 PATCH: SAVE BURNS SAFELY
             ecoStats.divisions.active = stats.activeDivs; 
             ecoStats.divisions.mint = stats.totalProd; 
             ecoStats.cityBurn = stats.cityBurn;
