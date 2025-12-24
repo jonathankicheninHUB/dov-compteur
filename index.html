@@ -37,7 +37,8 @@
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; }
+        /* CORRECTION CSS ICI : min-height passé à 180px */
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
@@ -514,21 +515,28 @@
             let cardEl = getId(cardId);
             
             if(cardEl) {
+                // MISE EN PAGE OPTIMISÉE (GRILLE) POUR TOUT FAIRE TENIR
                 cardEl.innerHTML = `
-                    <div style="margin-bottom:5px;">
+                    <div style="margin-bottom:8px;">
                         <div class="kc-title">${rd.label} / HOUR</div>
-                        <div class="kc-val">${fmtDec(currentProd)}</div>
+                        <div class="kc-val" style="font-size:22px;">${fmtDec(currentProd)}</div>
                     </div>
                     
-                    <div style="border-top:1px solid #333; padding-top:4px; margin-bottom:4px;">
-                        <div style="font-size:9px; color:#aaa;">DAILY: <b style="color:#fff; font-size:11px;">${fmtDec(dailyProd)}</b></div>
-                        <div style="font-size:9px; color:#666;">CAP: <span style="color:#888">${fmtDec(maxProd)}</span></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
+                        <div>
+                            <div style="font-size:9px; color:#888;">DAILY PROD</div>
+                            <div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(dailyProd)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:9px; color:#888;">CAPACITY</div>
+                            <div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div>
+                        </div>
                     </div>
                     
-                    <div style="margin:5px 0;">
+                    <div style="margin-bottom:5px;">
                         <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;">
                             <span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span>
-                            <span style="color:#666">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span>
+                            <span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span>
                         </div>
                         <div style="height:4px; background:#333; border-radius:2px; overflow:hidden;">
                             <div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div>
