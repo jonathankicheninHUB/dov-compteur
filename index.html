@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V342 (FINAL STABLE)</title>
+    <title>DoV - COMMAND V337 (STABLE RESTORED)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
-            --text-main: #ffffff; --text-muted: #cccccc;
+            --text-main: #e0e0e0; --text-muted: #858595;
             
             /* ATOMIC HUB RARITY COLORS */
             --r-common: #787878; --r-rare: #4b90ea; --r-epic: #a64dff; --r-leg: #ffae00;
@@ -23,7 +23,7 @@
         .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; margin-bottom: 10px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
         .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .grp-lbl { font-size: 9px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
         button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -37,17 +37,16 @@
         .log-time { color: #555; margin-right: 5px; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
-        .page-sub { font-size: 11px; color: #888; margin-top: 5px; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .kc-title { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; }
+        .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
         .kc-val-huge { font-family: var(--font-num); font-size: 26px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -1px; }
-        .kc-sub { font-size: 10px; color: #888; font-family: var(--font-num); margin-top: auto; }
+        .kc-sub { font-size: 10px; color: #666; font-family: var(--font-num); margin-top: auto; }
         .kc-sep { height:1px; background:rgba(255,255,255,0.1); margin:8px 0; }
         .fuel .kpi-card::before { background: var(--orange); } .fuel .kc-val, .fuel .kc-val-huge { color: var(--orange); } 
         .health .kpi-card::before { background: var(--red); } .health .kc-val, .health .kc-val-huge { color: var(--red); } 
@@ -64,7 +63,7 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 90px 70px 70px; }
-        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #888; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -72,7 +71,7 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* CARD STYLES V342 - STABLE & VISUAL */
+        /* CARD STYLES V337 - ROBUST ID MAPPING */
         .zone-card { 
             background-color: #1a1a1a;
             background-size: cover; background-position: center;
@@ -81,39 +80,47 @@
             display: flex; flex-direction: column; justify-content: space-between; 
             height: 170px; cursor: pointer; transition: 0.2s; 
             position: relative; overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         .zone-card::after { 
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: linear-gradient(180deg, rgba(8,10,14,0.9) 0%, rgba(8,10,14,0.6) 40%, rgba(8,10,14,0.95) 100%); 
+            background: linear-gradient(180deg, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.6) 50%, rgba(8,8,10,0.95) 100%); 
             z-index: 1; pointer-events: none; 
         }
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
 
-        /* THEMES CSS */
-        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #00aaff; }
-        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #00ff44; }
-        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #888; }
-        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #ffae00; }
-        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #d500f9; }
-        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #ff3b30; } 
-        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #aa5500; }
-        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #0055ff; }
-        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #666; }
+        /* THEMES */
+        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); }
+        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); }
+        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); }
+        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); }
+        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); }
+        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); } 
+        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); }
+        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); }
+        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); }
 
-        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); filter: brightness(1.1); }
-        .zone-card.active { border-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
+        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.7); border-color: var(--blue); }
+        .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.3); }
         
-        .zc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px; }
-        .zone-title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; text-shadow: 0 2px 4px #000; display:block; margin-bottom:2px; }
-        .zc-sub { display:flex; justify-content: space-between; font-size:11px; font-weight:bold; text-shadow:0 1px 2px #000; }
-        .zc-mid { flex: 1; display:flex; flex-direction:column; justify-content:center; gap:8px; }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 11px; color: #eee; text-shadow:0 1px 2px #000; }
-        .zc-bot { border-top: 1px solid rgba(255,255,255,0.1); padding-top:6px; margin-top: auto; }
+        .zone-title {
+            font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            color: #fff; display:block; margin-bottom:2px;
+        }
+        .theme-beach .zone-title { text-shadow: 0 0 10px #00aaff; color: #e0f7ff; }
+        .theme-forest .zone-title { text-shadow: 0 0 10px #00ff44; color: #e0ffe4; }
+        .theme-city .zone-title { text-shadow: 0 0 10px #d500f9; color: #fce0ff; }
+        .theme-mil .zone-title { text-shadow: 0 0 10px #ff3b30; color: #ffe0e0; }
         
-        .tc-f { color: #ffa726; font-weight:bold; } .tc-h { color: #ef5350; font-weight:bold; } 
-        .tc-r { color: #42a5f5; font-weight:bold; } .tc-s { color: #ffee58; font-weight:bold; }
-        
+        .roi-panel { background: #15161d; border: 1px solid var(--border); border-left: 4px solid var(--green); padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; }
+        .roi-input-grp { flex: 1; display:flex; flex-direction:column; gap:5px; }
+        .roi-res-grp { flex: 2; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border-left:1px solid #333; padding-left:20px; }
+        .roi-kpi { text-align: center; }
+        .roi-kpi-lbl { font-size: 9px; color: #888; font-weight:bold; letter-spacing: 0.5px; }
+        .roi-kpi-val { font-family: var(--font-num); font-size: 16px; color: #fff; font-weight: bold; margin-top: 3px; }
+        .roi-highlight { color: var(--green); text-shadow: 0 0 10px rgba(0,240,144,0.3); }
+
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
+        .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
@@ -124,13 +131,6 @@
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
         .t-price { font-family: var(--font-num); color: var(--blue); font-size: 11px; margin-top: 4px; }
         .t-usd { font-family: var(--font-num); color: #666; font-size: 10px; }
-        
-        /* BADGES */
-        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 4px 8px; border-radius:4px; font-family: var(--font-num); font-size:10px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #888; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .badge-named:hover { background: #fff; color:#000; }
-        .r-common { border-color: #aaa; color: #ddd; } .r-rare { border-color: #4b90ea; color: #4b90ea; } .r-epic { border-color: #d500f9; color: #d500f9; } .r-leg { border-color: #ffae00; color: #ffae00; }
-        .badge-weight { font-size:10px; padding:3px 6px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid #444; color:#fff; display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; font-weight:bold; text-shadow:0 1px 2px #000; }
-        
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
         .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
         .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
@@ -154,6 +154,14 @@
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         
+        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:9px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; text-shadow: 0 1px 2px #000; }
+        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
+        .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; }
+        .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
+        .badge-req:hover { transform:scale(1.1); }
+        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
+        
         .xray-ctrl, .sybil-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
         .xray-res { background:#000; border:1px solid #333; padding:15px; border-radius:4px; min-height:200px; font-family:var(--font-num); color:#0f0; white-space:pre-wrap; overflow-x:auto; }
         .xray-table { width:100%; border-collapse:collapse; }
@@ -175,7 +183,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V342</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V337</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -183,20 +191,29 @@
             <div class="btn-row"><button class="btn-purple" onclick="showStatsView()">STATISTICS</button></div>
             <div class="btn-row"><button class="btn-yellow" onclick="showSimView()">WAR ROOM</button></div>
         </div>
+        
         <div class="control-group">
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
             <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL RADAR</button>
         </div>
+
         <div class="control-group">
             <span class="grp-lbl">BLACK BOX LOGGING</span>
-            <div class="btn-row"><button class="btn-purple" onclick="takeLogSnapshot(true)">FORCE SNAPSHOT</button><button class="btn-ghost" style="color:#fff" onclick="exportLogs()">EXPORT CSV</button></div>
+            <div class="btn-row">
+                <button class="btn-purple" onclick="takeLogSnapshot(true)">FORCE SNAPSHOT</button>
+                <button class="btn-ghost" style="color:#fff" onclick="exportLogs()">EXPORT CSV</button>
+            </div>
             <button class="btn-red" style="margin-top:8px;" onclick="openAuditView()">AUDIT INACTIFS ⚠️</button>
         </div>
+
         <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
-        <div class="control-group" style="margin-top:auto"><div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div><button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button></div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V342. Fix Total.</div></div>
+        <div class="control-group" style="margin-top:auto">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
+            <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
+        </div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V337. Repaired & Stable.</div></div>
     </aside>
 
     <main class="main-content">
@@ -211,9 +228,40 @@
         
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">STAKED ASSET ALLOCATION</h2><div class="page-sub">Deployment vectors & strategic yield generation zones. Real-time asset tracking.</div></div>
+                <div>
+                    <h2 class="page-h1">STAKED ASSET ALLOCATION</h2>
+                    <div class="page-sub">Deployment vectors & strategic yield generation zones. Real-time asset tracking.</div>
+                </div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
                 <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
+            </div>
+            
+            <div class="roi-panel">
+                <div class="roi-input-grp">
+                    <span class="grp-lbl">SELECT ZONE FOR ROI</span>
+                    <select id="roiZoneSelect" onchange="calculateZoneRoi()"></select>
+                    <span class="grp-lbl">FREQUENCY (CYCLES/MONTH)</span>
+                    <input type="number" id="roiFreq" value="30" onchange="calculateZoneRoi()" style="background:#000; text-align:center;">
+                </div>
+                <div class="roi-res-grp">
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">ENTRY COST</div>
+                        <div class="roi-kpi-val" id="roiCost" style="color:var(--orange)">0 DOVX</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">REVENUE / MONTH</div>
+                        <div class="roi-kpi-val" id="roiRevMonth">0 WAX</div>
+                        <div style="font-size:9px; color:#666;" id="roiRevUsd">$0.00</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">REVENUE / YEAR</div>
+                        <div class="roi-kpi-val" id="roiRevYear">0 WAX</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">ESTIMATED ROI</div>
+                        <div class="roi-kpi-val roi-highlight" id="roiDays">0 DAYS</div>
+                    </div>
+                </div>
             </div>
 
             <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
@@ -233,7 +281,10 @@
             <div class="sybil-ctrl">
                 <div style="color:#fff; font-weight:bold; margin-bottom:5px;">AUTOMATED SWEEP V2 (WHITELIST ENABLED)</div>
                 <div style="font-size:11px; color:#ccc; margin-bottom:10px;">Scans active players. Ignores exchanges. Detects similar names. Groups by Funding Source.</div>
-                <div style="display:flex; gap:10px;"><button class="btn-red" onclick="runAutoSybilScan()">LAUNCH FULL SCAN (TOP 50)</button><div id="sybilProgress" style="color:var(--orange); font-family:var(--font-num); align-self:center;"></div></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-red" onclick="runAutoSybilScan()">LAUNCH FULL SCAN (TOP 50)</button>
+                    <div id="sybilProgress" style="color:var(--orange); font-family:var(--font-num); align-self:center;"></div>
+                </div>
             </div>
             <div id="sybilResults" class="sybil-grid"></div>
         </div>
@@ -243,8 +294,15 @@
                 <div><h2 class="page-h1">X-RAY SCANNER</h2><div class="page-meta">SMART CONTRACT INSPECTOR</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
-            <div class="xray-ctrl"><div style="flex:1"><span class="grp-lbl">CONTRACT</span><select id="xrayContract" onchange="onXrayContractChange()"><option value="dawnfvictory">dawnfvictory (CORE)</option><option value="dovutilstake">dovutilstake (STAKING)</option><option value="dovpvecontrl">dovpvecontrl (WAR)</option></select></div><div style="width:150px;"><span class="grp-lbl">ACTION</span><button class="btn-blue" onclick="loadXrayAbi()">1. LOAD TABLES</button></div></div>
-            <div class="xray-ctrl"><div style="flex:1"><span class="grp-lbl">TARGET TABLE</span><select id="xrayTable"><option>Load ABI first...</option></select></div><div style="flex:1"><span class="grp-lbl">SCOPE</span><input type="text" id="xrayScope" value="dawnfvictory"></div><div style="width:150px;"><span class="grp-lbl">EXECUTE</span><button class="btn-purple" onclick="runXrayScan()">2. SCAN DATA</button></div></div>
+            <div class="xray-ctrl">
+                <div style="flex:1"><span class="grp-lbl">CONTRACT</span><select id="xrayContract" onchange="onXrayContractChange()"><option value="dawnfvictory">dawnfvictory (CORE)</option><option value="dovutilstake">dovutilstake (STAKING)</option><option value="dovpvecontrl">dovpvecontrl (WAR)</option></select></div>
+                <div style="width:150px;"><span class="grp-lbl">ACTION</span><button class="btn-blue" onclick="loadXrayAbi()">1. LOAD TABLES</button></div>
+            </div>
+            <div class="xray-ctrl">
+                <div style="flex:1"><span class="grp-lbl">TARGET TABLE</span><select id="xrayTable"><option>Load ABI first...</option></select></div>
+                <div style="flex:1"><span class="grp-lbl">SCOPE</span><input type="text" id="xrayScope" value="dawnfvictory"></div>
+                <div style="width:150px;"><span class="grp-lbl">EXECUTE</span><button class="btn-purple" onclick="runXrayScan()">2. SCAN DATA</button></div>
+            </div>
             <div class="xray-res" id="xrayResults">Awaiting Scan...</div>
         </div>
 
@@ -262,7 +320,12 @@
                 <div class="kpi-card"><div class="kc-title">MARKET FEE</div><div class="kc-val" id="ecoFee">0%</div></div>
                 <div class="kpi-card"><div class="kc-title">DAILY GDP (VALUE)</div><div class="kc-val" style="color:var(--green)" id="ecoGdpUsd">$0.00</div><div class="kc-sub" id="ecoGdpWax">0 WAX</div></div>
             </div>
-            <div class="data-panel" style="margin-bottom:25px;"><div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS (REVENUE)</span></div><div class="dt-grid dt-header" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell">PERIOD</div><div class="cell c-right">REVENUE (WAX)</div><div class="cell c-right">REVENUE (USD)</div></div><div id="projTable"></div></div>
+            <div style="text-align:right; margin-bottom:15px; font-size:10px;"><a href="https://nfthive.io/collection/dovdivisions" target="_blank" style="color:#666; text-decoration:none;">SOURCE: NFTHIVE.IO ↗</a></div>
+            <div class="data-panel" style="margin-bottom:25px;">
+                <div class="dp-head"><span class="dp-title">FINANCIAL PROJECTIONS (REVENUE)</span></div>
+                <div class="dt-grid dt-header" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell">PERIOD</div><div class="cell c-right">REVENUE (WAX)</div><div class="cell c-right">REVENUE (USD)</div></div>
+                <div id="projTable"></div>
+            </div>
         </div>
 
         <div id="viewStats" class="view-section">
@@ -270,10 +333,18 @@
                 <div><h2 class="page-h1">FINANCIAL SUITE</h2><div class="page-meta">ADVANCED ANALYTICS</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
-            <div class="chart-controls"><button class="chart-btn active" onclick="switchChart('pnl')">PNL (NET PROFIT)</button><button class="chart-btn" onclick="switchChart('scissors')">SCISSORS (REV vs COST)</button><button class="chart-btn" onclick="switchChart('tvl')">TVL GROWTH</button></div>
+            <div class="chart-controls">
+                <button class="chart-btn active" onclick="switchChart('pnl')">PNL (NET PROFIT)</button>
+                <button class="chart-btn" onclick="switchChart('scissors')">SCISSORS (REV vs COST)</button>
+                <button class="chart-btn" onclick="switchChart('tvl')">TVL GROWTH</button>
+            </div>
             <div id="chartContainer"><canvas id="analyticsChart"></canvas></div>
             <div id="financialInsight" class="analysis-box">Waiting for data...</div>
-            <div class="data-panel"><div class="dp-head"><span class="dp-title">LOG HISTORY (EXTENDED)</span></div><div class="dt-grid dt-header" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell">TIMESTAMP</div><div class="cell">TYPE</div><div class="cell c-right">REV (USD)</div><div class="cell c-right">COST (USD)</div><div class="cell c-right">NET (USD)</div><div class="cell c-right">ASSETS</div></div><div id="logTable" class="stats-table-wrapper"></div></div>
+            <div class="data-panel">
+                <div class="dp-head"><span class="dp-title">LOG HISTORY (EXTENDED)</span></div>
+                <div class="dt-grid dt-header" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell">TIMESTAMP</div><div class="cell">TYPE</div><div class="cell c-right">REV (USD)</div><div class="cell c-right">COST (USD)</div><div class="cell c-right">NET (USD)</div><div class="cell c-right">ASSETS</div></div>
+                <div id="logTable" class="stats-table-wrapper"></div>
+            </div>
         </div>
 
         <div id="viewSim" class="view-section">
@@ -281,34 +352,120 @@
                 <div><h2 class="page-h1" style="color:var(--yellow)">WAR ROOM</h2><div class="page-meta">GAP & CAPACITY PLANNING</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
-            <div style="margin-bottom:20px;"><button class="btn-yellow" style="width:250px; font-weight:bold;" onclick="runSimulation()">CALCULATE GAP & NEEDS</button><span style="font-size:10px; color:#666; margin-left:10px;">BASED ON LIVE SCANNED DATA</span></div>
-            <div class="sim-grid"><div class="data-panel"><div class="dp-head"><span class="dp-title" style="color:var(--blue)">CURRENT SUPPLY / DEMAND</span></div><div id="simGapList" style="padding:15px; font-family:var(--font-num);">Scan to Analyze...</div></div><div class="data-panel"><div class="dp-head"><span class="dp-title" style="color:var(--green)">CONSTRUCTION ORDERS</span></div><div id="simBuildList" style="padding:15px; font-family:var(--font-num);">Scan to Analyze...</div></div></div>
-            <div class="sim-result"><div id="simBalanceTable"></div><div id="simRec" class="rec-box">AWAITING CALCULATION...</div></div>
+            <div style="margin-bottom:20px;">
+                <button class="btn-yellow" style="width:250px; font-weight:bold;" onclick="runSimulation()">CALCULATE GAP & NEEDS</button>
+                <span style="font-size:10px; color:#666; margin-left:10px;">BASED ON LIVE SCANNED DATA</span>
+            </div>
+            <div class="sim-grid">
+                <div class="data-panel">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--blue)">CURRENT SUPPLY / DEMAND</span></div>
+                    <div id="simGapList" style="padding:15px; font-family:var(--font-num);">Scan to Analyze...</div>
+                </div>
+                <div class="data-panel">
+                    <div class="dp-head"><span class="dp-title" style="color:var(--green)">CONSTRUCTION ORDERS</span></div>
+                    <div id="simBuildList" style="padding:15px; font-family:var(--font-num);">Scan to Analyze...</div>
+                </div>
+            </div>
+            <div class="sim-result">
+                <div id="simBalanceTable"></div>
+                <div id="simRec" class="rec-box">AWAITING CALCULATION...</div>
+            </div>
         </div>
     </main>
 </div>
 
-<div class="modal-overlay" id="dataRoomModal"><div class="modal-box" style="width:700px;"><img src="https://ipfs.io/ipfs/QmcR7QTbt2tYHxMZ8rsH45FxYU8fuHPCy7UeAguZW3QupE" class="dr-logo" alt="DOV Logo"><h3 style="text-align:center; color:#fff; margin-top:0;">DAWN OF VICTORY - INVESTOR DATA ROOM</h3><div id="drContent"></div><div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('dataRoomModal')">CLOSE</button></div></div></div>
-<div class="modal-overlay" id="auditModal"><div class="modal-box" style="width:800px;"><h3 style="margin-top:0; color:var(--red); border-bottom:1px solid #333; padding-bottom:10px;">AUDIT RAPPORT: ACTIFS INACTIFS</h3><div style="height:400px; overflow-y:auto; margin-top:15px;"><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell">WALLET (OWNER)</div><div class="cell">TEMPLATE</div><div class="cell">ARRÊTÉ LE</div><div class="cell">INACTIF</div><div class="cell c-center">ACTION</div></div><div id="auditList"></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('auditModal')">CLOSE</button></div></div></div>
-<div class="modal-overlay" id="zoneDetailModal"><div class="modal-box" style="width:800px;"><h3 id="zdTitle" style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">ZONE DETAIL</h3><div style="height:400px; overflow-y:auto; margin-top:15px;"><div id="zdList"></div></div><div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('zoneDetailModal')">CLOSE</button></div></div></div>
+<div class="modal-overlay" id="dataRoomModal"><div class="modal-box" style="width:700px;">
+    <img src="https://ipfs.io/ipfs/QmcR7QTbt2tYHxMZ8rsH45FxYU8fuHPCy7UeAguZW3QupE" class="dr-logo" alt="DOV Logo">
+    <h3 style="text-align:center; color:#fff; margin-top:0;">DAWN OF VICTORY - INVESTOR DATA ROOM</h3>
+    <div id="drContent"></div>
+    <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('dataRoomModal')">CLOSE</button></div>
+</div></div>
+
+<div class="modal-overlay" id="auditModal"><div class="modal-box" style="width:800px;">
+    <h3 style="margin-top:0; color:var(--red); border-bottom:1px solid #333; padding-bottom:10px;">AUDIT RAPPORT: ACTIFS INACTIFS</h3>
+    <div style="height:400px; overflow-y:auto; margin-top:15px;">
+        <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
+            <div class="cell">WALLET (OWNER)</div>
+            <div class="cell">TEMPLATE</div>
+            <div class="cell">ARRÊTÉ LE</div>
+            <div class="cell">INACTIF</div>
+            <div class="cell c-center">ACTION</div>
+        </div>
+        <div id="auditList"></div>
+    </div>
+    <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('auditModal')">CLOSE</button></div>
+</div></div>
+
+<div class="modal-overlay" id="zoneDetailModal"><div class="modal-box" style="width:800px;">
+    <h3 id="zdTitle" style="margin-top:0; color:#fff; border-bottom:1px solid #333; padding-bottom:10px;">ZONE DETAIL</h3>
+    <div style="height:400px; overflow-y:auto; margin-top:15px;"><div id="zdList"></div></div>
+    <div style="text-align:right; margin-top:15px;"><button class="btn-ghost" onclick="closeModal('zoneDetailModal')">CLOSE</button></div>
+</div></div>
 
 <script>
-    const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051 };
+    // --- CONFIG ---
+    const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
-    const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" }, { name: "Beta Access", url: "https://beta.dawnofvictory.io/" }, { name: "Twitter", url: "https://twitter.com/DOVNFT" }, { name: "Telegram", url: "https://t.me/dawnofvictorynft" }, { name: "Email", url: "mailto:info@dawnofvictory.io" }, { name: "Top 100 Holders", url: "https://wax.bloks.io/tokens/DOVX-wax-dovvaultfort" }, { name: "Nefty Blends", url: "https://neftyblocks.com/c/dovdivisions/blends" }, { name: "Whimsical Info", url: "https://whimsical.com/dawn-of-victory-marketing-NgpNonWnGyLUqosCRRJ5Ng@3CRerdhrAvzbxBHgLbRvGZoU" } ], markets: [ { name: "DOVX (Swap)", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" }, { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" }, { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" }, { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" }, { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" }, { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V342'; const LOG_STORAGE_KEY = 'DOV_LOGS_V342';
+    const PROJECT_DATA = { 
+        links: [ 
+            { name: "Official Website", url: "https://dawnofvictory.io/" }, 
+            { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" },
+            { name: "Beta Access", url: "https://beta.dawnofvictory.io/" },
+            { name: "Twitter", url: "https://twitter.com/DOVNFT" },
+            { name: "Telegram", url: "https://t.me/dawnofvictorynft" },
+            { name: "Email", url: "mailto:info@dawnofvictory.io" },
+            { name: "Top 100 Holders", url: "https://wax.bloks.io/tokens/DOVX-wax-dovvaultfort" },
+            { name: "Nefty Blends", url: "https://neftyblocks.com/c/dovdivisions/blends" },
+            { name: "Whimsical Info", url: "https://whimsical.com/dawn-of-victory-marketing-NgpNonWnGyLUqosCRRJ5Ng@3CRerdhrAvzbxBHgLbRvGZoU" }
+        ], 
+        markets: [ 
+            { name: "DOVX (Swap)", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" },
+            { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" },
+            { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" },
+            { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" },
+            { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" },
+            { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" }
+        ], 
+        contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
+    };
+
+    const STORAGE_KEY = 'DOV_DATA_V337';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V337';
+    const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
-    
+
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
     const fmt = (n) => n.toLocaleString('fr-FR', {maximumFractionDigits: 0});
     const fmtDec = (n) => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     const fmtUsd = (n) => n.toLocaleString('en-US', {style:'currency', currency:'USD', minimumFractionDigits: 4});
+    
+    window.onerror = function(msg, url, line) { let errBanner = getId('error-banner'); errBanner.style.display = 'block'; errBanner.innerText = `CRITICAL ERROR: ${msg} (Line ${line}). Please Reset.`; return false; };
+    function log(msg) { let c = getId('sysLog'); if(c) { let d = document.createElement("div"); d.className="log-entry"; d.innerHTML=`<span class="log-time">${new Date().toLocaleTimeString()}</span>${msg}`; c.prepend(d); } }
 
-    const DEFAULT_DATA = { apiConfig: { rpcNodes: [ "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", "https://wax.dapplica.io", "https://wax.eosphere.io" ] }, resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } }, templates: { "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 } }, "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 } }, "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 } }, "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 } } } };
+    const DEFAULT_DATA = {
+        apiConfig: { 
+            rpcNodes: [
+                "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io",
+                "https://wax.dapplica.io", "https://wax.eosphere.io", "https://wax.eosusa.io",
+                "https://wax-public1.neftyblocks.com", "https://wax-public2.neftyblocks.com",
+                "https://wax.eosrio.io", "https://api.wax.detroitledger.tech", "https://wax.oiac.io",
+                "https://api.hivebp.io", "https://api2.hivebp.io", "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", "https://wax.blacklusion.io", "https://api.waxsweden.org",
+                "https://wax-bp.wizardsguild.one", "https://api.wax.alohaeos.com", "https://wax.eu.eosamsterdam.net"
+            ] 
+        },
+        resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
+        templates: {
+            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 } },
+            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 } },
+            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 } },
+            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 } }
+        }
+    };
 
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 
@@ -333,7 +490,7 @@
         20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
     };
 
-    // V342: MAPPING THEME PAR ID (ROBUSTE)
+    // V334/V337: MAPPING THEME PAR ID (ROBUSTE)
     const ZONE_BG_MAP = {
         1: "beach", 2: "beach", 3: "beach",
         4: "mil",
@@ -411,6 +568,7 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
+    let imageCache = {};
     let inactiveAssetsLog = [];
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
@@ -431,13 +589,11 @@
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
         if(getId('dictSize')) getId('dictSize').innerText = count;
         
-        // CRITICAL ORDER FIX FOR V342
-        buildUI(); // MUST BE FIRST
-        startClock(); 
-        startMonitoringRoutine();
-        renderTicker(); 
-        updateEcoUI(); 
-        
+        startClock(); startMonitoringRoutine();
+        buildUI(); renderTicker(); updateEcoUI(); 
+        preloadImages();
+        populateRoiSelect();
+
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
             getId('cntRows').innerText = fmt(ecoStats.buildings.active); 
@@ -445,10 +601,49 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V342 Final Stable.");
+        log("Ready. Mode: V337 Stable Restored.");
     }
 
-    // --- LEVENSHTEIN DISTANCE (For Name Similarity) ---
+    // --- ROI LOGIC ---
+    function populateRoiSelect() {
+        let sel = getId('roiZoneSelect');
+        if(!sel) return;
+        sel.innerHTML = '<option value="">-- SELECT ZONE --</option>';
+        Object.keys(SMART_ZONES_BIBLE).forEach(id => {
+            let z = SMART_ZONES_BIBLE[id];
+            let opt = document.createElement("option");
+            opt.value = id;
+            opt.innerText = z.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    function calculateZoneRoi() {
+        let zid = getId('roiZoneSelect').value;
+        let freq = parseFloat(getId('roiFreq').value) || 30; // Cycles per month
+        if(!zid) return;
+
+        let z = SMART_ZONES_BIBLE[zid];
+        let cost = z.cost;
+        let revPerCycle = z.win;
+        let revMonth = revPerCycle * freq;
+        let revYear = revMonth * 12;
+        let revDay = revMonth / 30;
+        let waxVal = revMonth * CONFIG_PRIX.DOVX_WAX;
+        let usdVal = waxVal * CONFIG_PRIX.WAX_USD;
+        let roiDays = 0;
+        if(revDay > 0) roiDays = cost / revDay;
+
+        getId('roiCost').innerText = fmt(cost) + " DOVX";
+        getId('roiRevMonth').innerText = fmtDec(revMonth) + " DOVX (" + fmtDec(waxVal) + " WAX)";
+        getId('roiRevUsd').innerText = fmtUsd(usdVal);
+        getId('roiRevYear').innerText = fmtDec(revYear) + " DOVX";
+        
+        if(roiDays > 0) getId('roiDays').innerText = Math.ceil(roiDays) + " DAYS";
+        else getId('roiDays').innerText = "N/A";
+    }
+
+    // --- LEVENSHTEIN DISTANCE ---
     function levenshtein(a, b) {
         if(a.length === 0) return b.length; 
         if(b.length === 0) return a.length;
@@ -474,7 +669,7 @@
         return null;
     }
 
-    // --- SYBIL RADAR MODULE V333 ---
+    // --- SYBIL RADAR MODULE ---
     function showSybilView() { switchView('viewSybil'); }
     
     async function runAutoSybilScan() {
@@ -516,7 +711,7 @@
                 if (funnel !== "None") {
                     clusterKey = "FUNNEL: " + funnel;
                     riskLevel = "HIGH";
-                } 
+                }
                 
                 if(similarTo) {
                     if(clusterKey === "INDEPENDENT") clusterKey = "PATTERN: " + target.substring(0,6) + "*";
@@ -564,27 +759,14 @@
         getId('sybilResults').innerHTML = html;
     }
 
+    // --- STANDARD FUNCTIONS ---
     async function fetchHistoryCluster(endpoint) {
         let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
         for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
         throw new Error("HISTORY NODES BUSY");
     }
 
-    // --- STANDARD FUNCTIONS (Explicit) ---
-    function buildUI() { 
-        const areaC = getId('areaCards'); 
-        const areaL = getId('areaLists'); 
-        if(!areaC || !areaL) return; // Safety check
-        
-        areaC.innerHTML = ''; areaL.innerHTML = ''; 
-        const order = ["F", "H", "R", "S"]; 
-        for(let k of order) { 
-            let rd = DATA.resourceDefs[k]; 
-            areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`; 
-            areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`; 
-        } 
-    }
-
+    function buildUI() { const areaC = getId('areaCards'); const areaL = getId('areaLists'); areaC.innerHTML = ''; areaL.innerHTML = ''; const order = ["F", "H", "R", "S"]; for(let k of order) { let rd = DATA.resourceDefs[k]; areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`; areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`; } }
     function renderTicker() { let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`; const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ]; tokens.forEach(t => { let usd = t.p * CONFIG_PRIX.WAX_USD; html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`; }); getId('marketTicker').innerHTML = html; }
     function startClock() { setInterval(() => { const now = new Date(); const time = now.toLocaleTimeString('fr-FR'); const date = now.toLocaleDateString('fr-FR', { year:'numeric', month:'2-digit', day:'2-digit' }); if(getId('liveTime')) { getId('liveTime').innerText = time; getId('liveDate').innerText = date; } let copies = document.querySelectorAll('.clock-copy'); copies.forEach(c => c.innerText = `${time} | ${date}`); }, 1000); }
     async function takeLogSnapshot(isManual) { if(isManual) { log("Manual Snapshot Initiated..."); await dispatchGlobalScan(true); await startZoneScan(true); } let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalRevWax = dailyIndustryWax + dailyMilitaryWax; let costWax = ecoStats.buildings.totalCost * CONFIG_PRIX.DOVX_WAX; let entry = { timestamp: new Date().toISOString(), type: isManual ? "MANUAL" : "AUTO", revenue_usd: totalRevWax * CONFIG_PRIX.WAX_USD, cost_usd: costWax * CONFIG_PRIX.WAX_USD, profit_usd: (totalRevWax - costWax) * CONFIG_PRIX.WAX_USD, assets_count: ecoStats.buildings.active + ecoStats.divisions.active }; logs.push(entry); if(logs.length > 1000) logs.shift(); localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs)); if(isManual) { alert("Snapshot Saved."); renderStatsUI(); } else { log("Auto-Log Saved."); } }
@@ -595,6 +777,7 @@
     function exportLogs() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; } let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n"; logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click(); }
     function findTemplate(tid) { if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' }; if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' }; if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' }; if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' }; return null; }
     async function fetchSmartCluster(endpoint, body) { let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("CLUSTER UNREACHABLE"); }
+    async function preloadImages() { log("Initialisation des visuels..."); let uniqueIds = new Set(); Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); }); let idsArray = Array.from(uniqueIds); if(idsArray.length === 0) return; let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`; try { let res = await fetch(url); let json = await res.json(); if(json.data) { json.data.forEach(t => { if(t.immutable_data && t.immutable_data.img) { imageCache[t.template_id] = t.immutable_data.img; } }); log(`${json.data.length} images chargées.`); if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions); } } catch(e) { log("Erreur images: " + e.message); } }
     
     // --- XRAY MODULE ---
     async function loadXrayAbi() { let contract = getId('xrayContract').value; log(`X-RAY: Loading ABI for ${contract}...`); try { let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract})); if(res.abi && res.abi.tables) { let html = ""; res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; }); getId('xrayTable').innerHTML = html; log(`X-RAY: Found ${res.abi.tables.length} tables.`); } else { log("X-RAY: No tables found or ABI access denied."); } } catch(e) { log("X-RAY Error: " + e.message); } }
@@ -606,6 +789,8 @@
     async function dispatchGlobalScan(silent = false) { stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "..."; log("Scanning Buildings..."); let next = ""; let stats = { totalCost:0, types:{ F:{p:0, a:0, t:0, max:0}, H:{p:0, a:0, t:0, max:0}, R:{p:0, a:0, t:0, max:0}, S:{p:0, a:0, t:0, max:0} } }; let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0; inactiveAssetsLog = []; try { while(!stopSignal) { let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})); if(!res.rows) break; const now = Date.now()/1000; for(let r of res.rows) { let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue; rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count; stats.types[tpl.type].t += count; runtimeWalletSet.add(r.owner); let potentialProd = count * tpl.prod; stats.types[tpl.type].max += potentialProd; if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) { stats.types[tpl.type].a += count; let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; let existing = groups[tpl.type].find(x => x.name === tpl.name); if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); } existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c; stats.types[tpl.type].p += h; stats.totalCost += c; } else { let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay); let stopDate = new Date(stopTime * 1000); let safeIds = r.asset_ids || []; inactiveAssetsLog.push({ owner: r.owner, name: tpl.name, ids: safeIds, stopDate: stopDate.toLocaleString('fr-FR'), daysInactive: ((now - stopTime) / 86400).toFixed(1) }); } } ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost; updateGlobalUI(rowCount, stats, groups); if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); } }
     function updateGlobalUI(rows, stats, groups) { if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); for(let k in DATA.resourceDefs) { let rd = DATA.resourceDefs[k]; let currentProd = stats.types[k].p; let dailyProd = currentProd * 24; let maxProd = stats.types[k].max; let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0; let missingProd = maxProd - currentProd; let colorVar = 'var(--fff)'; if(rd.class === 'fuel') colorVar = 'var(--orange)'; if(rd.class === 'health') colorVar = 'var(--red)'; if(rd.class === 'repair') colorVar = 'var(--blue)'; if(rd.class === 'supply') colorVar = 'var(--yellow)'; let cardId = `card-${k}`; let cardEl = getId(cardId); if(cardEl) { cardEl.innerHTML = `<div style="margin-bottom:5px;"><div class="kc-title">DAILY PRODUCTION</div><div class="kc-val-huge" style="color:${colorVar}">${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;"><div><div style="font-size:9px; color:#888;">HOURLY</div><div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div></div><div style="text-align:right;"><div style="font-size:9px; color:#888;">CAPACITY (MAX)</div><div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div></div></div><div style="margin-bottom:5px;"><div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;"><span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span><span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span></div><div style="height:4px; background:#333; border-radius:2px; overflow:hidden;"><div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div></div></div><div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>`; } let list = groups[k].sort((a,b) => b.totH - a.totH); let html = ""; list.forEach(i => { let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`; let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0; let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)"); let rarityColor = "#ccc"; if(i.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(i.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(i.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`; }); getId(`tbl-${k}`).innerHTML = html; } }
     async function startZoneScan(silent = false) { stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING..."; log("Scanning Divisions (Detailed)..."); let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; let next = ""; let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; }); zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; }); try { while(!stopSignal) { let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})); if(!json.rows) break; for(let r of json.rows) { let zid = r.zone_id || r.zoneID; if(zonesData[zid]) { zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); let end = parseFloat(r.unlock_time || r.end_time || 0); let isFighting = end > (Date.now()/1000); if(isFighting) { zonesData[zid].active++; stats.activeDivs++; let zConf = SMART_ZONES_BIBLE[zid]; let isCity = [17, 18, 19, 20].includes(parseInt(zid)); if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } else { zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; zonesData[zid].br += zConf.cost; stats.br += zConf.cost; zonesData[zid].bs += zConf.cost; stats.bs += zConf.cost; } zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win; zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win }); } } } ecoStats.divisions.active = stats.activeDivs; ecoStats.divisions.mint = stats.totalProd; ecoStats.cityBurn = stats.cityBurn; if(ecoStats.burns) { ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs; } updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); } if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete."; }
+    
+    // --- V337 RESTORED & CLEANED updateZoneUI ---
     function updateZoneUI(zonesData, stats) { 
         if(!getId('zTotalDivsHeader')) return; 
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); 
@@ -626,19 +811,20 @@
             let d = zonesData[id]; 
             let activeClass = d.count > 0 ? "active" : ""; 
             let isCity = [17,18,19,20].includes(parseInt(id)); 
-            
-            // --- NEW V342: MAPPING PAR ID - STABLE & CLEAN ---
             let theme = ZONE_BG_MAP[id] || "default";
             let bgClass = "theme-" + theme;
-
             let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`; 
             let reqBadges = ""; 
             if(z.req && z.req.length > 0) { 
                 z.req.forEach(r => { 
                     let entry = REQ_DICT[r]; 
+                    let imgHash = imageCache[r]; 
                     if(entry) { 
-                        // TEXT BADGE ONLY (No images to prevent crash)
-                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`; 
+                        if(imgHash) { 
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`; 
+                        } else { 
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`; 
+                        } 
                     } else { 
                         reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`; 
                     } 
@@ -646,6 +832,7 @@
             } 
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; 
             
+            // CLEAN STRUCTURE V330 (Repaired) + V335 HUD
             html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')">
                 <div class="zc-header">
                     <span class="zone-title">${z.name}</span>
@@ -664,11 +851,13 @@
         }); 
         getId('areaZones').innerHTML = html; 
     }
-
-    // --- STANDARD FUNCTIONS (Included implicitly) ---
-    function openAuditView() { if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; } let toolbar = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;"><div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div><div style="display:flex; gap:10px; align-items:center;"><span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span><input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;"><button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button></div></div>`; let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive)); let html = ""; sorted.forEach(item => { let rarityColor = "#ccc"; if(item.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(item.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(item.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(item.name.startsWith("S1_")) rarityColor = "var(--red)"; let idsString = JSON.stringify(item.ids); html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button></div></div>`; }); getId('auditList').innerHTML = toolbar + html; getId('auditModal').style.display = 'flex'; }
-    function exportAuditCsv() { let days = parseFloat(document.getElementById('auditThreshold').value) || 0; let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days); if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; } let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n"; targetList.forEach(r => { let idsStr = JSON.stringify(r.ids || []); let idsSafe = idsStr.replace(/"/g, '""'); csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click(); }
-    function copyIds(idsArray) { let text = JSON.stringify(idsArray); navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); }); }
+    
+    async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
+    function updateEcoUI() { let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD; getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets; getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX"; let html = `<div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div><div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`; getId('projTable').innerHTML = html; }
+    function openDataRoom() { let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`; PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; }); html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`; PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; }); html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`; PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; }); html += `</div></div>`; getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex'; }
+    function openZoneDetail(zid) { if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return; let list = zoneDetailsCache[zid]; let groups = {}; list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; }); let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count); let html = ""; sorted.forEach(owner => { html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`; }); getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex'; }
+    function showSimView() { switchView('viewSim'); }
+    function runSimulation() { if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; } if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) { alert("No data available. Please perform OPERATIONS scans first."); return; } let prod = { F: ecoStats.buildings.prodF * 24, H: ecoStats.buildings.prodH * 24, R: ecoStats.buildings.prodR * 24, S: ecoStats.buildings.prodS * 24 }; let burn = { F: ecoStats.burns.F, H: ecoStats.burns.H, R: ecoStats.burns.R, S: ecoStats.burns.S }; let htmlGap = ""; let htmlBuild = ""; let totalNewBurnDOVX = 0; let commonProdDaily = 5.4 * 24; let commonBurnDaily = commonProdDaily * 0.085; let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}}; Object.keys(prod).forEach(k => { let p = prod[k]; let b = burn[k]; let gap = p - b; let gapColor = gap >= 0 ? "val-green" : "val-red"; htmlGap += `<div class="gap-row"><span>${resourceMap[k].n}</span><span style="color:#888">${fmt(p)} / ${fmt(b)}</span><span class="${gapColor}">${gap >= 0 ? "+" : ""}${fmt(gap)}</span></div>`; if (gap < 0) { let deficit = Math.abs(gap); let buildingsNeeded = Math.ceil(deficit / commonProdDaily); let addedBurnDOVX = buildingsNeeded * commonBurnDaily; let costToProduceGap = deficit * 0.085; totalNewBurnDOVX += addedBurnDOVX; htmlBuild += `<div class="gap-row" style="border-color:var(--red); display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center;"><div style="line-height:1.1;"><span style="color:var(--red); font-weight:800; font-size:10px;">${resourceMap[k].n} DEFICIT</span><br><span style="font-size:9px; color:#666;">GAP: -${fmt(deficit)}</span></div><div style="text-align:center;"><span style="color:#fff; font-weight:bold;">BUILD ${buildingsNeeded}</span><br><span style="font-size:9px; color:#444;">COMMON UNITS</span></div><div style="text-align:right; line-height:1.1;"><span style="font-size:9px; color:#666;">COÛT PROD</span><br><span style="color:var(--purple); font-weight:800; font-size:12px;">${fmt(costToProduceGap)} DOVX</span></div></div>`; } else { htmlBuild += `<div class="gap-row" style="border-color:var(--green); opacity:0.5"><span style="color:var(--green)">${resourceMap[k].n} SECURE</span><span>OK</span><span>-</span></div>`; } }); getId('simGapList').innerHTML = htmlGap; getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>"; let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0); let currentMint = ecoStats.divisions.mint; let netDOVX = currentMint - (currentCost + totalNewBurnDOVX); let htmlBal = `<h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span></h3><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell">POSTE</div><div class="cell c-right">CHARGES ACTUELLES</div><div class="cell c-right">CHARGES ADD.</div><div class="cell c-right">RÉSULTAT NET</div></div><div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div><div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span></div></div>`; getId('simBalanceTable').innerHTML = htmlBal; let recBox = getId('simRec'); if (totalNewBurnDOVX > 0) { recBox.className = "rec-box"; recBox.style.color = "var(--red)"; recBox.style.borderColor = "var(--red)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.</div>`; } else { recBox.className = "rec-box"; recBox.style.color = "var(--green)"; recBox.style.borderColor = "var(--green)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.</div>`; } }
 
     window.onload = init;
 </script>
