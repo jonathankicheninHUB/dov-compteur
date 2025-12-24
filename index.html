@@ -2,15 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V344 (AUDIT FIXED)</title>
+    <title>DoV - COMMAND V345 (FIXED & STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
-            --text-main: #ffffff; --text-muted: #cccccc;
-            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
-            /* RARITY COLORS */
+            --text-main: #e0e0e0; --text-muted: #858595;
+            
+            /* ATOMIC HUB RARITY COLORS */
             --r-common: #787878; --r-rare: #4b90ea; --r-epic: #a64dff; --r-leg: #ffae00;
+            
+            --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         * { box-sizing: border-box; }
@@ -21,7 +23,7 @@
         .app-title { color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 1px; display:flex; align-items:center; gap:8px; margin-bottom: 10px; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
         .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .grp-lbl { font-size: 9px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .grp-lbl { font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { background: #08080a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px; font-family: var(--font-num); width: 100%; }
         button { padding: 9px; border: none; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.2s; width: 100%; }
         button:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -35,17 +37,16 @@
         .log-time { color: #555; margin-right: 5px; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
-        .page-sub { font-size: 11px; color: #888; margin-top: 5px; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .kc-title { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; }
+        .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
         .kc-val { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
         .kc-val-huge { font-family: var(--font-num); font-size: 26px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -1px; }
-        .kc-sub { font-size: 10px; color: #888; font-family: var(--font-num); margin-top: auto; }
+        .kc-sub { font-size: 10px; color: #666; font-family: var(--font-num); margin-top: auto; }
         .kc-sep { height:1px; background:rgba(255,255,255,0.1); margin:8px 0; }
         .fuel .kpi-card::before { background: var(--orange); } .fuel .kc-val, .fuel .kc-val-huge { color: var(--orange); } 
         .health .kpi-card::before { background: var(--red); } .health .kc-val, .health .kc-val-huge { color: var(--red); } 
@@ -62,7 +63,7 @@
         .dp-title { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; }
         .dp-badges { display: flex; gap: 8px; font-family: var(--font-num); font-size: 10px; }
         .dt-grid { display: grid; grid-template-columns: minmax(140px, 2fr) 50px 70px 90px 90px 90px 70px 70px; }
-        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #888; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .dt-header { padding: 8px 12px; font-size: 9px; font-weight: 700; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .dt-row { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; align-items: center; color: #ccc; transition: 0.1s; }
         .dt-row:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -70,45 +71,45 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* ZONE CARD V344 (IMAGES VIA CSS) */
+        /* CARD STYLES V345 */
         .zone-card { 
-            background-color: #1a1a1a;
+            background-color: var(--bg-panel); 
             background-size: cover; background-position: center;
             border: 1px solid var(--border); 
             padding: 10px; border-radius: 4px; 
             display: flex; flex-direction: column; justify-content: space-between; 
-            height: 170px; cursor: pointer; transition: 0.2s; 
+            height: 160px; cursor: pointer; transition: 0.2s; 
             position: relative; overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
+        
+        /* FIX: POINTER EVENTS NONE ON OVERLAY TO ALLOW CLICKS */
         .zone-card::after { 
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: linear-gradient(180deg, rgba(8,10,14,0.9) 0%, rgba(8,10,14,0.6) 40%, rgba(8,10,14,0.95) 100%); 
-            z-index: 1; pointer-events: none; 
+            background: linear-gradient(180deg, rgba(19,20,27,0.95) 0%, rgba(19,20,27,0.7) 50%, rgba(19,20,27,0.95) 100%); 
+            z-index: 1; 
+            pointer-events: none; /* CRITICAL FIX */
         }
+        
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
 
-        /* THEMES */
-        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #00aaff; }
-        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #00ff44; }
-        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #888; }
-        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #ffae00; }
-        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #d500f9; }
-        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #ff3b30; } 
-        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #aa5500; }
-        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #0055ff; }
-        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); border-top: 3px solid #666; }
+        /* THEMES - CSS IMAGES */
+        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?q=80&w=400'); }
+        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400'); }
+        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?q=80&w=400'); }
+        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=400'); }
+        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=400'); }
+        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=400'); }
+        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); } 
+        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); }
+        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); }
 
-        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); filter: brightness(1.1); }
-        .zone-card.active { border-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
-        
-        .zc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px; }
-        .zone-title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; text-shadow: 0 2px 4px #000; display:block; margin-bottom:2px; }
-        .zc-sub { display:flex; justify-content: space-between; font-size:11px; font-weight:bold; text-shadow:0 1px 2px #000; }
-        .zc-mid { flex: 1; display:flex; flex-direction:column; justify-content:center; gap:8px; }
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 11px; color: #eee; text-shadow:0 1px 2px #000; }
-        .zc-bot { border-top: 1px solid rgba(255,255,255,0.1); padding-top:6px; margin-top: auto; }
-        .tc-f { color: #ffa726; font-weight:bold; } .tc-h { color: #ef5350; font-weight:bold; } .tc-r { color: #42a5f5; font-weight:bold; } .tc-s { color: #ffee58; font-weight:bold; }
+        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-color: var(--blue); }
+        .zone-card.active { border-color: var(--blue); background: rgba(41, 121, 255, 0.05); }
+        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px;}
+        .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #888; }
+        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
+        .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
@@ -142,11 +143,28 @@
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         
-        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 4px 8px; border-radius:4px; font-family: var(--font-num); font-size:10px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #888; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .badge-named:hover { background: #fff; color:#000; }
-        .r-common { border-color: #aaa; color: #ddd; } .r-rare { border-color: #4b90ea; color: #4b90ea; } .r-epic { border-color: #d500f9; color: #d500f9; } .r-leg { border-color: #ffae00; color: #ffae00; }
-        .badge-weight { font-size:10px; padding:3px 6px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid #444; color:#fff; display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; font-weight:bold; text-shadow:0 1px 2px #000; }
+        .badge-named { 
+            display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px;
+            padding: 3px 8px; border-radius:4px; 
+            font-family: var(--font-num); font-size:9px; font-weight:bold;
+            text-transform: uppercase; cursor:pointer; transition:0.2s;
+            text-decoration: none; color:#fff;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #444;
+        }
+        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
+        .r-common { border-color: var(--r-common); color: var(--r-common); background: rgba(120,120,120,0.15); }
+        .r-rare { border-color: var(--r-rare); color: var(--r-rare); background: rgba(75,144,234,0.15); }
+        .r-epic { border-color: var(--r-epic); color: var(--r-epic); background: rgba(166,77,255,0.15); }
+        .r-leg { border-color: var(--r-leg); color: var(--r-leg); background: rgba(255,174,0,0.15); }
+
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; }
         
+        /* IMAGES PRELOADER BADGES */
+        .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
+        .badge-req:hover { transform:scale(1.1); }
+        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; margin-right:4px; }
+
         .xray-ctrl, .sybil-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
         .xray-res { background:#000; border:1px solid #333; padding:15px; border-radius:4px; min-height:200px; font-family:var(--font-num); color:#0f0; white-space:pre-wrap; overflow-x:auto; }
         .xray-table { width:100%; border-collapse:collapse; }
@@ -168,7 +186,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V344</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V345</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -189,7 +207,7 @@
         </div>
         <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
         <div class="control-group" style="margin-top:auto"><div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div><button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button></div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V344. Audit Fix.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V345. Fix Total.</div></div>
     </aside>
 
     <main class="main-content">
@@ -204,7 +222,7 @@
         
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">STAKED ASSET ALLOCATION</h2><div class="page-sub">Deployment vectors & strategic yield generation zones. Real-time asset tracking.</div></div>
+                <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">UNITS: <span id="zTotalDivsHeader">0</span></div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
                 <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
             </div>
@@ -290,8 +308,9 @@
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" }, { name: "Beta Access", url: "https://beta.dawnofvictory.io/" }, { name: "Twitter", url: "https://twitter.com/DOVNFT" }, { name: "Telegram", url: "https://t.me/dawnofvictorynft" }, { name: "Email", url: "mailto:info@dawnofvictory.io" }, { name: "Top 100 Holders", url: "https://wax.bloks.io/tokens/DOVX-wax-dovvaultfort" }, { name: "Nefty Blends", url: "https://neftyblocks.com/c/dovdivisions/blends" }, { name: "Whimsical Info", url: "https://whimsical.com/dawn-of-victory-marketing-NgpNonWnGyLUqosCRRJ5Ng@3CRerdhrAvzbxBHgLbRvGZoU" } ], markets: [ { name: "DOVX (Swap)", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" }, { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" }, { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" }, { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" }, { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" }, { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V344'; const LOG_STORAGE_KEY = 'DOV_LOGS_V344';
+    const STORAGE_KEY = 'DOV_DATA_V345'; const LOG_STORAGE_KEY = 'DOV_LOGS_V345';
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
+    const AA_API = "https://wax.api.atomicassets.io";
     
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -302,10 +321,100 @@
 
     const DEFAULT_DATA = { apiConfig: { rpcNodes: [ "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io", "https://wax.dapplica.io", "https://wax.eosphere.io" ] }, resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } }, templates: { "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 } }, "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 } }, "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 } }, "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 } } } };
 
-    const SMART_ZONES_BIBLE = { 1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 3: { name:"Beach 3", cost:8800, win:3037, minW:35.00, maxW:54.59, req:[871037] }, 4: { name:"Bunker", cost:11120, win:3838, minW:69.99, maxW:108.53, req:[296767, 295956, 871038] }, 5: { name:"Forest 1", cost:14024, win:4840, minW:139.99, maxW:218.35, req:[296767, 296754, 871039, 401181] }, 6: { name:"Forest 2", cost:17704, win:6110, minW:255.18, maxW:341.18, req:[296768, 296754, 871041, 401181] }, 7: { name:"Forest 3", cost:22352, win:7714, minW:450.00, maxW:450.00, req:[296768, 296754, 871043, 401181] }, 8: { name:"Camp", cost:28220, win:9739, minW:382.78, maxW:511.76, req:[296768, 298537, 296761, 871045, 401182] }, 9: { name:"Hill 1", cost:37052, win:12788, minW:415.82, maxW:694.78, req:[296768, 298537, 298529, 871048, 401182] }, 10: { name:"Hill 2", cost:48652, win:16791, minW:519.82, maxW:868.55, req:[296769, 298537, 298529, 871049, 401182] }, 11: { name:"Hill 3", cost:64516, win:22266, minW:649.77, maxW:1085.69, req:[296769, 298539, 298529, 871051, 401184] }, 12: { name:"Radar", cost:84712, win:29236, minW:812.17, maxW:1357.04, req:[296770, 298539, 871052, 298548, 401184] }, 13: { name:"Plain 1", cost:99384, win:34300, minW:1298.56, maxW:1696.33, req:[296770, 298539, 871053, 298548, 401184] }, 14: { name:"Plain 2", cost:125708, win:43385, minW:1428.32, maxW:1865.84, req:[296770, 298541, 871054, 298549, 401187] }, 15: { name:"Plain 3", cost:151164, win:52171, minW:1570.79, maxW:2051.96, req:[296770, 298541, 871055, 298553, 401187] }, 16: { name:"HQ", cost:188000, win:64884, minW:1728.29, maxW:2494.23, req:[296770, 298543, 871057, 298551, 401187] }, 17: { name:"City 1", cost:1664, win:0, minW:69.99, maxW:108.53, req:[871058, 645495, 645444, 645455, 645463] }, 18: { name:"City 2", cost:4448, win:0, minW:382.78, maxW:511.76, req:[871059, 645504, 645450, 645469, 645485] }, 19: { name:"City 3", cost:13440, win:0, minW:812.17, maxW:1357.04, req:[871060, 645500, 645457, 645482, 649646] }, 20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] } };
+    const SMART_ZONES_BIBLE = {
+        1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 
+        2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 
+        3: { name:"Beach 3", cost:8800, win:3037, minW:35.00, maxW:54.59, req:[871037] }, 
+        4: { name:"Bunker", cost:11120, win:3838, minW:69.99, maxW:108.53, req:[296767, 295956, 871038] }, 
+        5: { name:"Forest 1", cost:14024, win:4840, minW:139.99, maxW:218.35, req:[296767, 296754, 871039, 401181] }, 
+        6: { name:"Forest 2", cost:17704, win:6110, minW:255.18, maxW:341.18, req:[296768, 296754, 871041, 401181] }, 
+        7: { name:"Forest 3", cost:22352, win:7714, minW:450.00, maxW:450.00, req:[296768, 296754, 871043, 401181] }, 
+        8: { name:"Camp", cost:28220, win:9739, minW:382.78, maxW:511.76, req:[296768, 298537, 296761, 871045, 401182] }, 
+        9: { name:"Hill 1", cost:37052, win:12788, minW:415.82, maxW:694.78, req:[296768, 298537, 298529, 871048, 401182] }, 
+        10: { name:"Hill 2", cost:48652, win:16791, minW:519.82, maxW:868.55, req:[296769, 298537, 298529, 871049, 401182] }, 
+        11: { name:"Hill 3", cost:64516, win:22266, minW:649.77, maxW:1085.69, req:[296769, 298539, 298529, 871051, 401184] }, 
+        12: { name:"Radar", cost:84712, win:29236, minW:812.17, maxW:1357.04, req:[296770, 298539, 871052, 298548, 401184] }, 
+        13: { name:"Plain 1", cost:99384, win:34300, minW:1298.56, maxW:1696.33, req:[296770, 298539, 871053, 298548, 401184] }, 
+        14: { name:"Plain 2", cost:125708, win:43385, minW:1428.32, maxW:1865.84, req:[296770, 298541, 871054, 298549, 401187] }, 
+        15: { name:"Plain 3", cost:151164, win:52171, minW:1570.79, maxW:2051.96, req:[296770, 298541, 871055, 298553, 401187] }, 
+        16: { name:"HQ", cost:188000, win:64884, minW:1728.29, maxW:2494.23, req:[296770, 298543, 871057, 298551, 401187] }, 
+        17: { name:"City 1", cost:1664, win:0, minW:69.99, maxW:108.53, req:[871058, 645495, 645444, 645455, 645463] }, 
+        18: { name:"City 2", cost:4448, win:0, minW:382.78, maxW:511.76, req:[871059, 645504, 645450, 645469, 645485] }, 
+        19: { name:"City 3", cost:13440, win:0, minW:812.17, maxW:1357.04, req:[871060, 645500, 645457, 645482, 649646] }, 
+        20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
+    };
 
-    const ZONE_BG_MAP = { 1: "beach", 2: "beach", 3: "beach", 4: "mil", 5: "forest", 6: "forest", 7: "forest", 8: "camp", 9: "hill", 10: "hill", 11: "hill", 12: "mil", 13: "plain", 14: "plain", 15: "plain", 16: "mil", 17: "city", 18: "city", 19: "city", 20: "bridge" };
-    const REQ_DICT = { "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" }, "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" }, "871038": { n: "🔑 KEY BUNKER", r: "r-rare" }, "871039": { n: "🔑 KEY FOREST 1", r: "r-rare" }, "871041": { n: "🔑 KEY FOREST 2", r: "r-rare" }, "871043": { n: "🔑 KEY FOREST 3", r: "r-rare" }, "871045": { n: "🔑 KEY CAMP", r: "r-rare" }, "871048": { n: "🔑 KEY HILL 1", r: "r-rare" }, "871049": { n: "🔑 KEY HILL 2", r: "r-rare" }, "871051": { n: "🔑 KEY HILL 3", r: "r-rare" }, "871052": { n: "🔑 KEY RADAR", r: "r-rare" }, "871053": { n: "🔑 KEY PLAIN 1", r: "r-rare" }, "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" }, "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" }, "871057": { n: "🔑 KEY HQ", r: "r-rare" }, "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" }, "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" }, "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" }, "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" }, "296767": { n: "🛠️ ENGINEER", r: "r-epic" }, "296768": { n: "🛠️ ENGINEER II", r: "r-epic" }, "296769": { n: "🛠️ ENGINEER III", r: "r-leg" }, "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" }, "401181": { n: "🏹 RANGER", r: "r-rare" }, "401182": { n: "🧗 CLIMBER", r: "r-epic" }, "401184": { n: "📡 TECH", r: "r-epic" }, "401187": { n: "🎖️ GENERAL", r: "r-leg" }, "295956": { n: "⚙️ PART A", r: "r-common" }, "296754": { n: "⚙️ PART B", r: "r-common" }, "298537": { n: "⚙️ PART C", r: "r-common" }, "296761": { n: "⚙️ PART D", r: "r-common" }, "298529": { n: "⚙️ PART E", r: "r-common" }, "298539": { n: "⚙️ PART F", r: "r-common" }, "298548": { n: "⚙️ PART G", r: "r-common" }, "298541": { n: "⚙️ PART H", r: "r-common" }, "298549": { n: "⚙️ PART I", r: "r-common" }, "298553": { n: "⚙️ PART J", r: "r-common" }, "298543": { n: "⚙️ PART K", r: "r-common" }, "298551": { n: "⚙️ PART L", r: "r-common" }, "645495": { n: "📜 PERMIT A", r: "r-common" }, "645444": { n: "📜 PERMIT B", r: "r-common" }, "645455": { n: "📜 PERMIT C", r: "r-common" }, "645463": { n: "📜 PERMIT D", r: "r-common" }, "645504": { n: "📜 PERMIT E", r: "r-common" }, "645450": { n: "📜 PERMIT F", r: "r-common" }, "645469": { n: "📜 PERMIT G", r: "r-common" }, "645485": { n: "📜 PERMIT H", r: "r-common" }, "645500": { n: "📜 PERMIT I", r: "r-common" }, "645457": { n: "📜 PERMIT J", r: "r-common" }, "645482": { n: "📜 PERMIT K", r: "r-common" }, "649646": { n: "📜 PERMIT L", r: "r-common" }, "297681": { n: "📜 PERMIT M", r: "r-common" }, "649648": { n: "📜 PERMIT N", r: "r-common" }, "645465": { n: "📜 PERMIT O", r: "r-common" }, "645464": { n: "📜 PERMIT P", r: "r-common" } };
+    // V334: MAPPING THEME PAR ID (ROBUSTE)
+    const ZONE_BG_MAP = {
+        1: "beach", 2: "beach", 3: "beach",
+        4: "mil",
+        5: "forest", 6: "forest", 7: "forest",
+        8: "camp",
+        9: "hill", 10: "hill", 11: "hill",
+        12: "mil",
+        13: "plain", 14: "plain", 15: "plain",
+        16: "mil",
+        17: "city", 18: "city", 19: "city",
+        20: "bridge"
+    };
+
+    const REQ_DICT = {
+        "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" },
+        "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" },
+        "871038": { n: "🔑 KEY BUNKER", r: "r-rare" },
+        "871039": { n: "🔑 KEY FOREST 1", r: "r-rare" },
+        "871041": { n: "🔑 KEY FOREST 2", r: "r-rare" },
+        "871043": { n: "🔑 KEY FOREST 3", r: "r-rare" },
+        "871045": { n: "🔑 KEY CAMP", r: "r-rare" },
+        "871048": { n: "🔑 KEY HILL 1", r: "r-rare" },
+        "871049": { n: "🔑 KEY HILL 2", r: "r-rare" },
+        "871051": { n: "🔑 KEY HILL 3", r: "r-rare" },
+        "871052": { n: "🔑 KEY RADAR", r: "r-rare" },
+        "871053": { n: "🔑 KEY PLAIN 1", r: "r-rare" },
+        "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" },
+        "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" },
+        "871057": { n: "🔑 KEY HQ", r: "r-rare" },
+        "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" },
+        "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" },
+        "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" },
+        "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" },
+        "296767": { n: "🛠️ ENGINEER", r: "r-epic" },      
+        "296768": { n: "🛠️ ENGINEER II", r: "r-epic" },   
+        "296769": { n: "🛠️ ENGINEER III", r: "r-leg" },   
+        "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" },    
+        "401181": { n: "🏹 RANGER", r: "r-rare" },
+        "401182": { n: "🧗 CLIMBER", r: "r-epic" },
+        "401184": { n: "📡 TECH", r: "r-epic" },
+        "401187": { n: "🎖️ GENERAL", r: "r-leg" },
+        "295956": { n: "⚙️ PART A", r: "r-common" },
+        "296754": { n: "⚙️ PART B", r: "r-common" },
+        "298537": { n: "⚙️ PART C", r: "r-common" },
+        "296761": { n: "⚙️ PART D", r: "r-common" },
+        "298529": { n: "⚙️ PART E", r: "r-common" },
+        "298539": { n: "⚙️ PART F", r: "r-common" },
+        "298548": { n: "⚙️ PART G", r: "r-common" },
+        "298541": { n: "⚙️ PART H", r: "r-common" },
+        "298549": { n: "⚙️ PART I", r: "r-common" },
+        "298553": { n: "⚙️ PART J", r: "r-common" },
+        "298543": { n: "⚙️ PART K", r: "r-common" },
+        "298551": { n: "⚙️ PART L", r: "r-common" },
+        "645495": { n: "📜 PERMIT A", r: "r-common" },
+        "645444": { n: "📜 PERMIT B", r: "r-common" },
+        "645455": { n: "📜 PERMIT C", r: "r-common" },
+        "645463": { n: "📜 PERMIT D", r: "r-common" },
+        "645504": { n: "📜 PERMIT E", r: "r-common" },
+        "645450": { n: "📜 PERMIT F", r: "r-common" },
+        "645469": { n: "📜 PERMIT G", r: "r-common" },
+        "645485": { n: "📜 PERMIT H", r: "r-common" },
+        "645500": { n: "📜 PERMIT I", r: "r-common" },
+        "645457": { n: "📜 PERMIT J", r: "r-common" },
+        "645482": { n: "📜 PERMIT K", r: "r-common" },
+        "649646": { n: "📜 PERMIT L", r: "r-common" },
+        "297681": { n: "📜 PERMIT M", r: "r-common" },
+        "649648": { n: "📜 PERMIT N", r: "r-common" },
+        "645465": { n: "📜 PERMIT O", r: "r-common" },
+        "645464": { n: "📜 PERMIT P", r: "r-common" }
+    };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
     let stopSignal = false;
@@ -313,6 +422,7 @@
     let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
+    let imageCache = {};
     let inactiveAssetsLog = [];
 
     function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
@@ -322,25 +432,117 @@
         const local = localStorage.getItem(STORAGE_KEY);
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; if(loaded.ecoStats) { ecoStats = loaded.ecoStats; if(!ecoStats.burns) ecoStats.burns = {F:0, H:0, R:0, S:0}; } } catch(e){} }
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length); if(getId('dictSize')) getId('dictSize').innerText = count;
-        startClock(); startMonitoringRoutine(); buildUI(); renderTicker(); updateEcoUI();
+        
+        // 1. BUILD UI FIRST
+        buildUI();
+        
+        // 2. LOAD IMAGES (BACKGROUND ASYNC)
+        preloadImages(); // Added back to load pre-requisite images
+
+        // 3. START ROUTINES
+        startClock(); startMonitoringRoutine(); renderTicker(); updateEcoUI();
+        
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V344 Audit Fixed.");
+        log("Ready. Mode: V345 Fix Total.");
     }
 
-    // --- AUDIT FUNCTIONS (RESTORED) ---
-    function openAuditView() { if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; } let toolbar = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;"><div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div><div style="display:flex; gap:10px; align-items:center;"><span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span><input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;"><button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button></div></div>`; let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive)); let html = ""; sorted.forEach(item => { let rarityColor = "#ccc"; if(item.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(item.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(item.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(item.name.startsWith("S1_")) rarityColor = "var(--red)"; let idsString = JSON.stringify(item.ids); html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button></div></div>`; }); getId('auditList').innerHTML = toolbar + html; getId('auditModal').style.display = 'flex'; }
-    function exportAuditCsv() { let days = parseFloat(document.getElementById('auditThreshold').value) || 0; let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days); if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; } let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n"; targetList.forEach(r => { let idsStr = JSON.stringify(r.ids || []); let idsSafe = idsStr.replace(/"/g, '""'); csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click(); }
-    function copyIds(idsArray) { let text = JSON.stringify(idsArray); navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); }); }
+    // --- LEVENSHTEIN DISTANCE ---
+    function levenshtein(a, b) {
+        if(a.length === 0) return b.length; 
+        if(b.length === 0) return a.length;
+        const matrix = [];
+        for(let i = 0; i <= b.length; i++){ matrix[i] = [i]; }
+        for(let j = 0; j <= a.length; j++){ matrix[0][j] = j; }
+        for(let i = 1; i <= b.length; i++){
+            for(let j = 1; j <= a.length; j++){
+                if(b.charAt(i-1) == a.charAt(j-1)){ matrix[i][j] = matrix[i-1][j-1]; }
+                else { matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
 
-    // --- SYBIL & OTHER FUNCTIONS ---
-    function levenshtein(a, b) { if(a.length === 0) return b.length; if(b.length === 0) return a.length; const matrix = []; for(let i = 0; i <= b.length; i++){ matrix[i] = [i]; } for(let j = 0; j <= a.length; j++){ matrix[0][j] = j; } for(let i = 1; i <= b.length; i++){ for(let j = 1; j <= a.length; j++){ if(b.charAt(i-1) == a.charAt(j-1)){ matrix[i][j] = matrix[i-1][j-1]; } else { matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); } } } return matrix[b.length][a.length]; }
-    function checkSimilarity(target, allNames) { for (let name of allNames) { if (name !== target && Math.abs(name.length - target.length) < 3) { let dist = levenshtein(target, name); if (dist <= 2) return name; } } return null; }
+    function checkSimilarity(target, allNames) {
+        for (let name of allNames) {
+            if (name !== target && Math.abs(name.length - target.length) < 3) {
+                let dist = levenshtein(target, name);
+                if (dist <= 2) return name; 
+            }
+        }
+        return null;
+    }
+
+    // --- SYBIL RADAR MODULE ---
     function showSybilView() { switchView('viewSybil'); }
-    async function runAutoSybilScan() { if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; } let suspects = Array.from(runtimeWalletSet).slice(0, 50); getId('sybilResults').innerHTML = `<div style="color:#fff; grid-column:1/-1; text-align:center;">SCANNING ${suspects.length} SUSPECTS...</div>`; let clusters = {}; let count = 0; for(let target of suspects) { count++; getId('sybilProgress').innerText = `${count} / ${suspects.length}`; try { let creator = "Unknown"; let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`); if(resC && resC.actions.length > 0) creator = resC.actions[0].act.data.creator; let funnel = "None"; let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=50&sort=desc`); if(resF && resF.actions) { let lastOut = resF.actions.find(a => a.act.data.from === target && !SYBIL_WHITELIST.includes(a.act.data.to)); if(lastOut) funnel = lastOut.act.data.to; } let similarTo = checkSimilarity(target, suspects); let clusterKey = funnel !== "None" ? "FUNNEL: " + funnel : (similarTo ? "PATTERN: " + target.substring(0,6) + "*" : "INDEPENDENT"); let riskLevel = funnel !== "None" ? "HIGH" : (similarTo ? "MEDIUM" : "SAFE"); if(!clusters[clusterKey]) clusters[clusterKey] = []; clusters[clusterKey].push({ name: target, creator: creator, funnel: funnel, similar: similarTo, risk: riskLevel }); renderSybilClusters(clusters); await new Promise(r => setTimeout(r, 600)); } catch(e) { console.log(e); } } getId('sybilProgress').innerText = "SCAN COMPLETE."; }
-    function renderSybilClusters(clusters) { let html = ""; let sortedKeys = Object.keys(clusters).sort((a,b) => clusters[b].length - clusters[a].length); sortedKeys.forEach(key => { let group = clusters[key]; let isRisk = key.includes("FUNNEL") || key.includes("PATTERN"); let borderColor = isRisk ? "var(--red)" : "var(--green)"; if(group.length < 2 && isRisk) borderColor = "var(--orange)"; html += `<div class="sybil-cluster" style="border-color:${borderColor}"><div class="sc-head" style="background:${borderColor === 'var(--green)' ? '#003300' : '#440000'}"><span>${key}</span><span>${group.length} ACCOUNTS</span></div><div class="sc-body">`; group.forEach(m => { let riskTag = m.risk === "HIGH" || m.risk === "CRITICAL" ? `<span class="tag-risk">${m.risk}</span>` : `<span class="tag-safe">SAFE</span>`; html += `<div class="sc-row"><span style="color:#fff; font-weight:bold;">${m.name}</span><span>Created: ${m.creator.split(' ')[0]}</span>${riskTag}</div>`; }); html += `</div></div>`; }); getId('sybilResults').innerHTML = html; }
-    async function fetchHistoryCluster(endpoint) { let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("HISTORY NODES BUSY"); }
+    
+    async function runAutoSybilScan() {
+        if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; }
+        let suspects = Array.from(runtimeWalletSet).slice(0, 50);
+        getId('sybilResults').innerHTML = `<div style="color:#fff; grid-column:1/-1; text-align:center;">SCANNING ${suspects.length} SUSPECTS...</div>`;
+        let clusters = {}; let count = 0;
+        for(let target of suspects) {
+            count++; getId('sybilProgress').innerText = `${count} / ${suspects.length}`;
+            try {
+                let creator = "Unknown";
+                let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
+                if(resC && resC.actions.length > 0) creator = resC.actions[0].act.data.creator;
+                
+                let funnel = "None";
+                let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=50&sort=desc`);
+                if(resF && resF.actions) {
+                    let lastOut = resF.actions.find(a => a.act.data.from === target && !SYBIL_WHITELIST.includes(a.act.data.to));
+                    if(lastOut) funnel = lastOut.act.data.to;
+                }
+                let similarTo = checkSimilarity(target, suspects);
+                let clusterKey = funnel !== "None" ? "FUNNEL: " + funnel : (similarTo ? "PATTERN: " + target.substring(0,6) + "*" : "INDEPENDENT");
+                let riskLevel = funnel !== "None" ? "HIGH" : (similarTo ? "MEDIUM" : "SAFE");
 
+                if(!clusters[clusterKey]) clusters[clusterKey] = [];
+                clusters[clusterKey].push({ name: target, creator: creator, funnel: funnel, similar: similarTo, risk: riskLevel });
+                renderSybilClusters(clusters); await new Promise(r => setTimeout(r, 600)); 
+            } catch(e) { console.log(e); }
+        }
+        getId('sybilProgress').innerText = "SCAN COMPLETE.";
+    }
+
+    function renderSybilClusters(clusters) {
+        let html = "";
+        let sortedKeys = Object.keys(clusters).sort((a,b) => clusters[b].length - clusters[a].length);
+        
+        sortedKeys.forEach(key => {
+            let group = clusters[key];
+            let isRisk = key.includes("FUNNEL") || key.includes("PATTERN");
+            let borderColor = isRisk ? "var(--red)" : "var(--green)";
+            if(group.length < 2 && isRisk) borderColor = "var(--orange)";
+            
+            html += `<div class="sybil-cluster" style="border-color:${borderColor}">
+                <div class="sc-head" style="background:${borderColor === 'var(--green)' ? '#003300' : '#440000'}">
+                    <span>${key}</span>
+                    <span>${group.length} ACCOUNTS</span>
+                </div>
+                <div class="sc-body">`;
+                
+            group.forEach(m => {
+                let riskTag = m.risk === "HIGH" || m.risk === "CRITICAL" ? `<span class="tag-risk">${m.risk}</span>` : `<span class="tag-safe">SAFE</span>`;
+                html += `<div class="sc-row">
+                    <span style="color:#fff; font-weight:bold;">${m.name}</span>
+                    <span>Created: ${m.creator.split(' ')[0]}</span>
+                    ${riskTag}
+                </div>`;
+            });
+            html += `</div></div>`;
+        });
+        getId('sybilResults').innerHTML = html;
+    }
+
+    async function fetchHistoryCluster(endpoint) {
+        let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
+        throw new Error("HISTORY NODES BUSY");
+    }
+
+    // --- STANDARD FUNCTIONS (Included implicitly) ---
     function buildUI() { const areaC = getId('areaCards'); const areaL = getId('areaLists'); areaC.innerHTML = ''; areaL.innerHTML = ''; const order = ["F", "H", "R", "S"]; for(let k of order) { let rd = DATA.resourceDefs[k]; areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`; areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`; } }
     function renderTicker() { let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`; const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ]; tokens.forEach(t => { let usd = t.p * CONFIG_PRIX.WAX_USD; html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`; }); getId('marketTicker').innerHTML = html; }
     function startClock() { setInterval(() => { const now = new Date(); const time = now.toLocaleTimeString('fr-FR'); const date = now.toLocaleDateString('fr-FR', { year:'numeric', month:'2-digit', day:'2-digit' }); if(getId('liveTime')) { getId('liveTime').innerText = time; getId('liveDate').innerText = date; } let copies = document.querySelectorAll('.clock-copy'); copies.forEach(c => c.innerText = `${time} | ${date}`); }, 1000); }
@@ -352,6 +554,24 @@
     function exportLogs() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; } let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n"; logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click(); }
     function findTemplate(tid) { if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' }; if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' }; if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' }; if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' }; return null; }
     async function fetchSmartCluster(endpoint, body) { let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("CLUSTER UNREACHABLE"); }
+    
+    // --- RESTORED PRELOADER (SAFE) ---
+    async function preloadImages() {
+        log("Initialisation des visuels...");
+        let uniqueIds = new Set();
+        Object.values(SMART_ZONES_BIBLE).forEach(z => { if(z.req) z.req.forEach(id => uniqueIds.add(id)); });
+        let idsArray = Array.from(uniqueIds);
+        if(idsArray.length === 0) return;
+        let url = `${AA_API}/atomicassets/v1/templates?collection_name=dovdivisions&ids=${idsArray.join(',')}&limit=100`;
+        // NO AWAIT HERE - RUNS IN BACKGROUND
+        fetch(url).then(res => res.json()).then(json => {
+            if(json.data) {
+                json.data.forEach(t => { if(t.immutable_data && t.immutable_data.img) { imageCache[t.template_id] = t.immutable_data.img; } });
+                log(`${json.data.length} images chargées.`);
+                if(ecoStats.divisions.active > 0) updateZoneUI(zoneDetailsCache, ecoStats.divisions);
+            }
+        }).catch(e => log("Images skipped (API busy)"));
+    }
     
     // --- XRAY MODULE ---
     async function loadXrayAbi() { let contract = getId('xrayContract').value; log(`X-RAY: Loading ABI for ${contract}...`); try { let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract})); if(res.abi && res.abi.tables) { let html = ""; res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; }); getId('xrayTable').innerHTML = html; log(`X-RAY: Found ${res.abi.tables.length} tables.`); } else { log("X-RAY: No tables found or ABI access denied."); } } catch(e) { log("X-RAY Error: " + e.message); } }
@@ -394,8 +614,14 @@
                 z.req.forEach(r => { 
                     let entry = REQ_DICT[r]; 
                     if(entry) { 
-                        // TEXT BADGE ONLY (No images to prevent crash)
-                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub" onclick="event.stopPropagation()">${entry.n}</a>`; 
+                        // PATCH V345: RESTORED IMAGES
+                        let imgHash = imageCache[r];
+                        if(imgHash) {
+                             reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}" onclick="event.stopPropagation()"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`; 
+                        } else {
+                            // FALLBACK TEXT IF IMAGE NOT LOADED YET
+                             reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub" onclick="event.stopPropagation()">${entry.n}</a>`; 
+                        }
                     } else { 
                         reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;" onclick="event.stopPropagation()"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`; 
                     } 
@@ -421,13 +647,11 @@
         }); 
         getId('areaZones').innerHTML = html; 
     }
-    
-    async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
-    function updateEcoUI() { let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD; getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets; getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX"; let html = `<div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div><div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`; getId('projTable').innerHTML = html; }
-    function openDataRoom() { let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`; PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; }); html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`; PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; }); html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`; PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; }); html += `</div></div>`; getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex'; }
-    function openZoneDetail(zid) { if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return; let list = zoneDetailsCache[zid]; let groups = {}; list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; }); let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count); let html = ""; sorted.forEach(owner => { html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`; }); getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex'; }
-    function showSimView() { switchView('viewSim'); }
-    function runSimulation() { if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; } if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) { alert("No data available. Please perform OPERATIONS scans first."); return; } let prod = { F: ecoStats.buildings.prodF * 24, H: ecoStats.buildings.prodH * 24, R: ecoStats.buildings.prodR * 24, S: ecoStats.buildings.prodS * 24 }; let burn = { F: ecoStats.burns.F, H: ecoStats.burns.H, R: ecoStats.burns.R, S: ecoStats.burns.S }; let htmlGap = ""; let htmlBuild = ""; let totalNewBurnDOVX = 0; let commonProdDaily = 5.4 * 24; let commonBurnDaily = commonProdDaily * 0.085; let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}}; Object.keys(prod).forEach(k => { let p = prod[k]; let b = burn[k]; let gap = p - b; let gapColor = gap >= 0 ? "val-green" : "val-red"; htmlGap += `<div class="gap-row"><span>${resourceMap[k].n}</span><span style="color:#888">${fmt(p)} / ${fmt(b)}</span><span class="${gapColor}">${gap >= 0 ? "+" : ""}${fmt(gap)}</span></div>`; if (gap < 0) { let deficit = Math.abs(gap); let buildingsNeeded = Math.ceil(deficit / commonProdDaily); let addedBurnDOVX = buildingsNeeded * commonBurnDaily; let costToProduceGap = deficit * 0.085; totalNewBurnDOVX += addedBurnDOVX; htmlBuild += `<div class="gap-row" style="border-color:var(--red); display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center;"><div style="line-height:1.1;"><span style="color:var(--red); font-weight:800; font-size:10px;">${resourceMap[k].n} DEFICIT</span><br><span style="font-size:9px; color:#666;">GAP: -${fmt(deficit)}</span></div><div style="text-align:center;"><span style="color:#fff; font-weight:bold;">BUILD ${buildingsNeeded}</span><br><span style="font-size:9px; color:#444;">COMMON UNITS</span></div><div style="text-align:right; line-height:1.1;"><span style="font-size:9px; color:#666;">COÛT PROD</span><br><span style="color:var(--purple); font-weight:800; font-size:12px;">${fmt(costToProduceGap)} DOVX</span></div></div>`; } else { htmlBuild += `<div class="gap-row" style="border-color:var(--green); opacity:0.5"><span style="color:var(--green)">${resourceMap[k].n} SECURE</span><span>OK</span><span>-</span></div>`; } }); getId('simGapList').innerHTML = htmlGap; getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>"; let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0); let currentMint = ecoStats.divisions.mint; let netDOVX = currentMint - (currentCost + totalNewBurnDOVX); let htmlBal = `<h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span></h3><div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell">POSTE</div><div class="cell c-right">CHARGES ACTUELLES</div><div class="cell c-right">CHARGES ADD.</div><div class="cell c-right">RÉSULTAT NET</div></div><div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;"><div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div><div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div><div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div><div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span></div></div>`; getId('simBalanceTable').innerHTML = htmlBal; let recBox = getId('simRec'); if (totalNewBurnDOVX > 0) { recBox.className = "rec-box"; recBox.style.color = "var(--red)"; recBox.style.borderColor = "var(--red)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.</div>`; } else { recBox.className = "rec-box"; recBox.style.color = "var(--green)"; recBox.style.borderColor = "var(--green)"; recBox.innerHTML = `<div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div><div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.</div>`; } }
+
+    // --- STANDARD FUNCTIONS (Included implicitly) ---
+    function openAuditView() { if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; } let toolbar = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;"><div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div><div style="display:flex; gap:10px; align-items:center;"><span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span><input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;"><button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button></div></div>`; let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive)); let html = ""; sorted.forEach(item => { let rarityColor = "#ccc"; if(item.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(item.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(item.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(item.name.startsWith("S1_")) rarityColor = "var(--red)"; let idsString = JSON.stringify(item.ids); html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button></div></div>`; }); getId('auditList').innerHTML = toolbar + html; getId('auditModal').style.display = 'flex'; }
+    function exportAuditCsv() { let days = parseFloat(document.getElementById('auditThreshold').value) || 0; let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days); if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; } let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n"; targetList.forEach(r => { let idsStr = JSON.stringify(r.ids || []); let idsSafe = idsStr.replace(/"/g, '""'); csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click(); }
+    function copyIds(idsArray) { let text = JSON.stringify(idsArray); navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); }); }
 
     window.onload = init;
 </script>
