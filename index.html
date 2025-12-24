@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V333 (PRECISION RADAR)</title>
+    <title>DoV - COMMAND V334 (ID MAPPING)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -71,21 +71,36 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* CARD STYLES */
-        .zone-card { background-color: var(--bg-panel); background-size: cover; background-position: center; border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
-        .zone-card::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(19,20,27,0.95) 0%, rgba(19,20,27,0.7) 50%, rgba(19,20,27,0.95) 100%); z-index: 1; pointer-events: none; }
+        /* ZONE CARD V334 - ROBUST ID MAPPING */
+        .zone-card { 
+            background-color: #1a1a1a; /* Fallback color if image fails */
+            background-size: cover; background-position: center;
+            border: 1px solid var(--border); 
+            padding: 10px; border-radius: 4px; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            height: 160px; cursor: pointer; transition: 0.2s; 
+            position: relative; overflow: hidden;
+        }
+        .zone-card::after { 
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
+            background: linear-gradient(180deg, rgba(10,12,16,0.95) 0%, rgba(10,12,16,0.6) 50%, rgba(10,12,16,0.95) 100%); 
+            z-index: 1; pointer-events: none; 
+        }
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
-        .type-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?q=80&w=400'); }
-        .type-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400'); }
-        .type-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?q=80&w=400'); }
-        .type-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=400'); }
-        .type-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=400'); }
-        .type-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=400'); }
-        .type-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); }
-        .type-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); }
-        .type-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); }
+
+        /* THEMES MAPPED BY ID */
+        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); background-color: #003366; }
+        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); background-color: #004400; }
+        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); background-color: #444444; }
+        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); background-color: #554400; }
+        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); background-color: #220033; }
+        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); background-color: #333333; } 
+        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); background-color: #332200; }
+        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); background-color: #002244; }
+        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); }
+
         .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
-        .zone-card.active { border-color: var(--blue); }
+        .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.3); }
         .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
@@ -134,8 +149,6 @@
         .xray-table { width:100%; border-collapse:collapse; }
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
-        
-        /* NEW SYBIL V333 */
         .sybil-ctrl { background:#150000; border:1px solid var(--red); flex-direction:column; }
         .sybil-res { display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px; } /* Legacy */
         .sybil-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; } /* New Cluster View */
@@ -152,7 +165,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V333</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V334</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -182,7 +195,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V333. Precision Radar.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V334. ID Mapping Active.</div></div>
     </aside>
 
     <main class="main-content">
@@ -370,8 +383,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V333';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V333';
+    const STORAGE_KEY = 'DOV_DATA_V334';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V334';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -427,6 +440,20 @@
         18: { name:"City 2", cost:4448, win:0, minW:382.78, maxW:511.76, req:[871059, 645504, 645450, 645469, 645485] }, 
         19: { name:"City 3", cost:13440, win:0, minW:812.17, maxW:1357.04, req:[871060, 645500, 645457, 645482, 649646] }, 
         20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
+    };
+
+    // V334: MAPPING THEME PAR ID (ROBUSTE)
+    const ZONE_BG_MAP = {
+        1: "beach", 2: "beach", 3: "beach",
+        4: "mil",
+        5: "forest", 6: "forest", 7: "forest",
+        8: "camp",
+        9: "hill", 10: "hill", 11: "hill",
+        12: "mil",
+        13: "plain", 14: "plain", 15: "plain",
+        16: "mil",
+        17: "city", 18: "city", 19: "city",
+        20: "bridge"
     };
 
     const REQ_DICT = {
@@ -525,7 +552,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V333 Precision Radar.");
+        log("Ready. Mode: V334 ID Mapping.");
     }
 
     // --- LEVENSHTEIN DISTANCE (For Name Similarity) ---
@@ -687,7 +714,54 @@
     async function dispatchGlobalScan(silent = false) { stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "..."; log("Scanning Buildings..."); let next = ""; let stats = { totalCost:0, types:{ F:{p:0, a:0, t:0, max:0}, H:{p:0, a:0, t:0, max:0}, R:{p:0, a:0, t:0, max:0}, S:{p:0, a:0, t:0, max:0} } }; let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0; inactiveAssetsLog = []; try { while(!stopSignal) { let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next})); if(!res.rows) break; const now = Date.now()/1000; for(let r of res.rows) { let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue; rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count; stats.types[tpl.type].t += count; runtimeWalletSet.add(r.owner); let potentialProd = count * tpl.prod; stats.types[tpl.type].max += potentialProd; if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) { stats.types[tpl.type].a += count; let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; let existing = groups[tpl.type].find(x => x.name === tpl.name); if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); } existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c; stats.types[tpl.type].p += h; stats.totalCost += c; } else { let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay); let stopDate = new Date(stopTime * 1000); let safeIds = r.asset_ids || []; inactiveAssetsLog.push({ owner: r.owner, name: tpl.name, ids: safeIds, stopDate: stopDate.toLocaleString('fr-FR'), daysInactive: ((now - stopTime) / 86400).toFixed(1) }); } } ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost; updateGlobalUI(rowCount, stats, groups); if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); } }
     function updateGlobalUI(rows, stats, groups) { if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); for(let k in DATA.resourceDefs) { let rd = DATA.resourceDefs[k]; let currentProd = stats.types[k].p; let dailyProd = currentProd * 24; let maxProd = stats.types[k].max; let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0; let missingProd = maxProd - currentProd; let colorVar = 'var(--fff)'; if(rd.class === 'fuel') colorVar = 'var(--orange)'; if(rd.class === 'health') colorVar = 'var(--red)'; if(rd.class === 'repair') colorVar = 'var(--blue)'; if(rd.class === 'supply') colorVar = 'var(--yellow)'; let cardId = `card-${k}`; let cardEl = getId(cardId); if(cardEl) { cardEl.innerHTML = `<div style="margin-bottom:5px;"><div class="kc-title">DAILY PRODUCTION</div><div class="kc-val-huge" style="color:${colorVar}">${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;"><div><div style="font-size:9px; color:#888;">HOURLY</div><div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div></div><div style="text-align:right;"><div style="font-size:9px; color:#888;">CAPACITY (MAX)</div><div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div></div></div><div style="margin-bottom:5px;"><div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;"><span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span><span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span></div><div style="height:4px; background:#333; border-radius:2px; overflow:hidden;"><div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div></div></div><div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>`; } let list = groups[k].sort((a,b) => b.totH - a.totH); let html = ""; list.forEach(i => { let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`; let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0; let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)"); let rarityColor = "#ccc"; if(i.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(i.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(i.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`; }); getId(`tbl-${k}`).innerHTML = html; } }
     async function startZoneScan(silent = false) { stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING..."; log("Scanning Divisions (Detailed)..."); let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; let next = ""; let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; }); zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; }); try { while(!stopSignal) { let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next})); if(!json.rows) break; for(let r of json.rows) { let zid = r.zone_id || r.zoneID; if(zonesData[zid]) { zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); let end = parseFloat(r.unlock_time || r.end_time || 0); let isFighting = end > (Date.now()/1000); if(isFighting) { zonesData[zid].active++; stats.activeDivs++; let zConf = SMART_ZONES_BIBLE[zid]; let isCity = [17, 18, 19, 20].includes(parseInt(zid)); if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } else { zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; zonesData[zid].br += zConf.cost; stats.br += zConf.cost; zonesData[zid].bs += zConf.cost; stats.bs += zConf.cost; } zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win; zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win }); } } } ecoStats.divisions.active = stats.activeDivs; ecoStats.divisions.mint = stats.totalProd; ecoStats.cityBurn = stats.cityBurn; if(ecoStats.burns) { ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs; } updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50)); } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); } if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete."; }
-    function updateZoneUI(zonesData, stats) { if(!getId('zTotalDivsHeader')) return; getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs); let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0; getId('zPieVal').innerText = activePct.toFixed(0) + "%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`; getId('zTotalProd').innerText = fmt(stats.totalProd); getId('gBurnF').innerText = fmt(stats.bf); getId('gBurnH').innerText = fmt(stats.bh); getId('gBurnR').innerText = fmt(stats.br); getId('gBurnS').innerText = fmt(stats.bs); getId('gCityBurn').innerText = fmt(stats.cityBurn); let html = ""; Object.keys(zonesData).forEach(id => { let z = SMART_ZONES_BIBLE[id]; let d = zonesData[id]; let activeClass = d.count > 0 ? "active" : ""; let isCity = [17,18,19,20].includes(parseInt(id)); let bgClass = "type-default"; let n = z.name.toLowerCase(); if(n.includes("beach")) bgClass = "type-beach"; else if(n.includes("forest")) bgClass = "type-forest"; else if(n.includes("hill")) bgClass = "type-hill"; else if(n.includes("plain")) bgClass = "type-plain"; else if(n.includes("city")) bgClass = "type-city"; else if(n.includes("bunker") || n.includes("hq") || n.includes("radar")) bgClass = "type-mil"; else if(n.includes("camp")) bgClass = "type-camp"; else if(n.includes("bridge")) bgClass = "type-bridge"; let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`; let reqBadges = ""; if(z.req && z.req.length > 0) { z.req.forEach(r => { let entry = REQ_DICT[r]; let imgHash = imageCache[r]; if(entry) { if(imgHash) { reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`; } else { reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`; } } else { reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`; } }); } let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span style="text-shadow:0 2px 4px #000;">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; }); getId('areaZones').innerHTML = html; }
+    function updateZoneUI(zonesData, stats) { 
+        if(!getId('zTotalDivsHeader')) return; 
+        getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); 
+        getId('zTotalDivs').innerText = fmt(stats.totalDivs); 
+        getId('zActiveDivs').innerText = fmt(stats.activeDivs); 
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0; 
+        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; 
+        getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`; 
+        getId('zTotalProd').innerText = fmt(stats.totalProd); 
+        getId('gBurnF').innerText = fmt(stats.bf); 
+        getId('gBurnH').innerText = fmt(stats.bh); 
+        getId('gBurnR').innerText = fmt(stats.br); 
+        getId('gBurnS').innerText = fmt(stats.bs); 
+        getId('gCityBurn').innerText = fmt(stats.cityBurn); 
+        let html = ""; 
+        Object.keys(zonesData).forEach(id => { 
+            let z = SMART_ZONES_BIBLE[id]; 
+            let d = zonesData[id]; 
+            let activeClass = d.count > 0 ? "active" : ""; 
+            let isCity = [17,18,19,20].includes(parseInt(id)); 
+            
+            // --- NEW V334: MAPPING PAR ID ---
+            let theme = ZONE_BG_MAP[id] || "default";
+            let bgClass = "theme-" + theme;
+
+            let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`; 
+            let reqBadges = ""; 
+            if(z.req && z.req.length > 0) { 
+                z.req.forEach(r => { 
+                    let entry = REQ_DICT[r]; 
+                    let imgHash = imageCache[r]; 
+                    if(entry) { 
+                        if(imgHash) { 
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="${entry.n}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}" style="border:1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--'+entry.r.replace('r-',''))}"></a>`; 
+                        } else { 
+                            reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-named ${entry.r}" title="View on AtomicHub">${entry.n}</a>`; 
+                        } 
+                    } else { 
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`; 
+                    } 
+                }); 
+            } 
+            let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; 
+            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span style="text-shadow:0 2px 4px #000;">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; 
+        }); 
+        getId('areaZones').innerHTML = html; 
+    }
+    
     async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
     function updateEcoUI() { let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX); let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX; let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD; getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets; getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX"; let html = `<div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div><div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`; getId('projTable').innerHTML = html; }
     function openDataRoom() { let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`; PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; }); html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`; PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; }); html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`; PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; }); html += `</div></div>`; getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex'; }
