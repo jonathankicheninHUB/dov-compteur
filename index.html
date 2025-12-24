@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V324 (VISUAL REQ)</title>
+    <title>DoV - COMMAND V325 (FAST CDN)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -112,8 +112,8 @@
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
         .badge-req:hover { transform:scale(1.1); }
-        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; }
-        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); }
+        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(41, 121, 255, 0.1); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; }
         
         /* XRAY STYLES */
         .xray-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
@@ -127,7 +127,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V324</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V325</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -156,7 +156,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V324. Visuals Preloaded.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V325. CDN Accelerated.</div></div>
     </aside>
 
     <main class="main-content">
@@ -360,8 +360,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V324';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V324';
+    const STORAGE_KEY = 'DOV_DATA_V325';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V325';
     const AA_API = "https://wax.api.atomicassets.io";
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
@@ -460,7 +460,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V324 Visual Req.");
+        log("Ready. Mode: V325 Fast CDN.");
     }
 
     function buildUI() {
@@ -879,10 +879,9 @@
                 z.req.forEach(r => {
                     let imgHash = imageCache[r];
                     if(imgHash) {
-                        // VISUAL MODE
-                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="ID: ${r}"><img src="https://ipfs.io/ipfs/${imgHash}"></a>`;
+                        // FIX V325: USE ATOMIC IPFS CDN
+                        reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" class="badge-req" title="ID: ${r}"><img src="https://atomichub-ipfs.com/ipfs/${imgHash}"></a>`;
                     } else {
-                        // FALLBACK TEXT MODE
                         reqBadges += `<a href="https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${r}" target="_blank" style="text-decoration:none;"><span class="badge-req" title="Req Template: ${r}">🔗 ${r}</span></a>`;
                     }
                 });
