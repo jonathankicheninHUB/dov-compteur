@@ -37,7 +37,6 @@
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        /* CORRECTION CSS ICI : min-height passé à 180px */
         .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
         .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kc-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
@@ -510,25 +509,32 @@
             let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0;
             let missingProd = maxProd - currentProd;
 
+            // COLOR LOGIC
+            let colorVar = 'var(--fff)';
+            if(rd.class === 'fuel') colorVar = 'var(--orange)';
+            if(rd.class === 'health') colorVar = 'var(--red)';
+            if(rd.class === 'repair') colorVar = 'var(--blue)';
+            if(rd.class === 'supply') colorVar = 'var(--yellow)';
+
             // Injection HTML Riche dans la carte KPI
             let cardId = `card-${k}`;
             let cardEl = getId(cardId);
             
             if(cardEl) {
-                // MISE EN PAGE OPTIMISÉE (GRILLE) POUR TOUT FAIRE TENIR
+                // MISE EN PAGE OPTIMISÉE (HIERARCHIE INVERSEE)
                 cardEl.innerHTML = `
-                    <div style="margin-bottom:8px;">
-                        <div class="kc-title">${rd.label} / HOUR</div>
-                        <div class="kc-val" style="font-size:22px;">${fmtDec(currentProd)}</div>
+                    <div style="margin-bottom:5px;">
+                        <div class="kc-title">DAILY PRODUCTION</div>
+                        <div class="kc-val-huge" style="color:${colorVar}">${fmtDec(dailyProd)}</div>
                     </div>
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
                         <div>
-                            <div style="font-size:9px; color:#888;">DAILY PROD</div>
-                            <div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(dailyProd)}</div>
+                            <div style="font-size:9px; color:#888;">HOURLY</div>
+                            <div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div>
                         </div>
                         <div style="text-align:right;">
-                            <div style="font-size:9px; color:#888;">CAPACITY</div>
+                            <div style="font-size:9px; color:#888;">CAPACITY (MAX)</div>
                             <div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div>
                         </div>
                     </div>
