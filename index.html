@@ -610,6 +610,17 @@
     function openAuditView() {
         if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
         
+        // --- ADDED TOOLBAR FOR EXPORT ---
+        let toolbar = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;">
+                <div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span>
+                    <input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;">
+                    <button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button>
+                </div>
+            </div>`;
+
         // TRIER PAR DURÉE D'INACTIVITÉ (Pire en premier)
         let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
         
@@ -637,8 +648,33 @@
             </div>`;
         });
         
-        getId('auditList').innerHTML = html;
+        getId('auditList').innerHTML = toolbar + html;
         getId('auditModal').style.display = 'flex';
+    }
+
+    function exportAuditCsv() {
+        let days = parseFloat(document.getElementById('auditThreshold').value) || 0;
+        
+        // Filtrage
+        let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days);
+        
+        if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; }
+
+        // Génération CSV
+        let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
+        targetList.forEach(r => {
+            // On échappe les guillemets pour le JSON des IDs dans le CSV
+            let idsSafe = JSON.stringify(r.ids).replace(/"/g, '""'); 
+            csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
+        });
+
+        // Téléchargement
+        let blob = new Blob([csv], {type:'text/csv'});
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); 
+        a.href = url; 
+        a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; 
+        a.click();
     }
 
     function copyIds(idsArray) {
