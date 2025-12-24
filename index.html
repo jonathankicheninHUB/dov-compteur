@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V320 (X-RAY)</title>
+    <title>DoV - COMMAND V322 (PRECISION)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -126,7 +126,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V320</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V322</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -155,7 +155,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V320. X-Ray Ready.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V322. Precision Corrected.</div></div>
     </aside>
 
     <main class="main-content">
@@ -336,8 +336,8 @@
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" } ], markets: [ { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V320';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V320';
+    const STORAGE_KEY = 'DOV_DATA_V322';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V322';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -369,29 +369,28 @@
         }
     };
 
-    // FIXED V318: HARDCODED LOGISTICS FOR IMMEDIATE VISIBILITY
-    // NOTE: minW/maxW hardcoded for robustness if fetch fails
+    // FIXED V322: CORRECTED DATA WITH DIVISION BY 10000
     const SMART_ZONES_BIBLE = {
-        1: { name:"Beach 1", cost:1160, win:400, minW:0, maxW:0, req:[] }, 
-        2: { name:"Beach 2", cost:6968, win:2405, minW:0, maxW:0, req:[] }, 
-        3: { name:"Beach 3", cost:8800, win:3037, minW:0, maxW:0, req:[] }, 
-        4: { name:"Bunker", cost:11120, win:3838, minW:0, maxW:0, req:[] }, 
-        5: { name:"Forest 1", cost:14024, win:4840, minW:0, maxW:0, req:[] }, 
-        6: { name:"Forest 2", cost:17704, win:6110, minW:0, maxW:0, req:[] }, 
-        7: { name:"Forest 3", cost:22352, win:7714, minW:0, maxW:0, req:[] }, 
-        8: { name:"Camp", cost:28220, win:9739, minW:0, maxW:0, req:[] }, 
-        9: { name:"Hill 1", cost:37052, win:12788, minW:0, maxW:0, req:[] }, 
-        10: { name:"Hill 2", cost:48652, win:16791, minW:0, maxW:0, req:[] }, 
-        11: { name:"Hill 3", cost:64516, win:22266, minW:0, maxW:0, req:[] }, 
-        12: { name:"Radar", cost:84712, win:29236, minW:0, maxW:0, req:[] }, 
-        13: { name:"Plain 1", cost:99384, win:34300, minW:0, maxW:0, req:[] }, 
-        14: { name:"Plain 2", cost:125708, win:43385, minW:0, maxW:0, req:[] }, 
-        15: { name:"Plain 3", cost:151164, win:52171, minW:0, maxW:0, req:[] }, 
-        16: { name:"HQ", cost:188000, win:64884, minW:0, maxW:0, req:[] }, 
-        17: { name:"City 1", cost:1664, win:0, minW:0, maxW:0, req:[] }, 
-        18: { name:"City 2", cost:4448, win:0, minW:0, maxW:0, req:[] }, 
-        19: { name:"City 3", cost:13440, win:0, minW:0, maxW:0, req:[] }, 
-        20: { name:"Bridge", cost:29856, win:0, minW:0, maxW:0, req:[] }
+        1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 
+        2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 
+        3: { name:"Beach 3", cost:8800, win:3037, minW:35.00, maxW:54.59, req:[871037] }, 
+        4: { name:"Bunker", cost:11120, win:3838, minW:69.99, maxW:108.53, req:[296767, 295956, 871038] }, 
+        5: { name:"Forest 1", cost:14024, win:4840, minW:139.99, maxW:218.35, req:[296767, 296754, 871039, 401181] }, 
+        6: { name:"Forest 2", cost:17704, win:6110, minW:255.18, maxW:341.18, req:[296768, 296754, 871041, 401181] }, 
+        7: { name:"Forest 3", cost:22352, win:7714, minW:450.00, maxW:450.00, req:[296768, 296754, 871043, 401181] }, 
+        8: { name:"Camp", cost:28220, win:9739, minW:382.78, maxW:511.76, req:[296768, 298537, 296761, 871045, 401182] }, 
+        9: { name:"Hill 1", cost:37052, win:12788, minW:415.82, maxW:694.78, req:[296768, 298537, 298529, 871048, 401182] }, 
+        10: { name:"Hill 2", cost:48652, win:16791, minW:519.82, maxW:868.55, req:[296769, 298537, 298529, 871049, 401182] }, 
+        11: { name:"Hill 3", cost:64516, win:22266, minW:649.77, maxW:1085.69, req:[296769, 298539, 298529, 871051, 401184] }, 
+        12: { name:"Radar", cost:84712, win:29236, minW:812.17, maxW:1357.04, req:[296770, 298539, 871052, 298548, 401184] }, 
+        13: { name:"Plain 1", cost:99384, win:34300, minW:1298.56, maxW:1696.33, req:[296770, 298539, 871053, 298548, 401184] }, 
+        14: { name:"Plain 2", cost:125708, win:43385, minW:1428.32, maxW:1865.84, req:[296770, 298541, 871054, 298549, 401187] }, 
+        15: { name:"Plain 3", cost:151164, win:52171, minW:1570.79, maxW:2051.96, req:[296770, 298541, 871055, 298553, 401187] }, 
+        16: { name:"HQ", cost:188000, win:64884, minW:1728.29, maxW:2494.23, req:[296770, 298543, 871057, 298551, 401187] }, 
+        17: { name:"City 1", cost:1664, win:0, minW:69.99, maxW:108.53, req:[871058, 645495, 645444, 645455, 645463] }, 
+        18: { name:"City 2", cost:4448, win:0, minW:382.78, maxW:511.76, req:[871059, 645504, 645450, 645469, 645485] }, 
+        19: { name:"City 3", cost:13440, win:0, minW:812.17, maxW:1357.04, req:[871060, 645500, 645457, 645482, 649646] }, 
+        20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] }
     };
 
     let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -426,8 +425,7 @@
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         
-        // --- NEW: FETCH DYNAMIC RULES ---
-        loadZoneRules();
+        // NO DYNAMIC FETCH FOR ZONES - USING HARDCODED V322 DATA
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -436,7 +434,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V320 Full Map (Dynamic).");
+        log("Ready. Mode: V322 Corrected Data.");
     }
 
     function buildUI() {
@@ -543,49 +541,76 @@
         throw new Error("CLUSTER UNREACHABLE");
     }
 
-    // --- NEW: SYNC ZONES DYNAMICALLY ---
-    async function loadZoneRules() {
-        log("Synchronisation des Règles de Zone (Poids/Clés)...");
+    // --- XRAY MODULE FUNCTIONS ---
+    async function loadXrayAbi() {
+        let contract = getId('xrayContract').value;
+        log(`X-RAY: Loading ABI for ${contract}...`);
         try {
-            // Fetch 'zones' table from 'dovpvecontrl'
-            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                json: true,
-                code: "dovpvecontrl",
-                scope: "dovpvecontrl",
-                table: "zones",
-                limit: 100
-            }));
+            // Get ABI
+            let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract}));
+            if(res.abi && res.abi.tables) {
+                let html = "";
+                res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; });
+                getId('xrayTable').innerHTML = html;
+                log(`X-RAY: Found ${res.abi.tables.length} tables.`);
+            } else {
+                log("X-RAY: No tables found or ABI access denied.");
+            }
+        } catch(e) { log("X-RAY Error: " + e.message); }
+    }
 
-            if(res.rows) {
-                let updateCount = 0;
-                res.rows.forEach(row => {
-                    let id = row.id;
-                    // If zone exists in our Bible, enrich it
-                    if(SMART_ZONES_BIBLE[id]) {
-                        SMART_ZONES_BIBLE[id].minW = row.min_weight;
-                        SMART_ZONES_BIBLE[id].maxW = row.max_weight;
-                        // Map requirements
-                        SMART_ZONES_BIBLE[id].req = row.requirements || []; 
-                        updateCount++;
-                    }
+    function onXrayContractChange() {
+        // Auto-fill scope based on contract
+        let c = getId('xrayContract').value;
+        let s = c; // default scope = contract
+        if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
+        getId('xrayScope').value = s;
+    }
+
+    async function runXrayScan() {
+        let contract = getId('xrayContract').value;
+        let table = getId('xrayTable').value;
+        let scope = getId('xrayScope').value;
+        if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
+        
+        getId('xrayResults').innerText = "Scanning...";
+        log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
+        
+        try {
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
+                json: true, code: contract, scope: scope, table: table, limit: 100
+            }));
+            
+            if(res.rows && res.rows.length > 0) {
+                // Build dynamic table
+                let headers = Object.keys(res.rows[0]);
+                let html = `<table class="xray-table"><thead><tr>`;
+                headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
+                html += `</tr></thead><tbody>`;
+                
+                res.rows.forEach(r => {
+                    html += `<tr>`;
+                    headers.forEach(h => {
+                        let val = r[h];
+                        if(typeof val === 'object') val = JSON.stringify(val);
+                        html += `<td>${val}</td>`;
+                    });
+                    html += `</tr>`;
                 });
-                log(`Succès: ${updateCount} Zones mises à jour avec les données Blockchain.`);
-                rulesLoaded = true; // Flag for UI
-                // Refresh View if already active
-                if(getId('viewZones').classList.contains('active-view')) {
-                    // We need stats to redraw, if we don't have them yet, we just wait for the main loop.
-                    // But if we have some, we try to redraw.
-                    if(ecoStats.divisions.active > 0 || ecoStats.divisions.totalDivs > 0) {
-                         // We can't call updateZoneUI without zoneData. 
-                         // Best is to let the loop handle it, but we can log.
-                         log("UI will refresh on next scan tick.");
-                    }
-                }
+                html += `</tbody></table>`;
+                getId('xrayResults').innerHTML = html;
+                log(`X-RAY: ${res.rows.length} rows retrieved.`);
+            } else {
+                getId('xrayResults').innerText = "No data found (Empty table or wrong scope).";
+                log("X-RAY: Empty result.");
             }
         } catch(e) {
-            log("Erreur synchro zones: " + e.message);
+            getId('xrayResults').innerText = "Error: " + e.message;
+            log("X-RAY Error: " + e.message);
         }
     }
+
+    function showXrayView() { switchView('viewXray'); }
 
     // MODIFIED FOR OEE (Overall Equipment Effectiveness)
     async function dispatchGlobalScan(silent = false) {
@@ -817,7 +842,7 @@
         
         let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
         let next = "";
-        // FIXED V318: FULL 20 ZONES LIST FROM V299
+        // FIXED V322: FULL 20 ZONES LIST WITH HARDCODED VALUES
         let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
         zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
 
@@ -874,18 +899,15 @@
             let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
             
-            // --- NEW: WEIGHT & REQ BADGES ---
-            let weightBadge = z.minW > 0 ? `<span class="badge-weight">⚖️ ${z.minW}-${z.maxW}</span>` : (rulesLoaded ? "<span class='badge-weight' style='border-color:#444; color:#666;'>⚖️ N/A</span>" : "<span class='badge-offline'>WAIT</span>");
+            // --- NEW: WEIGHT & REQ BADGES (HARDCODED VERSION) ---
+            // USING fmtDec to show 2 decimals
+            let weightBadge = `<span class="badge-weight">⚖️ ${fmtDec(z.minW)}-${fmtDec(z.maxW)}</span>`;
             
             let reqBadges = "";
             if(z.req && z.req.length > 0) {
                 z.req.forEach(r => {
                     reqBadges += `<span class="badge-req" title="Req Template: ${r}">🔒 ID:${r}</span>`;
                 });
-            } else if (rulesLoaded && z.minW === 0) {
-                 // Nothing to show if no req and we loaded rules
-            } else if (!rulesLoaded) {
-                 reqBadges = "<span class='badge-offline'>...</span>";
             }
 
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
@@ -896,7 +918,6 @@
                 
                 <div class="zc-mid">
                     <div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div>
-                    
                     <div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
                     <div style="height:1px; background:#333; margin:2px 0;"></div>
                     ${burnHtml}
@@ -1087,77 +1108,6 @@
                 </div>`;
         }
     }
-
-    // --- XRAY MODULE FUNCTIONS ---
-    async function loadXrayAbi() {
-        let contract = getId('xrayContract').value;
-        log(`X-RAY: Loading ABI for ${contract}...`);
-        try {
-            // Get ABI
-            let res = await fetchSmartCluster("/v1/chain/get_abi", JSON.stringify({account_name: contract}));
-            if(res.abi && res.abi.tables) {
-                let html = "";
-                res.abi.tables.forEach(t => { html += `<option value="${t.name}">${t.name}</option>`; });
-                getId('xrayTable').innerHTML = html;
-                log(`X-RAY: Found ${res.abi.tables.length} tables.`);
-            } else {
-                log("X-RAY: No tables found or ABI access denied.");
-            }
-        } catch(e) { log("X-RAY Error: " + e.message); }
-    }
-
-    function onXrayContractChange() {
-        // Auto-fill scope based on contract
-        let c = getId('xrayContract').value;
-        let s = c; // default scope = contract
-        if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
-        getId('xrayScope').value = s;
-    }
-
-    async function runXrayScan() {
-        let contract = getId('xrayContract').value;
-        let table = getId('xrayTable').value;
-        let scope = getId('xrayScope').value;
-        if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
-        
-        getId('xrayResults').innerText = "Scanning...";
-        log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
-        
-        try {
-            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
-                json: true, code: contract, scope: scope, table: table, limit: 100
-            }));
-            
-            if(res.rows && res.rows.length > 0) {
-                // Build dynamic table
-                let headers = Object.keys(res.rows[0]);
-                let html = `<table class="xray-table"><thead><tr>`;
-                headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
-                html += `</tr></thead><tbody>`;
-                
-                res.rows.forEach(r => {
-                    html += `<tr>`;
-                    headers.forEach(h => {
-                        let val = r[h];
-                        if(typeof val === 'object') val = JSON.stringify(val);
-                        html += `<td>${val}</td>`;
-                    });
-                    html += `</tr>`;
-                });
-                html += `</tbody></table>`;
-                getId('xrayResults').innerHTML = html;
-                log(`X-RAY: ${res.rows.length} rows retrieved.`);
-            } else {
-                getId('xrayResults').innerText = "No data found (Empty table or wrong scope).";
-                log("X-RAY: Empty result.");
-            }
-        } catch(e) {
-            getId('xrayResults').innerText = "Error: " + e.message;
-            log("X-RAY Error: " + e.message);
-        }
-    }
-
-    function showXrayView() { switchView('viewXray'); }
 
     window.onload = init;
 </script>
