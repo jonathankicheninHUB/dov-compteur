@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V328 (IMMERSION)</title>
+    <title>DoV - COMMAND V329 (FULL COVERAGE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -93,13 +93,18 @@
         /* CONTENT ON TOP */
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
 
-        /* SPECIFIC BACKGROUNDS */
+        /* SPECIFIC BACKGROUNDS - UPDATED V329 */
+        /* Fallback Default */
+        .type-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?q=80&w=400'); }
+        
         .type-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400'); }
         .type-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?q=80&w=400'); }
         .type-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=400'); }
         .type-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=400'); }
         .type-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=400'); }
         .type-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); } /* HQ, Bunker, Radar */
+        .type-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); } /* Camp specific */
+        .type-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); } /* Bridge specific */
 
         .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
         .zone-card.active { border-color: var(--blue); }
@@ -179,7 +184,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V328</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V329</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -208,7 +213,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V328. Immersive Mode.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V329. Full Coverage.</div></div>
     </aside>
 
     <main class="main-content">
@@ -412,8 +417,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V328';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V328';
+    const STORAGE_KEY = 'DOV_DATA_V329';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V329';
     const getId = (id) => document.getElementById(id);
     const closeModal = (id) => getId(id).style.display = 'none';
     const switchView = (id) => { document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active-view')); getId(id).classList.add('active-view'); };
@@ -577,7 +582,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V328 Immersive.");
+        log("Ready. Mode: V329 Full Coverage.");
     }
 
     function buildUI() {
@@ -702,6 +707,7 @@
     }
 
     function onXrayContractChange() {
+        // Auto-fill scope based on contract
         let c = getId('xrayContract').value;
         let s = c; // default scope = contract
         if(c.includes('atomic') || c.includes('nefty') || c.includes('blend')) s = 'dawnfvictory'; // Common collections
@@ -713,20 +719,29 @@
         let table = getId('xrayTable').value;
         let scope = getId('xrayScope').value;
         if(!table || table === "Load ABI first...") { alert("Please load ABI first."); return; }
+        
         getId('xrayResults').innerText = "Scanning...";
         log(`X-RAY: Scanning ${contract} -> ${table} (Scope: ${scope})...`);
+        
         try {
             let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
                 json: true, code: contract, scope: scope, table: table, limit: 100
             }));
+            
             if(res.rows && res.rows.length > 0) {
+                // Build dynamic table
                 let headers = Object.keys(res.rows[0]);
                 let html = `<table class="xray-table"><thead><tr>`;
                 headers.forEach(h => html += `<th>${h.toUpperCase()}</th>`);
                 html += `</tr></thead><tbody>`;
+                
                 res.rows.forEach(r => {
                     html += `<tr>`;
-                    headers.forEach(h => { let val = r[h]; if(typeof val === 'object') val = JSON.stringify(val); html += `<td>${val}</td>`; });
+                    headers.forEach(h => {
+                        let val = r[h];
+                        if(typeof val === 'object') val = JSON.stringify(val);
+                        html += `<td>${val}</td>`;
+                    });
                     html += `</tr>`;
                 });
                 html += `</tbody></table>`;
@@ -951,14 +966,17 @@
             let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
             
-            // --- NEW: DYNAMIC BACKGROUND ---
+            // --- NEW: DYNAMIC BACKGROUND (FIXED V329) ---
             let bgClass = "type-default";
-            if(z.name.toLowerCase().includes("beach")) bgClass = "type-beach";
-            else if(z.name.toLowerCase().includes("forest")) bgClass = "type-forest";
-            else if(z.name.toLowerCase().includes("hill")) bgClass = "type-hill";
-            else if(z.name.toLowerCase().includes("plain")) bgClass = "type-plain";
-            else if(z.name.toLowerCase().includes("city")) bgClass = "type-city";
-            else if(z.name.toLowerCase().includes("bunker") || z.name.toLowerCase().includes("hq") || z.name.toLowerCase().includes("radar")) bgClass = "type-mil";
+            let n = z.name.toLowerCase();
+            if(n.includes("beach")) bgClass = "type-beach";
+            else if(n.includes("forest")) bgClass = "type-forest";
+            else if(n.includes("hill")) bgClass = "type-hill";
+            else if(n.includes("plain")) bgClass = "type-plain";
+            else if(n.includes("city")) bgClass = "type-city";
+            else if(n.includes("bunker") || n.includes("hq") || n.includes("radar")) bgClass = "type-mil";
+            else if(n.includes("camp")) bgClass = "type-camp"; // NEW
+            else if(n.includes("bridge")) bgClass = "type-bridge"; // NEW
 
             // --- NEW: WEIGHT & REQ BADGES (HARDCODED VERSION) ---
             // USING fmtDec to show 2 decimals
