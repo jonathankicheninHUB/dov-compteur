@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V332 (SYBIL RADAR)</title>
+    <title>DoV - COMMAND V333 (STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -146,7 +146,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V332</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V333</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -176,7 +176,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V332. Auto-Radar.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V333. Stable.</div></div>
     </aside>
 
     <main class="main-content">
@@ -338,7 +338,7 @@
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
     
-    // UPDATED V323: FULL DATA ROOM LINKS
+    // UPDATED V333: FULL DATA ROOM LINKS
     const PROJECT_DATA = { 
         links: [ 
             { name: "Official Website", url: "https://dawnofvictory.io/" }, 
@@ -362,8 +362,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V332';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V332';
+    const STORAGE_KEY = 'DOV_DATA_V333';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V333';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -525,7 +525,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V332 Auto-Radar.");
+        log("Ready. Mode: V333 Stable.");
     }
 
     // --- RESTORED AUDIT FUNCTIONS (V330 FIX) ---
@@ -538,7 +538,9 @@
             let rarityColor = "#ccc"; 
             if(item.name.startsWith("R_")) rarityColor = "var(--blue)"; else if(item.name.startsWith("E_")) rarityColor = "var(--purple)"; else if(item.name.startsWith("L_")) rarityColor = "var(--orange)"; else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
             let idsString = JSON.stringify(item.ids);
-            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button></div></div>`;
+            // ESCAPE QUOTES FOR ONCLICK
+            let safeIds = idsString.replace(/"/g, '&quot;');
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;"><div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div><div class="cell" style="color:${rarityColor}">${item.name}</div><div class="cell" style="color:#888">${item.stopDate}</div><div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div><div class="cell c-center"><button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick="copyIds('${safeIds}')">COPIER IDs</button></div></div>`;
         });
         getId('auditList').innerHTML = toolbar + html; getId('auditModal').style.display = 'flex';
     }
@@ -553,15 +555,21 @@
         let a = document.createElement('a'); a.href = url; a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; a.click();
     }
 
-    function copyIds(idsArray) {
-        let text = JSON.stringify(idsArray);
-        navigator.clipboard.writeText(text).then(() => { alert("IDs copiés !"); });
+    function copyIds(idsString) {
+        // V333 FIX: CLEANER COPY
+        try {
+            // Remove brackets and quotes for easy atomic hub pasting
+            let clean = idsString.replace(/[\[\]"]/g, '');
+            navigator.clipboard.writeText(clean).then(() => { alert("IDs copiés (Format CSV pour AtomicHub) !"); });
+        } catch(e) {
+             navigator.clipboard.writeText(idsString).then(() => { alert("IDs copiés (JSON Brut) !"); });
+        }
     }
 
     // --- SYBIL RADAR MODULE ---
     function showSybilView() { switchView('viewSybil'); }
     
-    // NEW V332: AUTO SCAN
+    // NEW V333: AUTO SCAN WITH ERROR HANDLING
     async function runAutoSybilScan() {
         if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; }
         let suspects = Array.from(runtimeWalletSet).slice(0, 50); // Limit 50 to avoid freeze
@@ -601,9 +609,13 @@
                 </div>`;
                 
                 getId('sybilResults').innerHTML = html; // Update live
-                await new Promise(r => setTimeout(r, 500)); // Pace requests
+                await new Promise(r => setTimeout(r, 600)); // V333: Increased delay to avoid rate limit
 
-            } catch(e) { console.log(e); }
+            } catch(e) { 
+                console.log(e); 
+                html += `<div class="sybil-card" style="border-color:var(--orange)"><div style="color:#fff; font-weight:bold;">${target}</div><div style="color:var(--orange); font-size:10px;">SCAN FAILED (API BUSY)</div></div>`;
+                getId('sybilResults').innerHTML = html;
+            }
         }
         getId('sybilProgress').innerText = "SCAN COMPLETE.";
     }
@@ -1073,7 +1085,7 @@
         getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
     }
 
-    // V316: GAP ANALYZER LOGIC
+    // V316: GAP ANALYZER LOGIC (REVISED V333)
     function showSimView() { switchView('viewSim'); }
     
     function runSimulation() {
@@ -1103,7 +1115,10 @@
         let htmlBuild = "";
         let totalNewBurnDOVX = 0;
         let commonProdDaily = 5.4 * 24; // 129.6 TU/Day
-        let commonBurnDaily = commonProdDaily * 0.085; // DOVX cost
+        
+        // V333 FIX: DYNAMIC PRICE CALCULATION
+        // Assuming 8.5% of production value is maintenance cost (Standard mechanics)
+        let commonBurnDaily = commonProdDaily * 0.085; 
 
         let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}};
 
