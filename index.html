@@ -110,6 +110,8 @@
         .gap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #333; color:#ccc; }
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
+        .badge-req { font-size:8px; padding:1px 3px; border-radius:2px; background:rgba(213,0,249,0.15); border:1px solid var(--purple); color:var(--purple); margin-left:3px; }
+        .badge-weight { font-size:8px; padding:1px 3px; border-radius:2px; background:#222; border:1px solid #444; color:#aaa; }
     </style>
 </head>
 <body>
@@ -314,6 +316,7 @@
     };
 
     // FIXED V318: RESTORED FULL ZONE LIST (20 ZONES)
+    // NOTE: 'minW', 'maxW', 'req' will be populated by loadZoneRules()
     const SMART_ZONES_BIBLE = {
         1: { name:"Beach 1", cost:1160, win:400 }, 2: { name:"Beach 2", cost:6968, win:2405 }, 3: { name:"Beach 3", cost:8800, win:3037 }, 4: { name:"Bunker", cost:11120, win:3838 }, 
         5: { name:"Forest 1", cost:14024, win:4840 }, 6: { name:"Forest 2", cost:17704, win:6110 }, 7: { name:"Forest 3", cost:22352, win:7714 }, 8: { name:"Camp", cost:28220, win:9739 }, 
@@ -353,6 +356,9 @@
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         
+        // --- NEW: FETCH DYNAMIC RULES ---
+        loadZoneRules();
+
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
             getId('cntRows').innerText = fmt(ecoStats.buildings.active); 
@@ -465,6 +471,39 @@
         let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
         for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
         throw new Error("CLUSTER UNREACHABLE");
+    }
+
+    // --- NEW: SYNC ZONES DYNAMICALLY ---
+    async function loadZoneRules() {
+        log("Synchronisation des Règles de Zone (Poids/Clés)...");
+        try {
+            // Fetch 'zones' table from 'dovpvecontrl'
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
+                json: true,
+                code: "dovpvecontrl",
+                scope: "dovpvecontrl",
+                table: "zones",
+                limit: 100
+            }));
+
+            if(res.rows) {
+                res.rows.forEach(row => {
+                    let id = row.id;
+                    // If zone exists in our Bible, enrich it
+                    if(SMART_ZONES_BIBLE[id]) {
+                        SMART_ZONES_BIBLE[id].minW = row.min_weight;
+                        SMART_ZONES_BIBLE[id].maxW = row.max_weight;
+                        // Map requirements
+                        SMART_ZONES_BIBLE[id].req = row.requirements || []; 
+                    }
+                });
+                log("Règles de Zones mises à jour depuis la Blockchain.");
+                // Refresh View if already active
+                if(ecoStats.divisions.active > 0) startZoneScan(true); 
+            }
+        } catch(e) {
+            log("Erreur synchro zones: " + e.message);
+        }
     }
 
     // MODIFIED FOR OEE (Overall Equipment Effectiveness)
@@ -738,6 +777,7 @@
         if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete.";
     }
 
+    // MODIFIED WITH DYNAMIC WEIGHTS / REQS
     function updateZoneUI(zonesData, stats) {
         if(!getId('zTotalDivsHeader')) return;
         getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
@@ -749,11 +789,35 @@
         
         let html = "";
         Object.keys(zonesData).forEach(id => {
-            let z = SMART_ZONES_BIBLE[id]; let d = zonesData[id]; let activeClass = d.count > 0 ? "active" : "";
+            let z = SMART_ZONES_BIBLE[id]; 
+            let d = zonesData[id]; 
+            let activeClass = d.count > 0 ? "active" : "";
             let isCity = [17,18,19,20].includes(parseInt(id));
+            
+            // --- NEW: WEIGHT & REQ BADGES ---
+            let weightBadge = z.minW ? `<span class="badge-weight">⚖️ ${z.minW}-${z.maxW}</span>` : "";
+            
+            let reqBadges = "";
+            if(z.req && z.req.length > 0) {
+                z.req.forEach(r => {
+                    reqBadges += `<span class="badge-req" title="Req Template: ${r}">🔒 REQ</span>`;
+                });
+            }
+
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
                                   : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
-            html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div><div style="height:1px; background:#333; margin:2px 0;"></div>${burnHtml}</div></div>`;
+            
+            html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')">
+                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
+                
+                <div class="zc-mid">
+                    <div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap;">${weightBadge} ${reqBadges}</div>
+                    
+                    <div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div style="height:1px; background:#333; margin:2px 0;"></div>
+                    ${burnHtml}
+                </div>
+            </div>`;
         });
         getId('areaZones').innerHTML = html;
     }
