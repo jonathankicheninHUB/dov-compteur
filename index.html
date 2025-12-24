@@ -300,3 +300,743 @@
         apiConfig: { 
             rpcNodes: [
                 "https://wax.greymass.com", "https://wax.eosio.online", "https://wax.api.eosnation.io",
+                "https://wax.dapplica.io", "https://wax.eosphere.io", "https://wax.eosusa.io",
+                "https://wax-public1.neftyblocks.com", "https://wax-public2.neftyblocks.com",
+                "https://wax.eosrio.io", "https://api.wax.detroitledger.tech", "https://wax.oiac.io",
+                "https://api.hivebp.io", "https://api2.hivebp.io", "https://api-wax.eosauthority.com",
+                "https://wax.eosdac.io", "https://wax.blacklusion.io", "https://api.waxsweden.org",
+                "https://wax-bp.wizardsguild.one", "https://api.wax.alohaeos.com", "https://wax.eu.eosamsterdam.net"
+            ] 
+        },
+        resourceDefs: { "F": { label: "FUEL", class: "fuel" }, "H": { label: "HEALTH", class: "health" }, "R": { label: "REPAIR", class: "repair" }, "S": { label: "SUPPLY", class: "supply" } },
+        templates: {
+            "FUEL": { "490122": { "name": "C_F1_PRODUCER_FUEL", "prod": 5.4 }, "492363": { "name": "C_F2_PRODUCER_FUEL", "prod": 12.15 }, "492366": { "name": "C_F3_PRODUCER_FUEL", "prod": 30.38 }, "492368": { "name": "C_F4_PRODUCER_FUEL", "prod": 83.53 }, "492373": { "name": "R_F1_PRODUCER_FUEL", "prod": 16.20 }, "492376": { "name": "R_F2_PRODUCER_FUEL", "prod": 36.45 }, "492379": { "name": "R_F3_PRODUCER_FUEL", "prod": 91.13 }, "492381": { "name": "R_F4_PRODUCER_FUEL", "prod": 250.59 }, "492383": { "name": "E_F1_PRODUCER_FUEL", "prod": 48.60 }, "492385": { "name": "E_F2_PRODUCER_FUEL", "prod": 109.35 }, "492386": { "name": "E_F3_PRODUCER_FUEL", "prod": 273.38 }, "492387": { "name": "E_F4_PRODUCER_FUEL", "prod": 751.78 }, "492389": { "name": "L_F1_PRODUCER_FUEL", "prod": 145.80 }, "492390": { "name": "L_F2_PRODUCER_FUEL", "prod": 328.05 }, "492391": { "name": "L_F3_PRODUCER_FUEL", "prod": 820.13 }, "492392": { "name": "L_F4_PRODUCER_FUEL", "prod": 2255.34 }, "544068": { "name": "S1_OWNER_FUEL", "prod": 2255.34 } },
+            "HEALTH": { "492394": { "name": "C_F1_PRODUCER_HEALTH", "prod": 5.4 }, "492395": { "name": "C_F2_PRODUCER_HEALTH", "prod": 12.15 }, "492396": { "name": "C_F3_PRODUCER_HEALTH", "prod": 30.38 }, "492397": { "name": "C_F4_PRODUCER_HEALTH", "prod": 83.53 }, "492399": { "name": "R_F1_PRODUCER_HEALTH", "prod": 16.20 }, "492401": { "name": "R_F2_PRODUCER_HEALTH", "prod": 36.45 }, "492535": { "name": "R_F3_PRODUCER_HEALTH", "prod": 91.13 }, "492537": { "name": "R_F4_PRODUCER_HEALTH", "prod": 250.59 }, "492539": { "name": "E_F1_PRODUCER_HEALTH", "prod": 48.60 }, "492543": { "name": "E_F2_PRODUCER_HEALTH", "prod": 109.35 }, "492545": { "name": "E_F3_PRODUCER_HEALTH", "prod": 273.38 }, "492546": { "name": "E_F4_PRODUCER_HEALTH", "prod": 751.78 }, "492550": { "name": "L_F1_PRODUCER_HEALTH", "prod": 145.80 }, "492554": { "name": "L_F2_PRODUCER_HEALTH", "prod": 328.05 }, "492555": { "name": "L_F3_PRODUCER_HEALTH", "prod": 820.13 }, "492557": { "name": "L_F4_PRODUCER_HEALTH", "prod": 2255.34 }, "544070": { "name": "S1_OWNER_HEALTH", "prod": 2255.34 } },
+            "REPAIR": { "492559": { "name": "C_F1_PRODUCER_REPAIR", "prod": 5.4 }, "492560": { "name": "C_F2_PRODUCER_REPAIR", "prod": 12.15 }, "492561": { "name": "C_F3_PRODUCER_REPAIR", "prod": 30.38 }, "492562": { "name": "C_F4_PRODUCER_REPAIR", "prod": 83.53 }, "492563": { "name": "R_F1_PRODUCER_REPAIR", "prod": 16.20 }, "492465": { "name": "R_F2_PRODUCER_REPAIR", "prod": 36.45 }, "492566": { "name": "R_F3_PRODUCER_REPAIR", "prod": 91.13 }, "492568": { "name": "R_F4_PRODUCER_REPAIR", "prod": 250.59 }, "492964": { "name": "E_F1_PRODUCER_REPAIR", "prod": 48.60 }, "492965": { "name": "E_F2_PRODUCER_REPAIR", "prod": 109.35 }, "492966": { "name": "E_F3_PRODUCER_REPAIR", "prod": 273.38 }, "492967": { "name": "E_F4_PRODUCER_REPAIR", "prod": 751.78 }, "492572": { "name": "L_F1_PRODUCER_REPAIR", "prod": 145.80 }, "492579": { "name": "L_F2_PRODUCER_REPAIR", "prod": 328.05 }, "492582": { "name": "L_F3_PRODUCER_REPAIR", "prod": 820.13 }, "492583": { "name": "L_F4_PRODUCER_REPAIR", "prod": 2255.34 }, "544061": { "name": "S1_OWNER_REPAIR", "prod": 2255.34 } },
+            "SUPPLY": { "492585": { "name": "C_F1_PRODUCER_SUPPLY", "prod": 5.4 }, "492587": { "name": "C_F2_PRODUCER_SUPPLY", "prod": 12.15 }, "492589": { "name": "C_F3_PRODUCER_SUPPLY", "prod": 30.38 }, "492702": { "name": "C_F4_PRODUCER_SUPPLY", "prod": 83.53 }, "492703": { "name": "R_F1_PRODUCER_SUPPLY", "prod": 16.20 }, "492704": { "name": "R_F2_PRODUCER_SUPPLY", "prod": 36.45 }, "492706": { "name": "R_F3_PRODUCER_SUPPLY", "prod": 91.13 }, "492707": { "name": "R_F4_PRODUCER_SUPPLY", "prod": 250.59 }, "492708": { "name": "E_F1_PRODUCER_SUPPLY", "prod": 48.60 }, "492709": { "name": "E_F2_PRODUCER_SUPPLY", "prod": 109.35 }, "492710": { "name": "E_F3_PRODUCER_SUPPLY", "prod": 273.38 }, "492711": { "name": "E_F4_PRODUCER_SUPPLY", "prod": 751.78 }, "492712": { "name": "L_F1_PRODUCER_SUPPLY", "prod": 145.80 }, "492713": { "name": "L_F2_PRODUCER_SUPPLY", "prod": 328.05 }, "492714": { "name": "L_F3_PRODUCER_SUPPLY", "prod": 820.13 }, "492715": { "name": "L_F4_PRODUCER_SUPPLY", "prod": 2255.34 }, "544064": { "name": "S1_OWNER_SUPPLY", "prod": 2255.34 } }
+        }
+    };
+
+    // FIXED V319: PURGED FAKE DATA - SYNC ONLY
+    // Fields minW, maxW, req initialized to 0/empty. Will be populated by blockchain.
+    const SMART_ZONES_BIBLE = {
+        1: { name:"Beach 1", cost:1160, win:400, minW:0, maxW:0, req:[] }, 
+        2: { name:"Beach 2", cost:6968, win:2405, minW:0, maxW:0, req:[] }, 
+        3: { name:"Beach 3", cost:8800, win:3037, minW:0, maxW:0, req:[] }, 
+        4: { name:"Bunker", cost:11120, win:3838, minW:0, maxW:0, req:[] }, 
+        5: { name:"Forest 1", cost:14024, win:4840, minW:0, maxW:0, req:[] }, 
+        6: { name:"Forest 2", cost:17704, win:6110, minW:0, maxW:0, req:[] }, 
+        7: { name:"Forest 3", cost:22352, win:7714, minW:0, maxW:0, req:[] }, 
+        8: { name:"Camp", cost:28220, win:9739, minW:0, maxW:0, req:[] }, 
+        9: { name:"Hill 1", cost:37052, win:12788, minW:0, maxW:0, req:[] }, 
+        10: { name:"Hill 2", cost:48652, win:16791, minW:0, maxW:0, req:[] }, 
+        11: { name:"Hill 3", cost:64516, win:22266, minW:0, maxW:0, req:[] }, 
+        12: { name:"Radar", cost:84712, win:29236, minW:0, maxW:0, req:[] }, 
+        13: { name:"Plain 1", cost:99384, win:34300, minW:0, maxW:0, req:[] }, 
+        14: { name:"Plain 2", cost:125708, win:43385, minW:0, maxW:0, req:[] }, 
+        15: { name:"Plain 3", cost:151164, win:52171, minW:0, maxW:0, req:[] }, 
+        16: { name:"HQ", cost:188000, win:64884, minW:0, maxW:0, req:[] }, 
+        17: { name:"City 1", cost:1664, win:0, minW:0, maxW:0, req:[] }, 
+        18: { name:"City 2", cost:4448, win:0, minW:0, maxW:0, req:[] }, 
+        19: { name:"City 3", cost:13440, win:0, minW:0, maxW:0, req:[] }, 
+        20: { name:"Bridge", cost:29856, win:0, minW:0, maxW:0, req:[] }
+    };
+
+    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let stopSignal = false;
+    let zoneDetailsCache = {}; 
+    let ecoStats = { buildings: { active:0, prodF:0, prodH:0, prodR:0, prodS:0, totalCost:0 }, divisions: { active:0, mint:0, cost:0 }, cityBurn: 0, burns: {F:0,H:0,R:0,S:0}, uniqueWalletCount: 0, totalAssetsAtomic: 0 };
+    let runtimeWalletSet = new Set(); 
+    let currentChartMode = 'pnl';
+    
+    // NEW: AUDIT LOG
+    let inactiveAssetsLog = [];
+    let rulesLoaded = false;
+
+    function saveData() { DATA.ecoStats = ecoStats; localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); log("Data Saved."); }
+    function hardReset() { if(confirm("FULL RESET?")) { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LOG_STORAGE_KEY); location.reload(); } }
+
+    function init() {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if(local) { 
+            try { 
+                let loaded = JSON.parse(local); 
+                DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; 
+                if(loaded.ecoStats) {
+                    ecoStats = loaded.ecoStats;
+                    if(!ecoStats.burns) ecoStats.burns = {F:0, H:0, R:0, S:0};
+                }
+            } catch(e){} 
+        }
+        let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length);
+        if(getId('dictSize')) getId('dictSize').innerText = count;
+        
+        startClock(); startMonitoringRoutine();
+        buildUI(); renderTicker(); updateEcoUI(); 
+        
+        // --- NEW: FETCH DYNAMIC RULES ---
+        loadZoneRules();
+
+        if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
+            getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
+            getId('cntRows').innerText = fmt(ecoStats.buildings.active); 
+        }
+        if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
+            getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
+        }
+        log("Ready. Mode: V319 Full Map (Dynamic).");
+    }
+
+    function buildUI() {
+        const areaC = getId('areaCards'); const areaL = getId('areaLists');
+        areaC.innerHTML = ''; areaL.innerHTML = '';
+        const order = ["F", "H", "R", "S"];
+        for(let k of order) {
+            let rd = DATA.resourceDefs[k];
+            // Initial placeholder structure, content will be injected by updateGlobalUI
+            areaC.innerHTML += `<div class="kpi-card ${rd.class}" id="card-${k}"><div><div class="kc-title">${rd.label} / HOUR</div><div class="kc-val" id="val-${k}">0</div></div><div class="kc-sep"></div><div><div class="kc-title" style="color:#fff; opacity:0.8;">DAILY PRODUCTION</div><div class="kc-val-huge" id="val24-${k}">0</div></div><div class="kc-sub" id="act-${k}">0 ACTIVE</div></div>`;
+            areaL.innerHTML += `<div class="data-panel"><div class="dp-head"><span class="dp-title">${rd.label} BREAKDOWN</span><div class="dp-badges"><span style="color:#888">PROD:</span> <span id="btot-${k}" style="color:#fff">0</span></div></div><div class="dt-grid dt-header"><div class="cell">TEMPLATE</div><div class="cell c-center">ACT / TOT</div><div class="cell c-right">UNIT</div><div class="cell c-right">PROD/H</div><div class="cell c-right">PROD/24</div><div class="cell c-right" style="color:#aaa">YIELD (TU/DOVX)</div><div class="cell c-right" style="color:var(--purple)">COST/24</div></div><div id="tbl-${k}"></div></div>`;
+        }
+    }
+
+    function renderTicker() {
+        let html = `<div class="ticker-item"><div class="t-sym" style="color:var(--orange)">WAX</div><div class="t-price">$${CONFIG_PRIX.WAX_USD}</div></div>`;
+        const tokens = [ { s:"DOVX", p: CONFIG_PRIX.DOVX_WAX }, { s:"DOVF", p: CONFIG_PRIX.DOVF_WAX }, { s:"DOVH", p: CONFIG_PRIX.DOVH_WAX }, { s:"DOVR", p: CONFIG_PRIX.DOVR_WAX }, { s:"DOVS", p: CONFIG_PRIX.DOVS_WAX } ];
+        tokens.forEach(t => { let usd = t.p * CONFIG_PRIX.WAX_USD; html += `<div class="ticker-item"><div class="t-sym">${t.s}</div><div class="t-price">${t.p} WAX</div><div class="t-usd">$${usd.toFixed(6)}</div></div>`; });
+        getId('marketTicker').innerHTML = html;
+    }
+
+    function startClock() {
+        setInterval(() => {
+            const now = new Date(); const time = now.toLocaleTimeString('fr-FR'); const date = now.toLocaleDateString('fr-FR', { year:'numeric', month:'2-digit', day:'2-digit' });
+            if(getId('liveTime')) { getId('liveTime').innerText = time; getId('liveDate').innerText = date; }
+            let copies = document.querySelectorAll('.clock-copy'); copies.forEach(c => c.innerText = `${time} | ${date}`);
+        }, 1000);
+    }
+
+    async function takeLogSnapshot(isManual) {
+        if(isManual) { log("Manual Snapshot Initiated..."); await dispatchGlobalScan(true); await startZoneScan(true); }
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]");
+        let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX);
+        let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX;
+        let totalRevWax = dailyIndustryWax + dailyMilitaryWax;
+        let costWax = ecoStats.buildings.totalCost * CONFIG_PRIX.DOVX_WAX;
+        let entry = {
+            timestamp: new Date().toISOString(), type: isManual ? "MANUAL" : "AUTO",
+            revenue_usd: totalRevWax * CONFIG_PRIX.WAX_USD, cost_usd: costWax * CONFIG_PRIX.WAX_USD,
+            profit_usd: (totalRevWax - costWax) * CONFIG_PRIX.WAX_USD, assets_count: ecoStats.buildings.active + ecoStats.divisions.active
+        };
+        logs.push(entry); if(logs.length > 1000) logs.shift();
+        localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs));
+        if(isManual) { alert("Snapshot Saved."); renderStatsUI(); } else { log("Auto-Log Saved."); }
+    }
+
+    function startMonitoringRoutine() { setInterval(() => { takeLogSnapshot(false); }, 3600000); }
+    function switchChart(mode) { currentChartMode = mode; document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); renderStatsUI(); }
+    function showStatsView() { switchView('viewStats'); renderStatsUI(); }
+
+    function renderStatsUI() {
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]").reverse();
+        let html = "";
+        logs.forEach(l => {
+            let date = new Date(l.timestamp).toLocaleString('fr-FR'); let color = l.type === "MANUAL" ? "var(--purple)" : "#666";
+            let rev = l.revenue_usd || 0; let cost = l.cost_usd || 0; let net = l.profit_usd || 0; let ast = l.assets_count || 0;
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell" style="color:#fff">${date}</div><div class="cell" style="color:${color}; font-weight:bold;">${l.type}</div><div class="cell c-right" style="color:var(--green)">$${rev.toFixed(2)}</div><div class="cell c-right" style="color:var(--orange)">$${cost.toFixed(2)}</div><div class="cell c-right" style="color:${net>=0?'var(--blue)':'var(--red)'}">$${net.toFixed(2)}</div><div class="cell c-right">${ast}</div></div>`;
+        });
+        getId('logTable').innerHTML = html;
+        if(logs.length > 0) {
+            let last = logs[0]; let prev = logs.length > 1 ? logs[1] : last; let diff = last.profit_usd - prev.profit_usd;
+            let trend = diff >= 0 ? "UP" : "DOWN";
+            getId('financialInsight').innerText = `LATEST: Profit $${last.profit_usd?.toFixed(2)} (${trend} $${Math.abs(diff).toFixed(2)}). Margin: ${((last.profit_usd/last.revenue_usd)*100).toFixed(1)}%.`;
+        }
+        if(logs.length < 2) return;
+        let cvs = getId('analyticsChart'); let ctx = cvs.getContext('2d'); let w = cvs.width = cvs.parentElement.offsetWidth; let h = cvs.height = cvs.parentElement.offsetHeight;
+        ctx.fillStyle = "#08080a"; ctx.fillRect(0,0,w,h);
+        let data = logs.slice(0, 30).reverse(); if(data.length < 2) return;
+        let maxVal = 0; data.forEach(d => { if(currentChartMode === 'pnl') maxVal = Math.max(maxVal, d.profit_usd || 0); if(currentChartMode === 'scissors') maxVal = Math.max(maxVal, d.revenue_usd || 0); if(currentChartMode === 'tvl') maxVal = Math.max(maxVal, d.assets_count || 0); }); maxVal = maxVal * 1.1;
+        ctx.strokeStyle = "#222"; ctx.beginPath(); for(let i=0; i<5; i++) { let y = i*(h/4); ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke();
+        let step = w / (data.length - 1);
+        if(currentChartMode === 'pnl') {
+            ctx.fillStyle = "rgba(41, 121, 255, 0.2)"; ctx.strokeStyle = "#2979ff"; ctx.lineWidth = 2; ctx.beginPath();
+            data.forEach((d, i) => { let val = d.profit_usd || 0; let x = i * step; let y = h - ((val / maxVal) * h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+            ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill();
+        } else if (currentChartMode === 'scissors') {
+            ctx.strokeStyle = "#00f090"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.revenue_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke();
+            ctx.strokeStyle = "#ff3b30"; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.cost_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke();
+        } else if (currentChartMode === 'tvl') {
+            ctx.fillStyle = "#ff9100"; let barW = (w / data.length) - 2;
+            data.forEach((d, i) => { let hBar = ((d.assets_count||0) / maxVal) * h; ctx.fillRect(i*step, h - hBar, barW, hBar); });
+        }
+    }
+
+    function exportLogs() {
+        let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; }
+        let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n";
+        logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; });
+        let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click();
+    }
+
+    function findTemplate(tid) {
+        if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' };
+        if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' };
+        if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' };
+        if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' };
+        return null;
+    }
+
+    async function fetchSmartCluster(endpoint, body) {
+        let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
+        throw new Error("CLUSTER UNREACHABLE");
+    }
+
+    // --- NEW: SYNC ZONES DYNAMICALLY ---
+    async function loadZoneRules() {
+        log("Synchronisation des Règles de Zone (Poids/Clés)...");
+        try {
+            // Fetch 'zones' table from 'dovpvecontrl'
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({
+                json: true,
+                code: "dovpvecontrl",
+                scope: "dovpvecontrl",
+                table: "zones",
+                limit: 100
+            }));
+
+            if(res.rows) {
+                let updateCount = 0;
+                res.rows.forEach(row => {
+                    let id = row.id;
+                    // If zone exists in our Bible, enrich it
+                    if(SMART_ZONES_BIBLE[id]) {
+                        SMART_ZONES_BIBLE[id].minW = row.min_weight;
+                        SMART_ZONES_BIBLE[id].maxW = row.max_weight;
+                        // Map requirements
+                        SMART_ZONES_BIBLE[id].req = row.requirements || []; 
+                        updateCount++;
+                    }
+                });
+                log(`Succès: ${updateCount} Zones mises à jour avec les données Blockchain.`);
+                rulesLoaded = true; // Flag for UI
+                // Refresh View if already active
+                if(getId('viewZones').classList.contains('active-view')) {
+                    // We need stats to redraw, if we don't have them yet, we just wait for the main loop.
+                    // But if we have some, we try to redraw.
+                    if(ecoStats.divisions.active > 0 || ecoStats.divisions.totalDivs > 0) {
+                         // We can't call updateZoneUI without zoneData. 
+                         // Best is to let the loop handle it, but we can log.
+                         log("UI will refresh on next scan tick.");
+                    }
+                }
+            }
+        } catch(e) {
+            log("Erreur synchro zones: " + e.message);
+        }
+    }
+
+    // MODIFIED FOR OEE (Overall Equipment Effectiveness)
+    async function dispatchGlobalScan(silent = false) {
+        stopSignal = false; if(!silent) switchView('viewGlobal'); if(getId('cntRows')) getId('cntRows').innerText = "...";
+        log("Scanning Buildings..."); 
+        
+        let next = ""; 
+        let stats = { 
+            totalCost:0, 
+            types:{
+                F:{p:0, a:0, t:0, max:0}, // max = Potentiel Max
+                H:{p:0, a:0, t:0, max:0}, 
+                R:{p:0, a:0, t:0, max:0}, 
+                S:{p:0, a:0, t:0, max:0}
+            } 
+        }; 
+        let groups = {F:[], H:[], R:[], S:[]}; let rowCount = 0; let assetCount = 0;
+        
+        // RESET AUDIT LOG
+        inactiveAssetsLog = [];
+
+        try { while(!stopSignal) {
+            let res = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovutilstake", scope:"dovutilstake", table:"buildings", limit:1000, lower_bound:next}));
+            if(!res.rows) break;
+            const now = Date.now()/1000;
+            for(let r of res.rows) {
+                let tid = r.template_id.toString(); let tpl = findTemplate(tid); if(!tpl) continue;
+                rowCount++; let count = r.asset_ids ? r.asset_ids.length : 1; assetCount += count;
+                
+                stats.types[tpl.type].t += count; 
+                runtimeWalletSet.add(r.owner); 
+
+                // CALCUL CAPACITÉ MAX (OEE)
+                let potentialProd = count * tpl.prod;
+                stats.types[tpl.type].max += potentialProd;
+
+                if(now < (parseFloat(r.last_claim) + parseFloat(r.delay))) {
+                    stats.types[tpl.type].a += count; 
+                    let h = count * tpl.prod; let d = h * 24; let c = d * 0.085; 
+                    let existing = groups[tpl.type].find(x => x.name === tpl.name);
+                    if(!existing) { existing = { id:tid, name:tpl.name, act:0, tot:0, unit:tpl.prod, totH:0, totD:0, costD:0 }; groups[tpl.type].push(existing); }
+                    existing.tot += count; existing.act += count; existing.totH += h; existing.totD += d; existing.costD += c;
+                    stats.types[tpl.type].p += h; stats.totalCost += c;
+                } else {
+                    // --- AUDIT LOGIQUE : ASSET INACTIF ---
+                    let stopTime = parseFloat(r.last_claim) + parseFloat(r.delay);
+                    let stopDate = new Date(stopTime * 1000);
+                    // SAFETY FIX FOR CRASH: Force empty array if asset_ids is missing
+                    let safeIds = r.asset_ids || [];
+                    
+                    inactiveAssetsLog.push({
+                        owner: r.owner,
+                        name: tpl.name,
+                        ids: safeIds,
+                        stopDate: stopDate.toLocaleString('fr-FR'),
+                        daysInactive: ((now - stopTime) / 86400).toFixed(1)
+                    });
+                }
+            }
+            ecoStats.buildings.active = assetCount; ecoStats.buildings.prodF = stats.types.F.p; ecoStats.buildings.prodH = stats.types.H.p; ecoStats.buildings.prodR = stats.types.R.p; ecoStats.buildings.prodS = stats.types.S.p; ecoStats.buildings.totalCost = stats.totalCost;
+            updateGlobalUI(rowCount, stats, groups);
+            if(res.more) next = res.next_key; else break; await new Promise(r => setTimeout(r, 50));
+        } saveData(); log(`Buildings Scan Done. ${assetCount} Assets.`); } catch(e) { log("Error Buildings: " + e.message); }
+    }
+
+    // MODIFIED FOR OEE DISPLAY - RESTORED DAILY PROD
+    function updateGlobalUI(rows, stats, groups) {
+        if(!getId('cntRows')) return; getId('cntRows').innerText = fmt(rows); if(getId('gTotalCost')) getId('gTotalCost').innerText = fmt(stats.totalCost); 
+        
+        for(let k in DATA.resourceDefs) {
+            let rd = DATA.resourceDefs[k]; 
+            
+            // Données OEE
+            let currentProd = stats.types[k].p;
+            let dailyProd = currentProd * 24; // RESTORED
+            let maxProd = stats.types[k].max;
+            let efficiency = maxProd > 0 ? (currentProd / maxProd) * 100 : 0;
+            let missingProd = maxProd - currentProd;
+
+            // COLOR LOGIC
+            let colorVar = 'var(--fff)';
+            if(rd.class === 'fuel') colorVar = 'var(--orange)';
+            if(rd.class === 'health') colorVar = 'var(--red)';
+            if(rd.class === 'repair') colorVar = 'var(--blue)';
+            if(rd.class === 'supply') colorVar = 'var(--yellow)';
+
+            // Injection HTML Riche dans la carte KPI
+            let cardId = `card-${k}`;
+            let cardEl = getId(cardId);
+            
+            if(cardEl) {
+                // MISE EN PAGE OPTIMISÉE (HIERARCHIE INVERSEE)
+                cardEl.innerHTML = `
+                    <div style="margin-bottom:5px;">
+                        <div class="kc-title">DAILY PRODUCTION</div>
+                        <div class="kc-val-huge" style="color:${colorVar}">
+                            ${fmtDec(dailyProd)} <span style="font-size:14px; font-weight:normal; opacity:0.8;">${rd.label}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:8px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
+                        <div>
+                            <div style="font-size:9px; color:#888;">HOURLY</div>
+                            <div style="font-size:12px; font-weight:bold; color:#fff;">${fmtDec(currentProd)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:9px; color:#888;">CAPACITY (MAX)</div>
+                            <div style="font-size:12px; font-weight:bold; color:#ccc;">${fmtDec(maxProd)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:5px;">
+                        <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:bold; margin-bottom:2px;">
+                            <span style="color:${efficiency < 80 ? 'var(--orange)' : 'var(--green)'}">OEE: ${efficiency.toFixed(1)}%</span>
+                            <span style="color:#666" title="Manque à produire">${missingProd > 0 ? '-' + fmt(missingProd) : 'OK'}</span>
+                        </div>
+                        <div style="height:4px; background:#333; border-radius:2px; overflow:hidden;">
+                            <div style="height:100%; width:${efficiency}%; background:${efficiency < 50 ? 'var(--red)' : (efficiency < 90 ? 'var(--orange)' : 'var(--green)')};"></div>
+                        </div>
+                    </div>
+
+                    <div class="kc-sub" id="act-${k}" style="margin-top:auto;">${fmt(stats.types[k].a)} / ${fmt(stats.types[k].t)} ACT</div>
+                `;
+            }
+
+            // Liste Breakdown (inchangée)
+            let list = groups[k].sort((a,b) => b.totH - a.totH); let html = "";
+            list.forEach(i => {
+                let link = `https://wax.atomichub.io/explorer/template/wax-mainnet/dovdivisions/${i.id}`;
+                let ratio = (i.costD > 0 && i.totD > 0) ? (i.totD / i.costD) : 0;
+                let statusColor = i.act === 0 ? "color:var(--red)" : (i.act < i.tot ? "color:var(--orange)" : "color:var(--green)");
+                
+                // --- NEW: RARITY COLOR LOGIC ---
+                let rarityColor = "#ccc"; // Default Common
+                if(i.name.startsWith("R_")) rarityColor = "var(--blue)";
+                else if(i.name.startsWith("E_")) rarityColor = "var(--purple)";
+                else if(i.name.startsWith("L_")) rarityColor = "var(--orange)";
+                else if(i.name.startsWith("S1_") || i.name.startsWith("S_")) rarityColor = "var(--red)"; // S1_OWNER usually
+
+                html += `<div class="dt-grid dt-row"><div class="cell"><a href="${link}" target="_blank" class="atomic" style="color:${rarityColor}">${i.name}</a></div><div class="cell c-center" style="font-weight:700;"><span style="${statusColor}">${i.act}</span> / <span style="color:#666">${i.tot}</span></div><div class="cell c-right" style="color:#666">${fmtDec(i.unit)}</div><div class="cell c-right ${rd.class}" style="font-weight:700;">${fmtDec(i.totH)}</div><div class="cell c-right" style="color:#888;">${fmtDec(i.totD)}</div><div class="cell c-right" style="color:#aaa;">${ratio.toFixed(2)}</div><div class="cell c-right" style="color:var(--purple);">${fmtDec(i.costD)}</div></div>`;
+            });
+            getId(`tbl-${k}`).innerHTML = html;
+        }
+    }
+
+    // AUDIT FUNCTIONS
+    function openAuditView() {
+        if(inactiveAssetsLog.length === 0) { alert("Aucun actif inactif détecté ou scan non effectué."); return; }
+        
+        // --- ADDED TOOLBAR FOR EXPORT ---
+        let toolbar = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#111; padding:10px; border-radius:4px; border:1px solid #333;">
+                <div style="font-size:10px; color:#888;">FILTRE D'EXPORTATION</div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="font-size:10px; color:#ccc;">MINIMUM JOURS:</span>
+                    <input type="number" id="auditThreshold" value="30" style="width:60px; padding:4px; text-align:center; background:#000; border:1px solid #444; color:#fff;">
+                    <button class="btn-blue" style="width:auto; padding:4px 15px;" onclick="exportAuditCsv()">EXPORTER LA CIBLE (.CSV)</button>
+                </div>
+            </div>`;
+
+        // TRIER PAR DURÉE D'INACTIVITÉ (Pire en premier)
+        let sorted = inactiveAssetsLog.sort((a,b) => parseFloat(b.daysInactive) - parseFloat(a.daysInactive));
+        
+        let html = "";
+        sorted.forEach(item => {
+            // RARITY COLOR
+            let rarityColor = "#ccc"; 
+            if(item.name.startsWith("R_")) rarityColor = "var(--blue)";
+            else if(item.name.startsWith("E_")) rarityColor = "var(--purple)";
+            else if(item.name.startsWith("L_")) rarityColor = "var(--orange)";
+            else if(item.name.startsWith("S1_")) rarityColor = "var(--red)";
+
+            // COPY COMMAND JSON
+            let idsString = JSON.stringify(item.ids);
+            
+            html += `
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 100px 100px;">
+                <div class="cell" style="color:#fff; font-weight:bold;">${item.owner}</div>
+                <div class="cell" style="color:${rarityColor}">${item.name}</div>
+                <div class="cell" style="color:#888">${item.stopDate}</div>
+                <div class="cell" style="color:var(--red); font-weight:bold;">${item.daysInactive} JOURS</div>
+                <div class="cell c-center">
+                    <button class="btn-ghost" style="padding:2px 5px; font-size:9px;" onclick='copyIds(${idsString})'>COPIER IDs</button>
+                </div>
+            </div>`;
+        });
+        
+        getId('auditList').innerHTML = toolbar + html;
+        getId('auditModal').style.display = 'flex';
+    }
+
+    function exportAuditCsv() {
+        let days = parseFloat(document.getElementById('auditThreshold').value) || 0;
+        
+        // Filtrage
+        let targetList = inactiveAssetsLog.filter(x => parseFloat(x.daysInactive) >= days);
+        
+        if(targetList.length === 0) { alert("Aucun actif ne correspond à ce critère."); return; }
+
+        // Génération CSV
+        let csv = "OWNER,TEMPLATE,DAYS_INACTIVE,STOP_DATE,IDS_JSON\n";
+        targetList.forEach(r => {
+            // FIX SAFETY FOR UNDEFINED IDs
+            let idsStr = JSON.stringify(r.ids || []); 
+            // On échappe les guillemets pour le JSON des IDs dans le CSV
+            let idsSafe = idsStr.replace(/"/g, '""'); 
+            csv += `${r.owner},${r.name},${r.daysInactive},${r.stopDate},"${idsSafe}"\n`;
+        });
+
+        // Téléchargement
+        let blob = new Blob([csv], {type:'text/csv'});
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); 
+        a.href = url; 
+        a.download = `AUDIT_INACTIFS_PLUS_${days}J.csv`; 
+        a.click();
+    }
+
+    function copyIds(idsArray) {
+        let text = JSON.stringify(idsArray);
+        navigator.clipboard.writeText(text).then(() => {
+            alert("IDs copiés ! Prêt pour la commande 'withdraw'.");
+        });
+    }
+
+    async function startZoneScan(silent = false) {
+        stopSignal = false; if(!silent) switchView('viewZones'); if(getId('zTotalDivsHeader')) getId('zTotalDivsHeader').innerText = "SCANNING...";
+        log("Scanning Divisions (Detailed)..."); 
+        
+        let stats = { totalDivs: 0, activeDivs: 0, totalProd: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; 
+        let next = "";
+        // FIXED V318: FULL 20 ZONES LIST FROM V299
+        let zonesData = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zonesData[id] = { count: 0, active: 0, prod: 0, cityBurn:0, bf:0, bh:0, br:0, bs:0 }; });
+        zoneDetailsCache = {}; Object.keys(SMART_ZONES_BIBLE).forEach(id => { zoneDetailsCache[id] = []; });
+
+        try { while(!stopSignal) {
+            let json = await fetchSmartCluster("/v1/chain/get_table_rows", JSON.stringify({json:true, code:"dovpvecontrl", scope:"dovpvecontrl", table:"sdivisions", limit:1000, lower_bound:next}));
+            if(!json.rows) break;
+            for(let r of json.rows) {
+                let zid = r.zone_id || r.zoneID;
+                if(zonesData[zid]) {
+                    zonesData[zid].count++; stats.totalDivs++; runtimeWalletSet.add(r.owner); 
+                    let end = parseFloat(r.unlock_time || r.end_time || 0);
+                    let isFighting = end > (Date.now()/1000); 
+                    if(isFighting) {
+                        zonesData[zid].active++; stats.activeDivs++;
+                        let zConf = SMART_ZONES_BIBLE[zid];
+                        let isCity = [17, 18, 19, 20].includes(parseInt(zid));
+                        if(isCity) { zonesData[zid].cityBurn += zConf.cost; stats.cityBurn += zConf.cost; } 
+                        else { 
+                            zonesData[zid].bf += zConf.cost; stats.bf += zConf.cost; 
+                            zonesData[zid].bh += zConf.cost; stats.bh += zConf.cost; 
+                            zonesData[zid].br += zConf.cost; stats.br += zConf.cost; 
+                            zonesData[zid].bs += zConf.cost; stats.bs += zConf.cost; 
+                        }
+                        zonesData[zid].prod += zConf.win; stats.totalProd += zConf.win;
+                        zoneDetailsCache[zid].push({ owner: r.owner, reward: zConf.win });
+                    }
+                }
+            }
+            ecoStats.divisions.active = stats.activeDivs; 
+            ecoStats.divisions.mint = stats.totalProd; 
+            ecoStats.cityBurn = stats.cityBurn;
+            if(ecoStats.burns) {
+                ecoStats.burns.F = stats.bf; ecoStats.burns.H = stats.bh; ecoStats.burns.R = stats.br; ecoStats.burns.S = stats.bs;
+            }
+
+            updateZoneUI(zonesData, stats); if(!json.more) break; next = json.next_key; await new Promise(r => setTimeout(r, 50));
+        } saveData(); log(`Divisions Scan Done. ${stats.activeDivs} Fighting.`); } catch(e) { log("Error Divisions: " + e.message); }
+        if(getId('zoneStatus')) getId('zoneStatus').innerText = "Complete.";
+    }
+
+    function updateZoneUI(zonesData, stats) {
+        if(!getId('zTotalDivsHeader')) return;
+        getId('zTotalDivsHeader').innerText = fmt(stats.totalDivs); getId('zTotalDivs').innerText = fmt(stats.totalDivs); getId('zActiveDivs').innerText = fmt(stats.activeDivs);
+        let activePct = stats.totalDivs > 0 ? (stats.activeDivs / stats.totalDivs) * 100 : 0;
+        getId('zPieVal').innerText = activePct.toFixed(0) + "%"; getId('zPieChart').style.background = `conic-gradient(var(--green) 0% ${activePct}%, #333 ${activePct}% 100%)`;
+        getId('zTotalProd').innerText = fmt(stats.totalProd); 
+        getId('gBurnF').innerText = fmt(stats.bf); getId('gBurnH').innerText = fmt(stats.bh); getId('gBurnR').innerText = fmt(stats.br); getId('gBurnS').innerText = fmt(stats.bs);
+        getId('gCityBurn').innerText = fmt(stats.cityBurn);
+        
+        let html = "";
+        Object.keys(zonesData).forEach(id => {
+            let z = SMART_ZONES_BIBLE[id]; 
+            let d = zonesData[id]; 
+            let activeClass = d.count > 0 ? "active" : "";
+            let isCity = [17,18,19,20].includes(parseInt(id));
+            
+            // --- NEW: WEIGHT & REQ BADGES ---
+            let weightBadge = z.minW > 0 ? `<span class="badge-weight">⚖️ ${z.minW}-${z.maxW}</span>` : (rulesLoaded ? "<span class='badge-weight' style='border-color:#444; color:#666;'>⚖️ N/A</span>" : "<span class='badge-offline'>WAIT</span>");
+            
+            let reqBadges = "";
+            if(z.req && z.req.length > 0) {
+                z.req.forEach(r => {
+                    reqBadges += `<span class="badge-req" title="Req Template: ${r}">🔒 ID:${r}</span>`;
+                });
+            } else if (rulesLoaded && z.minW === 0) {
+                 // Nothing to show if no req and we loaded rules
+            } else if (!rulesLoaded) {
+                 reqBadges = "<span class='badge-offline'>...</span>";
+            }
+
+            let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px;">ENTRY COST: ${z.cost} DOVX</div>` 
+                                  : `<div class="zs-item" style="color:#888; font-size:9px;">UTILITY COST</div><div class="zs-item" style="font-size:9px;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`;
+            
+            html += `<div class="zone-card ${activeClass}" onclick="openZoneDetail('${id}')">
+                <div class="zc-top"><span>${z.name}</span> <span style="color:${d.active>0?'var(--green)':'#666'}">${d.active} FIGHT</span> / <span style="color:#fff">${d.count} TOT</span></div>
+                
+                <div class="zc-mid">
+                    <div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div>
+                    
+                    <div class="zs-item"><span>MINT (DOVX)</span> <span style="color:var(--purple)">${fmt(d.prod)}</span></div>
+                    <div style="height:1px; background:#333; margin:2px 0;"></div>
+                    ${burnHtml}
+                </div>
+            </div>`;
+        });
+        getId('areaZones').innerHTML = html;
+    }
+
+    async function startEconomyScan() { switchView('viewEco'); getId('ecoStatus').innerText = "SCANNING..."; runtimeWalletSet.clear(); await dispatchGlobalScan(true); await startZoneScan(true); ecoStats.uniqueWalletCount = runtimeWalletSet.size; saveData(); getId('ecoStatus').innerText = "REPORT GENERATED."; updateEcoUI(); }
+
+    function updateEcoUI() {
+        let dailyIndustryWax = (ecoStats.buildings.prodF * 24 * CONFIG_PRIX.DOVF_WAX) + (ecoStats.buildings.prodH * 24 * CONFIG_PRIX.DOVH_WAX) + (ecoStats.buildings.prodR * 24 * CONFIG_PRIX.DOVR_WAX) + (ecoStats.buildings.prodS * 24 * CONFIG_PRIX.DOVS_WAX);
+        let dailyMilitaryWax = ecoStats.divisions.mint * CONFIG_PRIX.DOVX_WAX;
+        let totalDailyWax = dailyIndustryWax + dailyMilitaryWax; let totalDailyUsd = totalDailyWax * CONFIG_PRIX.WAX_USD;
+        getId('ecoWallets').innerText = NFTHIVE_SNAPSHOT.users; getId('ecoNftCap').innerText = NFTHIVE_SNAPSHOT.marketCap; getId('ecoTVL').innerText = NFTHIVE_SNAPSHOT.assets;
+        getId('ecoGdpUsd').innerText = fmtUsd(totalDailyUsd); getId('ecoGdpWax').innerText = fmtDec(totalDailyWax) + " WAX";
+        let html = `
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY INDUSTRY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyIndustryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyIndustryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell"><b>DAILY MILITARY</b></div><div class="cell c-right" style="color:var(--orange)">${fmtDec(dailyMilitaryWax)} W</div><div class="cell c-right" style="color:var(--green)">${fmtUsd(dailyMilitaryWax * CONFIG_PRIX.WAX_USD)}</div></div>
+            <div style="height:5px;"></div><div class="dt-grid dt-row" style="grid-template-columns: 200px 1fr 1fr;"><div class="cell" style="color:var(--purple)"><b>ANNUAL TOTAL</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtDec(totalDailyWax * 365)} W</b></div><div class="cell c-right" style="color:var(--purple)"><b>${fmtUsd(totalDailyUsd * 365)}</b></div></div>`;
+        getId('projTable').innerHTML = html;
+    }
+
+    function openDataRoom() {
+        let html = `<div class="dr-section"><div class="dr-title">OFFICIAL RESOURCES</div><div class="dr-grid">`;
+        PROJECT_DATA.links.forEach(l => { html += `<div class="dr-item"><span>${l.name}</span><a href="${l.url}" target="_blank">OPEN ↗</a></div>`; });
+        html += `</div></div><div class="dr-section"><div class="dr-title">LIQUIDITY (ALCOR)</div><div class="dr-grid">`;
+        PROJECT_DATA.markets.forEach(m => { html += `<div class="dr-item"><span>${m.name}</span><a href="${m.url}" target="_blank" style="color:var(--orange)">TRADE</a></div>`; });
+        html += `</div></div><div class="dr-section" style="border:none;"><div class="dr-title">AUTHORIZED CONTRACTS</div><div style="font-family:var(--font-num); color:#666; font-size:10px;">`;
+        PROJECT_DATA.contracts.forEach(c => { html += `<span style="margin-right:10px; padding:2px 5px; background:#111; border-radius:3px;">${c}</span>`; });
+        html += `</div></div>`;
+        getId('drContent').innerHTML = html; getId('dataRoomModal').style.display = 'flex';
+    }
+
+    function openZoneDetail(zid) { 
+        if(!zoneDetailsCache[zid] || zoneDetailsCache[zid].length === 0) return;
+        let list = zoneDetailsCache[zid];
+        let groups = {};
+        list.forEach(item => { if(!groups[item.owner]) groups[item.owner] = { count:0, mint:0 }; groups[item.owner].count++; groups[item.owner].mint += item.reward; });
+        let sorted = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count);
+        let html = "";
+        sorted.forEach(owner => {
+            html += `<div class="dt-grid dt-row" style="grid-template-columns: 1fr 100px 100px 50px;"><div class="cell" style="font-weight:bold; color:#fff;">${owner}</div><div class="cell c-right" style="color:var(--blue)">${groups[owner].count} DIVS</div><div class="cell c-right" style="color:var(--purple)">${fmt(groups[owner].mint)}</div><div class="cell c-center"><a href="https://waxblock.io/account/${owner}" target="_blank" style="color:#555;">LINK</a></div></div>`;
+        });
+        getId('zdList').innerHTML = html; getId('zoneDetailModal').style.display = 'flex';
+    }
+
+    // V316: GAP ANALYZER LOGIC
+    function showSimView() { switchView('viewSim'); }
+    
+    function runSimulation() {
+        if(!ecoStats.burns) { alert("Data structure updating. Please run scans first."); return; }
+        if(ecoStats.buildings.active === 0 && ecoStats.divisions.active === 0) {
+            alert("No data available. Please perform OPERATIONS scans first.");
+            return;
+        }
+
+        // 1. GATHER REAL DATA (DAILY)
+        let prod = {
+            F: ecoStats.buildings.prodF * 24,
+            H: ecoStats.buildings.prodH * 24,
+            R: ecoStats.buildings.prodR * 24,
+            S: ecoStats.buildings.prodS * 24
+        };
+        
+        let burn = {
+            F: ecoStats.burns.F,
+            H: ecoStats.burns.H,
+            R: ecoStats.burns.R,
+            S: ecoStats.burns.S
+        };
+
+        // 2. CALCULATE GAP & NEEDS
+        let htmlGap = "";
+        let htmlBuild = "";
+        let totalNewBurnDOVX = 0;
+        let commonProdDaily = 5.4 * 24; // 129.6 TU/Day
+        let commonBurnDaily = commonProdDaily * 0.085; // DOVX cost
+
+        let resourceMap = {F: {n:"FUEL", p:CONFIG_PRIX.DOVF_WAX}, H: {n:"HEALTH", p:CONFIG_PRIX.DOVH_WAX}, R: {n:"REPAIR", p:CONFIG_PRIX.DOVR_WAX}, S: {n:"SUPPLY", p:CONFIG_PRIX.DOVS_WAX}};
+
+        Object.keys(prod).forEach(k => {
+            let p = prod[k];
+            let b = burn[k];
+            let gap = p - b;
+            let gapColor = gap >= 0 ? "val-green" : "val-red";
+            
+            // Render Gap Row
+            htmlGap += `<div class="gap-row">
+                <span>${resourceMap[k].n}</span>
+                <span style="color:#888">${fmt(p)} / ${fmt(b)}</span>
+                <span class="${gapColor}">${gap >= 0 ? "+" : ""}${fmt(gap)}</span>
+            </div>`;
+
+            // Calculate Needs if Deficit
+            if (gap < 0) {
+                let deficit = Math.abs(gap);
+                let buildingsNeeded = Math.ceil(deficit / commonProdDaily);
+                let addedBurnDOVX = buildingsNeeded * commonBurnDaily;
+                let valueWax = deficit * resourceMap[k].p;
+                let valueUsd = valueWax * CONFIG_PRIX.WAX_USD;
+                
+                // CALCUL DU COÛT TECHNIQUE (Votre formule : Spread * 0.085)
+                let costToProduceGap = deficit * 0.085;
+
+                totalNewBurnDOVX += addedBurnDOVX;
+
+                // NOUVEL AFFICHAGE (Design 3 Colonnes : Alerte | Action | Coût DOVX)
+                htmlBuild += `<div class="gap-row" style="border-color:var(--red); display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center;">
+                    <div style="line-height:1.1;">
+                        <span style="color:var(--red); font-weight:800; font-size:10px;">${resourceMap[k].n} DEFICIT</span><br>
+                        <span style="font-size:9px; color:#666;">GAP: -${fmt(deficit)}</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <span style="color:#fff; font-weight:bold;">BUILD ${buildingsNeeded}</span><br>
+                        <span style="font-size:9px; color:#444;">COMMON UNITS</span>
+                    </div>
+                    <div style="text-align:right; line-height:1.1;">
+                        <span style="font-size:9px; color:#666;">COÛT PROD</span><br>
+                        <span style="color:var(--purple); font-weight:800; font-size:12px;">${fmt(costToProduceGap)} DOVX</span>
+                    </div>
+                </div>`;
+            } else {
+                htmlBuild += `<div class="gap-row" style="border-color:var(--green); opacity:0.5">
+                    <span style="color:var(--green)">${resourceMap[k].n} SECURE</span>
+                    <span>OK</span>
+                    <span>-</span>
+                </div>`;
+            }
+        });
+
+        getId('simGapList').innerHTML = htmlGap;
+        getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>";
+
+        // 3. DOVX BALANCE (Refonte: Compte d'Exploitation)
+        // Charges = Maintenance Bâtiments + Burn des Villes (City)
+        let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0);
+        let currentMint = ecoStats.divisions.mint;
+        let projectedCost = currentCost + totalNewBurnDOVX;
+        let netDOVX = currentMint - projectedCost;
+
+        // Affichage Tableau Financier
+        let htmlBal = `
+            <h3 style="margin:0 0 10px 0; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:1px;">
+                COMPTE D'EXPLOITATION PRÉVISIONNEL <span style="color:#666">(DOVX / 24H)</span>
+            </h3>
+            <div class="dt-grid dt-header" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell">POSTE</div>
+                <div class="cell c-right">CHARGES ACTUELLES</div>
+                <div class="cell c-right">CHARGES ADD.</div>
+                <div class="cell c-right">RÉSULTAT NET</div>
+            </div>
+            <div class="dt-grid dt-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                <div class="cell" style="color:#fff; font-weight:bold;">BALANCE OPÉRATIONNELLE</div>
+                <div class="cell c-right" style="color:var(--purple)">-${fmt(currentCost)}</div>
+                <div class="cell c-right" style="color:var(--red)">-${fmt(totalNewBurnDOVX)}</div>
+                <div class="cell c-right" style="color:${netDOVX>=0?'var(--green)':'var(--red)'}; font-weight:bold;">
+                    ${fmt(netDOVX)} <span style="font-size:9px; color:#666; font-weight:normal;">DOVX</span>
+                </div>
+            </div>
+        `;
+        getId('simBalanceTable').innerHTML = htmlBal;
+
+        // 4. RECOMMENDATION (Refonte: Avis de Gestion)
+        let recBox = getId('simRec');
+        if (totalNewBurnDOVX > 0) {
+            recBox.className = "rec-box";
+            recBox.style.color = "var(--red)";
+            recBox.style.borderColor = "var(--red)";
+            // Message alerte pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">⚠️ AVIS DE GESTION : DÉFICIT CAPACITAIRE IDENTIFIÉ</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    L'ÉQUILIBRE DU SPREAD NÉCESSITE UNE EXPANSION DU BFR (BESOIN EN FONDS DE ROULEMENT).<br>
+                    IMPACT PRÉVISIONNEL SUR LA TRÉSORERIE : <b style="color:#fff; font-size:11px;">-${fmt(totalNewBurnDOVX)} DOVX</b> / JOUR.
+                </div>`;
+        } else {
+            recBox.className = "rec-box";
+            recBox.style.color = "var(--green)";
+            recBox.style.borderColor = "var(--green)";
+            // Message succès pro
+            recBox.innerHTML = `
+                <div style="font-size:12px; margin-bottom:5px; text-transform:uppercase;">✅ AVIS DE GESTION : FLUX OPÉRATIONNELS STABILISÉS</div>
+                <div style="color:#ccc; font-weight:normal; font-size:10px; line-height:1.4;">
+                    CAPACITÉ DE PRODUCTION SUFFISANTE. AUCUN INVESTISSEMENT (CAPEX) REQUIS.<br>
+                    LA MARGE D'AUTO-FINANCEMENT EST POSITIVE.
+                </div>`;
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
