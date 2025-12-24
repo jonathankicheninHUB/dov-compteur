@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V334 (ID MAPPING)</title>
+    <title>DoV - COMMAND V335 (FINANCIAL SUITE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -37,6 +37,7 @@
         .log-time { color: #555; margin-right: 5px; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
+        .page-sub { font-size: 11px; color: #888; margin-top: 5px; max-width: 600px; line-height: 1.4; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
@@ -71,36 +72,61 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* ZONE CARD V334 - ROBUST ID MAPPING */
+        /* ZONE CARD V335 - FINANCIAL HUD STYLE */
         .zone-card { 
-            background-color: #1a1a1a; /* Fallback color if image fails */
+            background-color: #1a1a1a;
             background-size: cover; background-position: center;
             border: 1px solid var(--border); 
             padding: 10px; border-radius: 4px; 
             display: flex; flex-direction: column; justify-content: space-between; 
-            height: 160px; cursor: pointer; transition: 0.2s; 
+            height: 170px; cursor: pointer; transition: 0.2s; 
             position: relative; overflow: hidden;
         }
         .zone-card::after { 
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: linear-gradient(180deg, rgba(10,12,16,0.95) 0%, rgba(10,12,16,0.6) 50%, rgba(10,12,16,0.95) 100%); 
+            background: linear-gradient(180deg, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.6) 50%, rgba(8,8,10,0.95) 100%); 
             z-index: 1; pointer-events: none; 
         }
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
 
-        /* THEMES MAPPED BY ID */
-        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); background-color: #003366; }
-        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); background-color: #004400; }
-        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); background-color: #444444; }
-        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); background-color: #554400; }
-        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); background-color: #220033; }
-        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); background-color: #333333; } 
-        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); background-color: #332200; }
-        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); background-color: #002244; }
+        /* THEMES */
+        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); }
+        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); }
+        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); }
+        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); }
+        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); }
+        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); } 
+        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); }
+        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); }
         .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); }
 
-        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
+        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.7); border-color: var(--blue); }
         .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.3); }
+        
+        /* NEW V335: HUD TYPOGRAPHY FOR ZONES */
+        .zone-title {
+            font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            color: #fff; display:block; margin-bottom:2px;
+        }
+        .theme-beach .zone-title { text-shadow: 0 0 10px #00aaff; color: #e0f7ff; }
+        .theme-forest .zone-title { text-shadow: 0 0 10px #00ff44; color: #e0ffe4; }
+        .theme-city .zone-title { text-shadow: 0 0 10px #d500f9; color: #fce0ff; }
+        .theme-mil .zone-title { text-shadow: 0 0 10px #ff3b30; color: #ffe0e0; }
+        
+        /* ROI CALCULATOR STYLES */
+        .roi-panel { 
+            background: linear-gradient(90deg, #13141b 0%, #0d0e12 100%); 
+            border: 1px solid var(--border); border-left: 4px solid var(--green);
+            padding: 15px; border-radius: 6px; margin-bottom: 20px;
+            display: flex; gap: 20px; align-items: center;
+        }
+        .roi-input-grp { flex: 1; display:flex; flex-direction:column; gap:5px; }
+        .roi-res-grp { flex: 2; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border-left:1px solid #333; padding-left:20px; }
+        .roi-kpi { text-align: center; }
+        .roi-kpi-lbl { font-size: 9px; color: #888; font-weight:bold; letter-spacing: 0.5px; }
+        .roi-kpi-val { font-family: var(--font-num); font-size: 16px; color: #fff; font-weight: bold; margin-top: 3px; }
+        .roi-highlight { color: var(--green); text-shadow: 0 0 10px rgba(0,240,144,0.3); }
+
         .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
@@ -150,8 +176,8 @@
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
         .sybil-ctrl { background:#150000; border:1px solid var(--red); flex-direction:column; }
-        .sybil-res { display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px; } /* Legacy */
-        .sybil-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; } /* New Cluster View */
+        .sybil-res { display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px; }
+        .sybil-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; }
         .sybil-cluster { background:#220000; border:1px solid #500; border-radius:6px; overflow:hidden; }
         .sc-head { padding:10px; background:#400000; color:#fff; font-weight:bold; font-size:11px; display:flex; justify-content:space-between; align-items:center; }
         .sc-body { padding:10px; }
@@ -165,7 +191,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V334</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V335</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -195,7 +221,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V334. ID Mapping Active.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V335. Financial Suite.</div></div>
     </aside>
 
     <main class="main-content">
@@ -208,6 +234,53 @@
             <div class="kpi-grid" id="areaCards"></div><div class="tables-grid" id="areaLists"></div>
         </div>
         
+        <div id="viewZones" class="view-section">
+            <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
+                <div>
+                    <h2 class="page-h1">STAKED ASSET ALLOCATION</h2>
+                    <div class="page-sub">Deployment vectors & strategic yield generation zones. Real-time asset tracking.</div>
+                </div>
+                <div class="sys-clock"><span class="clock-copy"></span></div>
+                <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
+            </div>
+            
+            <div class="roi-panel">
+                <div class="roi-input-grp">
+                    <span class="grp-lbl">SELECT ZONE FOR ROI</span>
+                    <select id="roiZoneSelect" onchange="calculateZoneRoi()"></select>
+                    <span class="grp-lbl">FREQUENCY (CYCLES/MONTH)</span>
+                    <input type="number" id="roiFreq" value="30" onchange="calculateZoneRoi()" style="background:#000; text-align:center;">
+                </div>
+                <div class="roi-res-grp">
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">ENTRY COST</div>
+                        <div class="roi-kpi-val" id="roiCost" style="color:var(--orange)">0 DOVX</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">REVENUE / MONTH</div>
+                        <div class="roi-kpi-val" id="roiRevMonth">0 WAX</div>
+                        <div style="font-size:9px; color:#666;" id="roiRevUsd">$0.00</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">REVENUE / YEAR</div>
+                        <div class="roi-kpi-val" id="roiRevYear">0 WAX</div>
+                    </div>
+                    <div class="roi-kpi">
+                        <div class="roi-kpi-lbl">ESTIMATED ROI</div>
+                        <div class="roi-kpi-val roi-highlight" id="roiDays">0 DAYS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
+                <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div></div>
+                <div class="kpi-card"><div class="kc-title">IN FIGHT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div></div>
+                <div class="kpi-card" style="align-items:center; justify-content:center;"><div class="pie-container"><div class="pie-chart" id="zPieChart"><span class="pie-val" id="zPieVal">0%</span></div></div></div>
+                <div class="kpi-card"><div class="kc-title">TOTAL DOVX MINT</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div></div>
+            </div>
+            <div class="zones-map" id="areaZones"></div>
+        </div>
+
         <div id="viewSybil" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--red)">
                 <div><h2 class="page-h1" style="color:var(--red)">SYBIL RADAR</h2><div class="page-meta">PRECISION CLUSTER ANALYSIS</div></div>
@@ -239,21 +312,6 @@
                 <div style="width:150px;"><span class="grp-lbl">EXECUTE</span><button class="btn-purple" onclick="runXrayScan()">2. SCAN DATA</button></div>
             </div>
             <div class="xray-res" id="xrayResults">Awaiting Scan...</div>
-        </div>
-
-        <div id="viewZones" class="view-section">
-            <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">UNITS: <span id="zTotalDivsHeader">0</span></div></div>
-                <div class="sys-clock"><span class="clock-copy"></span></div>
-                <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
-            </div>
-            <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
-                <div class="kpi-card"><div class="kc-title">TOTAL DIVISIONS</div><div class="kc-val" id="zTotalDivs">0</div></div>
-                <div class="kpi-card"><div class="kc-title">IN FIGHT</div><div class="kc-val" id="zActiveDivs" style="color:var(--green)">0</div></div>
-                <div class="kpi-card" style="align-items:center; justify-content:center;"><div class="pie-container"><div class="pie-chart" id="zPieChart"><span class="pie-val" id="zPieVal">0%</span></div></div></div>
-                <div class="kpi-card"><div class="kc-title">TOTAL DOVX MINT</div><div class="kc-val" id="zTotalProd" style="color:var(--purple)">0</div></div>
-            </div>
-            <div class="zones-map" id="areaZones"></div>
         </div>
 
         <div id="viewEco" class="view-section">
@@ -356,8 +414,6 @@
     // --- CONFIG ---
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
-    
-    // V333: WHITELIST FOR SYBIL
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
 
     const PROJECT_DATA = { 
@@ -383,8 +439,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V334';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V334';
+    const STORAGE_KEY = 'DOV_DATA_V335';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V335';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -544,6 +600,7 @@
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         preloadImages();
+        populateRoiSelect(); // V335
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -552,7 +609,56 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V334 ID Mapping.");
+        log("Ready. Mode: V335 Financial Suite.");
+    }
+
+    // --- V335: ROI LOGIC ---
+    function populateRoiSelect() {
+        let sel = getId('roiZoneSelect');
+        if(!sel) return;
+        sel.innerHTML = '<option value="">-- SELECT ZONE --</option>';
+        Object.keys(SMART_ZONES_BIBLE).forEach(id => {
+            let z = SMART_ZONES_BIBLE[id];
+            let opt = document.createElement("option");
+            opt.value = id;
+            opt.innerText = z.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    function calculateZoneRoi() {
+        let zid = getId('roiZoneSelect').value;
+        let freq = parseFloat(getId('roiFreq').value) || 30; // Cycles per month
+        if(!zid) return;
+
+        let z = SMART_ZONES_BIBLE[zid];
+        
+        // 1. Cost (1 Division)
+        let cost = z.cost;
+        
+        // 2. Revenue (Token)
+        let revPerCycle = z.win;
+        let revMonth = revPerCycle * freq;
+        let revYear = revMonth * 12;
+        let revDay = revMonth / 30;
+
+        // 3. Values
+        let waxVal = revMonth * CONFIG_PRIX.DOVX_WAX;
+        let usdVal = waxVal * CONFIG_PRIX.WAX_USD;
+
+        // 4. ROI (Days to Break Even)
+        // Cost / Daily Revenue
+        let roiDays = 0;
+        if(revDay > 0) roiDays = cost / revDay;
+
+        // Display
+        getId('roiCost').innerText = fmt(cost) + " DOVX";
+        getId('roiRevMonth').innerText = fmtDec(revMonth) + " DOVX (" + fmtDec(waxVal) + " WAX)";
+        getId('roiRevUsd').innerText = fmtUsd(usdVal);
+        getId('roiRevYear').innerText = fmtDec(revYear) + " DOVX";
+        
+        if(roiDays > 0) getId('roiDays').innerText = Math.ceil(roiDays) + " DAYS";
+        else getId('roiDays').innerText = "N/A";
     }
 
     // --- LEVENSHTEIN DISTANCE (For Name Similarity) ---
@@ -631,7 +737,7 @@
                 if (funnel !== "None") {
                     clusterKey = "FUNNEL: " + funnel;
                     riskLevel = "HIGH";
-                } else if (creator !== "Unknown" && creator !== "eosio" && creator !== "wombat") { // Generic creators ignored
+                } else if (creator !== "Unknown" && creator !== "eosio" && creator !== "wombat") { 
                      // Check if creator created others? For now just use as group key if needed, or stick to Independent
                 }
                 
@@ -757,7 +863,7 @@
                 }); 
             } 
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; 
-            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span style="text-shadow:0 2px 4px #000;">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; 
+            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span class="zone-title">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; 
         }); 
         getId('areaZones').innerHTML = html; 
     }
