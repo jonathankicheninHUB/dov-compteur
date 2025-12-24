@@ -759,8 +759,9 @@
         getId('simBuildList').innerHTML = htmlBuild || "<div style='text-align:center; color:var(--green)'>ALL SYSTEMS GREEN. NO BUILDINGS REQUIRED.</div>";
 
         // 3. DOVX BALANCE (Refonte: Compte d'Exploitation)
+        // Charges = Maintenance Bâtiments + Burn des Villes (City)
+        let currentCost = ecoStats.buildings.totalCost + (ecoStats.cityBurn || 0);
         let currentMint = ecoStats.divisions.mint;
-        let currentCost = ecoStats.buildings.totalCost; // Existing Burn
         let projectedCost = currentCost + totalNewBurnDOVX;
         let netDOVX = currentMint - projectedCost;
 
