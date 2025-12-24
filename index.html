@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V335 (FINANCIAL SUITE)</title>
+    <title>DoV - COMMAND V336 (REPAIRED)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -37,7 +37,7 @@
         .log-time { color: #555; margin-right: 5px; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .page-h1 { font-size: 20px; font-weight: 800; color: #fff; margin: 0; }
-        .page-sub { font-size: 11px; color: #888; margin-top: 5px; max-width: 600px; line-height: 1.4; }
+        .page-sub { font-size: 11px; color: #888; margin-top: 5px; }
         .total-cost { text-align: right; }
         .tc-val { font-family: var(--font-num); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 10px rgba(213, 0, 249, 0.3); } 
         .tc-unit { color: #888; font-size: 12px; font-weight: 700; }
@@ -72,62 +72,34 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* ZONE CARD V335 - FINANCIAL HUD STYLE */
+        /* REPAIRED ZONE CARD V336 - CLEAN & ROBUST */
         .zone-card { 
-            background-color: #1a1a1a;
-            background-size: cover; background-position: center;
+            background: #191a21; /* Solid Fallback */
             border: 1px solid var(--border); 
-            padding: 10px; border-radius: 4px; 
+            padding: 12px; border-radius: 6px; 
             display: flex; flex-direction: column; justify-content: space-between; 
             height: 170px; cursor: pointer; transition: 0.2s; 
-            position: relative; overflow: hidden;
         }
-        .zone-card::after { 
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: linear-gradient(180deg, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.6) 50%, rgba(8,8,10,0.95) 100%); 
-            z-index: 1; pointer-events: none; 
-        }
-        .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
+        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
+        .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.2); }
 
-        /* THEMES */
-        .theme-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80'); }
-        .theme-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?auto=format&fit=crop&w=400&q=80'); }
-        .theme-hill { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80'); }
-        .theme-plain { background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80'); }
-        .theme-city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=80'); }
-        .theme-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?auto=format&fit=crop&w=400&q=80'); } 
-        .theme-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?auto=format&fit=crop&w=400&q=80'); }
-        .theme-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=400&q=80'); }
-        .theme-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?auto=format&fit=crop&w=400&q=80'); }
+        /* HEADER DESIGN - BIGGER & COLORED */
+        .zc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 8px; }
+        .zc-name { font-size: 15px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; display:block; }
+        .zc-sub { font-size: 10px; color: #888; display:flex; justify-content: space-between; margin-top: 2px; }
 
-        .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.7); border-color: var(--blue); }
-        .zone-card.active { border-color: var(--blue); box-shadow: 0 0 10px rgba(41, 121, 255, 0.3); }
+        /* COLOR THEMES BY ID (Subtle Border/Glow) */
+        .theme-beach { border-top: 3px solid #00aaff; } .theme-beach .zc-name { color: #00aaff; }
+        .theme-forest { border-top: 3px solid #00ff44; } .theme-forest .zc-name { color: #00ff44; }
+        .theme-hill { border-top: 3px solid #888888; } .theme-hill .zc-name { color: #ccc; }
+        .theme-city { border-top: 3px solid #d500f9; } .theme-city .zc-name { color: #d500f9; }
+        .theme-mil { border-top: 3px solid #ff3b30; } .theme-mil .zc-name { color: #ff3b30; }
+        .theme-plain { border-top: 3px solid #ffae00; } .theme-plain .zc-name { color: #ffae00; }
+
+        .zc-mid { flex: 1; display:flex; flex-direction:column; justify-content:center; gap:5px; }
+        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 10px; color: #ccc; }
+        .zc-bot { border-top: 1px solid rgba(255,255,255,0.05); padding-top:6px; margin-top: auto; }
         
-        /* NEW V335: HUD TYPOGRAPHY FOR ZONES */
-        .zone-title {
-            font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            color: #fff; display:block; margin-bottom:2px;
-        }
-        .theme-beach .zone-title { text-shadow: 0 0 10px #00aaff; color: #e0f7ff; }
-        .theme-forest .zone-title { text-shadow: 0 0 10px #00ff44; color: #e0ffe4; }
-        .theme-city .zone-title { text-shadow: 0 0 10px #d500f9; color: #fce0ff; }
-        .theme-mil .zone-title { text-shadow: 0 0 10px #ff3b30; color: #ffe0e0; }
-        
-        /* ROI CALCULATOR STYLES */
-        .roi-panel { 
-            background: linear-gradient(90deg, #13141b 0%, #0d0e12 100%); 
-            border: 1px solid var(--border); border-left: 4px solid var(--green);
-            padding: 15px; border-radius: 6px; margin-bottom: 20px;
-            display: flex; gap: 20px; align-items: center;
-        }
-        .roi-input-grp { flex: 1; display:flex; flex-direction:column; gap:5px; }
-        .roi-res-grp { flex: 2; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border-left:1px solid #333; padding-left:20px; }
-        .roi-kpi { text-align: center; }
-        .roi-kpi-lbl { font-size: 9px; color: #888; font-weight:bold; letter-spacing: 0.5px; }
-        .roi-kpi-val { font-family: var(--font-num); font-size: 16px; color: #fff; font-weight: bold; margin-top: 3px; }
-        .roi-highlight { color: var(--green); text-shadow: 0 0 10px rgba(0,240,144,0.3); }
-
-        .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
@@ -139,6 +111,22 @@
         .t-sym { font-weight: 800; color: #fff; font-size: 12px; }
         .t-price { font-family: var(--font-num); color: var(--blue); font-size: 11px; margin-top: 4px; }
         .t-usd { font-family: var(--font-num); color: #666; font-size: 10px; }
+        
+        /* ROI PANEL STYLE */
+        .roi-panel { background: #15161d; border: 1px solid var(--border); border-left: 4px solid var(--green); padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; }
+        .roi-input-grp { flex: 1; display:flex; flex-direction:column; gap:5px; }
+        .roi-res-grp { flex: 2; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border-left:1px solid #333; padding-left:20px; }
+        .roi-kpi { text-align: center; }
+        .roi-kpi-lbl { font-size: 9px; color: #888; font-weight:bold; letter-spacing: 0.5px; }
+        .roi-kpi-val { font-family: var(--font-num); font-size: 16px; color: #fff; font-weight: bold; margin-top: 3px; }
+        .roi-highlight { color: var(--green); text-shadow: 0 0 10px rgba(0,240,144,0.3); }
+
+        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:10px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; }
+        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
+        .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
+        .badge-weight { font-size:10px; padding:2px 5px; border-radius:3px; background:rgba(41, 121, 255, 0.15); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; font-weight:bold; }
+        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; margin-right:4px; }
+        
         #error-banner { display:none; background:var(--red); color:#fff; padding:10px; text-align:center; position:fixed; top:0; left:0; width:100%; z-index:9999; font-weight:bold; }
         .dr-section { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px; }
         .dr-title { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
@@ -161,13 +149,6 @@
         .gap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #333; color:#ccc; }
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
-        .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:9px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; text-shadow: 0 1px 2px #000; }
-        .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
-        .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
-        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; }
-        .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
-        .badge-req:hover { transform:scale(1.1); }
-        .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
         
         /* XRAY & SYBIL */
         .xray-ctrl, .sybil-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
@@ -191,7 +172,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V335</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V336</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -221,7 +202,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V335. Financial Suite.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V336. Repaired & Optimized.</div></div>
     </aside>
 
     <main class="main-content">
@@ -414,6 +395,8 @@
     // --- CONFIG ---
     const CONFIG_PRIX = { WAX_USD: 0.00751, DOVX_WAX: 0.00528553, DOVR_WAX: 0.00052051, DOVF_WAX: 0.00052051, DOVH_WAX: 0.00052051, DOVS_WAX: 0.00052051, PRIX_MOYEN_NFT_USD: 5 };
     const NFTHIVE_SNAPSHOT = { sales: "$954.1K", assets: "140 466", marketCap: "$883.3K", users: "8 334", fee: "6%" };
+    
+    // V333: WHITELIST FOR SYBIL
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
 
     const PROJECT_DATA = { 
@@ -439,8 +422,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V335';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V335';
+    const STORAGE_KEY = 'DOV_DATA_V336';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V336';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -600,7 +583,7 @@
         startClock(); startMonitoringRoutine();
         buildUI(); renderTicker(); updateEcoUI(); 
         preloadImages();
-        populateRoiSelect(); // V335
+        populateRoiSelect();
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { 
             getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); 
@@ -609,10 +592,10 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V335 Financial Suite.");
+        log("Ready. Mode: V336 Repaired.");
     }
 
-    // --- V335: ROI LOGIC ---
+    // --- ROI LOGIC ---
     function populateRoiSelect() {
         let sel = getId('roiZoneSelect');
         if(!sel) return;
@@ -841,7 +824,7 @@
             let activeClass = d.count > 0 ? "active" : ""; 
             let isCity = [17,18,19,20].includes(parseInt(id)); 
             
-            // --- NEW V334: MAPPING PAR ID ---
+            // --- NEW V336: MAPPING PAR ID - STABLE & CLEAN ---
             let theme = ZONE_BG_MAP[id] || "default";
             let bgClass = "theme-" + theme;
 
@@ -863,7 +846,23 @@
                 }); 
             } 
             let burnHtml = isCity ? `<div class="zs-item" style="font-size:10px; color:var(--purple); font-weight:bold; margin-top:2px; text-shadow:0 1px 2px #000;">ENTRY COST: ${z.cost} DOVX</div>` : `<div class="zs-item" style="color:#eee; font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;">UTILITY COST</div><div class="zs-item" style="font-size:9px; font-weight:bold; text-shadow:0 1px 2px #000;"><span class="tc-f">${fmt(d.bf)}</span> <span class="tc-h">${fmt(d.bh)}</span> <span class="tc-r">${fmt(d.br)}</span> <span class="tc-s">${fmt(d.bs)}</span></div>`; 
-            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')"><div class="zc-top"><span class="zone-title">${z.name}</span> <span style="text-shadow:0 2px 4px #000; color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHT</span> / <span style="text-shadow:0 2px 4px #000; color:#fff">${d.count} TOT</span></div><div class="zc-mid"><div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div><div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div><div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>${burnHtml}</div></div>`; 
+            
+            // CLEAN STRUCTURE V330 (Repaired)
+            html += `<div class="zone-card ${activeClass} ${bgClass}" onclick="openZoneDetail('${id}')">
+                <div class="zc-header">
+                    <span class="zc-name">${z.name}</span>
+                    <div class="zc-sub">
+                        <span style="color:${d.active>0?'var(--green)':'#aaa'}">${d.active} FIGHTING</span>
+                        <span style="color:#fff">${d.count} TOTAL</span>
+                    </div>
+                </div>
+                <div class="zc-mid">
+                    <div style="margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap; min-height:15px;">${weightBadge} ${reqBadges}</div>
+                    <div class="zs-item" style="text-shadow:0 1px 2px #000;"><span>MINT (DOVX)</span> <span style="color:var(--purple); font-weight:bold;">${fmt(d.prod)}</span></div>
+                    <div style="height:1px; background:rgba(255,255,255,0.2); margin:2px 0;"></div>
+                    ${burnHtml}
+                </div>
+            </div>`; 
         }); 
         getId('areaZones').innerHTML = html; 
     }
