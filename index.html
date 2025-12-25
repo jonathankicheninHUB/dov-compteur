@@ -2,13 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V352 (V336 PATCHED)</title>
+    <title>DoV - COMMAND V353 (STRICT CONTEXT INTEGRATION)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
             --green: #00f090; --red: #ff3b30; --blue: #2979ff; --orange: #ff9100; --purple: #d500f9; --yellow: #ffea00;
             --text-main: #e0e0e0; --text-muted: #858595;
+            
+            /* ATOMIC HUB RARITY COLORS */
             --r-common: #787878; --r-rare: #4b90ea; --r-epic: #a64dff; --r-leg: #ffae00;
+            
             --font-ui: 'Inter', system-ui, sans-serif; --font-num: 'JetBrains Mono', 'Consolas', monospace; 
         }
         body { background: var(--bg-app); color: var(--text-muted); font-family: var(--font-ui); margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
@@ -68,9 +71,12 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
+        /* CARD STYLES V336 */
         .zone-card { background-color: var(--bg-panel); background-size: cover; background-position: center; border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
         .zone-card::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(19,20,27,0.95) 0%, rgba(19,20,27,0.7) 50%, rgba(19,20,27,0.95) 100%); z-index: 1; pointer-events: none; }
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
+        
+        /* TYPE CLASSES FROM V336 (PRESERVED) */
         .type-default { background-image: url('https://images.unsplash.com/photo-1626084926084-3c812d09b43e?q=80&w=400'); }
         .type-beach { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400'); }
         .type-forest { background-image: url('https://images.unsplash.com/photo-1448375240586-dfd8f3793371?q=80&w=400'); }
@@ -80,13 +86,12 @@
         .type-mil { background-image: url('https://images.unsplash.com/photo-1599365638266-9903b9f39002?q=80&w=400'); }
         .type-camp { background-image: url('https://images.unsplash.com/photo-1534951474654-88451f265d1d?q=80&w=400'); }
         .type-bridge { background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=400'); }
+        
         .zone-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: var(--blue); }
         .zone-card.active { border-color: var(--blue); }
-        .zc-top { display: flex; justify-content: space-between; font-weight: 700; color: #fff; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px; }
-        .zc-mid { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .zs-item { display: flex; justify-content: space-between; font-family: var(--font-num); font-size: 9px; color: #ccc; }
-        .zc-bot { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-num); border-top: 1px solid rgba(255,255,255,0.05); padding-top:4px; margin-top: auto; }
         .tc-f { color: var(--orange); } .tc-h { color: var(--red); } .tc-r { color: var(--blue); } .tc-s { color: var(--yellow); }
+        
         .view-section { display: none; } .active-view { display: block; }
         a.atomic { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; }
         a.atomic:hover { color: var(--blue); border-bottom-color: var(--blue); }
@@ -120,6 +125,7 @@
         .gap-val { font-family:var(--font-num); font-weight:bold; }
         .val-red { color:var(--red); } .val-green { color:var(--green); }
         
+        /* BADGE STYLES */
         .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:9px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; text-shadow: 0 1px 2px #000; }
         .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
         .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
@@ -128,12 +134,12 @@
         .badge-req:hover { transform:scale(1.1); }
         .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
         
+        /* XRAY & SYBIL */
         .xray-ctrl, .sybil-ctrl { display:flex; gap:10px; margin-bottom:15px; background:#111; padding:10px; border:1px solid #333; border-radius:4px; }
         .xray-res { background:#000; border:1px solid #333; padding:15px; border-radius:4px; min-height:200px; font-family:var(--font-num); color:#0f0; white-space:pre-wrap; overflow-x:auto; }
         .xray-table { width:100%; border-collapse:collapse; }
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
-        
         .sybil-ctrl { background:#150000; border:1px solid var(--red); flex-direction:column; }
         .sybil-res { display:block; margin-top:20px; }
         .sybil-section { margin-bottom: 25px; }
@@ -158,7 +164,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V352</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V353</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -166,12 +172,14 @@
             <div class="btn-row"><button class="btn-purple" onclick="showStatsView()">STATISTICS</button></div>
             <div class="btn-row"><button class="btn-yellow" onclick="showSimView()">WAR ROOM</button></div>
         </div>
+        
         <div class="control-group">
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
             <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL PRO</button>
         </div>
+
         <div class="control-group">
             <span class="grp-lbl">BLACK BOX LOGGING</span>
             <div class="btn-row">
@@ -180,9 +188,13 @@
             </div>
             <button class="btn-red" style="margin-top:8px;" onclick="openAuditView()">AUDIT INACTIFS ⚠️</button>
         </div>
+
         <div class="control-group"><span class="grp-lbl">TARGET INTELLIGENCE</span><input type="text" id="targetIn" value="u2d2k.c.wam"><div class="btn-row"><button class="btn-ghost" style="color:#fff">DIVISIONS</button><button class="btn-ghost" style="color:#fff">BUILDINGS</button></div></div>
-        <div class="control-group" style="margin-top:auto"><div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div><button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button></div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V352. Sybil Base + Context.</div></div>
+        <div class="control-group" style="margin-top:auto">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
+            <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
+        </div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V353. Strict Update.</div></div>
     </aside>
 
     <main class="main-content">
@@ -292,7 +304,7 @@
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" }, { name: "Beta Access", url: "https://beta.dawnofvictory.io/" }, { name: "Twitter", url: "https://twitter.com/DOVNFT" }, { name: "Telegram", url: "https://t.me/dawnofvictorynft" }, { name: "Email", url: "mailto:info@dawnofvictory.io" }, { name: "Top 100 Holders", url: "https://wax.bloks.io/tokens/DOVX-wax-dovvaultfort" }, { name: "Nefty Blends", url: "https://neftyblocks.com/c/dovdivisions/blends" }, { name: "Whimsical Info", url: "https://whimsical.com/dawn-of-victory-marketing-NgpNonWnGyLUqosCRRJ5Ng@3CRerdhrAvzbxBHgLbRvGZoU" } ], markets: [ { name: "DOVX (Swap)", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" }, { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" }, { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" }, { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" }, { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" }, { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V352'; const LOG_STORAGE_KEY = 'DOV_LOGS_V352';
+    const STORAGE_KEY = 'DOV_DATA_V353'; const LOG_STORAGE_KEY = 'DOV_LOGS_V353';
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
     const AA_API = "https://wax.api.atomicassets.io";
     
@@ -307,12 +319,11 @@
 
     const SMART_ZONES_BIBLE = { 1: { name:"Beach 1", cost:1160, win:400, minW:9.66, maxW:13.92, req:[] }, 2: { name:"Beach 2", cost:6968, win:2405, minW:17.50, maxW:27.29, req:[871036] }, 3: { name:"Beach 3", cost:8800, win:3037, minW:35.00, maxW:54.59, req:[871037] }, 4: { name:"Bunker", cost:11120, win:3838, minW:69.99, maxW:108.53, req:[296767, 295956, 871038] }, 5: { name:"Forest 1", cost:14024, win:4840, minW:139.99, maxW:218.35, req:[296767, 296754, 871039, 401181] }, 6: { name:"Forest 2", cost:17704, win:6110, minW:255.18, maxW:341.18, req:[296768, 296754, 871041, 401181] }, 7: { name:"Forest 3", cost:22352, win:7714, minW:450.00, maxW:450.00, req:[296768, 296754, 871043, 401181] }, 8: { name:"Camp", cost:28220, win:9739, minW:382.78, maxW:511.76, req:[296768, 298537, 296761, 871045, 401182] }, 9: { name:"Hill 1", cost:37052, win:12788, minW:415.82, maxW:694.78, req:[296768, 298537, 298529, 871048, 401182] }, 10: { name:"Hill 2", cost:48652, win:16791, minW:519.82, maxW:868.55, req:[296769, 298537, 298529, 871049, 401182] }, 11: { name:"Hill 3", cost:64516, win:22266, minW:649.77, maxW:1085.69, req:[296769, 298539, 298529, 871051, 401184] }, 12: { name:"Radar", cost:84712, win:29236, minW:812.17, maxW:1357.04, req:[296770, 298539, 871052, 298548, 401184] }, 13: { name:"Plain 1", cost:99384, win:34300, minW:1298.56, maxW:1696.33, req:[296770, 298539, 871053, 298548, 401184] }, 14: { name:"Plain 2", cost:125708, win:43385, minW:1428.32, maxW:1865.84, req:[296770, 298541, 871054, 298549, 401187] }, 15: { name:"Plain 3", cost:151164, win:52171, minW:1570.79, maxW:2051.96, req:[296770, 298541, 871055, 298553, 401187] }, 16: { name:"HQ", cost:188000, win:64884, minW:1728.29, maxW:2494.23, req:[296770, 298543, 871057, 298551, 401187] }, 17: { name:"City 1", cost:1664, win:0, minW:69.99, maxW:108.53, req:[871058, 645495, 645444, 645455, 645463] }, 18: { name:"City 2", cost:4448, win:0, minW:382.78, maxW:511.76, req:[871059, 645504, 645450, 645469, 645485] }, 19: { name:"City 3", cost:13440, win:0, minW:812.17, maxW:1357.04, req:[871060, 645500, 645457, 645482, 649646] }, 20: { name:"Bridge", cost:29856, win:0, minW:1728.29, maxW:2494.23, req:[871061, 297681, 649648, 645465, 645464] } };
 
-    const ZONE_BG_MAP = { 1: "beach", 2: "beach", 3: "beach", 4: "mil", 5: "forest", 6: "forest", 7: "forest", 8: "camp", 9: "hill", 10: "hill", 11: "hill", 12: "mil", 13: "plain", 14: "plain", 15: "plain", 16: "mil", 17: "city", 18: "city", 19: "city", 20: "bridge" };
     const REQ_DICT = { "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" }, "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" }, "871038": { n: "🔑 KEY BUNKER", r: "r-rare" }, "871039": { n: "🔑 KEY FOREST 1", r: "r-rare" }, "871041": { n: "🔑 KEY FOREST 2", r: "r-rare" }, "871043": { n: "🔑 KEY FOREST 3", r: "r-rare" }, "871045": { n: "🔑 KEY CAMP", r: "r-rare" }, "871048": { n: "🔑 KEY HILL 1", r: "r-rare" }, "871049": { n: "🔑 KEY HILL 2", r: "r-rare" }, "871051": { n: "🔑 KEY HILL 3", r: "r-rare" }, "871052": { n: "🔑 KEY RADAR", r: "r-rare" }, "871053": { n: "🔑 KEY PLAIN 1", r: "r-rare" }, "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" }, "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" }, "871057": { n: "🔑 KEY HQ", r: "r-rare" }, "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" }, "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" }, "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" }, "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" }, "296767": { n: "🛠️ ENGINEER", r: "r-epic" }, "296768": { n: "🛠️ ENGINEER II", r: "r-epic" }, "296769": { n: "🛠️ ENGINEER III", r: "r-leg" }, "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" }, "401181": { n: "🏹 RANGER", r: "r-rare" }, "401182": { n: "🧗 CLIMBER", r: "r-epic" }, "401184": { n: "📡 TECH", r: "r-epic" }, "401187": { n: "🎖️ GENERAL", r: "r-leg" }, "295956": { n: "⚙️ PART A", r: "r-common" }, "296754": { n: "⚙️ PART B", r: "r-common" }, "298537": { n: "⚙️ PART C", r: "r-common" }, "296761": { n: "⚙️ PART D", r: "r-common" }, "298529": { n: "⚙️ PART E", r: "r-common" }, "298539": { n: "⚙️ PART F", r: "r-common" }, "298548": { n: "⚙️ PART G", r: "r-common" }, "298541": { n: "⚙️ PART H", r: "r-common" }, "298549": { n: "⚙️ PART I", r: "r-common" }, "298553": { n: "⚙️ PART J", r: "r-common" }, "298543": { n: "⚙️ PART K", r: "r-common" }, "298551": { n: "⚙️ PART L", r: "r-common" }, "645495": { n: "📜 PERMIT A", r: "r-common" }, "645444": { n: "📜 PERMIT B", r: "r-common" }, "645455": { n: "📜 PERMIT C", r: "r-common" }, "645463": { n: "📜 PERMIT D", r: "r-common" }, "645504": { n: "📜 PERMIT E", r: "r-common" }, "645450": { n: "📜 PERMIT F", r: "r-common" }, "645469": { n: "📜 PERMIT G", r: "r-common" }, "645485": { n: "📜 PERMIT H", r: "r-common" }, "645500": { n: "📜 PERMIT I", r: "r-common" }, "645457": { n: "📜 PERMIT J", r: "r-common" }, "645482": { n: "📜 PERMIT K", r: "r-common" }, "649646": { n: "📜 PERMIT L", r: "r-common" }, "297681": { n: "📜 PERMIT M", r: "r-common" }, "649648": { n: "📜 PERMIT N", r: "r-common" }, "645465": { n: "📜 PERMIT O", r: "r-common" }, "645464": { n: "📜 PERMIT P", r: "r-common" } };
 
-    // --- ADDED: ASSET FAMILIES FOR CONTEXT ---
+    // --- ADDED: ASSET HIERARCHY ---
     const ASSET_FAMILIES = {
-        "ENGINEER": [296767, 296768, 296769, 296770], // I, II, III, IV
+        "ENGINEER": [296767, 296768, 296769, 296770],
         "RANGER": [401181], 
         "CLIMBER": [401182],
         "TECH": [401184],
@@ -330,7 +341,7 @@
     let runtimeWalletSet = new Set(); 
     let currentChartMode = 'pnl';
     
-    // --- ADDED: Image Cache & Audit Vars ---
+    // --- ADDED: VARS ---
     let imageCache = {};
     let inactiveAssetsLog = [];
 
@@ -341,14 +352,16 @@
         const local = localStorage.getItem(STORAGE_KEY);
         if(local) { try { let loaded = JSON.parse(local); DATA = { ...DEFAULT_DATA, ...loaded, templates: { ...DEFAULT_DATA.templates, ...loaded.templates } }; if(loaded.ecoStats) { ecoStats = loaded.ecoStats; if(!ecoStats.burns) ecoStats.burns = {F:0, H:0, R:0, S:0}; } } catch(e){} }
         let count = 0; Object.values(DATA.templates).forEach(t => count += Object.keys(t).length); if(getId('dictSize')) getId('dictSize').innerText = count;
-        startClock(); startMonitoringRoutine(); buildUI(); renderTicker(); updateEcoUI(); 
+        
+        buildUI(); 
+        startClock(); startMonitoringRoutine(); renderTicker(); updateEcoUI(); 
         
         // --- ADDED: Preload ---
         preloadImages();
         
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V352 Patch Reconciliation.");
+        log("Ready. Mode: V353 Patch Reconciliation.");
     }
     
     // --- ADDED: Context Window ---
@@ -374,7 +387,7 @@
     function copyIds(idsString) { try { let clean = idsString.replace(/[\[\]"]/g, ''); navigator.clipboard.writeText(clean).then(() => { alert("IDs copiés !"); }); } catch(e) { navigator.clipboard.writeText(idsString).then(() => { alert("IDs copiés !"); }); } }
 
     function levenshtein(a, b) { if(a.length === 0) return b.length; if(b.length === 0) return a.length; const matrix = []; for(let i = 0; i <= b.length; i++){ matrix[i] = [i]; } for(let j = 0; j <= a.length; j++){ matrix[0][j] = j; } for(let i = 1; i <= b.length; i++){ for(let j = 1; j <= a.length; j++){ if(b.charAt(i-1) == a.charAt(j-1)){ matrix[i][j] = matrix[i-1][j-1]; } else { matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); } } } return matrix[b.length][a.length]; }
-    function getLevenshtein(a,b) { return levenshtein(a,b); } // V336 needs this
+    function getLevenshtein(a,b) { return levenshtein(a,b); }
     function showSybilView() { switchView('viewSybil'); }
     async function fetchWithTimeout(url, options = {}, timeout = 3000) { const controller = new AbortController(); const id = setTimeout(() => controller.abort(), timeout); const config = { ...options, signal: controller.signal }; try { const response = await fetch(url, config); clearTimeout(id); return response; } catch (error) { clearTimeout(id); throw error; } }
     async function fetchHistoryCluster(endpoint) { let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let res = await fetchWithTimeout(shuffled[i] + endpoint, { method: 'GET' }, 3000); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("HISTORY NODES BUSY"); }
@@ -389,11 +402,10 @@
     function switchChart(mode) { currentChartMode = mode; document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); renderStatsUI(); }
     function showStatsView() { switchView('viewStats'); renderStatsUI(); }
     function renderStatsUI() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]").reverse(); let html = ""; logs.forEach(l => { let date = new Date(l.timestamp).toLocaleString('fr-FR'); let color = l.type === "MANUAL" ? "var(--purple)" : "#666"; let rev = l.revenue_usd || 0; let cost = l.cost_usd || 0; let net = l.profit_usd || 0; let ast = l.assets_count || 0; html += `<div class="dt-grid dt-row" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell" style="color:#fff">${date}</div><div class="cell" style="color:${color}; font-weight:bold;">${l.type}</div><div class="cell c-right" style="color:var(--green)">$${rev.toFixed(2)}</div><div class="cell c-right" style="color:var(--orange)">$${cost.toFixed(2)}</div><div class="cell c-right" style="color:${net>=0?'var(--blue)':'var(--red)'}">$${net.toFixed(2)}</div><div class="cell c-right">${ast}</div></div>`; }); getId('logTable').innerHTML = html; if(logs.length > 0) { let last = logs[0]; let prev = logs.length > 1 ? logs[1] : last; let diff = last.profit_usd - prev.profit_usd; let trend = diff >= 0 ? "UP" : "DOWN"; getId('financialInsight').innerText = `LATEST: Profit $${last.profit_usd?.toFixed(2)} (${trend} $${Math.abs(diff).toFixed(2)}). Margin: ${((last.profit_usd/last.revenue_usd)*100).toFixed(1)}%.`; } if(logs.length < 2) return; let cvs = getId('analyticsChart'); let ctx = cvs.getContext('2d'); let w = cvs.width = cvs.parentElement.offsetWidth; let h = cvs.height = cvs.parentElement.offsetHeight; ctx.fillStyle = "#08080a"; ctx.fillRect(0,0,w,h); let data = logs.slice(0, 30).reverse(); if(data.length < 2) return; let maxVal = 0; data.forEach(d => { if(currentChartMode === 'pnl') maxVal = Math.max(maxVal, d.profit_usd || 0); if(currentChartMode === 'scissors') maxVal = Math.max(maxVal, d.revenue_usd || 0); if(currentChartMode === 'tvl') maxVal = Math.max(maxVal, d.assets_count || 0); }); maxVal = maxVal * 1.1; ctx.strokeStyle = "#222"; ctx.beginPath(); for(let i=0; i<5; i++) { let y = i*(h/4); ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); let step = w / (data.length - 1); if(currentChartMode === 'pnl') { ctx.fillStyle = "rgba(41, 121, 255, 0.2)"; ctx.strokeStyle = "#2979ff"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let val = d.profit_usd || 0; let x = i * step; let y = h - ((val / maxVal) * h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill(); } else if (currentChartMode === 'scissors') { ctx.strokeStyle = "#00f090"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.revenue_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); ctx.strokeStyle = "#ff3b30"; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.cost_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); } else if (currentChartMode === 'tvl') { ctx.fillStyle = "#ff9100"; let barW = (w / data.length) - 2; data.forEach((d, i) => { let hBar = ((d.assets_count||0) / maxVal) * h; ctx.fillRect(i*step, h - hBar, barW, hBar); }); } }
-    function exportLogs() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; } let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n"; logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click(); }
     function findTemplate(tid) { if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' }; if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' }; if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' }; if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' }; return null; }
     async function fetchSmartCluster(endpoint, body) { let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("CLUSTER UNREACHABLE"); }
     
-    // --- ADDED PRELOADER FOR V352 ---
+    // --- ADDED PRELOADER FOR V353 ---
     async function preloadImages() {
         log("Initialisation des visuels...");
         let uniqueIds = new Set();
