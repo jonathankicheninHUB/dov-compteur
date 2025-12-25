@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V335 (SYBIL COMMAND)</title>
+    <title>DoV - COMMAND V336 (SYBIL PRO)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -135,35 +135,41 @@
         .xray-table th { text-align:left; color:#888; font-size:9px; border-bottom:1px solid #333; padding:5px; }
         .xray-table td { color:#ccc; font-size:10px; border-bottom:1px solid #222; padding:5px; }
         .sybil-ctrl { background:#150000; border:1px solid var(--red); flex-direction:column; }
-        .sybil-res { display:block; margin-top:20px; } /* Changed from grid to block for sections */
+        .sybil-res { display:block; margin-top:20px; }
         
-        /* NEW SYBIL LAYOUT V335 */
+        /* NEW SYBIL LAYOUT V336 */
         .sybil-section { margin-bottom: 25px; }
         .sybil-sec-title { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; }
         
-        /* CLUSTER BOX (RED) */
-        .cluster-box { background: rgba(255, 59, 48, 0.05); border: 1px solid var(--red); border-radius: 4px; padding: 10px; margin-bottom: 10px; }
-        .cluster-head { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: var(--font-num); }
-        .cluster-name { color: var(--red); font-weight: bold; font-size: 12px; }
-        .cluster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        /* CLUSTER BOX (COMPACT & SCROLLABLE) */
+        .cluster-box { background: rgba(255, 59, 48, 0.03); border: 1px solid var(--red); border-radius: 4px; margin-bottom: 15px; }
+        .cluster-head { padding: 8px 10px; background: rgba(255, 59, 48, 0.1); border-bottom: 1px solid rgba(255, 59, 48, 0.2); display: flex; justify-content: space-between; font-family: var(--font-num); font-weight: bold; color: var(--red); font-size: 11px; }
+        .cluster-body { max-height: 200px; overflow-y: auto; padding: 5px; }
+        .cluster-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #221111; font-size: 10px; align-items: center; }
+        .cluster-item:last-child { border-bottom: none; }
+        .cluster-item:hover { background: #221111; }
         
-        /* RISK ROW (ORANGE/RED) */
-        .risk-row { display: flex; align-items: center; justify-content: space-between; background: #190a0a; border: 1px solid #442222; padding: 8px; margin-bottom: 5px; border-radius: 4px; font-family: var(--font-num); font-size: 10px; }
-        .risk-row.funnel { border-color: var(--red); }
-        .risk-row:hover { background: #221111; }
+        /* RISK ROW */
+        .risk-row { display: flex; align-items: center; justify-content: space-between; background: #190a0a; border: 1px solid #442222; padding: 6px 10px; margin-bottom: 4px; border-radius: 3px; font-family: var(--font-num); font-size: 10px; }
+        .risk-row:hover { background: #2b1111; }
         
-        /* SAFE LIST (COMPACT) */
-        .safe-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-        .safe-item { background: #111; border: 1px solid #222; padding: 3px 8px; border-radius: 3px; font-size: 10px; color: #666; font-family: var(--font-num); }
+        /* SAFE LIST */
+        .safe-grid { display: flex; flex-wrap: wrap; gap: 5px; max-height: 150px; overflow-y: auto; }
+        .safe-item { background: #111; border: 1px solid #222; padding: 3px 8px; border-radius: 3px; font-size: 9px; color: #555; font-family: var(--font-num); text-decoration: none; transition: 0.2s; }
         .safe-item:hover { color: var(--green); border-color: var(--green); }
         
+        a.wallet-link { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; }
+        a.wallet-link:hover { color: var(--blue); border-bottom-color: var(--blue); }
+        
+        /* INPUT STYLE FOR SCAN LIMIT */
+        .scan-input { background: #000; border: 1px solid #444; color: #fff; padding: 8px; width: 80px; text-align: center; border-radius: 4px; font-family: var(--font-num); margin-right: 10px; }
     </style>
 </head>
 <body>
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V335</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V336</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -176,7 +182,7 @@
             <span class="grp-lbl">PROJECT INTELLIGENCE</span>
             <button class="btn-ghost" style="color:#fff; border-color:#555;" onclick="openDataRoom()">DATA ROOM</button>
             <button class="btn-ghost" style="color:var(--purple); border-color:var(--purple); margin-top:5px;" onclick="showXrayView()">X-RAY SCANNER</button>
-            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL COMMAND</button>
+            <button class="btn-red" style="margin-top:5px;" onclick="showSybilView()">SYBIL PRO</button>
         </div>
 
         <div class="control-group">
@@ -193,7 +199,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V335. Sybil Command.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V336. Sybil Pro.</div></div>
     </aside>
 
     <main class="main-content">
@@ -208,15 +214,19 @@
         
         <div id="viewSybil" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--red)">
-                <div><h2 class="page-h1" style="color:var(--red)">SYBIL COMMAND</h2><div class="page-meta">THREAT INTELLIGENCE</div></div>
+                <div><h2 class="page-h1" style="color:var(--red)">SYBIL PRO</h2><div class="page-meta">THREAT INTELLIGENCE</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
             </div>
             <div class="sybil-ctrl">
                 <div style="color:#fff; font-weight:bold; margin-bottom:5px;">AUTOMATED SWEEP</div>
-                <div style="font-size:11px; color:#ccc; margin-bottom:10px;">Deep scan analysis with hierarchical grouping.</div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-red" onclick="runAutoSybilScan()">LAUNCH FULL SCAN (TOP 50)</button>
-                    <div id="sybilProgress" style="color:var(--orange); font-family:var(--font-num); align-self:center;"></div>
+                <div style="font-size:11px; color:#ccc; margin-bottom:10px;">Deep scan analysis with hierarchical grouping & manual limit.</div>
+                <div style="display:flex; align-items:center;">
+                    <div style="margin-right:10px;">
+                        <span class="grp-lbl" style="display:block; margin-bottom:2px;">LIMIT</span>
+                        <input type="number" id="scanLimit" class="scan-input" value="50" min="10" max="500">
+                    </div>
+                    <button class="btn-red" style="height:34px; margin-top:12px;" onclick="runAutoSybilScan()">LAUNCH SCAN</button>
+                    <div id="sybilProgress" style="color:var(--orange); font-family:var(--font-num); margin-left:15px; margin-top:12px;"></div>
                 </div>
             </div>
             <div id="sybilResults" class="sybil-res"></div>
@@ -379,8 +389,8 @@
         contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] 
     };
 
-    const STORAGE_KEY = 'DOV_DATA_V335';
-    const LOG_STORAGE_KEY = 'DOV_LOGS_V335';
+    const STORAGE_KEY = 'DOV_DATA_V336';
+    const LOG_STORAGE_KEY = 'DOV_LOGS_V336';
     const AA_API = "https://wax.api.atomicassets.io";
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
 
@@ -542,7 +552,7 @@
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { 
             getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); 
         }
-        log("Ready. Mode: V335 Sybil Command.");
+        log("Ready. Mode: V336 Sybil Pro.");
     }
 
     // --- RESTORED AUDIT FUNCTIONS (V330 FIX) ---
@@ -603,11 +613,50 @@
         return matrix[b.length][a.length];
     }
     
-    // UPDATED V335: HIERARCHICAL RENDERING
+    // UPDATED V336: RESILIENT FETCH (CORS/TIMEOUT)
+    async function fetchWithTimeout(url, options = {}, timeout = 3000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        const config = { ...options, signal: controller.signal };
+        try {
+            const response = await fetch(url, config);
+            clearTimeout(id);
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+            throw error;
+        }
+    }
+
+    // UPDATED V336: ROBUST CLUSTER FETCH (ANTI-CORS)
+    async function fetchHistoryCluster(endpoint) {
+        let nodes = HYPERION_NODES; 
+        // Shuffle nodes to distribute load
+        let shuffled = [...nodes].sort(() => 0.5 - Math.random());
+        
+        for(let i=0; i<shuffled.length; i++) { 
+            try { 
+                let res = await fetchWithTimeout(shuffled[i] + endpoint, { method: 'GET' }, 3000); 
+                if(res.ok) return await res.json(); 
+            } catch(e) { 
+                // Silent fail: move to next node immediately
+                // console.log("Node busy or CORS:", shuffled[i]); 
+            } 
+        }
+        throw new Error("HISTORY NODES BUSY");
+    }
+
+    // UPDATED V336: MANUAL LIMIT & PRO LIST
     async function runAutoSybilScan() {
         if(runtimeWalletSet.size === 0) { alert("Please run a standard scan first to find players."); return; }
-        let suspects = Array.from(runtimeWalletSet).slice(0, 50); 
-        getId('sybilResults').innerHTML = `<div style="color:#fff; text-align:center; padding:20px; border:1px solid #333; background:#000;">SCANNING IN PROGRESS... PLEASE WAIT.</div>`;
+        
+        // V336: READ USER LIMIT
+        let limitInput = parseInt(getId('scanLimit').value);
+        if(isNaN(limitInput) || limitInput < 1) limitInput = 50;
+        if(limitInput > 100) { if(!confirm("Scanning > 100 wallets might take a few minutes. Continue?")) return; }
+
+        let suspects = Array.from(runtimeWalletSet).slice(0, limitInput); 
+        getId('sybilResults').innerHTML = `<div style="color:#fff; text-align:center; padding:20px; border:1px solid #333; background:#000;">INITIALIZING SCAN ON ${suspects.length} WALLETS...</div>`;
         
         let reportData = [];
         let count = 0;
@@ -623,17 +672,19 @@
             let similarTo = null;
 
             try {
-                // API Calls
+                // API Calls with new fetchWithTimeout
                 try {
                     let resC = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio:newaccount&limit=1`);
                     if(resC && resC.actions.length > 0) creator = resC.actions[0].act.data.creator;
                 } catch(e) { creator = "N/A"; }
                 
-                let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=20&sort=desc`);
-                if(resF && resF.actions) {
-                    let lastOut = resF.actions.find(a => a.act.data.from === target);
-                    if(lastOut) funnel = lastOut.act.data.to;
-                }
+                try {
+                    let resF = await fetchHistoryCluster(`/v2/history/get_actions?account=${target}&filter=eosio.token:transfer&limit=20&sort=desc`);
+                    if(resF && resF.actions) {
+                        let lastOut = resF.actions.find(a => a.act.data.from === target);
+                        if(lastOut) funnel = lastOut.act.data.to;
+                    }
+                } catch(e) { funnel = "Unknown (API Error)"; }
                 
                 isRiskFunnel = (funnel !== "None" && !WHITELIST.includes(funnel));
 
@@ -650,7 +701,7 @@
                 }
                 
                 reportData.push({ target, creator, funnel, isRiskFunnel, similarTo });
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 600)); // Maintain polite delay
 
             } catch(e) { console.log(e); }
         }
@@ -660,19 +711,13 @@
     }
 
     function renderSybilReport(data) {
-        // 1. Group by Cluster (using similarTo as link)
         let clusters = {}; 
         let risks = [];
         let safe = [];
         let processed = new Set();
 
-        // Pass 1: Build Clusters
         data.forEach(d => {
             if(d.similarTo) {
-                // Simplified clustering: just group by the "similarTo" key if not exists, or self
-                // Finding a common root is hard in O(n), so we bucket by the first match
-                let key = d.target < d.similarTo ? d.target : d.similarTo;
-                // Actually, let's group by "Pattern Name" (first 4-5 chars)
                 let prefix = d.target.substring(0, 5); 
                 if(!clusters[prefix]) clusters[prefix] = [];
                 clusters[prefix].push(d);
@@ -680,26 +725,35 @@
             }
         });
 
-        // Pass 2: Sort remaining
         data.forEach(d => {
             if(processed.has(d.target)) return;
             if(d.isRiskFunnel) risks.push(d);
             else safe.push(d);
         });
 
-        // RENDER HTML
+        // RENDER HTML V336
         let html = "";
 
-        // SECTION 1: CLUSTERS
-        let clusterKeys = Object.keys(clusters).filter(k => clusters[k].length > 1); // Only real groups
+        // SECTION 1: CLUSTERS (COMPACT & SCROLLABLE)
+        let clusterKeys = Object.keys(clusters).filter(k => clusters[k].length > 1); 
         if(clusterKeys.length > 0) {
             html += `<div class="sybil-section"><div class="sybil-sec-title">🔴 HIGH PRIORITY CLUSTERS</div>`;
             clusterKeys.forEach(k => {
-                html += `<div class="cluster-box"><div class="cluster-head"><span class="cluster-name">PATTERN: ${k.toUpperCase()}...</span><span>${clusters[k].length} WALLETS</span></div><div class="cluster-grid">`;
+                html += `<div class="cluster-box">
+                    <div class="cluster-head">
+                        <span>PATTERN: ${k.toUpperCase()}...</span>
+                        <span>${clusters[k].length} WALLETS</span>
+                    </div>
+                    <div class="cluster-body">`;
+                
                 clusters[k].forEach(w => {
-                    html += `<div style="background:#220000; padding:5px; border-radius:3px; font-size:10px; color:#fff;">
-                        <div style="font-weight:bold">${w.target}</div>
-                        <div style="color:#666; font-size:9px;">To: ${w.funnel}</div>
+                    html += `<div class="cluster-item">
+                        <div style="width:140px; font-weight:bold; color:#fff;">
+                            <a href="https://waxblock.io/account/${w.target}" target="_blank" class="wallet-link">🔗 ${w.target}</a>
+                        </div>
+                        <div style="flex:1; text-align:right; color:#888;">
+                            To: <span style="color:var(--red); font-weight:bold;">${w.funnel}</span>
+                        </div>
                     </div>`;
                 });
                 html += `</div></div>`;
@@ -711,9 +765,9 @@
         if(risks.length > 0) {
             html += `<div class="sybil-section"><div class="sybil-sec-title" style="color:var(--orange)">🟠 SUSPICIOUS ACTIVITY</div>`;
             risks.forEach(r => {
-                html += `<div class="risk-row funnel">
-                    <span style="color:#fff; font-weight:bold; width:120px;">${r.target}</span>
-                    <span style="color:#888;">Creator: ${r.creator}</span>
+                html += `<div class="risk-row">
+                    <span style="width:140px; font-weight:bold;"><a href="https://waxblock.io/account/${r.target}" target="_blank" class="wallet-link" style="color:#fff;">🔗 ${r.target}</a></span>
+                    <span style="color:#666; font-size:9px;">Creator: ${r.creator}</span>
                     <span style="color:var(--red);"> ➔ ${r.funnel}</span>
                 </div>`;
             });
@@ -724,18 +778,12 @@
         if(safe.length > 0) {
             html += `<div class="sybil-section"><div class="sybil-sec-title" style="color:var(--green); border-color:#223322;">🟢 CLEARED (${safe.length})</div><div class="safe-grid">`;
             safe.forEach(s => {
-                html += `<div class="safe-item" title="To: ${s.funnel}">${s.target}</div>`;
+                html += `<a href="https://waxblock.io/account/${s.target}" target="_blank" class="safe-item" title="To: ${s.funnel}">${s.target}</a>`;
             });
             html += `</div></div>`;
         }
 
         getId('sybilResults').innerHTML = html;
-    }
-
-    async function fetchHistoryCluster(endpoint) {
-        let nodes = HYPERION_NODES; let shuffled = [...nodes].sort(() => 0.5 - Math.random());
-        for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 5000); let res = await fetch(shuffled[i] + endpoint, { method: 'GET', signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } }
-        throw new Error("HISTORY NODES BUSY");
     }
 
     // --- STANDARD FUNCTIONS (Identical to V330 but kept for integrity) ---
