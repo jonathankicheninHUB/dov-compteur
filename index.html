@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DoV - COMMAND V355 (SYBIL PRO + CONTEXT FIX)</title>
+    <title>DoV - COMMAND V356 (FINAL STABLE)</title>
     <style>
         :root {
             --bg-app: #0b0c10; --bg-panel: #13141b; --bg-header: #1c1d26; --border: #2d2e3a;
@@ -71,7 +71,7 @@
         .c-center { text-align: center; justify-content: center; }
         .zones-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         
-        /* CARD STYLES V336 - PRESERVED EXACTLY */
+        /* ZONE CARD STYLES V336 - PRESERVED */
         .zone-card { background-color: var(--bg-panel); background-size: cover; background-position: center; border: 1px solid var(--border); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; height: 160px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
         .zone-card::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(19,20,27,0.95) 0%, rgba(19,20,27,0.7) 50%, rgba(19,20,27,0.95) 100%); z-index: 1; pointer-events: none; }
         .zc-top, .zc-mid, .zc-bot { z-index: 2; position: relative; }
@@ -128,7 +128,8 @@
         .badge-named { display:inline-flex; align-items:center; margin-right:4px; margin-bottom:4px; padding: 3px 8px; border-radius:4px; font-family: var(--font-num); font-size:9px; font-weight:bold; text-transform: uppercase; cursor:pointer; transition:0.2s; text-decoration: none; color:#fff; background: rgba(0,0,0,0.6); border: 1px solid #444; text-shadow: 0 1px 2px #000; }
         .badge-named:hover { filter: brightness(1.3); transform:translateY(-1px); }
         .r-common { border-color: var(--r-common); color: var(--r-common); } .r-rare { border-color: var(--r-rare); color: var(--r-rare); } .r-epic { border-color: var(--r-epic); color: var(--r-epic); } .r-leg { border-color: var(--r-leg); color: var(--r-leg); }
-        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid var(--blue); color:var(--blue); display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; }
+        .badge-weight { font-size:9px; padding:2px 4px; border-radius:3px; background:rgba(0,0,0,0.6); border:1px solid #444; color:#fff; display:inline-block; font-family:var(--font-num); vertical-align:middle; margin-right:4px; }
+        
         .badge-req { display:inline-flex; align-items:center; margin-right:4px; cursor:pointer; transition:0.2s; }
         .badge-req:hover { transform:scale(1.1); }
         .badge-req img { width:25px; height:25px; border-radius:4px; border:1px solid var(--purple); background:#000; object-fit:cover; }
@@ -156,7 +157,6 @@
         .safe-grid { display: flex; flex-wrap: wrap; gap: 5px; max-height: 150px; overflow-y: auto; }
         .safe-item { background: #111; border: 1px solid #222; padding: 3px 8px; border-radius: 3px; font-size: 9px; color: #555; font-family: var(--font-num); text-decoration: none; transition: 0.2s; }
         .safe-item:hover { color: var(--green); border-color: var(--green); }
-        
         .scan-input { background: #000; border: 1px solid #444; color: #fff; padding: 8px; width: 80px; text-align: center; border-radius: 4px; font-family: var(--font-num); margin-right: 10px; }
         a.wallet-link { color: inherit; text-decoration: none; border-bottom: 1px dotted #444; transition: 0.2s; }
         a.wallet-link:hover { color: var(--blue); border-bottom-color: var(--blue); }
@@ -166,7 +166,7 @@
 <div id="error-banner"></div>
 <div class="layout">
     <aside class="sidebar">
-        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V355</span></div>
+        <div class="app-title"><div class="status-dot"></div> DOV COMMAND <span style="opacity:0.5; font-weight:400;">V356</span></div>
         <div class="control-group">
             <span class="grp-lbl">OPERATIONS</span>
             <div class="btn-row"><button class="btn-green" onclick="dispatchGlobalScan()">BÂTIMENTS</button></div>
@@ -196,7 +196,7 @@
             <div style="display:flex; justify-content:space-between; font-size:10px; color:#666;"><span>DB</span> <span id="dictSize" style="color:#fff">0</span></div>
             <button class="btn-ghost" style="color:var(--red); border-color:var(--red);" onclick="hardReset()">FACTORY RESET</button>
         </div>
-        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V355. Fixed & Aligned.</div></div>
+        <div class="console-log" id="sysLog"><div class="log-entry"><span class="log-time">SYS:</span>V356. Final Stable.</div></div>
     </aside>
 
     <main class="main-content">
@@ -211,7 +211,7 @@
         
         <div id="viewZones" class="view-section">
             <div class="dashboard-header" style="border-left: 4px solid var(--blue)">
-                <div><h2 class="page-h1">CARTE DIVISIONS</h2><div class="page-meta">UNITS: <span id="zTotalDivsHeader">0</span></div></div>
+                <div><h2 class="page-h1">STAKED ASSET ALLOCATION</h2><div class="page-sub">Deployment vectors & strategic yield generation zones. Real-time asset tracking.</div></div>
                 <div class="sys-clock"><span class="clock-copy"></span></div>
                 <div class="total-cost"><div class="grp-lbl">CONSOMMATION DU DOVX 24H00</div><div style="font-family:var(--font-num); font-size:14px; font-weight:800; margin-top:4px;"><span class="tc-f">FUEL <span id="gBurnF">0</span></span> | <span class="tc-h">HEALTH <span id="gBurnH">0</span></span> | <span class="tc-r">REPAIR <span id="gBurnR">0</span></span> | <span class="tc-s">SUPPLY <span id="gBurnS">0</span></span></div><div style="text-align:right; margin-top:5px; font-size:11px; color:var(--purple); font-weight:bold;">CITY DOVX BURN: <span id="gCityBurn">0</span></div></div>
             </div>
@@ -306,7 +306,7 @@
     const SYBIL_WHITELIST = ['alcordexmain', 'eosio.stake', 'atomicmarket', 'waxapps', 'farmersworld', 'alien.worlds', 'cpu4', 'blenderizerx', 'neftyblocksd', 'dovutilstake'];
     const PROJECT_DATA = { links: [ { name: "Official Website", url: "https://dawnofvictory.io/" }, { name: "Whitepaper", url: "https://dawn-of-victory.gitbook.io/dov/" }, { name: "Beta Access", url: "https://beta.dawnofvictory.io/" }, { name: "Twitter", url: "https://twitter.com/DOVNFT" }, { name: "Telegram", url: "https://t.me/dawnofvictorynft" }, { name: "Email", url: "mailto:info@dawnofvictory.io" }, { name: "Top 100 Holders", url: "https://wax.bloks.io/tokens/DOVX-wax-dovvaultfort" }, { name: "Nefty Blends", url: "https://neftyblocks.com/c/dovdivisions/blends" }, { name: "Whimsical Info", url: "https://whimsical.com/dawn-of-victory-marketing-NgpNonWnGyLUqosCRRJ5Ng@3CRerdhrAvzbxBHgLbRvGZoU" } ], markets: [ { name: "DOVX (Swap)", url: "https://wax.alcor.exchange/swap?output=DOVX-dovvaultfort&input=WAX-eosio.token" }, { name: "DOVX / WAX", url: "https://alcor.exchange/trade/dovx-dovvaultfort_wax-eosio.token" }, { name: "DOVF / WAX", url: "https://wax.alcor.exchange/trade/dovf-dovvaultfort_wax-eosio.token" }, { name: "DOVH / WAX", url: "https://wax.alcor.exchange/trade/dovh-dovvaultfort_wax-eosio.token" }, { name: "DOVR / WAX", url: "https://wax.alcor.exchange/trade/dovr-dovvaultfort_wax-eosio.token" }, { name: "DOVS / WAX", url: "https://wax.alcor.exchange/trade/dovs-dovvaultfort_wax-eosio.token" } ], contracts: [ "dovutilstake", "dovpvecontrl", "dawnfvictory", "atomicdropsx", "neftyblocksd" ] };
 
-    const STORAGE_KEY = 'DOV_DATA_V355'; const LOG_STORAGE_KEY = 'DOV_LOGS_V355';
+    const STORAGE_KEY = 'DOV_DATA_V356'; const LOG_STORAGE_KEY = 'DOV_LOGS_V356';
     const HYPERION_NODES = [ "https://wax.eosrio.io", "https://wax.greymass.com", "https://api.waxsweden.org", "https://wax.eu.eosamsterdam.net" ];
     const AA_API = "https://wax.api.atomicassets.io";
     
@@ -323,14 +323,13 @@
 
     const REQ_DICT = { "871036": { n: "🔑 KEY BEACH 2", r: "r-rare" }, "871037": { n: "🔑 KEY BEACH 3", r: "r-rare" }, "871038": { n: "🔑 KEY BUNKER", r: "r-rare" }, "871039": { n: "🔑 KEY FOREST 1", r: "r-rare" }, "871041": { n: "🔑 KEY FOREST 2", r: "r-rare" }, "871043": { n: "🔑 KEY FOREST 3", r: "r-rare" }, "871045": { n: "🔑 KEY CAMP", r: "r-rare" }, "871048": { n: "🔑 KEY HILL 1", r: "r-rare" }, "871049": { n: "🔑 KEY HILL 2", r: "r-rare" }, "871051": { n: "🔑 KEY HILL 3", r: "r-rare" }, "871052": { n: "🔑 KEY RADAR", r: "r-rare" }, "871053": { n: "🔑 KEY PLAIN 1", r: "r-rare" }, "871054": { n: "🔑 KEY PLAIN 2", r: "r-rare" }, "871055": { n: "🔑 KEY PLAIN 3", r: "r-rare" }, "871057": { n: "🔑 KEY HQ", r: "r-rare" }, "871058": { n: "🏙️ CITY 1 PASS", r: "r-epic" }, "871059": { n: "🏙️ CITY 2 PASS", r: "r-epic" }, "871060": { n: "🏙️ CITY 3 PASS", r: "r-epic" }, "871061": { n: "🌉 BRIDGE PASS", r: "r-leg" }, "296767": { n: "🛠️ ENGINEER", r: "r-epic" }, "296768": { n: "🛠️ ENGINEER II", r: "r-epic" }, "296769": { n: "🛠️ ENGINEER III", r: "r-leg" }, "296770": { n: "🛠️ ENGINEER IV", r: "r-leg" }, "401181": { n: "🏹 RANGER", r: "r-rare" }, "401182": { n: "🧗 CLIMBER", r: "r-epic" }, "401184": { n: "📡 TECH", r: "r-epic" }, "401187": { n: "🎖️ GENERAL", r: "r-leg" }, "295956": { n: "⚙️ PART A", r: "r-common" }, "296754": { n: "⚙️ PART B", r: "r-common" }, "298537": { n: "⚙️ PART C", r: "r-common" }, "296761": { n: "⚙️ PART D", r: "r-common" }, "298529": { n: "⚙️ PART E", r: "r-common" }, "298539": { n: "⚙️ PART F", r: "r-common" }, "298548": { n: "⚙️ PART G", r: "r-common" }, "298541": { n: "⚙️ PART H", r: "r-common" }, "298549": { n: "⚙️ PART I", r: "r-common" }, "298553": { n: "⚙️ PART J", r: "r-common" }, "298543": { n: "⚙️ PART K", r: "r-common" }, "298551": { n: "⚙️ PART L", r: "r-common" }, "645495": { n: "📜 PERMIT A", r: "r-common" }, "645444": { n: "📜 PERMIT B", r: "r-common" }, "645455": { n: "📜 PERMIT C", r: "r-common" }, "645463": { n: "📜 PERMIT D", r: "r-common" }, "645504": { n: "📜 PERMIT E", r: "r-common" }, "645450": { n: "📜 PERMIT F", r: "r-common" }, "645469": { n: "📜 PERMIT G", r: "r-common" }, "645485": { n: "📜 PERMIT H", r: "r-common" }, "645500": { n: "📜 PERMIT I", r: "r-common" }, "645457": { n: "📜 PERMIT J", r: "r-common" }, "645482": { n: "📜 PERMIT K", r: "r-common" }, "649646": { n: "📜 PERMIT L", r: "r-common" }, "297681": { n: "📜 PERMIT M", r: "r-common" }, "649648": { n: "📜 PERMIT N", r: "r-common" }, "645465": { n: "📜 PERMIT O", r: "r-common" }, "645464": { n: "📜 PERMIT P", r: "r-common" } };
 
-    // --- NEW: ASSET HIERARCHY FOR CONTEXT WINDOW (V355) ---
+    // --- ADDED: ASSET HIERARCHY ---
     const ASSET_FAMILIES = {
         "ENGINEER": [296767, 296768, 296769, 296770], // I, II, III, IV
         "RANGER": [401181], 
         "CLIMBER": [401182],
         "TECH": [401184],
         "GENERAL": [401187],
-        // City Passes Grouped
         "CITY_1": [645495, 645444, 645455, 645463],
         "CITY_2": [645504, 645450, 645469, 645485],
         "CITY_3": [645500, 645457, 645482, 649646],
@@ -366,10 +365,10 @@
 
         if(ecoStats.buildings.active > 0 && getId('gTotalCost')) { getId('gTotalCost').innerText = fmt(ecoStats.buildings.totalCost); getId('cntRows').innerText = fmt(ecoStats.buildings.active); }
         if(ecoStats.divisions.active > 0 && getId('zTotalDivsHeader')) { getId('zTotalDivsHeader').innerText = fmt(ecoStats.divisions.active); }
-        log("Ready. Mode: V355 Strict Fix.");
+        log("Ready. Mode: V356 Final Stable.");
     }
     
-    // --- NEW: CONTEXT WINDOW LOGIC V355 ---
+    // --- NEW: CONTEXT WINDOW LOGIC V356 ---
     function openReqContext(reqId) {
         event.stopPropagation();
         let info = REQ_DICT[reqId]; if (!info) return;
@@ -407,11 +406,10 @@
     function switchChart(mode) { currentChartMode = mode; document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); renderStatsUI(); }
     function showStatsView() { switchView('viewStats'); renderStatsUI(); }
     function renderStatsUI() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]").reverse(); let html = ""; logs.forEach(l => { let date = new Date(l.timestamp).toLocaleString('fr-FR'); let color = l.type === "MANUAL" ? "var(--purple)" : "#666"; let rev = l.revenue_usd || 0; let cost = l.cost_usd || 0; let net = l.profit_usd || 0; let ast = l.assets_count || 0; html += `<div class="dt-grid dt-row" style="grid-template-columns: 140px 60px 100px 100px 100px 100px;"><div class="cell" style="color:#fff">${date}</div><div class="cell" style="color:${color}; font-weight:bold;">${l.type}</div><div class="cell c-right" style="color:var(--green)">$${rev.toFixed(2)}</div><div class="cell c-right" style="color:var(--orange)">$${cost.toFixed(2)}</div><div class="cell c-right" style="color:${net>=0?'var(--blue)':'var(--red)'}">$${net.toFixed(2)}</div><div class="cell c-right">${ast}</div></div>`; }); getId('logTable').innerHTML = html; if(logs.length > 0) { let last = logs[0]; let prev = logs.length > 1 ? logs[1] : last; let diff = last.profit_usd - prev.profit_usd; let trend = diff >= 0 ? "UP" : "DOWN"; getId('financialInsight').innerText = `LATEST: Profit $${last.profit_usd?.toFixed(2)} (${trend} $${Math.abs(diff).toFixed(2)}). Margin: ${((last.profit_usd/last.revenue_usd)*100).toFixed(1)}%.`; } if(logs.length < 2) return; let cvs = getId('analyticsChart'); let ctx = cvs.getContext('2d'); let w = cvs.width = cvs.parentElement.offsetWidth; let h = cvs.height = cvs.parentElement.offsetHeight; ctx.fillStyle = "#08080a"; ctx.fillRect(0,0,w,h); let data = logs.slice(0, 30).reverse(); if(data.length < 2) return; let maxVal = 0; data.forEach(d => { if(currentChartMode === 'pnl') maxVal = Math.max(maxVal, d.profit_usd || 0); if(currentChartMode === 'scissors') maxVal = Math.max(maxVal, d.revenue_usd || 0); if(currentChartMode === 'tvl') maxVal = Math.max(maxVal, d.assets_count || 0); }); maxVal = maxVal * 1.1; ctx.strokeStyle = "#222"; ctx.beginPath(); for(let i=0; i<5; i++) { let y = i*(h/4); ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); let step = w / (data.length - 1); if(currentChartMode === 'pnl') { ctx.fillStyle = "rgba(41, 121, 255, 0.2)"; ctx.strokeStyle = "#2979ff"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let val = d.profit_usd || 0; let x = i * step; let y = h - ((val / maxVal) * h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.fill(); } else if (currentChartMode === 'scissors') { ctx.strokeStyle = "#00f090"; ctx.lineWidth = 2; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.revenue_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); ctx.strokeStyle = "#ff3b30"; ctx.beginPath(); data.forEach((d, i) => { let y = h - (((d.cost_usd||0) / maxVal) * h); if(i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y); }); ctx.stroke(); } else if (currentChartMode === 'tvl') { ctx.fillStyle = "#ff9100"; let barW = (w / data.length) - 2; data.forEach((d, i) => { let hBar = ((d.assets_count||0) / maxVal) * h; ctx.fillRect(i*step, h - hBar, barW, hBar); }); } }
-    function exportLogs() { let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); if(logs.length === 0) { alert("No logs."); return; } let csv = "TIMESTAMP,TYPE,REV_USD,COST_USD,NET_USD,ASSETS\n"; logs.forEach(r => { csv += `${r.timestamp},${r.type},${r.revenue_usd},${r.cost_usd},${r.profit_usd},${r.assets_count}\n`; }); let blob = new Blob([csv], {type:'text/csv'}); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href=url; a.download='dov_financials.csv'; a.click(); }
     function findTemplate(tid) { if(DATA.templates.FUEL[tid]) return { ...DATA.templates.FUEL[tid], type:'F' }; if(DATA.templates.HEALTH[tid]) return { ...DATA.templates.HEALTH[tid], type:'H' }; if(DATA.templates.REPAIR[tid]) return { ...DATA.templates.REPAIR[tid], type:'R' }; if(DATA.templates.SUPPLY[tid]) return { ...DATA.templates.SUPPLY[tid], type:'S' }; return null; }
     async function fetchSmartCluster(endpoint, body) { let nodes = DATA.apiConfig.rpcNodes; let shuffled = [...nodes].sort(() => 0.5 - Math.random()); for(let i=0; i<shuffled.length; i++) { try { let controller = new AbortController(); setTimeout(() => controller.abort(), 2500); let res = await fetch(shuffled[i] + endpoint, { method: 'POST', body: body, signal: controller.signal }); if(res.ok) return await res.json(); } catch(e) { } } throw new Error("CLUSTER UNREACHABLE"); }
     
-    // --- ADDED PRELOADER FOR V355 ---
+    // --- ADDED PRELOADER FOR V356 ---
     async function preloadImages() {
         log("Initialisation des visuels...");
         let uniqueIds = new Set();
